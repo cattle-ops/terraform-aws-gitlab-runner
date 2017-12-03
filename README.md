@@ -77,11 +77,14 @@ All variables and defaults:
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
 | environment | A name that indentifies the environment, will used as prefix and for taggin. | string | - | yes |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
-| runner_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
-| runner_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
-| runner_limit | Limit for the runners, will be used in the runner config.toml | string | `1` | no |
-| runner_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
-| runner_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
+| runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
+| runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
+| runners_idle_count | Idle count of the runners, will be used in the runner config.toml | string | `0` | no |
+| runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
+| runners_limit | Limit for the runners, will be used in the runner config.toml | string | `1` | no |
+| runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
+| runners_privilled | Runners will run in privilled mode, will be used in the runner config.toml | string | `true` | no |
+| runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 | ssh_key_file_pub | File contians the public key used for the gitlab-runner. | string | - | yes |
 | subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
@@ -91,10 +94,10 @@ All variables and defaults:
 
 ## Example
 
-An example is provided, execute the following steps to run the sample. Ensure your AWS and Terraform environment is set up correctly.
+An example is provided, execute the following steps to run the sample. Ensure your AWS and Terraform environment is set up correctly. All commands below are supposed to be run inside the directory `example`.
 
 ### AWS keys
-Run `example/init.sh` to create SSH keys for the runner instance.
+Run `init.sh` to create SSH keys for the runner instance.
 
 ### Configure GitLab
 Register a new runner:
@@ -116,4 +119,4 @@ terraform desroy
 ```
 
 ## Notes:
-- A user is create for the gitlab-runner / docker-machine to create ec2 instances, the permission NOT restrictive enough.
+- A user is create for the gitlab-runner / docker-machine to create ec2 instances, the permissions are NOT very restrictive.

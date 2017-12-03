@@ -72,7 +72,7 @@ data "template_file" "runners" {
 
   vars {
     aws_region = "${var.aws_region}"
-    gitlab_url = "${var.runner_gitlab_url}"
+    gitlab_url = "${var.runners_gitlab_url}"
 
     runners_vpc_id              = "${var.vpc_id}"
     runners_subnet_id           = "${var.subnet_id_runners}"
@@ -82,10 +82,13 @@ data "template_file" "runners" {
     runners_secret_key          = "${aws_iam_access_key.docker_machine_user.secret}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
 
-    runner_name            = "${var.runner_name}"
-    runner_token           = "${var.runner_token}"
-    runner_limit           = "${var.runner_limit}"
-    runner_concurrent      = "${var.runner_concurrent}"
+    runners_name           = "${var.runners_name}"
+    runners_token          = "${var.runners_token}"
+    runners_limit          = "${var.runners_limit}"
+    runners_concurrent     = "${var.runners_concurrent}"
+    runners_privilled      = "${var.runners_privilled}"
+    runners_idle_count     = "${var.runners_idle_count}"
+    runners_idle_time      = "${var.runners_idle_time}"
     bucket_user_access_key = "${aws_iam_access_key.cache_user.id}"
     bucket_user_secret_key = "${aws_iam_access_key.cache_user.secret}"
     bucket_name            = "${aws_s3_bucket.build_cache.bucket}"

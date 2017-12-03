@@ -33,7 +33,7 @@ module "runner" {
   subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
   subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
 
-  runner_name       = "${var.runner_name}"
-  runner_gitlab_url = "${var.gitlab_url}"
-  runner_token      = "${var.runner_token}"
+  runners_name       = "${var.runner_name}"
+  runners_gitlab_url = "${var.gitlab_url}"
+  runners_token      = "${var.runner_token}"
 }

@@ -67,29 +67,44 @@ variable "docker_machine_spot_price_bid" {
   default     = "0.03"
 }
 
-variable "runner_name" {
+variable "runners_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = "string"
 }
 
-variable "runner_gitlab_url" {
+variable "runners_gitlab_url" {
   description = "URL of the gitlab instance to connect to."
   type        = "string"
 }
 
-variable "runner_token" {
+variable "runners_token" {
   description = "Token for the runner, will be used in the runner config.toml"
   type        = "string"
 }
 
-variable "runner_limit" {
+variable "runners_limit" {
   description = "Limit for the runners, will be used in the runner config.toml"
   default     = 1
 }
 
-variable "runner_concurrent" {
+variable "runners_concurrent" {
   description = "Concurrent value for the runners, will be used in the runner config.toml"
   default     = 10
+}
+
+variable "runners_idle_time" {
+  description = "Idle time of the runners, will be used in the runner config.toml"
+  default     = 600
+}
+
+variable "runners_idle_count" {
+  description = "Idle count of the runners, will be used in the runner config.toml"
+  default     = 0
+}
+
+variable "runners_privilled" {
+  description = "Runners will run in privilled mode, will be used in the runner config.toml"
+  default     = true
 }
 
 variable "docker_machine_user" {

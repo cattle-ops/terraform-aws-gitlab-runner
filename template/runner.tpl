@@ -1,16 +1,16 @@
-concurrent = ${runner_concurrent}
+concurrent = ${runners_concurrent}
 check_interval = 0
 
 [[runners]]
-  name = "${runner_name}"
+  name = "${runners_name}"
   url = "${gitlab_url}"
-  token = "${runner_token}"
+  token = "${runners_token}"
   executor = "docker+machine"
-  limit = ${runner_limit}
+  limit = ${runners_limit}
   [runners.docker]
     tls_verify = false
-    image = "17.11.0-ce"
-    privileged = true
+    image = "docker:17.11.0-ce"
+    privileged = ${runners_privilled}
     disable_cache = false
     volumes = ["/cache"]
     shm_size = 0
@@ -22,8 +22,8 @@ check_interval = 0
     BucketName = "${bucket_name}"
     Insecure = false
   [runners.machine]
-    IdleCount = 0
-    IdleTime = 600
+    IdleCount = ${runners_idle_count}
+    IdleTime = ${runners_idle_time}
     MachineDriver = "amazonec2"
     MachineName = "runner-%s"
     MachineOptions = ["amazonec2-access-key=${runners_access_key}", "amazonec2-secret-key=${runners_secret_key}", "amazonec2-instance-type=${runners_instance_type}", "amazonec2-region=${aws_region}", "amazonec2-vpc-id=${runners_vpc_id}", "amazonec2-subnet-id=${runners_subnet_id}", "amazonec2-private-address-only=true", "amazonec2-request-spot-instance=true", "amazonec2-spot-price=${runners_spot_price_bid}", "amazonec2-security-group=${runners_security_group_name}"]
