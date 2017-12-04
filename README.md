@@ -1,4 +1,4 @@
-# Terraform module for running GitLab autoscaling runners on Spot instances
+# Terraform module for GitLab auto scaling runners on Spot instances
 
 This repo contains a terraform module and example to run a [GitLab CI multi runner](https://docs.gitlab.com/runner/) on AWS Spot instances.
 This repo contains a terraform sample script to create GitLab CI multi runners on AWS spot instances. The setup is based on the blog post: [Autoscale GitLab CI runners and save 90% on EC2 costs] (https://about.gitlab.com/2017/11/23/autoscale-ci-runners/)
@@ -71,6 +71,7 @@ All variables and defaults:
 |------|-------------|:----:|:-----:|:-----:|
 | amazon_optimized_amis | AMI map per region-zone for the gitlab-runner instance AMI. | map | `<map>` | no |
 | aws_region | AWS region. | string | - | yes |
+| cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
 | cache_user | User name of the user to create to write and read to the s3 cache. | string | `cache_user` | no |
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m3.large` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.03` | no |
@@ -89,7 +90,6 @@ All variables and defaults:
 | subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
 | vpc_id | The VPC that is used for the instances. | string | - | yes |
-
 
 
 ## Example

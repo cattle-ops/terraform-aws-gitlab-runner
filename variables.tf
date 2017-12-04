@@ -118,3 +118,8 @@ variable "cache_user" {
   type        = "string"
   default     = "cache_user"
 }
+
+variable "cache_expiration_days" {
+  description = "Number of days before cache objects expires."
+  default     = 1
+}
