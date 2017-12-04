@@ -73,7 +73,7 @@ All variables and defaults:
 | aws_region | AWS region. | string | - | yes |
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
 | cache_user | User name of the user to create to write and read to the s3 cache. | string | `cache_user` | no |
-| docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m3.large` | no |
+| docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.03` | no |
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
 | environment | A name that indentifies the environment, will used as prefix and for taggin. | string | - | yes |

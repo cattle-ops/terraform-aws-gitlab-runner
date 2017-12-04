@@ -59,7 +59,7 @@ variable "ssh_key_file_pub" {
 
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
-  default     = "m3.large"
+  default     = "m4.large"
 }
 
 variable "docker_machine_spot_price_bid" {
