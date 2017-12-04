@@ -25,11 +25,6 @@ resource "aws_s3_bucket" "build_cache" {
 
     prefix = "runner/"
 
-    tags {
-      "rule"      = "clean"
-      "autoclean" = "true"
-    }
-
     expiration {
       days = 1
     }
