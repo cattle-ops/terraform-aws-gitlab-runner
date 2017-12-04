@@ -67,12 +67,39 @@ resource "aws_security_group_rule" "out_all" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
-data "template_file" "runners" {
-  template = "${file("${path.module}/template/runner.tpl")}"
+data "template_file" "user_data" {
+  template = "${file("${path.module}/template/user-data.tpl")}"
 
   vars {
-    aws_region = "${var.aws_region}"
-    gitlab_url = "${var.runners_gitlab_url}"
+    logging       = "${data.template_file.logging.rendered}"
+    gitlab_runner = "${data.template_file.gitlab_runner.rendered}"
+  }
+}
+
+data "template_file" "logging" {
+  template = "${file("${path.module}/template/logging.tpl")}"
+
+  vars {
+    environment = "${var.environment}"
+  }
+}
+
+data "template_file" "gitlab_runner" {
+  template = "${file("${path.module}/template/gitlab-runner.tpl")}"
+
+  vars {
+    gitlab_runner_version = "${var.gitlab_runner_version}"
+    runners_config        = "${data.template_file.runners.rendered}"
+  }
+}
+
+data "template_file" "runners" {
+  template = "${file("${path.module}/template/runner-config.tpl")}"
+
+  vars {
+    aws_region  = "${var.aws_region}"
+    gitlab_url  = "${var.runners_gitlab_url}"
+    environment = "${var.environment}"
 
     runners_vpc_id              = "${var.vpc_id}"
     runners_subnet_id           = "${var.subnet_id_runners}"
@@ -92,23 +119,6 @@ data "template_file" "runners" {
     bucket_user_access_key = "${aws_iam_access_key.cache_user.id}"
     bucket_user_secret_key = "${aws_iam_access_key.cache_user.secret}"
     bucket_name            = "${aws_s3_bucket.build_cache.bucket}"
-  }
-}
-
-data "template_file" "user_data" {
-  template = "${file("${path.module}/template/user-data.tpl")}"
-
-  vars {
-    runners_config = "${data.template_file.runners.rendered}"
-    logging        = "${data.template_file.logging.rendered}"
-  }
-}
-
-data "template_file" "logging" {
-  template = "${file("${path.module}/template/logging.tpl")}"
-
-  vars {
-    environment = "${var.environment}"
   }
 }
 

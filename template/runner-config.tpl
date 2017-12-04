@@ -26,7 +26,7 @@ check_interval = 0
     IdleTime = ${runners_idle_time}
     MachineDriver = "amazonec2"
     MachineName = "runner-%s"
-    MachineOptions = ["amazonec2-access-key=${runners_access_key}", "amazonec2-secret-key=${runners_secret_key}", "amazonec2-instance-type=${runners_instance_type}", "amazonec2-region=${aws_region}", "amazonec2-vpc-id=${runners_vpc_id}", "amazonec2-subnet-id=${runners_subnet_id}", "amazonec2-private-address-only=true", "amazonec2-request-spot-instance=true", "amazonec2-spot-price=${runners_spot_price_bid}", "amazonec2-security-group=${runners_security_group_name}"]
+    MachineOptions = ["amazonec2-access-key=${runners_access_key}", "amazonec2-secret-key=${runners_secret_key}", "amazonec2-instance-type=${runners_instance_type}", "amazonec2-region=${aws_region}", "amazonec2-vpc-id=${runners_vpc_id}", "amazonec2-subnet-id=${runners_subnet_id}", "amazonec2-private-address-only=true", "amazonec2-request-spot-instance=true", "amazonec2-spot-price=${runners_spot_price_bid}", "amazonec2-security-group=${runners_security_group_name}", "amazonec2-tags=environment,${environment}"]
     OffPeakTimezone = ""
     OffPeakIdleCount = 0
     OffPeakIdleTime = 0

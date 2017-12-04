@@ -104,7 +104,8 @@ variable "runners_idle_count" {
 
 variable "runners_privilled" {
   description = "Runners will run in privilled mode, will be used in the runner config.toml"
-  default     = true
+  type        = "string"
+  default     = "true"
 }
 
 variable "docker_machine_user" {
@@ -122,4 +123,10 @@ variable "cache_user" {
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
   default     = 1
+}
+
+variable "gitlab_runner_version" {
+  description = "Version for the gitlab runner."
+  type        = "string"
+  default     = "10.2.0"
 }
