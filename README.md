@@ -1,5 +1,3 @@
-[![license](http://img.shields.io/badge/license-GNU-blue.svg)](https://raw.githubusercontent.com/asciinema/asciinema/master/LICENSE)
-
 # Terraform module for GitLab auto scaling runners on Spot instances
 
 This repo contains a terraform module and example to run a [GitLab CI multi runner](https://docs.gitlab.com/runner/) on AWS Spot instances.
