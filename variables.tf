@@ -130,3 +130,8 @@ variable "gitlab_runner_version" {
   type        = "string"
   default     = "10.2.0"
 }
+
+variable "enable_cloudwatch_logging" {
+  description = "Enable or disable the cloudwatch logging."
+  default     = 1
+}

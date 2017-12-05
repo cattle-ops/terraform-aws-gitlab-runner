@@ -3,7 +3,7 @@
 This repo contains a terraform module and example to run a [GitLab CI multi runner](https://docs.gitlab.com/runner/) on AWS Spot instances.
 This repo contains a terraform sample script to create GitLab CI multi runners on AWS spot instances. The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs] (https://about.gitlab.com/2017/11/23/autoscale-ci-runners/)
 
-The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration.
+The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled.
 
 ## Prerequisites
 
@@ -76,6 +76,7 @@ All variables and defaults:
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.03` | no |
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
+| enable_cloudwatch_logging | Enable or disable the cloudwatch logging. | string | `0` | no |
 | environment | A name that indentifies the environment, will used as prefix and for taggin. | string | - | yes |
 | gitlab_runner_version | Version for the gitlab runner. | string | `10.2.0` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |

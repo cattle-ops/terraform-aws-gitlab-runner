@@ -71,7 +71,7 @@ data "template_file" "user_data" {
   template = "${file("${path.module}/template/user-data.tpl")}"
 
   vars {
-    logging       = "${data.template_file.logging.rendered}"
+    logging       = "${var.enable_cloudwatch_logging ? data.template_file.logging.rendered : ""}"
     gitlab_runner = "${data.template_file.gitlab_runner.rendered}"
   }
 }
@@ -153,8 +153,6 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
-
-  # associate_public_ip_address = true
 
   lifecycle {
     create_before_destroy = true
