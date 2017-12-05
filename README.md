@@ -77,6 +77,7 @@ All variables and defaults:
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.03` | no |
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
 | environment | A name that indentifies the environment, will used as prefix and for taggin. | string | - | yes |
+| gitlab_runner_version | Version for the gitlab runner. | string | `10.2.0` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
 | runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
@@ -86,11 +87,10 @@ All variables and defaults:
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
 | runners_privilled | Runners will run in privilled mode, will be used in the runner config.toml | string | `true` | no |
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
-| ssh_key_file_pub | File contians the public key used for the gitlab-runner. | string | - | yes |
+| ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
 | subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
 | vpc_id | The VPC that is used for the instances. | string | - | yes |
-
 
 ## Example
 

@@ -1,6 +1,6 @@
 resource "aws_key_pair" "key" {
   key_name   = "${var.environment}-gitlab-runner"
-  public_key = "${file("${var.ssh_key_file_pub}")}"
+  public_key = "${var.ssh_public_key}"
 }
 
 resource "aws_security_group" "runner" {

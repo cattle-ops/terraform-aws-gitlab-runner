@@ -52,8 +52,8 @@ variable "amazon_optimized_amis" {
   }
 }
 
-variable "ssh_key_file_pub" {
-  description = "File contians the public key used for the gitlab-runner."
+variable "ssh_public_key" {
+  description = "Public SSH key used for the gitlab-runner ec2 instance."
   type        = "string"
 }
 
