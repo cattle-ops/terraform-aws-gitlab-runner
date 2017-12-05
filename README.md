@@ -1,9 +1,11 @@
+[![license](http://img.shields.io/badge/license-GNU-blue.svg)](https://raw.githubusercontent.com/asciinema/asciinema/master/LICENSE)
+
 # Terraform module for GitLab auto scaling runners on Spot instances
 
 This repo contains a terraform module and example to run a [GitLab CI multi runner](https://docs.gitlab.com/runner/) on AWS Spot instances.
-This repo contains a terraform sample script to create GitLab CI multi runners on AWS spot instances. The setup is based on the blog post: [Autoscale GitLab CI runners and save 90% on EC2 costs] (https://about.gitlab.com/2017/11/23/autoscale-ci-runners/)
+This repo contains a terraform sample script to create GitLab CI multi runners on AWS spot instances. The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs] (https://about.gitlab.com/2017/11/23/autoscale-ci-runners/)
 
-The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch.
+The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration.
 
 ## Prerequisites
 
