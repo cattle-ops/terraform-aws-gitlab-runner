@@ -15,7 +15,7 @@ On mac simple install tfenv using brew.
 ```
 brew install tfenv
 ```
-Next intall a terraform version.
+Next install a terraform version.
 ```
 tfenv install <version>
 ```
@@ -34,24 +34,24 @@ Currently register a new runner is a manual process. See the GitLab Runner [docu
 ```
 docker run -it --rm gitlab/gitlab-runner register
 ```
-Provide the details in the interactive terminal. Once done the token cen found in the GitLab runners section, choose edit to get the token or see the config.toml file.
+Provide the details in the interactive terminal. Once done the token can be found in the GitLab runners section, choose edit to get the token or see the config.toml file.
 
 
 ## Usage
 
 ### Configuration
-Update the variables in `terraform.tfvars` to your needs and add the folling variables, see prevous step for how to obtain the token.
+Update the variables in `terraform.tfvars` to your needs and add the following variables, see previous step for how to obtain the token.
 ```
-runner_name = "NAME_OF_YOUR_RUNNER"
-gitlab_url = "GIT_LAB_URL"
-runner_token = "RUNNER_TOKEN"
+runner_name  = "NAME_OF_YOUR_RUNNER"
+gitlab_url   = "GIT_LAB_URL"
+runner_token  = "RUNNER_TOKEN"
 ```
 
 
 ### Usage module.
 ```
 module "runner" {
-  source = "https://github.com/npalm/terraform-aws-gitlab-runner.git"
+  source = "npalm/gitlab-runner/aws"
 
   aws_region              = "${var.aws_region}"
   environment             = "${var.environment}"
@@ -78,8 +78,8 @@ All variables and defaults:
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.03` | no |
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
-| enable_cloudwatch_logging | Enable or disable the cloudwatch logging. | string | `0` | no |
-| environment | A name that indentifies the environment, will used as prefix and for taggin. | string | - | yes |
+| enable_cloudwatch_logging | Enable or disable the CloudWatch logging. | string | `1` | no |
+| environment | A name that identifies the environment, will used as prefix and for tagging. | string | - | yes |
 | gitlab_runner_version | Version for the gitlab runner. | string | `10.2.0` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
@@ -110,11 +110,11 @@ docker run -it --rm gitlab/gitlab-runner register
 Once done, lookup the token in GitLab and update the `terraform.tfvars` file.
 
 ## Create runner
-Run `terraform init` to initialize terraform. Next you can run `terraform plan` to inspect the resources that will be created.
+Run `terraform init` to initialise terraform. Next you can run `terraform plan` to inspect the resources that will be created.
 
 To create the runner run:
 ```
-terrafrom apply
+terraform apply
 ```
 To destroy runner:
 ```

@@ -4,7 +4,7 @@ variable "aws_region" {
 }
 
 variable "environment" {
-  description = "A name that indentifies the environment, will used as prefix and for taggin."
+  description = "A name that identifies the environment, will used as prefix and for tagging."
   type        = "string"
 }
 
@@ -132,6 +132,6 @@ variable "gitlab_runner_version" {
 }
 
 variable "enable_cloudwatch_logging" {
-  description = "Enable or disable the cloudwatch logging."
+  description = "Enable or disable the CloudWatch logging."
   default     = 1
 }

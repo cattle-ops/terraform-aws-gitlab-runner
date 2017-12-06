@@ -154,6 +154,8 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   instance_type        = "${var.instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
 
+  associate_public_ip_address = false
+
   lifecycle {
     create_before_destroy = true
   }
