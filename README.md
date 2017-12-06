@@ -1,14 +1,15 @@
 # Terraform module for GitLab auto scaling runners on Spot instances
 
 This repo contains a terraform module and example to run a [GitLab CI multi runner](https://docs.gitlab.com/runner/) on AWS Spot instances.
-This repo contains a terraform sample script to create GitLab CI multi runners on AWS spot instances. The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs] (https://about.gitlab.com/2017/11/23/autoscale-ci-runners/)
 
-The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled.
+![GitLab Runners](https://github.com/npalm/assets/raw/master/images/2017-12-06_gitlab-multi-runner-aws.png)
+
+The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs] (https://about.gitlab.com/2017/11/23/autoscale-ci-runners/) The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled.
 
 ## Prerequisites
 
 ### Terraform
-Ensure you have Terraform installed, see `.terraform-version` for the used version.
+Ensure you have Terraform installed, see `.terraform-version` for the used version. A handy tool to mange your terraform version is [tfenv](https://github.com/kamatama41/tfenv).
 
 On mac simple install tfenv using brew.
 ```
@@ -33,7 +34,7 @@ Currently register a new runner is a manual process. See the GitLab Runner [docu
 ```
 docker run -it --rm gitlab/gitlab-runner register
 ```
-Provice the details in teh interactive terminal. Once done the token cen found in the GitLab runners section, choose edit to get the token.
+Provide the details in the interactive terminal. Once done the token cen found in the GitLab runners section, choose edit to get the token or see the config.toml file.
 
 
 ## Usage
@@ -50,18 +51,19 @@ runner_token = "RUNNER_TOKEN"
 ### Usage module.
 ```
 module "runner" {
-  source = "https://github.com/npalm/tf-aws-gitlab-runner.git"
+  source = "https://github.com/npalm/terraform-aws-gitlab-runner.git"
 
-  aws_region       = "<region-to-use>"
-  ssh_key_file_pub = "<file-contains-public-key"
+  aws_region              = "${var.aws_region}"
+  environment             = "${var.environment}"
+  ssh_public_key          = "${file("${var.ssh_key_file}")}"
 
-  vpc_id                  = "<vpc-id>"
-  subnet_id_gitlab_runner = "<subnet-for-runner"
-  subnet_id_runners       = "<subnet-for-docker-machine-runners"
+  vpc_id                  = "${module.vpc.vpc_id}"
+  subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
+  subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
 
-  runner_name       = "<name-of-the-runner"
-  runner_gitlab_url = "<gitlab-url>"
-  runner_token      = "<token-of-the-runner"
+  runners_name            = "${var.runner_name}"
+  runners_gitlab_url      = "${var.gitlab_url}"
+  runners_token           = "${var.runner_token}"
 }
 ```
 
@@ -108,7 +110,7 @@ docker run -it --rm gitlab/gitlab-runner register
 Once done, lookup the token in GitLab and update the `terraform.tfvars` file.
 
 ## Create runner
-Run `terraform init` to inialize terraform. Next you can run `terraform plan` to inspect the resources that will be create.
+Run `terraform init` to initialize terraform. Next you can run `terraform plan` to inspect the resources that will be created.
 
 To create the runner run:
 ```
@@ -116,7 +118,7 @@ terrafrom apply
 ```
 To destroy runner:
 ```
-terraform desroy
+terraform destroy
 ```
 
 ## Notes:

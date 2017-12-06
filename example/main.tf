@@ -25,15 +25,13 @@ module "vpc" {
 module "runner" {
   source = "../"
 
-  aws_region     = "${var.aws_region}"
-  environment    = "${var.environment}"
-  ssh_public_key = "${file("${var.ssh_key_file}")}"
-
+  aws_region              = "${var.aws_region}"
+  environment             = "${var.environment}"
+  ssh_public_key          = "${file("${var.ssh_key_file}")}"
   vpc_id                  = "${module.vpc.vpc_id}"
   subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
   subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
-
-  runners_name       = "${var.runner_name}"
-  runners_gitlab_url = "${var.gitlab_url}"
-  runners_token      = "${var.runner_token}"
+  runners_name            = "${var.runner_name}"
+  runners_gitlab_url      = "${var.gitlab_url}"
+  runners_token           = "${var.runner_token}"
 }
