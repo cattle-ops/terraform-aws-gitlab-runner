@@ -84,7 +84,7 @@ variable "runners_token" {
 
 variable "runners_limit" {
   description = "Limit for the runners, will be used in the runner config.toml"
-  default     = 1
+  default     = 0
 }
 
 variable "runners_concurrent" {
