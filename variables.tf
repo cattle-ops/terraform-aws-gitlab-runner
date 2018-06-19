@@ -36,19 +36,19 @@ variable "amazon_optimized_amis" {
   type        = "map"
 
   default = {
-    us-east-1      = "ami-8c1be5f6" # N. Virginia
-    us-east-2      = "ami-c5062ba0" # Ohio
-    us-west-1      = "ami-e689729e" # N. California
-    us-west-2      = "ami-02eada62" # Oregon
-    eu-west-1      = "ami-acd005d5" # Ireland
-    eu-west-2      = "ami-1a7f6d7e" # London
-    eu-central-1   = "ami-c7ee5ca8" # Frankfurt
-    ap-northeast-1 = "ami-0797ea64" # Tokyo
-    ap-northeast-2 = "ami-9bec36f5" # Seoel
-    ap-southeast-1 = "ami-2a69be4c" # Singapore
-    ap-southeast-2 = "ami-8536d6e7" # Sydney
-    ap-south-1     = "ami-4fc58420" # Mumbai
-    ca-central-1   = "ami-fd55ec99" # Canada
+    us-east-1      = "ami-97785bed" # N. Virginia
+    us-east-2      = "ami-f63b1193" # Ohio
+    us-west-1      = "ami-824c4ee2" # N. California
+    us-west-2      = "ami-f2d3638a" # Oregon
+    eu-west-1      = "ami-d834aba1" # Ireland
+    eu-west-2      = "ami-403e2524" # London
+    eu-central-1   = "ami-5652ce39" # Frankfurt
+    ap-northeast-1 = "ami-ceafcba8" # Tokyo
+    ap-northeast-2 = "ami-863090e8" # Seoel
+    ap-southeast-1 = "ami-68097514" # Singapore
+    ap-southeast-2 = "ami-942dd1f6" # Sydney
+    ap-south-1     = "ami-531a4c3c" # Mumbai
+    ca-central-1   = "ami-a954d1cd" # Canada
   }
 }
 
