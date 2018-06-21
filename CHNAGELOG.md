@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2018-06-21
+### Changed
+- Moved example so it is shown in the registry
+
 ## [1.0.0] - 2018-06-19
 ### Changed
 - Default Gitlab runner version set to 10.8.0

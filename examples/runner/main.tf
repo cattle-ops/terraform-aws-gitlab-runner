@@ -26,7 +26,7 @@ module "vpc" {
 }
 
 module "runner" {
-  source = "../"
+  source = "../../"
 
   aws_region     = "${var.aws_region}"
   environment    = "${var.environment}"
