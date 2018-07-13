@@ -1,0 +1,9 @@
+dist: trusty
+sudo: false
+
+jobs:
+  include:
+    - stage: verify
+      script: ./ci/bin/verify.sh 0.11.7 .
+    - stage: verify
+      script: ./ci/bin/verify-examples.sh 0.11.7 examples
