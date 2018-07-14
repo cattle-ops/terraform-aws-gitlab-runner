@@ -5,8 +5,8 @@ environment = "ci"
 aws_region = "eu-west-1"
 
 # Add the following variables:
-runner_name = ""
+runner_name = "docker.m3"
 
-gitlab_url = ""
+gitlab_url = "https://gitlab.com"
 
-runner_token = ""
+runner_token = "3939146918cced54ecf1dd08e6b87e"
