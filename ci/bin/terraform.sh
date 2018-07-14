@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-OS=${TRAVIS_OS_NAME}
 TARGET_DIR=/opt
+PATH=${PATH}:${TARGET_DIR}
+
+TERRAFORM_VERSION=${1:-"0.11.7"}
+OS=${2:-"linux"}
 TERRAFORM_URL="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip"
 
 installTerraform() {
@@ -9,8 +12,6 @@ installTerraform() {
 
   curl '-#' -fL -o ${TARGET_DIR}/terraform.zip ${TERRAFORM_URL} && \
     unzip -q -d ${TARGET_DIR}/ ${TARGET_DIR}/terraform.zip && \
-
-  export PATH=${PATH}:${TARGET_DIR}
 
   terraform --version
 }
