@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Add parameter for docker machine version
+- Upgrade default gitlab runner version to 11.0.0
+- Upgrade default docker-machine version to 0.15.0
 
 ## [1.0.2] - 2018-06-22
 ### Changed
