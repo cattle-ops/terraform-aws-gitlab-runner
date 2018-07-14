@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-source $(dirname "${BASH_SOURCE[0]}")/terraform.sh
+source $(dirname $0)/terraform.sh
 
 validate
 verifyModulesAndPlugins
