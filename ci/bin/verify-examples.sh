@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
-TERRAFORM_VERSION=$1
-DIR=$2
+DIR=${1:-examples}
 
-source $(dirname "${BASH_SOURCE[0]}")/terraform.sh
-installTerraform
+source $(dirname $0)/terraform.sh
 
-EXAMPLES="$(find ${DIR} -type d -mindepth 1 2> /dev/null )"
+EXAMPLES="$(find ${DIR} -maxdepth 1 -mindepth 1 -type d 2> /dev/null )"
 if [[ -z $EXAMPLES || "$($(echo $EXAMPLES) | wc -l)" -gt 0  ]] ; then
   echo "No example(s) directories found."
   exit 1

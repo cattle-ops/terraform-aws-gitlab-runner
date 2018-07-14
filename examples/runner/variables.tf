@@ -10,8 +10,12 @@ variable "environment" {
   type        = "string"
 }
 
-variable "ssh_key_file" {
+variable "public_ssh_key_filename" {
   default = "generated/id_rsa.pub"
+}
+
+variable "private_ssh_key_filename" {
+  default = "generated/id_rsa"
 }
 
 variable "runner_name" {
