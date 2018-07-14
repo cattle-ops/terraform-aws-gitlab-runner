@@ -67,6 +67,11 @@ variable "docker_machine_spot_price_bid" {
   default     = "0.04"
 }
 
+variable "docker_machine_version" {
+  description = "Version of docker-machine."
+  default     = "0.15.0"
+}
+
 variable "runners_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = "string"
@@ -128,7 +133,7 @@ variable "cache_expiration_days" {
 variable "gitlab_runner_version" {
   description = "Version for the gitlab runner."
   type        = "string"
-  default     = "10.8.0"
+  default     = "11.0.0"
 }
 
 variable "enable_cloudwatch_logging" {
