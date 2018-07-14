@@ -2,7 +2,7 @@ dist: trusty
 sudo: false
 
 install:
-  - ./ci/bin/install.sh 0.11.7
+  - ./ci/bin/install.sh
 
 jobs:
   include:
