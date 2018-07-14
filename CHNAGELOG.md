@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Add variable to enable cloudwatch monitoring for spot instances, by default disabled.
+- Add off peak runner settings.
+- Add file system root size for runners.
 
 ## [1.0.3] - 2018-07-14
 ### Changed

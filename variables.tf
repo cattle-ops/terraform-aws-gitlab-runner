@@ -118,6 +118,32 @@ variable "runners_monitoring" {
   default     = false
 }
 
+variable "runners_off_peak_timezone" {
+  description = "Off peak idle time zone of the runners, will be used in the runner config.toml."
+  default     = ""
+}
+
+variable "runners_off_peak_idle_count" {
+  description = "Off peak idle count of the runners, will be used in the runner config.toml."
+  default     = 0
+}
+
+variable "runners_off_peak_idle_time" {
+  description = "Off peak idle time of the runners, will be used in the runner config.toml."
+  default     = 0
+}
+
+variable "runners_off_peak_periods" {
+  description = "Off peak periods of the runners, will be used in the runner config.toml."
+  type        = "string"
+  default     = ""
+}
+
+variable "runners_root_size" {
+  description = "Runnner instance root size in GB."
+  default     = 16
+}
+
 variable "docker_machine_user" {
   description = "User name for the user to create spot instances to host docker-machine."
   type        = "string"
