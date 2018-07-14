@@ -95,7 +95,12 @@ All variables and defaults:
 | runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
 | runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
+| runners_off_peak_idle_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `0` | no |
+| runners_off_peak_idle_time | Off peak idle time of the runners, will be used in the runner config.toml. | string | `0` | no |
+| runners_off_peak_periods | Off peak periods of the runners, will be used in the runner config.toml. | string | `` | no |
+| runners_off_peak_timezone | Off peak idle time zone of the runners, will be used in the runner config.toml. | string | `` | no |
 | runners_privilled | Runners will run in privilled mode, will be used in the runner config.toml | string | `true` | no |
+| runners_root_size | Runnner instance root size in GB. | string | `16` | no |
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
 | subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
