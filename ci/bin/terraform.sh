@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 TARGET_DIR=/opt
 PATH=${PATH}:${TARGET_DIR}
