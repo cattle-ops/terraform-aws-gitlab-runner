@@ -109,6 +109,7 @@ data "template_file" "runners" {
     runners_access_key          = "${aws_iam_access_key.docker_machine_user.id}"
     runners_secret_key          = "${aws_iam_access_key.docker_machine_user.secret}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
+    runners_monitoring          = "${var.runners_monitoring}"
 
     runners_name           = "${var.runners_name}"
     runners_token          = "${var.runners_token}"

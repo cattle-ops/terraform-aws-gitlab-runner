@@ -74,7 +74,6 @@ module "gitlab-runner" {
 
 All variables and defaults:
 
-
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | amazon_optimized_amis | AMI map per region-zone for the gitlab-runner instance AMI. | map | `<map>` | no |
@@ -94,6 +93,7 @@ All variables and defaults:
 | runners_idle_count | Idle count of the runners, will be used in the runner config.toml | string | `0` | no |
 | runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
 | runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
+| runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
 | runners_privilled | Runners will run in privilled mode, will be used in the runner config.toml | string | `true` | no |
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |

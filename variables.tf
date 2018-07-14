@@ -113,6 +113,11 @@ variable "runners_privilled" {
   default     = "true"
 }
 
+variable "runners_monitoring" {
+  description = "Enable detailed cloudwatch monitoring for spot instances."
+  default     = false
+}
+
 variable "docker_machine_user" {
   description = "User name for the user to create spot instances to host docker-machine."
   type        = "string"
