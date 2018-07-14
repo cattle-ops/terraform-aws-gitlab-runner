@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add off peak runner settings.
 - Add file system root size for runners.
 
+### Changed
+- Refactored example, key generation is part of terraform.
+
 ## [1.0.3] - 2018-07-14
 ### Changed
 - Add parameter for docker machine version
