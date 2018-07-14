@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 DIR=${1:-examples}
 
 source $(dirname $0)/terraform.sh
