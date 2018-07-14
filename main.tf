@@ -88,8 +88,9 @@ data "template_file" "gitlab_runner" {
   template = "${file("${path.module}/template/gitlab-runner.tpl")}"
 
   vars {
-    gitlab_runner_version = "${var.gitlab_runner_version}"
-    runners_config        = "${data.template_file.runners.rendered}"
+    gitlab_runner_version  = "${var.gitlab_runner_version}"
+    docker_machine_version = "${var.docker_machine_version}"
+    runners_config         = "${data.template_file.runners.rendered}"
   }
 }
 
