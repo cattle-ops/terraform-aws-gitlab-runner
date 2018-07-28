@@ -164,10 +164,16 @@ variable "cache_expiration_days" {
 variable "gitlab_runner_version" {
   description = "Version for the gitlab runner."
   type        = "string"
-  default     = "11.0.0"
+  default     = "11.1.0"
 }
 
 variable "enable_cloudwatch_logging" {
   description = "Enable or disable the CloudWatch logging."
   default     = 1
+}
+
+variable "tags" {
+  type        = "map"
+  description = "Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt."
+  default     = {}
 }

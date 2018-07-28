@@ -21,20 +21,14 @@ resource "aws_security_group" "runner" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
-    Name        = "${var.environment}-runner-sg"
-    Environment = "${var.environment}"
-  }
+  tags = "${local.tags}"
 }
 
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = "${var.vpc_id}"
 
-  tags {
-    Name        = "${var.environment}-gitlab-sg"
-    Environment = "${var.environment}"
-  }
+  tags = "${local.tags}"
 }
 
 resource "aws_security_group_rule" "docker" {
@@ -106,8 +100,6 @@ data "template_file" "runners" {
     runners_subnet_id           = "${var.subnet_id_runners}"
     runners_instance_type       = "${var.docker_machine_instance_type}"
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
-    runners_access_key          = "${aws_iam_access_key.docker_machine_user.id}"
-    runners_secret_key          = "${aws_iam_access_key.docker_machine_user.secret}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
     runners_monitoring          = "${var.runners_monitoring}"
 
@@ -140,17 +132,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = "${aws_launch_configuration.gitlab_runner_instance.name}"
 
-  tag {
-    key                 = "Name"
-    value               = "${var.environment}-gitlab-runner"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Environment"
-    value               = "${var.environment}"
-    propagate_at_launch = true
-  }
+  tags = ["${data.null_data_source.tags.*.outputs}"]
 }
 
 resource "aws_launch_configuration" "gitlab_runner_instance" {
@@ -180,4 +162,21 @@ data "template_file" "instance_role_trust_policy" {
 resource "aws_iam_role" "instance" {
   name               = "${var.environment}-instance-role"
   assume_role_policy = "${data.template_file.instance_role_trust_policy.rendered}"
+}
+
+data "template_file" "docker_machine_policy" {
+  template = "${file("${path.module}/policies/instance-docker-machine-policy.json")}"
+}
+
+resource "aws_iam_policy" "docker_machine" {
+  name        = "${var.environment}-docker-machine"
+  path        = "/"
+  description = "Policy for docker machine."
+
+  policy = "${data.template_file.docker_machine_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "test-attach" {
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "${aws_iam_policy.docker_machine.arn}"
 }
