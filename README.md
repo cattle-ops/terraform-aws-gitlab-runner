@@ -53,8 +53,6 @@ runner_token  = "RUNNER_TOKEN"
 ```
 
 module "gitlab-runner" {
-  source  = "npalm/gitlab-runner/aws"
-
   source = "npalm/gitlab-runner/aws"
   version = "1.0.0"
 

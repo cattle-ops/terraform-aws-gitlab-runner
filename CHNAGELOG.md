@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Set default gitlab runner to 11.1.0
+- Replaced the dedicated docker machine user by an instance profile
+- Limit the resources access for docker machine.
 
 ## [1.1.0] - 2018-07-14
 ### Added
