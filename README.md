@@ -72,6 +72,7 @@ module "gitlab-runner" {
 }
 ```
 
+## Inputs
 All variables and defaults:
 
 | Name | Description | Type | Default | Required |
@@ -105,6 +106,7 @@ All variables and defaults:
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
 | subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
+| tags | Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt. | map | `<map>` | no |
 | vpc_id | The VPC that is used for the instances. | string | - | yes |
 
 ## Example

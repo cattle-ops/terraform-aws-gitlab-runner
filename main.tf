@@ -21,20 +21,14 @@ resource "aws_security_group" "runner" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
-    Name        = "${var.environment}-runner-sg"
-    Environment = "${var.environment}"
-  }
+  tags = "${local.tags}"
 }
 
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = "${var.vpc_id}"
 
-  tags {
-    Name        = "${var.environment}-gitlab-sg"
-    Environment = "${var.environment}"
-  }
+  tags = "${local.tags}"
 }
 
 resource "aws_security_group_rule" "docker" {
@@ -140,17 +134,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = "${aws_launch_configuration.gitlab_runner_instance.name}"
 
-  tag {
-    key                 = "Name"
-    value               = "${var.environment}-gitlab-runner"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "Environment"
-    value               = "${var.environment}"
-    propagate_at_launch = true
-  }
+  tags = ["${data.null_data_source.tags.*.outputs}"]
 }
 
 resource "aws_launch_configuration" "gitlab_runner_instance" {

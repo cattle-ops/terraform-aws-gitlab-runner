@@ -14,8 +14,5 @@ resource "aws_cloudwatch_log_group" "environment" {
   count = "${var.enable_cloudwatch_logging ? 1 : 0}"
   name  = "${var.environment}"
 
-  tags {
-    Name        = "${var.environment}-runners"
-    Environment = "${var.environment}"
-  }
+  tags = "${local.tags}"
 }
