@@ -1,6 +1,6 @@
 key_name = "gitlab-runner"
 
-environment = "ci-test"
+environment = "ci"
 
 aws_region = "eu-west-1"
 

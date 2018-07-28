@@ -5,14 +5,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Added
-- Add a map for for a more flexible mechanism to tag.
-
-### Changed
-- Set default gitlab runner to 11.1.0
-- Replaced the dedicated docker machine user by an instance profile
-- Limit the resources access for docker machine.
-- Updated default docker build image to 18.03.1-ce
 
 ## [1.1.0] - 2018-07-14
 ### Added

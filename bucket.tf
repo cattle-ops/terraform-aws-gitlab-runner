@@ -4,7 +4,10 @@ resource "aws_s3_bucket" "build_cache" {
   bucket = "${data.aws_caller_identity.current.account_id}-gitlab-runner-cache"
   acl    = "private"
 
-  tags = "${local.tags}"
+  tags {
+    Name        = "Bucket for runner cache"
+    Environment = "${var.environment}"
+  }
 
   force_destroy = true
 
