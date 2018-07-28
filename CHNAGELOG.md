@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Add a map for for a more flexible mechanism to tag.
 
+### Changed
+- Set default gitlab runner to 11.1.0
 
 ## [1.1.0] - 2018-07-14
 ### Added

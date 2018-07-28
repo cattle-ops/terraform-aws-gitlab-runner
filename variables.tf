@@ -164,7 +164,7 @@ variable "cache_expiration_days" {
 variable "gitlab_runner_version" {
   description = "Version for the gitlab runner."
   type        = "string"
-  default     = "11.0.0"
+  default     = "11.1.0"
 }
 
 variable "enable_cloudwatch_logging" {
