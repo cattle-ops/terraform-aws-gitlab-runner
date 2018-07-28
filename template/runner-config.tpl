@@ -9,7 +9,7 @@ check_interval = 0
   limit = ${runners_limit}
   [runners.docker]
     tls_verify = false
-    image = "docker:17.11.0-ce"
+    image = "docker:18.03.1-ce"
     privileged = ${runners_privilled}
     disable_cache = false
     volumes = ["/cache"]
