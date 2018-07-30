@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Limit the resources access for docker machine.
 - Updated default docker build image to 18.03.1-ce
 
+### Fixes
+- Add fix for non correct ec2 instances starting, add retry to yum update
+
 ## [1.1.0] - 2018-07-14
 ### Added
 - Add variable to enable cloudwatch monitoring for spot instances, by default disabled.
