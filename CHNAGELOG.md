@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.2.0] - 2018-07-30
 ### Added
 - Add a map for for a more flexible mechanism to tag.
 
@@ -13,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Replaced the dedicated docker machine user by an instance profile
 - Limit the resources access for docker machine.
 - Updated default docker build image to 18.03.1-ce
+
+### Fixes
+- Add fix for non correct ec2 instances starting, add retry to yum update
 
 ## [1.1.0] - 2018-07-14
 ### Added

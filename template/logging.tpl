@@ -1,7 +1,8 @@
 echo 'installing additional software for logging'
 # installing in a loop to ensure the cli is intalled.
-for i in {1..5}
+for i in {1..7}
 do
+  echo "Attempt: ---- " $i
   yum install -y aws-cli awslogs jq && break || sleep 60
 done
 
