@@ -144,6 +144,11 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "runners_use_private_address" {
+  description = "Restrict runners to use only private address"
+  default     = "true"
+}
+
 variable "docker_machine_user" {
   description = "User name for the user to create spot instances to host docker-machine."
   type        = "string"
