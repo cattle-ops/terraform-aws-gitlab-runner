@@ -151,6 +151,9 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   }
 }
 
+################################################################################
+### Trust policy
+################################################################################
 resource "aws_iam_instance_profile" "instance" {
   name = "${var.environment}-instance-profile"
   role = "${aws_iam_role.instance.name}"
@@ -165,6 +168,9 @@ resource "aws_iam_role" "instance" {
   assume_role_policy = "${data.template_file.instance_role_trust_policy.rendered}"
 }
 
+################################################################################
+### docker machine instance policy
+################################################################################
 data "template_file" "docker_machine_policy" {
   template = "${file("${path.module}/policies/instance-docker-machine-policy.json")}"
 }
@@ -177,7 +183,33 @@ resource "aws_iam_policy" "docker_machine" {
   policy = "${data.template_file.docker_machine_policy.rendered}"
 }
 
-resource "aws_iam_role_policy_attachment" "test-attach" {
+resource "aws_iam_role_policy_attachment" "docker_machine" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.docker_machine.arn}"
+}
+
+################################################################################
+### Service linked policy, optional
+################################################################################
+data "template_file" "service_linked_role" {
+  count = "${var.allow_iam_service_linked_role_creation ? 1 : 0}"
+
+  template = "${file("${path.module}/policies/service-linked-role-create-policy.json")}"
+}
+
+resource "aws_iam_policy" "service_linked_role" {
+  count = "${var.allow_iam_service_linked_role_creation ? 1 : 0}"
+
+  name        = "${var.environment}-service_linked_role"
+  path        = "/"
+  description = "Policy for creation of service linked roles."
+
+  policy = "${data.template_file.service_linked_role.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "service_linked_role" {
+  count = "${var.allow_iam_service_linked_role_creation ? 1 : 0}"
+
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "${aws_iam_policy.service_linked_role.arn}"
 }
