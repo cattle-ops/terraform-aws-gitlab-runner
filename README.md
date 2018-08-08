@@ -29,6 +29,22 @@ export AWS_ACCESS_KEY_ID=...
 export AWS_SECRET_ACCESS_KEY=...
 ```
 
+### Service linked roles
+Currently the ec2 instance role does not allow creation of service linked roles. The runner instances is depended on the following two service linked roles:
+- AWSServiceRoleForAutoScaling
+- AWSServiceRoleForEC2Spot
+
+You can create them manually or via terraform.
+
+```
+resource "aws_iam_service_linked_role" "spot" {
+  aws_service_name = "spot.amazonaws.com"
+}
+
+resource "aws_iam_service_linked_role" "autoscaling" {
+  aws_service_name = "autoscaling.amazonaws.com"
+}
+```
 
 ### Configuration GitLab runner token
 Currently register a new runner is a manual process. See the GitLab Runner [documentation](https://docs.gitlab.com/runner/register/index.html#docker) for more details.
@@ -100,6 +116,7 @@ All variables and defaults:
 | runners_off_peak_timezone | Off peak idle time zone of the runners, will be used in the runner config.toml. | string | `` | no |
 | runners_privilled | Runners will run in privilled mode, will be used in the runner config.toml | string | `true` | no |
 | runners_root_size | Runnner instance root size in GB. | string | `16` | no |
+| runners_use_private_address | Restrict runners to use only private address | string | `true` | no |
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
 | subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |

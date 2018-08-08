@@ -115,6 +115,7 @@ data "template_file" "runners" {
     runners_off_peak_idle_time  = "${var.runners_off_peak_idle_time}"
     runners_off_peak_periods    = "${var.runners_off_peak_periods}"
     runners_root_size           = "${var.runners_root_size}"
+    runners_use_private_address = "${var.runners_use_private_address}"
     bucket_user_access_key      = "${aws_iam_access_key.cache_user.id}"
     bucket_user_secret_key      = "${aws_iam_access_key.cache_user.secret}"
     bucket_name                 = "${aws_s3_bucket.build_cache.bucket}"
