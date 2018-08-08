@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Added an option to allow gitlab runner instance to create service linked roles, by default enabled.
+- Added example for public subnet
 
 ## [1.3.0] - 2018-08-08
 - Add option to run runners in public subnet
