@@ -182,3 +182,8 @@ variable "tags" {
   description = "Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt."
   default     = {}
 }
+
+variable "allow_iam_service_linked_role_creation" {
+  description = "Attach policy to runner instance to create service linked roles."
+  default     = true
+}

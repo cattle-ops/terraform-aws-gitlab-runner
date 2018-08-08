@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added an option to allow gitlab runner instance to create service linked roles, by default enabled.
 
 ## [1.3.0] - 2018-08-08
 - Add option to run runners in public subnet

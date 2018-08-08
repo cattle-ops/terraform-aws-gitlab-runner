@@ -30,11 +30,11 @@ export AWS_SECRET_ACCESS_KEY=...
 ```
 
 ### Service linked roles
-Currently the ec2 instance role does not allow creation of service linked roles. The runner instances is depended on the following two service linked roles:
+The gitlab runner ec2 instance needs the following sercice linked roles:
 - AWSServiceRoleForAutoScaling
 - AWSServiceRoleForEC2Spot
 
-You can create them manually or via terraform.
+By default the ec2 instance is allowed to create the roles, by setting the option `allow_iam_service_linked_role_creation` to `false` you can deny the creation of roles by the instance. In that case you have to ensure the roles exists. You can create them manually or via terraform.
 
 ```
 resource "aws_iam_service_linked_role" "spot" {
