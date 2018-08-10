@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Updated default AMI map to Amazon Linux AMI 2018.03 was released on 2018-06-28
 
 ## [1.4.0] - 2018-08-09
 ### Added
