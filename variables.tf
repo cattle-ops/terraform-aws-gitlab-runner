@@ -30,7 +30,8 @@ variable "instance_type" {
 }
 
 # list with amazon linux optimized images per region
-# last updated on: 2017-11-19 https://aws.amazon.com/amazon-linux-ami/
+# HVM (SSD) EBS-Backed 64-bit
+# Amazon Linux AMI 2018.03 was released on 2018-06-28 https://aws.amazon.com/amazon-linux-ami/
 variable "amazon_optimized_amis" {
   description = "AMI map per region-zone for the gitlab-runner instance AMI."
   type        = "map"
@@ -43,12 +44,15 @@ variable "amazon_optimized_amis" {
     eu-west-1      = "ami-d834aba1" # Ireland
     eu-west-2      = "ami-403e2524" # London
     eu-central-1   = "ami-5652ce39" # Frankfurt
+    eu-central-2   = "ami-8ee056f3" # Paris
     ap-northeast-1 = "ami-ceafcba8" # Tokyo
     ap-northeast-2 = "ami-863090e8" # Seoel
     ap-southeast-1 = "ami-68097514" # Singapore
     ap-southeast-2 = "ami-942dd1f6" # Sydney
     ap-south-1     = "ami-531a4c3c" # Mumbai
     ca-central-1   = "ami-a954d1cd" # Canada
+    sa-east-1      = "ami-84175ae8" # São Paulo
+    cn-north-1     = "ami-cb19c4a6" # Beijing
   }
 }
 
