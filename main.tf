@@ -119,7 +119,7 @@ data "template_file" "runners" {
     bucket_user_access_key      = "${aws_iam_access_key.cache_user.id}"
     bucket_user_secret_key      = "${aws_iam_access_key.cache_user.secret}"
     bucket_name                 = "${aws_s3_bucket.build_cache.bucket}"
-    runners_docker_volumes      = "/cache, ${join(var.additional_docker_volume_mounts,",")}"
+    runners_docker_volumes      = "/cache, ${join(",", var.additional_docker_volume_mounts)}"
   }
 }
 
