@@ -191,3 +191,9 @@ variable "allow_iam_service_linked_role_creation" {
   description = "Attach policy to runner instance to create service linked roles."
   default     = true
 }
+
+variable "additional_docker_volume_mounts" {
+  type        = "list"
+  description = "Additional volumens mounted via into runner containers"
+  default     = []
+}
