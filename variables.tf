@@ -148,6 +148,12 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "runners_iam_instance_profile" {
+  description = "IAM instance profile of the runners, will be used in the runner config.toml"
+  type        = "string"
+  default     = ""
+}
+
 variable "runners_use_private_address" {
   description = "Restrict runners to use only private address"
   default     = "true"
