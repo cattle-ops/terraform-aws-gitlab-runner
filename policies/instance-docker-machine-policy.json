@@ -15,7 +15,9 @@
         "ec2:CreateTags",
         "ec2:RequestSpotInstances",
         "ec2:CancelSpotInstanceRequests",
-        "ec2:DescribeSubnets"
+        "ec2:DescribeSubnets",
+        "ec2:AssociateIamInstanceProfile",
+        "iam:PassRole"
       ],
       "Effect": "Allow",
       "Resource": "*"
