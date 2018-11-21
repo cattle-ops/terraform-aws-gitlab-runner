@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.7.0] - 2018-11-21
+- Added option to configure instance-profile for runner pre build script. Thanks to @msvechla
+
 ## [1.6.0] - 2018-10-06
 - Updated the default GitLab Runner to 11.3.1
 
@@ -65,7 +68,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.6.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.7.0...HEAD
+[1.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.3.0...1.4.0
