@@ -1,3 +1,35 @@
+
+
+resource "aws_iam_instance_profile" "runner" {
+  name = "ci-runner-instance-profile"
+  role = "${aws_iam_role.runner.name}"
+}
+
+resource "aws_iam_role" "runner" {
+  name = "ci-runner-role"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "runner" {
+  name       = "ci-runner"
+  roles      = ["${aws_iam_role.runner.name}"]
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
 resource "aws_key_pair" "key" {
   key_name   = "${var.environment}-gitlab-runner"
   public_key = "${var.ssh_public_key}"
