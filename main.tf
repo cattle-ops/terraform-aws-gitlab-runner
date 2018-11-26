@@ -25,11 +25,25 @@ resource "aws_iam_role" "runner" {
 EOF
 }
 
+data "template_file" "ci_runner_policy" {
+  template = "${file("${path.module}/policies/ci-runner-policy.json")}"
+}
+
+resource "aws_iam_policy" "runner" {
+  name        = "ci-runner"
+  path        = "/"
+  description = "Policy ci runner."
+
+  policy = "${data.template_file.ci_runner_policy.rendered}"
+}
+
 resource "aws_iam_policy_attachment" "runner" {
   name       = "ci-runner"
   roles      = ["${aws_iam_role.runner.name}"]
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  policy_arn = "${aws_iam_policy.runner.arn}"
 }
+
+
 resource "aws_key_pair" "key" {
   key_name   = "${var.environment}-gitlab-runner"
   public_key = "${var.ssh_public_key}"
