@@ -16,4 +16,4 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
 service gitlab-runner restart
 chkconfig gitlab-runner on
 
-curl --request POST -L "https://code.siemens.com/api/v4/runners" --form "token=Ld22PLr4dN_yzEDo_hNs" --form "tag_list=DEV"
+curl --request POST -L "https://code.siemens.com/api/v4/runners" --form "token=Ld22PLr4dN_yzEDo_hNs" --form "tag_list=DEV
