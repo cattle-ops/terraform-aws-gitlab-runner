@@ -12,8 +12,17 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
   cp /tmp/docker-machine /usr/local/bin/docker-machine && \
   ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
 
-
 service gitlab-runner restart
 chkconfig gitlab-runner on
 
-curl --request POST -L "https://code.siemens.com/api/v4/runners" --form "token=Ld22PLr4dN_yzEDo_hNs" --form "tag_list=DEV"
+export token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
+    --form "token=${gitlab_runner_registration_token}" \
+    --form "tag_list=${gitlab_runner_tag_list}" \
+    --form "description=${giltab_runner_description}" \
+    --form "locked=${gitlab_runner_locked_to_project}" \
+    --form "run_untagged=${gitlab_runner_run_untagged}" \
+    --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
+    | jq -r .token)
+
+sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
+export token=""

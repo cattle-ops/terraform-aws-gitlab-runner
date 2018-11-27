@@ -4,7 +4,7 @@ check_interval = 0
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
-  token = "${runners_token}"
+  token = "__REPLACED_BY_USER_DATA__"
   executor = "docker+machine"
   limit = ${runners_limit}
   [runners.docker]

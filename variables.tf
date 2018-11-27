@@ -197,3 +197,11 @@ variable "additional_docker_volume_mounts" {
   description = "Additional volumens mounted via into runner containers"
   default     = []
 }
+
+variable "gitlab_runner_coordinator_url_with_trailing_slash" {
+  type        = "string"
+  description = "E.g. https://gitlab.com/"
+  default = "http://gitlab.com"
+}
+
+
