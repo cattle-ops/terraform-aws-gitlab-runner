@@ -168,7 +168,7 @@ data "template_file" "runners" {
     runners_iam_instance_profile_name = "${var.runners_iam_instance_profile_name}"
     runners_use_private_address       = "${var.runners_use_private_address}"
     runners_pre_build_script          = "${var.runners_pre_build_script}"
-    bucket_user_access_key            = "${aws_iam_access_key.cache_usecretser.id}"
+    bucket_user_access_key            = "${aws_iam_access_key.cache_user.id}"
     bucket_user_secret_key            = "${aws_iam_access_key.cache_user.secret}"
     bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
     runners_docker_volumes            = "'/cache', ${join(",", formatlist("'%s'", var.additional_docker_volume_mounts))}"
