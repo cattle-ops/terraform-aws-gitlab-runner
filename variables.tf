@@ -213,7 +213,7 @@ variable "additional_docker_volume_mounts" {
 variable "gitlab_runner_coordinator_url_with_trailing_slash" {
   type        = "string"
   description = "E.g. https://gitlab.com/"
-  default = "http://gitlab.com"
+  default     = "http://gitlab.com"
 }
 
 variable "gitlab_runner_registration_token" {

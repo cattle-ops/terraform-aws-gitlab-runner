@@ -1,5 +1,3 @@
-
-
 resource "aws_iam_instance_profile" "runner" {
   name = "ci-runner-instance-profile"
   role = "${aws_iam_role.runner.name}"
@@ -42,7 +40,6 @@ resource "aws_iam_policy_attachment" "runner" {
   roles      = ["${aws_iam_role.runner.name}"]
   policy_arn = "${aws_iam_policy.runner.arn}"
 }
-
 
 resource "aws_key_pair" "key" {
   key_name   = "${var.environment}-gitlab-runner"
@@ -128,16 +125,16 @@ data "template_file" "gitlab_runner" {
   template = "${file("${path.module}/template/gitlab-runner.tpl")}"
 
   vars {
-    gitlab_runner_version  = "${var.gitlab_runner_version}"
-    docker_machine_version = "${var.docker_machine_version}"
-    runners_config         = "${data.template_file.runners.rendered}"
+    gitlab_runner_version                             = "${var.gitlab_runner_version}"
+    docker_machine_version                            = "${var.docker_machine_version}"
+    runners_config                                    = "${data.template_file.runners.rendered}"
     gitlab_runner_coordinator_url_with_trailing_slash = "${var.gitlab_runner_coordinator_url_with_trailing_slash}"
-    gitlab_runner_registration_token = "${var.gitlab_runner_registration_token}"
-    gitlab_runner_tag_list = "${var.gitlab_runner_tag_list}"
-    giltab_runner_description = "${var.giltab_runner_description}"
-    gitlab_runner_locked_to_project = "${var.gitlab_runner_locked_to_project}"
-    gitlab_runner_run_untagged = "${var.gitlab_runner_run_untagged}"
-    gitlab_runner_maximum_timeout = "${var.gitlab_runner_maximum_timeout}"
+    gitlab_runner_registration_token                  = "${var.gitlab_runner_registration_token}"
+    gitlab_runner_tag_list                            = "${var.gitlab_runner_tag_list}"
+    giltab_runner_description                         = "${var.giltab_runner_description}"
+    gitlab_runner_locked_to_project                   = "${var.gitlab_runner_locked_to_project}"
+    gitlab_runner_run_untagged                        = "${var.gitlab_runner_run_untagged}"
+    gitlab_runner_maximum_timeout                     = "${var.gitlab_runner_maximum_timeout}"
   }
 }
 
