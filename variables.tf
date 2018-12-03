@@ -237,13 +237,13 @@ variable "giltab_runner_description" {
 }
 
 variable "gitlab_runner_locked_to_project" {
-  type        = "boolean"
-  description = "Weahter to lock the runner to the project or group" 
+  type        = "string"
+  description = "Weahter to lock the runner to the project or group. Allowed values 'true' and 'false'"
 }
 
 variable "gitlab_runner_run_untagged" {
-  type        = "boolean"
-  description = "Wheater to allow the runner on untaged jobs"
+  type        = "string"
+  description = "Wheater to allow the runner on untaged jobs. Allowed values 'true' and 'false'"
 }
 
 variable "gitlab_runner_maximum_timeout" {
