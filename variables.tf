@@ -221,11 +221,6 @@ variable "gitlab_runner_registration_token" {
   description = "Runner registration token"
 }
 
-variable "gitlab_runner_registration_token" {
-  type        = "string"
-  description = "Runner registration token"
-}
-
 variable "gitlab_runner_tag_list" {
   type        = "string"
   description = "Comma sepearted list of runner tags"
