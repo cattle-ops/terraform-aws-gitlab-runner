@@ -204,4 +204,37 @@ variable "gitlab_runner_coordinator_url_with_trailing_slash" {
   default = "http://gitlab.com"
 }
 
+variable "gitlab_runner_registration_token" {
+  type        = "string"
+  description = "Runner registration token"
+}
 
+variable "gitlab_runner_registration_token" {
+  type        = "string"
+  description = "Runner registration token"
+}
+
+variable "gitlab_runner_tag_list" {
+  type        = "string"
+  description = "Comma sepearted list of runner tags"
+}
+
+variable "giltab_runner_description" {
+  type        = "string"
+  description = "Runner description"
+}
+
+variable "gitlab_runner_locked_to_project" {
+  type        = "boolean"
+  description = "Weahter to lock the runner to the project or group" 
+}
+
+variable "gitlab_runner_run_untagged" {
+  type        = "boolean"
+  description = "Wheater to allow the runner on untaged jobs"
+}
+
+variable "gitlab_runner_maximum_timeout" {
+  type        = "string"
+  description = "Runner max timeout limit"
+}
