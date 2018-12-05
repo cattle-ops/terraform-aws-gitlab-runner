@@ -241,6 +241,11 @@ variable "gitlab_runner_run_untagged" {
   description = "Wheater to allow the runner on untaged jobs. Allowed values 'true' and 'false'"
 }
 
+variable "gitlab_runner_maximum_timeout" {
+  type        = "string"
+  description = "Runner max timeout limit"
+}
+
 variable "bucket_name_runner_roken_cache" {
   type = "string"
   description = "The bucket name to use for caching the runner token"
