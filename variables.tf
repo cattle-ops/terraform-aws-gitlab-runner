@@ -255,3 +255,8 @@ variable "bucket_key_runner_token_cache" {
   type = "string"
   description = "The bucket key to use for caching the runner token"
 }
+
+variable "bucket_kms_key_arn_runner_token_cache" {
+  type = "string"
+  description = "The KMS key ARN that is used to encrypt the bucket to store the runner token"
+}
