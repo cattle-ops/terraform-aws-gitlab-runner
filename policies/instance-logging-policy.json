@@ -28,6 +28,42 @@
           "s3:GetObjectAcl"
         ],
         "Resource": ["arn:aws:s3:::${bucket_name}/${bucket_key}"]
-    }
+    },
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+          "kms:ListKeys",
+          "kms:GenerateRandom",
+          "kms:ListAliases",
+          "s3:PutAccountPublicAccessBlock",
+          "s3:GetAccountPublicAccessBlock",
+          "s3:ListAllMyBuckets",
+          "s3:HeadBucket"
+      ],
+      "Resource": "*"
+  },
+  {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": [
+          "kms:ImportKeyMaterial",
+          "kms:ListKeyPolicies",
+          "kms:ListRetirableGrants",
+          "kms:GetKeyPolicy",
+          "kms:GenerateDataKeyWithoutPlaintext",
+          "kms:ListResourceTags",
+          "kms:ReEncryptFrom",
+          "kms:ListGrants",
+          "kms:GetParametersForImport",
+          "kms:TagResource",
+          "kms:Encrypt",
+          "kms:GetKeyRotationStatus",
+          "kms:GenerateDataKey",
+          "kms:ReEncryptTo",
+          "kms:DescribeKey"
+      ],
+      "Resource": "${kms_key_arn}"
+  }
   ]
 }

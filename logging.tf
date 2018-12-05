@@ -4,6 +4,7 @@ data "template_file" "instance_profile" {
   vars {
     bucket_name = "${var.bucket_name_runner_token_cache}"
     bucket_key = "${var.bucket_key_runner_token_cache}"
+    kms_key_arn = "${var.bucket_kms_key_arn_runner_token_cache}"
   }
 }
 
