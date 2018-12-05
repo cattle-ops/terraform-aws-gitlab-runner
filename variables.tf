@@ -246,12 +246,12 @@ variable "gitlab_runner_maximum_timeout" {
   description = "Runner max timeout limit"
 }
 
-variable "bucket_name_runner_roken_cache" {
+variable "bucket_name_runner_token_cache" {
   type = "string"
   description = "The bucket name to use for caching the runner token"
 }
 
-variable "bucket_key_runner_roken_cache" {
+variable "bucket_key_runner_token_cache" {
   type = "string"
   description = "The bucket key to use for caching the runner token"
 }
