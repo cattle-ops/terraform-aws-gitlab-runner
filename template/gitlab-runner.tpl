@@ -15,7 +15,10 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
 service gitlab-runner restart
 chkconfig gitlab-runner on
 
-export token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
+export token=$(aws s3 ls s3://${bucket_name_runner_token_cache}/${bucket_key_runner_token_cache})
+if [ `cat token | wc -l` == 0 ]
+then
+  token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
     --form "tag_list=${gitlab_runner_tag_list}" \
     --form "description=${giltab_runner_description}" \
@@ -23,6 +26,10 @@ export token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trai
     --form "run_untagged=${gitlab_runner_run_untagged}" \
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     | jq -r .token)
+  echo $token > token.file
+  aws s3 cp token.file s3://${bucket_name_runner_token_cache}/${bucket_key_runner_token_cache}
+  rm toke.file
+fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 export token=""
