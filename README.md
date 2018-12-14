@@ -106,6 +106,7 @@ All variables and defaults:
 | -----------------------------     | ------------------------------------------------------------------------------------------------------------------- | :----: | :--------------: | :------: |
 | amazon_optimized_amis             | AMI map per region-zone for the gitlab-runner instance AMI.                                                         | map    | `<map>`          | no       |
 | aws_region                        | AWS region.                                                                                                         | string | -                | yes      |
+| cache_bucket_prefix               | Prefix for s3 cache bucket name.                                                                                    | string | ""               | no       |
 | cache_expiration_days             | Number of days before cache objects expires.                                                                        | string | `1`              | no       |
 | cache_user                        | User name of the user to create to write and read to the s3 cache.                                                  | string | `cache_user`     | no       |
 | docker_machine_instance_type      | Instance type used for the instances hosting docker-machine.                                                        | string | `m4.large`       | no       |
