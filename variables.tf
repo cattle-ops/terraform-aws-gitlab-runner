@@ -177,6 +177,12 @@ variable "cache_user" {
   default     = "cache_user"
 }
 
+variable "cache_bucket_prefix" {
+  description = "Prefix for s3 cache bucket name."
+  type        = "string"
+  default     = ""
+}
+
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
   default     = 1
