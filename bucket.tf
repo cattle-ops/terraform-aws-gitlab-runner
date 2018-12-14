@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "build_cache" {
-  bucket = "${data.aws_caller_identity.current.account_id}-gitlab-runner-cache"
+  bucket = "${var.cache_bucket_prefix}${data.aws_caller_identity.current.account_id}-gitlab-runner-cache"
   acl    = "private"
 
   tags = "${local.tags}"
