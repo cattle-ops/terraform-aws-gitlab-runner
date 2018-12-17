@@ -252,17 +252,7 @@ variable "gitlab_runner_maximum_timeout" {
   description = "Runner max timeout limit"
 }
 
-variable "bucket_name_runner_token_cache" {
+variable "secure_parameter_store_runner_token_key" {
   type = "string"
-  description = "The bucket name to use for caching the runner token"
-}
-
-variable "bucket_key_runner_token_cache" {
-  type = "string"
-  description = "The bucket key to use for caching the runner token"
-}
-
-variable "bucket_kms_key_arn_runner_token_cache" {
-  type = "string"
-  description = "The KMS key ARN that is used to encrypt the bucket to store the runner token"
+  description = "The key name used store the Gitlab runner token in Secure Paramater Store"
 }

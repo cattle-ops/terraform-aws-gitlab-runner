@@ -93,8 +93,7 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_locked_to_project                   = "${var.gitlab_runner_locked_to_project}"
     gitlab_runner_run_untagged                        = "${var.gitlab_runner_run_untagged}"
     gitlab_runner_maximum_timeout                     = "${var.gitlab_runner_maximum_timeout}"
-    bucket_name_runner_token_cache = "${var.bucket_name_runner_token_cache}"
-    bucket_key_runner_token_cache = "${var.bucket_key_runner_token_cache}"
+    secure_parameter_store_runner_token_key =         "${var.secure_parameter_store_runner_token_key}"
   }
 }
 

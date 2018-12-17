@@ -15,7 +15,9 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
 service gitlab-runner restart
 chkconfig gitlab-runner on
 
-export token=$(aws s3 ls s3://${bucket_name_runner_token_cache}/${bucket_key_runner_token_cache})
+
+
+export token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq ".Parameters | .[0] | .Value")
 if [ `cat token | wc -l` == 0 ]
 then
   token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
@@ -27,8 +29,8 @@ then
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     | jq -r .token)
   echo $token > token.file
-  aws s3 cp token.file s3://${bucket_name_runner_token_cache}/${bucket_key_runner_token_cache}
-  rm toke.file
+  aws ssm put-parameter --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1
+  rm token.file
 fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml

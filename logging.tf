@@ -2,9 +2,7 @@ data "template_file" "instance_profile" {
   count    = "${var.enable_cloudwatch_logging ? 1 : 0}"
   template = "${file("${path.module}/policies/instance-logging-policy.json")}"
   vars {
-    bucket_name = "${var.bucket_name_runner_token_cache}"
-    bucket_key = "${var.bucket_key_runner_token_cache}"
-    kms_key_arn = "${var.bucket_kms_key_arn_runner_token_cache}"
+    secure_parameter_store_runner_token_key = "${var.secure_parameter_store_runner_token_key}"
   }
 }
 
