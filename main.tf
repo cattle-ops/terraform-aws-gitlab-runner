@@ -85,6 +85,8 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_version  = "${var.gitlab_runner_version}"
     docker_machine_version = "${var.docker_machine_version}"
     runners_config         = "${data.template_file.runners.rendered}"
+    pre_install            = "${var.userdata_pre_install}"
+    post_install           = "${var.userdata_post_install}"
   }
 }
 

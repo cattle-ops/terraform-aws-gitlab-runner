@@ -117,6 +117,8 @@ All variables and defaults:
 | environment                       | A name that identifies the environment, will used as prefix and for tagging.                                        | string | -                | yes      |
 | gitlab_runner_version             | Version for the gitlab runner.                                                                                      | string | `11.3.1`         | no       |
 | instance_type                     | Instance type used for the gitlab-runner.                                                                           | string | `t2.micro`       | no       |
+| userdata_pre_install              | User-data script snippet to insert before runner install                                                            | string | ""               | no       |
+| userdata_post_install             | User-data script snippet to insert after runner install                                                             | string | ""               | no       |
 | runners_concurrent                | Concurrent value for the runners, will be used in the runner config.toml                                            | string | `10`             | no       |
 | runners_gitlab_url                | URL of the gitlab instance to connect to.                                                                           | string | -                | yes      |
 | runners_idle_count                | Idle count of the runners, will be used in the runner config.toml                                                   | string | `0`              | no       |
