@@ -161,13 +161,13 @@ variable "runners_pre_build_script" {
 }
 
 variable "userdata_pre_install" {
-  description = "User-data script snippet to insert before runner install"
+  description = "User-data script snippet to insert before gitlab-runner install"
   type        = "string"
   default     = ""
 }
 
 variable "userdata_post_install" {
-  description = "User-data script snippet to insert after runner install"
+  description = "User-data script snippet to insert after gitlab-runner install"
   type        = "string"
   default     = ""
 }
