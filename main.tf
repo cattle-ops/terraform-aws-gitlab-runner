@@ -107,6 +107,7 @@ data "template_file" "runners" {
     runners_token                     = "${var.runners_token}"
     runners_limit                     = "${var.runners_limit}"
     runners_concurrent                = "${var.runners_concurrent}"
+    runners_image                     = "${var.runners_image}"
     runners_privilled                 = "${var.runners_privilled}"
     runners_idle_count                = "${var.runners_idle_count}"
     runners_idle_time                 = "${var.runners_idle_time}"

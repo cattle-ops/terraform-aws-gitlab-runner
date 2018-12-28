@@ -128,6 +128,7 @@ All variables and defaults:
 | runners_off_peak_idle_time        | Off peak idle time of the runners, will be used in the runner config.toml.                                          | string | `0`              | no       |
 | runners_off_peak_periods          | Off peak periods of the runners, will be used in the runner config.toml.                                            | string | ``               | no       |
 | runners_off_peak_timezone         | Off peak idle time zone of the runners, will be used in the runner config.toml.                                     | string | ``               | no       |
+| runners_image                     | Image to run builds, will be used in the runner config.toml                                                         | string | `docker:18.03.1-ce`           | no       |
 | runners_privilled                 | Runners will run in privilled mode, will be used in the runner config.toml                                          | string | `true`           | no       |
 | runners_root_size                 | Runnner instance root size in GB.                                                                                   | string | `16`             | no       |
 | runners_iam_instance_profile_name | Instance profile to attach to the runners                                                                           | string | ""               | no       |
