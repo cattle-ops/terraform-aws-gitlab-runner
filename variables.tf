@@ -111,6 +111,12 @@ variable "runners_idle_count" {
   default     = 0
 }
 
+variable "runners_image" {
+  description = "Image to run builds, will be used in the runner config.toml"
+  type        = "string"
+  default     = "docker:18.03.1-ce"
+}
+
 variable "runners_privilled" {
   description = "Runners will run in privilled mode, will be used in the runner config.toml"
   type        = "string"
