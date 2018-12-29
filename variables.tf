@@ -160,6 +160,18 @@ variable "runners_pre_build_script" {
   default     = ""
 }
 
+variable "userdata_pre_install" {
+  description = "User-data script snippet to insert before gitlab-runner install"
+  type        = "string"
+  default     = ""
+}
+
+variable "userdata_post_install" {
+  description = "User-data script snippet to insert after gitlab-runner install"
+  type        = "string"
+  default     = ""
+}
+
 variable "runners_use_private_address" {
   description = "Restrict runners to use only private address"
   default     = "true"
