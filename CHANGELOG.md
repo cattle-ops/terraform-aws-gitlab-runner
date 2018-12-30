@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.8.0] - 2018-12-30
 - Changed: Updated default docker-machine version to 0.16.0
 - Changed: Updated default gitlab runner to 11.6.0
 - Added: Configuration parameters for post_build_script, pre_clone_script, request_concurrency and output_limit. #22
@@ -74,7 +76,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.7.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.8.0...HEAD
+[1.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.7.0...1.8.0
 [1.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/1.4.0...1.5.0
