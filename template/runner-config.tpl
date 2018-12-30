@@ -7,6 +7,10 @@ check_interval = 0
   token = "${runners_token}"
   executor = "docker+machine"
   pre_build_script = "${runners_pre_build_script}"
+  post_build_script = "${runners_post_build_script}"
+  pre_clone_script = "${runners_pre_clone_script}"
+  request_concurrency = ${runners_request_concurrency}
+  output_limit = ${runners_output_limit}
   limit = ${runners_limit}
   [runners.docker]
     tls_verify = false

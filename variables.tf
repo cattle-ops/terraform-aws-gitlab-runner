@@ -166,6 +166,28 @@ variable "runners_pre_build_script" {
   default     = ""
 }
 
+variable "runners_post_build_script" {
+  description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
+  type        = "string"
+  default     = ""
+}
+
+variable "runners_pre_clone_script" {
+  description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
+  type        = "string"
+  default     = ""
+}
+
+variable "runners_request_concurrency" {
+  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)"
+  default     = "1"
+}
+
+variable "runners_output_limit" {
+  description = "Set maximum build log size in kilobytes, by default set to 4096 (4MB)"
+  default     = "4096"
+}
+
 variable "userdata_pre_install" {
   description = "User-data script snippet to insert before gitlab-runner install"
   type        = "string"
