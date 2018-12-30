@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
+- Changed: Updated default docker-machine version to 0.16.0
+- Changed: Updated default gitlab runner to 11.6.0
 - Added: Configuration parameters for post_build_script, pre_clone_script, request_concurrency and output_limit. #22
 - Added: Configurable docker image for runner #27
 - Added: Add pre/post install user-data snippets for runners #26
