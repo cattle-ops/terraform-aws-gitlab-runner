@@ -85,6 +85,8 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_version  = "${var.gitlab_runner_version}"
     docker_machine_version = "${var.docker_machine_version}"
     runners_config         = "${data.template_file.runners.rendered}"
+    pre_install            = "${var.userdata_pre_install}"
+    post_install           = "${var.userdata_post_install}"
   }
 }
 
@@ -107,6 +109,7 @@ data "template_file" "runners" {
     runners_token                     = "${var.runners_token}"
     runners_limit                     = "${var.runners_limit}"
     runners_concurrent                = "${var.runners_concurrent}"
+    runners_image                     = "${var.runners_image}"
     runners_privilled                 = "${var.runners_privilled}"
     runners_idle_count                = "${var.runners_idle_count}"
     runners_idle_time                 = "${var.runners_idle_time}"

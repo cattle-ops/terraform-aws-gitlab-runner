@@ -111,6 +111,12 @@ variable "runners_idle_count" {
   default     = 0
 }
 
+variable "runners_image" {
+  description = "Image to run builds, will be used in the runner config.toml"
+  type        = "string"
+  default     = "docker:18.03.1-ce"
+}
+
 variable "runners_privilled" {
   description = "Runners will run in privilled mode, will be used in the runner config.toml"
   type        = "string"
@@ -160,6 +166,18 @@ variable "runners_pre_build_script" {
   default     = ""
 }
 
+variable "userdata_pre_install" {
+  description = "User-data script snippet to insert before gitlab-runner install"
+  type        = "string"
+  default     = ""
+}
+
+variable "userdata_post_install" {
+  description = "User-data script snippet to insert after gitlab-runner install"
+  type        = "string"
+  default     = ""
+}
+
 variable "runners_use_private_address" {
   description = "Restrict runners to use only private address"
   default     = "true"
@@ -175,6 +193,12 @@ variable "cache_user" {
   description = "User name of the user to create to write and read to the s3 cache."
   type        = "string"
   default     = "cache_user"
+}
+
+variable "cache_bucket_prefix" {
+  description = "Prefix for s3 cache bucket name."
+  type        = "string"
+  default     = ""
 }
 
 variable "cache_expiration_days" {
