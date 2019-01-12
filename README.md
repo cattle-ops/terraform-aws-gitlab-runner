@@ -111,12 +111,13 @@ All variables and defaults:
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
 | cache_user | User name of the user to create to write and read to the s3 cache. | string | `cache_user` | no |
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
+| docker_machine_options | Additional to set options for docker machien. Each element of the list should be key and value. E.g. '["--amazonec2-zone=a"]' | list | `<list>` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
-| docker_machine_version | Version of docker-machine. | string | `0.15.0` | no |
+| docker_machine_version | Version of docker-machine. | string | `0.16.0` | no |
 | enable_cloudwatch_logging | Enable or disable the CloudWatch logging. | string | `1` | no |
 | environment | A name that identifies the environment, will used as prefix and for tagging. | string | - | yes |
-| gitlab_runner_version | Version for the gitlab runner. | string | `11.3.1` | no |
+| gitlab_runner_version | Version for the gitlab runner. | string | `11.6.0` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
 | runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |

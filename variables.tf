@@ -249,3 +249,9 @@ variable "allow_iam_service_linked_role_creation" {
   description = "Attach policy to runner instance to create service linked roles."
   default     = true
 }
+
+variable "docker_machine_options" {
+  description = "Additional to set options for docker machien. Each element of the list should be key and value. E.g. '[\"--amazonec2-zone=a\"]'"
+  type        = "list"
+  default     = []
+}

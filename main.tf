@@ -90,6 +90,11 @@ data "template_file" "gitlab_runner" {
   }
 }
 
+locals {
+  // Convert list to a string seperated and prepend by a comma
+  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+}
+
 data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
@@ -104,6 +109,8 @@ data "template_file" "runners" {
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
     runners_monitoring          = "${var.runners_monitoring}"
+
+    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
     runners_name                      = "${var.runners_name}"
     runners_token                     = "${var.runners_token}"
