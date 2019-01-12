@@ -77,6 +77,9 @@ gitlab_url   = "GIT_LAB_URL"
 runner_token  = "RUNNER_TOKEN"
 ```
 
+The base image used to host the GitLab Runner agent is the latest available Amazon Linux HVM EBS AMI. In previous version of the module an hard coded list of AMI per region was available. This list is replaced by a search filter to find the latest AMI. By setting the filter for example to `amzn-ami-hvm-2018.03.0.20180622-x86_64-ebs` you can lock the version of the AMI.
+
+
 ### Usage module.
 
 ```hcl
@@ -150,6 +153,13 @@ All variables and defaults:
 | userdata_post_install | User-data script snippet to insert after gitlab-runner install | string | `` | no |
 | userdata_pre_install | User-data script snippet to insert before gitlab-runner install | string | `` | no |
 | vpc_id | The VPC that is used for the instances. | string | - | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| runner_as_group_name | Name of the autoscaling group for the gitlab-runner instance |
+| runner_cache_bucket_arn | ARN of the S3 for the build cache. |
 
 ## Example
 

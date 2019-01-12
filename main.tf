@@ -152,10 +152,18 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   tags = ["${data.null_data_source.tags.*.outputs}"]
 }
 
+data "aws_ami" "runner" {
+  most_recent = "true"
+
+  filter = "${var.ami_filter}"
+
+  owners = ["${var.ami_owners}"]
+}
+
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = ["${aws_security_group.runner.id}"]
   key_name             = "${aws_key_pair.key.key_name}"
-  image_id             = "${lookup(var.amazon_optimized_amis, var.aws_region)}"
+  image_id             = "${data.aws_ami.runner.id}"
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
