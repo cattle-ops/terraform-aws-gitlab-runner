@@ -176,7 +176,7 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 data "template_file" "instance_role_trust_policy" {
-  template = "${file("${path.module}/policies/instance-role-trust-policy.json")}"
+  template = "${length(var.instance_role_json) > 0 ? var.instance_role_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
 }
 
 resource "aws_iam_role" "instance" {

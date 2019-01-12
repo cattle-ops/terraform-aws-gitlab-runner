@@ -255,3 +255,9 @@ variable "docker_machine_options" {
   type        = "list"
   default     = []
 }
+
+variable "instance_role_json" {
+  description = "Instance role json to override the default."
+  type        = "string"
+  default     = ""
+}

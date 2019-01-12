@@ -102,6 +102,7 @@ module "gitlab-runner" {
 
 All variables and defaults:
 
+
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | allow_iam_service_linked_role_creation | Attach policy to runner instance to create service linked roles. | string | `true` | no |
@@ -118,6 +119,7 @@ All variables and defaults:
 | enable_cloudwatch_logging | Enable or disable the CloudWatch logging. | string | `1` | no |
 | environment | A name that identifies the environment, will used as prefix and for tagging. | string | - | yes |
 | gitlab_runner_version | Version for the gitlab runner. | string | `11.6.0` | no |
+| instance_role_json | Instance role json to override the default. | string | `` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
 | runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
