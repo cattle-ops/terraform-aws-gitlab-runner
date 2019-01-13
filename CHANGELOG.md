@@ -5,14 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Changed: Replaced cache user by a instance profile to access the cache from the build
+- Changed: Update gitlab toml cache section, removed deprecated usages of s3
 - Changed: The variable `amazon_optimized_amis` is removed an replaced by a filter to select the AMI. To use the default of the latest AMI set the filter `ami_filter` to `amzn-ami-hvm-2018.03.0.20180622-x86_64-ebs`.
 - Added: Option to set docker machine options via `docker_machine_optionns`.
 - Added: Several output variables.
 
-
 ## [1.8.0] - 2018-12-30
-- Changed: Updated default docker-machine version to 0.16.0
-- Changed: Updated default gitlab runner to 11.6.0
+- Changed: Update default docker-machine version to 0.16.0
+- Changed: Update default gitlab runner to 11.6.0
 - Added: Configuration parameters for post_build_script, pre_clone_script, request_concurrency and output_limit. #22
 - Added: Configurable docker image for runner #27
 - Added: Add pre/post install user-data snippets for runners #26

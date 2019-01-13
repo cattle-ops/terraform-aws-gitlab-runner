@@ -109,11 +109,11 @@ All variables and defaults:
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | allow_iam_service_linked_role_creation | Attach policy to runner instance to create service linked roles. | string | `true` | no |
-| amazon_optimized_amis | AMI map per region-zone for the gitlab-runner instance AMI. | map | `<map>` | no |
+| ami_filter | AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration. | list | `<list>` | no |
+| ami_owners | A list of owners used to select the AMI for the instance. | list | `<list>` | no |
 | aws_region | AWS region. | string | - | yes |
 | cache_bucket_prefix | Prefix for s3 cache bucket name. | string | `` | no |
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
-| cache_user | User name of the user to create to write and read to the s3 cache. | string | `cache_user` | no |
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
 | docker_machine_options | Additional to set options for docker machien. Each element of the list should be key and value. E.g. '["--amazonec2-zone=a"]' | list | `<list>` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
@@ -122,7 +122,8 @@ All variables and defaults:
 | enable_cloudwatch_logging | Enable or disable the CloudWatch logging. | string | `1` | no |
 | environment | A name that identifies the environment, will used as prefix and for tagging. | string | - | yes |
 | gitlab_runner_version | Version for the gitlab runner. | string | `11.6.0` | no |
-| instance_role_json | Instance role json to override the default. | string | `` | no |
+| instance_role_json | Instance role json for the runner agent ec2 instance to override the default. | string | `` | no |
+| instance_role_runner_json | Instance role json for the docker machine runners to override the default. | string | `` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
 | runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
@@ -158,8 +159,10 @@ All variables and defaults:
 
 | Name | Description |
 |------|-------------|
+| runner_agent role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
 | runner_as_group_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner_cache_bucket_arn | ARN of the S3 for the build cache. |
+| runner_role | ARN of the rule used for the docker machine runners. |
 
 ## Example
 

@@ -109,6 +109,7 @@ data "template_file" "runners" {
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
     runners_monitoring          = "${var.runners_monitoring}"
+    runners_instance_profile    = "${aws_iam_instance_profile.runners.name}"
 
     docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
@@ -132,8 +133,6 @@ data "template_file" "runners" {
     runners_pre_clone_script          = "${var.runners_pre_clone_script}"
     runners_request_concurrency       = "${var.runners_request_concurrency}"
     runners_output_limit              = "${var.runners_output_limit}"
-    bucket_user_access_key            = "${aws_iam_access_key.cache_user.id}"
-    bucket_user_secret_key            = "${aws_iam_access_key.cache_user.secret}"
     bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
   }
 }
@@ -236,4 +235,42 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.service_linked_role.arn}"
+}
+
+################################################################################
+### docker machine runner role and policies
+################################################################################
+data "template_file" "runners_role_trust_policy" {
+  template = "${length(var.instance_role_runner_json) > 0 ? var.instance_role_runner_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
+}
+
+resource "aws_iam_role" "runners" {
+  name               = "${var.environment}-runners-role"
+  assume_role_policy = "${data.template_file.runners_role_trust_policy.rendered}"
+}
+
+resource "aws_iam_instance_profile" "runners" {
+  name = "${var.environment}-runners-profile"
+  role = "${aws_iam_role.runners.name}"
+}
+
+data "template_file" "cache_policy" {
+  template = "${file("${path.module}/policies/cache.json")}"
+
+  vars {
+    s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
+  }
+}
+
+resource "aws_iam_policy" "runners" {
+  name        = "${var.environment}-runners-cache-policy"
+  path        = "/"
+  description = "Policy for Runners."
+
+  policy = "${data.template_file.cache_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "runners" {
+  role       = "${aws_iam_role.runners.name}"
+  policy_arn = "${aws_iam_policy.runners.arn}"
 }
