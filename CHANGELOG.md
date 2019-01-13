@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added: Option to set docker machine options via `docker_machine_optionns`.
 - Added: Several output variables.
 
+
 ## [1.8.0] - 2018-12-30
 - Changed: Update default docker-machine version to 0.16.0
 - Changed: Update default gitlab runner to 11.6.0

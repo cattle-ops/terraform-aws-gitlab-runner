@@ -113,6 +113,8 @@ data "template_file" "runners" {
 
     docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
+    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
+
     runners_name                      = "${var.runners_name}"
     runners_token                     = "${var.runners_token}"
     runners_limit                     = "${var.runners_limit}"
