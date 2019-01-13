@@ -184,12 +184,6 @@ variable "docker_machine_user" {
   default     = "docker-machine"
 }
 
-variable "cache_user" {
-  description = "User name of the user to create to write and read to the s3 cache."
-  type        = "string"
-  default     = "cache_user"
-}
-
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = "string"
@@ -230,7 +224,13 @@ variable "docker_machine_options" {
 }
 
 variable "instance_role_json" {
-  description = "Instance role json to override the default."
+  description = "Instance role json for the runner agent ec2 instance to override the default."
+  type        = "string"
+  default     = ""
+}
+
+variable "instance_role_runner_json" {
+  description = "Instance role json for the docker machine runners to override the default."
   type        = "string"
   default     = ""
 }
