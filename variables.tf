@@ -29,33 +29,6 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
-# list with amazon linux optimized images per region
-# HVM (SSD) EBS-Backed 64-bit
-# Amazon Linux AMI 2018.03 was released on 2018-06-28 https://aws.amazon.com/amazon-linux-ami/
-variable "amazon_optimized_amis" {
-  description = "AMI map per region-zone for the gitlab-runner instance AMI."
-  type        = "map"
-
-  default = {
-    us-east-1      = "ami-97785bed" # N. Virginia
-    us-east-2      = "ami-f63b1193" # Ohio
-    us-west-1      = "ami-824c4ee2" # N. California
-    us-west-2      = "ami-f2d3638a" # Oregon
-    eu-west-1      = "ami-d834aba1" # Ireland
-    eu-west-2      = "ami-403e2524" # London
-    eu-central-1   = "ami-5652ce39" # Frankfurt
-    eu-central-2   = "ami-8ee056f3" # Paris
-    ap-northeast-1 = "ami-ceafcba8" # Tokyo
-    ap-northeast-2 = "ami-863090e8" # Seoel
-    ap-southeast-1 = "ami-68097514" # Singapore
-    ap-southeast-2 = "ami-942dd1f6" # Sydney
-    ap-south-1     = "ami-531a4c3c" # Mumbai
-    ca-central-1   = "ami-a954d1cd" # Canada
-    sa-east-1      = "ami-84175ae8" # São Paulo
-    cn-north-1     = "ami-cb19c4a6" # Beijing
-  }
-}
-
 variable "ssh_public_key" {
   description = "Public SSH key used for the gitlab-runner ec2 instance."
   type        = "string"
@@ -248,4 +221,32 @@ variable "tags" {
 variable "allow_iam_service_linked_role_creation" {
   description = "Attach policy to runner instance to create service linked roles."
   default     = true
+}
+
+variable "docker_machine_options" {
+  description = "Additional to set options for docker machien. Each element of the list should be key and value. E.g. '[\"--amazonec2-zone=a\"]'"
+  type        = "list"
+  default     = []
+}
+
+variable "instance_role_json" {
+  description = "Instance role json to override the default."
+  type        = "string"
+  default     = ""
+}
+
+variable "ami_filter" {
+  description = "AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration."
+  type        = "list"
+
+  default = [{
+    name   = "name"
+    values = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
+  }]
+}
+
+variable "ami_owners" {
+  description = "A list of owners used to select the AMI for the instance."
+  type        = "list"
+  default     = ["amazon"]
 }

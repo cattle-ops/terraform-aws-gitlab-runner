@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Changed: The variable `amazon_optimized_amis` is removed an replaced by a filter to select the AMI. To use the default of the latest AMI set the filter `ami_filter` to `amzn-ami-hvm-2018.03.0.20180622-x86_64-ebs`.
+- Added: Option to set docker machine options via `docker_machine_optionns`.
+- Added: Several output variables.
+
 
 ## [1.8.0] - 2018-12-30
 - Changed: Updated default docker-machine version to 0.16.0

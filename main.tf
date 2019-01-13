@@ -90,6 +90,11 @@ data "template_file" "gitlab_runner" {
   }
 }
 
+locals {
+  // Convert list to a string seperated and prepend by a comma
+  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+}
+
 data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
@@ -104,6 +109,8 @@ data "template_file" "runners" {
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
     runners_monitoring          = "${var.runners_monitoring}"
+
+    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
     runners_name                      = "${var.runners_name}"
     runners_token                     = "${var.runners_token}"
@@ -145,10 +152,18 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   tags = ["${data.null_data_source.tags.*.outputs}"]
 }
 
+data "aws_ami" "runner" {
+  most_recent = "true"
+
+  filter = "${var.ami_filter}"
+
+  owners = ["${var.ami_owners}"]
+}
+
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = ["${aws_security_group.runner.id}"]
   key_name             = "${aws_key_pair.key.key_name}"
-  image_id             = "${lookup(var.amazon_optimized_amis, var.aws_region)}"
+  image_id             = "${data.aws_ami.runner.id}"
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
@@ -169,7 +184,7 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 data "template_file" "instance_role_trust_policy" {
-  template = "${file("${path.module}/policies/instance-role-trust-policy.json")}"
+  template = "${length(var.instance_role_json) > 0 ? var.instance_role_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
 }
 
 resource "aws_iam_role" "instance" {
