@@ -222,3 +222,24 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.service_linked_role.arn}"
 }
+
+
+################################################################################
+### AWS Systems Manager access to store runner token once regsitered
+################################################################################
+data "template_file" "ssm_policy" {
+  template = "${file("${path.module}/policies/instance-secure-parameter-role-policy.json")}"
+}
+
+resource "aws_iam_policy" "ssm" {
+  name        = "${var.environment}-ssm"
+  path        = "/"
+  description = "Policy for runner token param access via SSM"
+
+  policy = "${data.template_file.ssm_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "${aws_iam_policy.ssm.arn}"
+}
