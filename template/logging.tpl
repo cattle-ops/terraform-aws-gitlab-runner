@@ -17,6 +17,12 @@ log_stream_name = {instanceId}/dmesg
 log_group_name = ${environment}
 initial_position = start_of_file
 
+[/var/log/user-data.log]
+file = /var/log/user-data.log
+log_stream_name = {instanceId}/user-data-ci-scheduler
+log_group_name = ${environment}
+initial_position = start_of_file
+
 [/var/log/messages]
 file = /var/log/messages
 log_stream_name = {instanceId}/messages
