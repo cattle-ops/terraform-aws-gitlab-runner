@@ -16,7 +16,7 @@ service gitlab-runner restart
 chkconfig gitlab-runner on
 
 aws ssm get-parameters --type SecureString --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq -r ".Parameters | .[0] | .Value" > token.file
-if [ `cat token.file | wc -l` == 0 ]
+if [ `cat token.file | wc -l` == 1 ]
 then
   token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
