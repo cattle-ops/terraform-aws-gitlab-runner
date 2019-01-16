@@ -8,6 +8,7 @@ check_interval = 0
   executor = "docker+machine"
   pre_build_script = "${runners_pre_build_script}"
   limit = ${runners_limit}
+  request_concurrency = 10
   [runners.docker]
     tls_verify = false
     image = "docker:18.03.1-ce"
