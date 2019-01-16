@@ -17,8 +17,8 @@ chkconfig gitlab-runner on
 
 
 
-export token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq ".Parameters | .[0] | .Value")
-if [ `cat token | wc -l` == 0 ]
+aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq ".Parameters | .[0] | .Value" > token.file
+if [ `cat token.file | wc -l` == 0 ]
 then
   token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
@@ -28,10 +28,9 @@ then
     --form "run_untagged=${gitlab_runner_run_untagged}" \
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     | jq -r .token)
-  echo $token > token.file
-  aws ssm put-parameter --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1
-  rm token.file
+  aws ssm put-parameter --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1  
 fi
 
-sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
-export token=""
+
+sed -i.bak s/__REPLACED_BY_USER_DATA__/`cat token.file`/g /etc/gitlab-runner/config.toml
+rm token.file
