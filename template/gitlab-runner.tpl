@@ -15,8 +15,8 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
 service gitlab-runner restart
 chkconfig gitlab-runner on
 
-aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq -r ".Parameters | .[0] | .Value" > token.file
-if [ `cat token.file | wc -l` == 1 ]
+token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq -r ".Parameters | .[0] | .Value")
+if [ `echo $token | wc -l` == 1 ]
 then
   token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
@@ -29,6 +29,4 @@ then
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1
 fi
 
-
-sed -i.bak s/__REPLACED_BY_USER_DATA__/`cat token.file`/g /etc/gitlab-runner/config.toml
-rm token.file
+sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
