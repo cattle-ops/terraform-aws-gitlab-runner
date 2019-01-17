@@ -26,7 +26,7 @@ then
     --form "run_untagged=${gitlab_runner_run_untagged}" \
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     | jq -r .token)
-  aws ssm put-parameter --type SecureString  --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1
+  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1
 fi
 
 
