@@ -1,6 +1,6 @@
 concurrent = ${runners_concurrent}
 check_interval = 0
-log_level = ${runners_log_level}
+log_level = "${runners_log_level}"
 
 [[runners]]
   name = "${runners_name}"
