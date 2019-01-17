@@ -256,3 +256,8 @@ variable "secure_parameter_store_runner_token_key" {
   type = "string"
   description = "The key name used store the Gitlab runner token in Secure Paramater Store"
 }
+
+variable "runners_log_level" {
+  type = "string"
+  default = "warning"
+}
