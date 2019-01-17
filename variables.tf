@@ -261,3 +261,8 @@ variable "runners_log_level" {
   type = "string"
   default = "warning"
 }
+
+variable "secure_parameter_store_region" {
+  type = "string"
+  default = "eu-central-1"
+}

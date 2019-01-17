@@ -15,7 +15,7 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
 service gitlab-runner restart
 chkconfig gitlab-runner on
 
-token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region eu-central-1 | jq -r ".Parameters | .[0] | .Value")
+token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
 if [ `echo $token | wc -l` == 1 ]
 then
   token=$(curl --request POST -L "${gitlab_runner_coordinator_url_with_trailing_slash}api/v4/runners" \
@@ -26,7 +26,7 @@ then
     --form "run_untagged=${gitlab_runner_run_untagged}" \
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     | jq -r .token)
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region eu-central-1
+  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --type "String" --value $token --region "${secure_parameter_store_region}"
 fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
