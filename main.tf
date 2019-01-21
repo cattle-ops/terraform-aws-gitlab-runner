@@ -281,6 +281,7 @@ resource "aws_iam_policy" "ssm" {
 resource "aws_iam_role_policy_attachment" "ssm" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.ssm.arn}"
+}
 ################################################################################
 ### docker machine runner role and policies
 ################################################################################
