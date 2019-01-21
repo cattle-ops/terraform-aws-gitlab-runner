@@ -13,7 +13,6 @@ log_level = "${runners_log_level}"
   request_concurrency = ${runners_request_concurrency}
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
-  request_concurrency = 10
   [runners.docker]
     tls_verify = false
     image = "${runners_image}"
