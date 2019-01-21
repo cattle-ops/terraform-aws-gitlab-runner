@@ -29,33 +29,6 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
-# list with amazon linux optimized images per region
-# HVM (SSD) EBS-Backed 64-bit
-# Amazon Linux AMI 2018.03 was released on 2018-06-28 https://aws.amazon.com/amazon-linux-ami/
-variable "amazon_optimized_amis" {
-  description = "AMI map per region-zone for the gitlab-runner instance AMI."
-  type        = "map"
-
-  default = {
-    us-east-1      = "ami-97785bed" # N. Virginia
-    us-east-2      = "ami-f63b1193" # Ohio
-    us-west-1      = "ami-824c4ee2" # N. California
-    us-west-2      = "ami-f2d3638a" # Oregon
-    eu-west-1      = "ami-d834aba1" # Ireland
-    eu-west-2      = "ami-403e2524" # London
-    eu-central-1   = "ami-5652ce39" # Frankfurt
-    eu-central-2   = "ami-8ee056f3" # Paris
-    ap-northeast-1 = "ami-ceafcba8" # Tokyo
-    ap-northeast-2 = "ami-863090e8" # Seoel
-    ap-southeast-1 = "ami-68097514" # Singapore
-    ap-southeast-2 = "ami-942dd1f6" # Sydney
-    ap-south-1     = "ami-531a4c3c" # Mumbai
-    ca-central-1   = "ami-a954d1cd" # Canada
-    sa-east-1      = "ami-84175ae8" # São Paulo
-    cn-north-1     = "ami-cb19c4a6" # Beijing
-  }
-}
-
 variable "ssh_public_key" {
   description = "Public SSH key used for the gitlab-runner ec2 instance."
   type        = "string"
@@ -73,7 +46,7 @@ variable "docker_machine_spot_price_bid" {
 
 variable "docker_machine_version" {
   description = "Version of docker-machine."
-  default     = "0.15.0"
+  default     = "0.16.0"
 }
 
 variable "runners_name" {
@@ -109,6 +82,12 @@ variable "runners_idle_time" {
 variable "runners_idle_count" {
   description = "Idle count of the runners, will be used in the runner config.toml"
   default     = 0
+}
+
+variable "runners_image" {
+  description = "Image to run builds, will be used in the runner config.toml"
+  type        = "string"
+  default     = "docker:18.03.1-ce"
 }
 
 variable "runners_privilled" {
@@ -160,6 +139,40 @@ variable "runners_pre_build_script" {
   default     = ""
 }
 
+variable "runners_post_build_script" {
+  description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
+  type        = "string"
+  default     = ""
+}
+
+variable "runners_pre_clone_script" {
+  description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
+  type        = "string"
+  default     = ""
+}
+
+variable "runners_request_concurrency" {
+  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)"
+  default     = "1"
+}
+
+variable "runners_output_limit" {
+  description = "Set maximum build log size in kilobytes, by default set to 4096 (4MB)"
+  default     = "4096"
+}
+
+variable "userdata_pre_install" {
+  description = "User-data script snippet to insert before gitlab-runner install"
+  type        = "string"
+  default     = ""
+}
+
+variable "userdata_post_install" {
+  description = "User-data script snippet to insert after gitlab-runner install"
+  type        = "string"
+  default     = ""
+}
+
 variable "runners_use_private_address" {
   description = "Restrict runners to use only private address"
   default     = "true"
@@ -169,12 +182,6 @@ variable "docker_machine_user" {
   description = "User name for the user to create spot instances to host docker-machine."
   type        = "string"
   default     = "docker-machine"
-}
-
-variable "cache_user" {
-  description = "User name of the user to create to write and read to the s3 cache."
-  type        = "string"
-  default     = "cache_user"
 }
 
 variable "cache_bucket_prefix" {
@@ -191,7 +198,7 @@ variable "cache_expiration_days" {
 variable "gitlab_runner_version" {
   description = "Version for the gitlab runner."
   type        = "string"
-  default     = "11.3.1"
+  default     = "11.6.0"
 }
 
 variable "enable_cloudwatch_logging" {
@@ -265,4 +272,36 @@ variable "runners_log_level" {
 variable "secure_parameter_store_region" {
   type = "string"
   default = "eu-central-1"
+variable "docker_machine_options" {
+  description = "Additional to set options for docker machien. Each element of the list should be key and value. E.g. '[\"--amazonec2-zone=a\"]'"
+  type        = "list"
+  default     = []
+}
+
+variable "instance_role_json" {
+  description = "Instance role json for the runner agent ec2 instance to override the default."
+  type        = "string"
+  default     = ""
+}
+
+variable "instance_role_runner_json" {
+  description = "Instance role json for the docker machine runners to override the default."
+  type        = "string"
+  default     = ""
+}
+
+variable "ami_filter" {
+  description = "AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration."
+  type        = "list"
+
+  default = [{
+    name   = "name"
+    values = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
+  }]
+}
+
+variable "ami_owners" {
+  description = "A list of owners used to select the AMI for the instance."
+  type        = "list"
+  default     = ["amazon"]
 }
