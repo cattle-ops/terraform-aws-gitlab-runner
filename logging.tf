@@ -13,5 +13,5 @@ resource "aws_iam_role_policy" "instance" {
 resource "aws_cloudwatch_log_group" "environment" {
   count = "${var.enable_cloudwatch_logging ? 1 : 0}"
   name  = "${var.environment}"
-  tags = "${local.tags}"
+  tags  = "${local.tags}"
 }

@@ -260,19 +260,20 @@ variable "gitlab_runner_maximum_timeout" {
 }
 
 variable "secure_parameter_store_runner_token_key" {
-  type = "string"
+  type        = "string"
   description = "The key name used store the Gitlab runner token in Secure Paramater Store"
 }
 
 variable "runners_log_level" {
-  type = "string"
+  type    = "string"
   default = "warning"
 }
 
 variable "secure_parameter_store_region" {
-  type = "string"
+  type    = "string"
   default = "eu-central-1"
 }
+
 variable "docker_machine_options" {
   description = "Additional to set options for docker machien. Each element of the list should be key and value. E.g. '[\"--amazonec2-zone=a\"]'"
   type        = "list"

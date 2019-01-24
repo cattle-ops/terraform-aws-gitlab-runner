@@ -1,4 +1,3 @@
-
 resource "aws_key_pair" "key" {
   key_name   = "${var.environment}-gitlab-runner"
   public_key = "${var.ssh_public_key}"
@@ -95,11 +94,11 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_maximum_timeout                     = "${var.gitlab_runner_maximum_timeout}"
     secure_parameter_store_runner_token_key           = "${var.secure_parameter_store_runner_token_key}"
     secure_parameter_store_region                     = "${var.secure_parameter_store_region}"
-    gitlab_runner_version  = "${var.gitlab_runner_version}"
-    docker_machine_version = "${var.docker_machine_version}"
-    runners_config         = "${data.template_file.runners.rendered}"
-    pre_install            = "${var.userdata_pre_install}"
-    post_install           = "${var.userdata_post_install}"
+    gitlab_runner_version                             = "${var.gitlab_runner_version}"
+    docker_machine_version                            = "${var.docker_machine_version}"
+    runners_config                                    = "${data.template_file.runners.rendered}"
+    pre_install                                       = "${var.userdata_pre_install}"
+    post_install                                      = "${var.userdata_post_install}"
   }
 }
 
@@ -112,18 +111,18 @@ data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
   vars {
-    aws_region                        = "${var.aws_region}"
-    gitlab_url                        = "${var.runners_gitlab_url}"
-    environment                       = "${var.environment}"
-    runners_vpc_id                    = "${var.vpc_id}"
-    runners_subnet_id                 = "${var.subnet_id_runners}"
-    runners_instance_type             = "${var.docker_machine_instance_type}"
-    runners_spot_price_bid            = "${var.docker_machine_spot_price_bid}"
-    runners_security_group_name       = "${aws_security_group.docker_machine.name}"
-    runners_monitoring                = "${var.runners_monitoring}"
-    aws_region  = "${var.aws_region}"
-    gitlab_url  = "${var.runners_gitlab_url}"
-    environment = "${var.environment}"
+    aws_region                  = "${var.aws_region}"
+    gitlab_url                  = "${var.runners_gitlab_url}"
+    environment                 = "${var.environment}"
+    runners_vpc_id              = "${var.vpc_id}"
+    runners_subnet_id           = "${var.subnet_id_runners}"
+    runners_instance_type       = "${var.docker_machine_instance_type}"
+    runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
+    runners_security_group_name = "${aws_security_group.docker_machine.name}"
+    runners_monitoring          = "${var.runners_monitoring}"
+    aws_region                  = "${var.aws_region}"
+    gitlab_url                  = "${var.runners_gitlab_url}"
+    environment                 = "${var.environment}"
 
     runners_vpc_id              = "${var.vpc_id}"
     runners_subnet_id           = "${var.subnet_id_runners}"
@@ -262,7 +261,6 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
   policy_arn = "${aws_iam_policy.service_linked_role.arn}"
 }
 
-
 ################################################################################
 ### AWS Systems Manager access to store runner token once regsitered
 ################################################################################
@@ -282,6 +280,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.ssm.arn}"
 }
+
 ################################################################################
 ### docker machine runner role and policies
 ################################################################################
