@@ -85,7 +85,14 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_version  = "${var.gitlab_runner_version}"
     docker_machine_version = "${var.docker_machine_version}"
     runners_config         = "${data.template_file.runners.rendered}"
+    pre_install            = "${var.userdata_pre_install}"
+    post_install           = "${var.userdata_post_install}"
   }
+}
+
+locals {
+  // Convert list to a string seperated and prepend by a comma
+  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
 }
 
 data "template_file" "runners" {
@@ -102,11 +109,17 @@ data "template_file" "runners" {
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
     runners_monitoring          = "${var.runners_monitoring}"
+    runners_instance_profile    = "${aws_iam_instance_profile.runners.name}"
+
+    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
+
+    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
     runners_name                      = "${var.runners_name}"
     runners_token                     = "${var.runners_token}"
     runners_limit                     = "${var.runners_limit}"
     runners_concurrent                = "${var.runners_concurrent}"
+    runners_image                     = "${var.runners_image}"
     runners_privilled                 = "${var.runners_privilled}"
     runners_idle_count                = "${var.runners_idle_count}"
     runners_idle_time                 = "${var.runners_idle_time}"
@@ -118,8 +131,10 @@ data "template_file" "runners" {
     runners_iam_instance_profile_name = "${var.runners_iam_instance_profile_name}"
     runners_use_private_address       = "${var.runners_use_private_address}"
     runners_pre_build_script          = "${var.runners_pre_build_script}"
-    bucket_user_access_key            = "${aws_iam_access_key.cache_user.id}"
-    bucket_user_secret_key            = "${aws_iam_access_key.cache_user.secret}"
+    runners_post_build_script         = "${var.runners_post_build_script}"
+    runners_pre_clone_script          = "${var.runners_pre_clone_script}"
+    runners_request_concurrency       = "${var.runners_request_concurrency}"
+    runners_output_limit              = "${var.runners_output_limit}"
     bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
   }
 }
@@ -138,10 +153,18 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   tags = ["${data.null_data_source.tags.*.outputs}"]
 }
 
+data "aws_ami" "runner" {
+  most_recent = "true"
+
+  filter = "${var.ami_filter}"
+
+  owners = ["${var.ami_owners}"]
+}
+
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = ["${aws_security_group.runner.id}"]
   key_name             = "${aws_key_pair.key.key_name}"
-  image_id             = "${lookup(var.amazon_optimized_amis, var.aws_region)}"
+  image_id             = "${data.aws_ami.runner.id}"
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
@@ -162,7 +185,7 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 data "template_file" "instance_role_trust_policy" {
-  template = "${file("${path.module}/policies/instance-role-trust-policy.json")}"
+  template = "${length(var.instance_role_json) > 0 ? var.instance_role_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
 }
 
 resource "aws_iam_role" "instance" {
@@ -214,4 +237,42 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.service_linked_role.arn}"
+}
+
+################################################################################
+### docker machine runner role and policies
+################################################################################
+data "template_file" "runners_role_trust_policy" {
+  template = "${length(var.instance_role_runner_json) > 0 ? var.instance_role_runner_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
+}
+
+resource "aws_iam_role" "runners" {
+  name               = "${var.environment}-runners-role"
+  assume_role_policy = "${data.template_file.runners_role_trust_policy.rendered}"
+}
+
+resource "aws_iam_instance_profile" "runners" {
+  name = "${var.environment}-runners-profile"
+  role = "${aws_iam_role.runners.name}"
+}
+
+data "template_file" "cache_policy" {
+  template = "${file("${path.module}/policies/cache.json")}"
+
+  vars {
+    s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
+  }
+}
+
+resource "aws_iam_policy" "runners" {
+  name        = "${var.environment}-runners-cache-policy"
+  path        = "/"
+  description = "Policy for Runners."
+
+  policy = "${data.template_file.cache_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "runners" {
+  role       = "${aws_iam_role.runners.name}"
+  policy_arn = "${aws_iam_policy.runners.arn}"
 }
