@@ -117,6 +117,7 @@ data "template_file" "runners" {
 
     runners_name                      = "${var.runners_name}"
     runners_token                     = "${var.runners_token}"
+    runners_executor                  = "${var.runners_executor}"
     runners_limit                     = "${var.runners_limit}"
     runners_concurrent                = "${var.runners_concurrent}"
     runners_image                     = "${var.runners_image}"
@@ -141,7 +142,7 @@ data "template_file" "runners" {
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                = "${var.environment}-as-group"
-  vpc_zone_identifier = ["${var.subnet_id_gitlab_runner}"]
+  vpc_zone_identifier = ["${var.subnet_ids_gitlab_runner}"]
 
   # vpc_zone_identifier       = ["${var.subnets}"]
   min_size                  = "1"

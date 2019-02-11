@@ -92,7 +92,7 @@ module "gitlab-runner" {
   ssh_public_key          = "${file("${var.ssh_key_file}")}"
 
   vpc_id                  = "${module.vpc.vpc_id}"
-  subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
+  subnet_ids_gitlab_runner = "${module.vpc.private_subnets}"
   subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
 
   runners_name            = "${var.runner_name}"
@@ -148,7 +148,7 @@ All variables and defaults:
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 | runners_use_private_address | Restrict runners to use only private address | string | `true` | no |
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
-| subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
+| subnet_ids_gitlab_runner | Subnets used for hosting the gitlab-runner. | list | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt. | map | `<map>` | no |
 | userdata_post_install | User-data script snippet to insert after gitlab-runner install | string | `` | no |

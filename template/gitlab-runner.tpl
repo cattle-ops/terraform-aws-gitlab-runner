@@ -13,8 +13,11 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
   chmod +x /tmp/docker-machine && \
   cp /tmp/docker-machine /usr/local/bin/docker-machine && \
   ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
+yum install docker -y
+usermod -a -G docker ec2-user
 
 ${post_install}
 
+service docker start
 service gitlab-runner restart
 chkconfig gitlab-runner on

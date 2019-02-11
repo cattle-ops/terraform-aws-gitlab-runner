@@ -14,13 +14,13 @@ variable "vpc_id" {
 }
 
 variable "subnet_id_runners" {
-  description = "Subnet used to hosts the docker-machine runners."
-  type        = "string"
+  description = "Subnets used to hosts the docker-machine runners."
+  type        = "list"
 }
 
-variable "subnet_id_gitlab_runner" {
+variable "subnet_ids_gitlab_runner" {
   description = "Subnet used for hosting the gitlab-runner."
-  type        = "string"
+  type        = "list"
 }
 
 variable "instance_type" {
@@ -52,6 +52,12 @@ variable "docker_machine_version" {
 variable "runners_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = "string"
+}
+
+variable "runners_executor" {
+  description = "The executor to use. Currently supports docker+machine or docker"
+  type        = "string"
+  default     = "docker+machine"
 }
 
 variable "runners_gitlab_url" {
@@ -139,8 +145,6 @@ variable "runners_pre_build_script" {
   default     = ""
 }
 
-<<<<<<< HEAD
-=======
 variable "runners_post_build_script" {
   description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
   type        = "string"
@@ -175,7 +179,6 @@ variable "userdata_post_install" {
   default     = ""
 }
 
->>>>>>> upstream/master
 variable "runners_use_private_address" {
   description = "Restrict runners to use only private address"
   default     = "true"
