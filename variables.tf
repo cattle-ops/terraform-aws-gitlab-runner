@@ -14,8 +14,8 @@ variable "vpc_id" {
 }
 
 variable "subnet_id_runners" {
-  description = "Subnets used to hosts the docker-machine runners."
-  type        = "list"
+  description = "Subnet used to hosts the docker-machine runners."
+  type        = "string"
 }
 
 variable "subnet_ids_gitlab_runner" {
