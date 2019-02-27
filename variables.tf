@@ -127,6 +127,10 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "create_runners_iam_instance_profile" {
+  default = true
+}
+
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = "string"
@@ -193,6 +197,12 @@ variable "cache_bucket_prefix" {
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
   default     = 1
+}
+
+variable "cache_shared" {
+  description = "Enables cache sharing between runners, false by default."
+  type        = "string"
+  default     = "false"
 }
 
 variable "gitlab_runner_version" {

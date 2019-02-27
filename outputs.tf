@@ -8,12 +8,7 @@ output "runner_cache_bucket_arn" {
   value       = "${aws_s3_bucket.build_cache.arn}"
 }
 
-output "runner_agent role" {
+output "runner_agent_role" {
   description = "ARN of the rule used for the ec2 instance for the GitLab runner agent."
   value       = "${aws_iam_role.instance.arn}"
-}
-
-output "runner_role" {
-  description = "ARN of the rule used for the docker machine runners."
-  value       = "${aws_iam_role.runners.arn}"
 }

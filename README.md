@@ -103,9 +103,6 @@ module "gitlab-runner" {
 
 ## Inputs
 
-All variables and defaults:
-
-
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | allow_iam_service_linked_role_creation | Attach policy to runner instance to create service linked roles. | string | `true` | no |
@@ -114,6 +111,8 @@ All variables and defaults:
 | aws_region | AWS region. | string | - | yes |
 | cache_bucket_prefix | Prefix for s3 cache bucket name. | string | `` | no |
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
+| cache_shared | Enables cache sharing between runners, false by default. | string | `false` | no |
+| create_runners_iam_instance_profile |  | string | `true` | no |
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
 | docker_machine_options | Additional to set options for docker machien. Each element of the list should be key and value. E.g. '["--amazonec2-zone=a"]' | list | `<list>` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
@@ -132,6 +131,7 @@ All variables and defaults:
 | runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
 | runners_image | Image to run builds, will be used in the runner config.toml | string | `docker:18.03.1-ce` | no |
 | runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
+| runners_machine_iam_instance_profile_name | IAM instance profile name to assign to the spot instance which runs the build. | string | `` | no |
 | runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
 | runners_off_peak_idle_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `0` | no |
@@ -159,10 +159,9 @@ All variables and defaults:
 
 | Name | Description |
 |------|-------------|
-| runner_agent role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
+| runner_agent_role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
 | runner_as_group_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner_cache_bucket_arn | ARN of the S3 for the build cache. |
-| runner_role | ARN of the rule used for the docker machine runners. |
 
 ## Example
 
