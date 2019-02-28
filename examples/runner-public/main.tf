@@ -30,11 +30,4 @@ module "runner" {
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
   runners_token      = "${var.runner_token}"
-
-  runners_off_peak_timezone   = "Europe/Amsterdam"
-  runners_off_peak_idle_count = 0
-  runners_off_peak_idle_time  = 60
-
-  # working 9 to 5 :)
-  runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
