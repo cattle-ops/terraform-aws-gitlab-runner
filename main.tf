@@ -92,7 +92,8 @@ data "template_file" "gitlab_runner" {
 
 locals {
   // Convert list to a string seperated and prepend by a comma
-  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+  docker_machine_options_string   = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+  runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
 }
 
 data "template_file" "runners" {
@@ -123,7 +124,7 @@ data "template_file" "runners" {
     runners_off_peak_timezone         = "${var.runners_off_peak_timezone}"
     runners_off_peak_idle_count       = "${var.runners_off_peak_idle_count}"
     runners_off_peak_idle_time        = "${var.runners_off_peak_idle_time}"
-    runners_off_peak_periods          = "${var.runners_off_peak_periods}"
+    runners_off_peak_periods_string   = "${local.runners_off_peak_periods_string}"
     runners_root_size                 = "${var.runners_root_size}"
     runners_iam_instance_profile_name = "${var.runners_iam_instance_profile_name}"
     runners_use_private_address       = "${var.runners_use_private_address}"

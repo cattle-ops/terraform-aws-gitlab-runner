@@ -95,9 +95,13 @@ module "gitlab-runner" {
   subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
   subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
 
-  runners_name            = "${var.runner_name}"
-  runners_gitlab_url      = "${var.gitlab_url}"
-  runners_token           = "${var.runner_token}"
+  runners_name             = "${var.runner_name}"
+  runners_gitlab_url       = "${var.gitlab_url}"
+  runners_token            = "${var.runner_token}"
+
+  # Optional
+  runners_off_peak_timezone = "Europe/Amsterdam"
+  runners_off_peak_periods  = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 ```
 
