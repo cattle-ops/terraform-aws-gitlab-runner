@@ -8,6 +8,8 @@ This repo contains a terraform module and example to run a [GitLab CI multi runn
 
 The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/) The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled.
 
+Besides the auto scaling option (docker+machine executor) the docker executor is supported as wel for a single node.
+
 ## Prerequisites
 
 ### Terraform
