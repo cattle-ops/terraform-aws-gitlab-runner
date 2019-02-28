@@ -8,6 +8,8 @@ This repo contains a terraform module and example to run a [GitLab CI multi runn
 
 The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/) The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled.
 
+Besides the auto scaling option (docker+machine executor) the docker executor is supported as wel for a single node.
+
 ## Prerequisites
 
 ### Terraform
@@ -92,19 +94,20 @@ module "gitlab-runner" {
   ssh_public_key          = "${file("${var.ssh_key_file}")}"
 
   vpc_id                  = "${module.vpc.vpc_id}"
-  subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
+  subnet_ids_gitlab_runner = "${module.vpc.private_subnets}"
   subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
 
-  runners_name            = "${var.runner_name}"
-  runners_gitlab_url      = "${var.gitlab_url}"
-  runners_token           = "${var.runner_token}"
+  runners_name             = "${var.runner_name}"
+  runners_gitlab_url       = "${var.gitlab_url}"
+  runners_token            = "${var.runner_token}"
+
+  # Optional
+  runners_off_peak_timezone = "Europe/Amsterdam"
+  runners_off_peak_periods  = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 ```
 
 ## Inputs
-
-All variables and defaults:
-
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
@@ -114,6 +117,8 @@ All variables and defaults:
 | aws_region | AWS region. | string | - | yes |
 | cache_bucket_prefix | Prefix for s3 cache bucket name. | string | `` | no |
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
+| cache_shared | Enables cache sharing between runners, false by default. | string | `false` | no |
+| create_runners_iam_instance_profile |  | string | `true` | no |
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
 | docker_machine_options | Additional to set options for docker machien. Each element of the list should be key and value. E.g. '["--amazonec2-zone=a"]' | list | `<list>` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
@@ -132,6 +137,7 @@ All variables and defaults:
 | runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
 | runners_image | Image to run builds, will be used in the runner config.toml | string | `docker:18.03.1-ce` | no |
 | runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
+| runners_machine_iam_instance_profile_name | IAM instance profile name to assign to the spot instance which runs the build. | string | `` | no |
 | runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
 | runners_off_peak_idle_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `0` | no |
@@ -148,7 +154,7 @@ All variables and defaults:
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 | runners_use_private_address | Restrict runners to use only private address | string | `true` | no |
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
-| subnet_id_gitlab_runner | Subnet used for hosting the gitlab-runner. | string | - | yes |
+| subnet_ids_gitlab_runner | Subnets used for hosting the gitlab-runner. | list | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt. | map | `<map>` | no |
 | userdata_post_install | User-data script snippet to insert after gitlab-runner install | string | `` | no |
@@ -159,10 +165,9 @@ All variables and defaults:
 
 | Name | Description |
 |------|-------------|
-| runner_agent role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
+| runner_agent_role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
 | runner_as_group_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner_cache_bucket_arn | ARN of the S3 for the build cache. |
-| runner_role | ARN of the rule used for the docker machine runners. |
 
 ## Example
 

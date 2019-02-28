@@ -25,9 +25,9 @@ module "runner" {
 
   ssh_public_key = "${local_file.public_ssh_key.content}"
 
-  vpc_id                  = "${module.vpc.vpc_id}"
-  subnet_id_gitlab_runner = "${element(module.vpc.private_subnets, 0)}"
-  subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
+  vpc_id                   = "${module.vpc.vpc_id}"
+  subnet_ids_gitlab_runner = "${module.vpc.private_subnets}"
+  subnet_id_runners        = "${element(module.vpc.private_subnets, 0)}"
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
