@@ -19,10 +19,14 @@ check_interval = 0
     disable_cache = false
     volumes = ["/cache"]
     shm_size = 0
-  [runners.cache.s3]
-    ServerAddress = "s3-${aws_region}.amazonaws.com"
-    BucketName = "${bucket_name}"
-    Insecure = false
+  [runners.cache]
+    Type = "s3"
+    Shared = ${shared_cache}
+    [runners.cache.s3]
+      ServerAddress = "s3.amazonaws.com"
+      BucketName = "${bucket_name}"
+      BucketLocation = "${aws_region}"
+      Insecure = false
   [runners.machine]
     IdleCount = ${runners_idle_count}
     IdleTime = ${runners_idle_time}
@@ -39,11 +43,10 @@ check_interval = 0
       "amazonec2-security-group=${runners_security_group_name}",
       "amazonec2-tags=environment,${environment}",
       "amazonec2-monitoring=${runners_monitoring}",
-      "amazonec2-iam-instance-profile=${runners_instance_profile}",
       "amazonec2-root-size=${runners_root_size}"
       ${docker_machine_options}
     ]
     OffPeakTimezone = "${runners_off_peak_timezone}"
     OffPeakIdleCount = ${runners_off_peak_idle_count}
     OffPeakIdleTime = ${runners_off_peak_idle_time}
-    OffPeakPeriods = ${runners_off_peak_periods}
+    ${runners_off_peak_periods_string}

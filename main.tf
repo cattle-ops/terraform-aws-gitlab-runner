@@ -92,7 +92,8 @@ data "template_file" "gitlab_runner" {
 
 locals {
   // Convert list to a string seperated and prepend by a comma
-  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+  docker_machine_options_string   = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+  runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
 }
 
 data "template_file" "runners" {
@@ -109,9 +110,6 @@ data "template_file" "runners" {
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
     runners_monitoring          = "${var.runners_monitoring}"
-    runners_instance_profile    = "${aws_iam_instance_profile.runners.name}"
-
-    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
     docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
 
@@ -126,7 +124,7 @@ data "template_file" "runners" {
     runners_off_peak_timezone         = "${var.runners_off_peak_timezone}"
     runners_off_peak_idle_count       = "${var.runners_off_peak_idle_count}"
     runners_off_peak_idle_time        = "${var.runners_off_peak_idle_time}"
-    runners_off_peak_periods          = "${var.runners_off_peak_periods}"
+    runners_off_peak_periods_string   = "${local.runners_off_peak_periods_string}"
     runners_root_size                 = "${var.runners_root_size}"
     runners_iam_instance_profile_name = "${var.runners_iam_instance_profile_name}"
     runners_use_private_address       = "${var.runners_use_private_address}"
@@ -136,6 +134,7 @@ data "template_file" "runners" {
     runners_request_concurrency       = "${var.runners_request_concurrency}"
     runners_output_limit              = "${var.runners_output_limit}"
     bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
+    shared_cache                      = "${var.cache_shared}"
   }
 }
 
@@ -214,6 +213,30 @@ resource "aws_iam_role_policy_attachment" "docker_machine" {
 }
 
 ################################################################################
+### docker machine policy to access the shared cache
+################################################################################
+data "template_file" "docker_machine_cache_policy" {
+  template = "${file("${path.module}/policies/cache.json")}"
+
+  vars {
+    s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
+  }
+}
+
+resource "aws_iam_policy" "docker_machine_cache" {
+  name        = "${var.environment}-docker-machine-cache"
+  path        = "/"
+  description = "Policy for docker machine instance to access cache"
+
+  policy = "${data.template_file.docker_machine_cache_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "docker_machine_cache" {
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "${aws_iam_policy.docker_machine_cache.arn}"
+}
+
+################################################################################
 ### Service linked policy, optional
 ################################################################################
 data "template_file" "service_linked_role" {
@@ -237,42 +260,4 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.service_linked_role.arn}"
-}
-
-################################################################################
-### docker machine runner role and policies
-################################################################################
-data "template_file" "runners_role_trust_policy" {
-  template = "${length(var.instance_role_runner_json) > 0 ? var.instance_role_runner_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
-}
-
-resource "aws_iam_role" "runners" {
-  name               = "${var.environment}-runners-role"
-  assume_role_policy = "${data.template_file.runners_role_trust_policy.rendered}"
-}
-
-resource "aws_iam_instance_profile" "runners" {
-  name = "${var.environment}-runners-profile"
-  role = "${aws_iam_role.runners.name}"
-}
-
-data "template_file" "cache_policy" {
-  template = "${file("${path.module}/policies/cache.json")}"
-
-  vars {
-    s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
-  }
-}
-
-resource "aws_iam_policy" "runners" {
-  name        = "${var.environment}-runners-cache-policy"
-  path        = "/"
-  description = "Policy for Runners."
-
-  policy = "${data.template_file.cache_policy.rendered}"
-}
-
-resource "aws_iam_role_policy_attachment" "runners" {
-  role       = "${aws_iam_role.runners.name}"
-  policy_arn = "${aws_iam_policy.runners.arn}"
 }
