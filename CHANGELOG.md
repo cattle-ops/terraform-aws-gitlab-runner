@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Bugfix: Shared cache is not working #33
+- Bugfix: Missing documentation makes setup fail #31
+- Added: Docker executor to run a single node runner, thanks to @msvechla 
 
 ## [2.0.0] - 2019-01-13
 - Changed: Replaced cache user by a instance profile to access the cache from the build

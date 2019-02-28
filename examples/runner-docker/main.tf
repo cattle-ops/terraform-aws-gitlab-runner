@@ -23,10 +23,11 @@ module "runner" {
 
   runners_use_private_address = false
 
-  vpc_id                  = "${module.vpc.vpc_id}"
+  vpc_id                   = "${module.vpc.vpc_id}"
   subnet_ids_gitlab_runner = "${module.vpc.public_subnets}"
-  subnet_id_runners       = "${element(module.vpc.public_subnets, 0)}"
+  subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
 
+  runners_executor   = "docker"
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
   runners_token      = "${var.runner_token}"

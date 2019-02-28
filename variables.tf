@@ -18,9 +18,9 @@ variable "subnet_id_runners" {
   type        = "string"
 }
 
-variable "subnet_id_gitlab_runner" {
+variable "subnet_ids_gitlab_runner" {
   description = "Subnet used for hosting the gitlab-runner."
-  type        = "string"
+  type        = "list"
 }
 
 variable "instance_type" {
@@ -52,6 +52,12 @@ variable "docker_machine_version" {
 variable "runners_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = "string"
+}
+
+variable "runners_executor" {
+  description = "The executor to use. Currently supports docker+machine or docker"
+  type        = "string"
+  default     = "docker+machine"
 }
 
 variable "runners_gitlab_url" {
@@ -127,6 +133,10 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "create_runners_iam_instance_profile" {
+  default = true
+}
+
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = "string"
@@ -193,6 +203,12 @@ variable "cache_bucket_prefix" {
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
   default     = 1
+}
+
+variable "cache_shared" {
+  description = "Enables cache sharing between runners, false by default."
+  type        = "string"
+  default     = "false"
 }
 
 variable "gitlab_runner_version" {
