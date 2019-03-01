@@ -105,7 +105,7 @@ data "template_file" "gitlab_runner" {
     post_install                            = "${var.userdata_post_install}"
     runners_gitlab_url                      = "${var.runners_gitlab_url}"
     runners_token                           = "${var.runners_token}"
-    secure_parameter_store_runner_token_key = "${local.secure_parameter_store_runner_token_key}"
+    secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
     secure_parameter_store_region           = "${var.aws_region}"
     gitlab_runner_registration_token        = "${var.gitlab_runner_registration_config["registration_token"]}"
     giltab_runner_description               = "${var.gitlab_runner_registration_config["description"]}"
