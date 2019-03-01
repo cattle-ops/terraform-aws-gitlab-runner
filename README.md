@@ -59,13 +59,36 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 
 ### Configuration GitLab runner token
 
-Currently register a new runner is a manual process. See the GitLab Runner [documentation](https://docs.gitlab.com/runner/register/index.html#docker) for more details.
+By default the runner is registered the first time. In previous version this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the parameter store.
 
-```sh
-docker run -it --rm gitlab/gitlab-runner register
+To register the runner automatically set the variable `gitlab_runner_registration_config["token"]` which you can find in your GitLab project, group or global settings. For a generic runner you find the token in the admin section. By default the runner will be locked to project, not run untagged. Below an example of the configuration map.
+
+```
+  gitlab_runner_registration_config = {
+    registration_token = "<registration token>"
+    tag_list           = "<your tags, comma separated"
+    description        = "<some description>"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
 ```
 
-Provide the details in the interactive terminal. Once done the token can be found in the GitLab runners section, choose edit to get the token or see the config.toml file.
+For migration to the new setup, just simply add the runner token to the parameter store. Once the runner is started it will lookup the parameter store for an already register one. If the value is null a new runner will be created.
+
+```
+# set the following variables, look up the variables in your terraform config.
+# see your terraform variables to fill in the vars below.
+aws-region=<${var.aws_region}>
+token=<runner-token-see-your-gitlab-runner>
+parameter-name=<${var.environment}>-<${var.secure_parameter_store_runner_token_key}>
+
+aws ssm put-parameter --overwrite --type SecureString  --name "${parameter-name}" --value ${token} --region "${aws-region}"
+```
+Once you have created the parameter, you have to remove the variable `runners_token` from your config. Then next time your gitlab runner instance is created it look up the token from the paramater store.
+
+Finally the runner still support the manual runner creation, no changes are required. Please keep in mind that this setup will be removed.
+
 
 ## Usage
 
@@ -111,63 +134,13 @@ module "gitlab-runner" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| allow_iam_service_linked_role_creation | Attach policy to runner instance to create service linked roles. | string | `true` | no |
-| ami_filter | AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration. | list | `<list>` | no |
-| ami_owners | A list of owners used to select the AMI for the instance. | list | `<list>` | no |
-| aws_region | AWS region. | string | - | yes |
-| cache_bucket_prefix | Prefix for s3 cache bucket name. | string | `` | no |
-| cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
-| cache_shared | Enables cache sharing between runners, false by default. | string | `false` | no |
-| create_runners_iam_instance_profile |  | string | `true` | no |
-| docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
-| docker_machine_options | Additional to set options for docker machien. Each element of the list should be key and value. E.g. '["--amazonec2-zone=a"]' | list | `<list>` | no |
-| docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
-| docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
-| docker_machine_version | Version of docker-machine. | string | `0.16.0` | no |
-| enable_cloudwatch_logging | Enable or disable the CloudWatch logging. | string | `1` | no |
-| environment | A name that identifies the environment, will used as prefix and for tagging. | string | - | yes |
-| gitlab_runner_version | Version for the gitlab runner. | string | `11.6.0` | no |
-| instance_role_json | Instance role json for the runner agent ec2 instance to override the default. | string | `` | no |
-| instance_role_runner_json | Instance role json for the docker machine runners to override the default. | string | `` | no |
-| instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
-| runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
-| runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
-| runners_iam_instance_profile_name | IAM instance profile name of the runners, will be used in the runner config.toml | string | `` | no |
-| runners_idle_count | Idle count of the runners, will be used in the runner config.toml | string | `0` | no |
-| runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
-| runners_image | Image to run builds, will be used in the runner config.toml | string | `docker:18.03.1-ce` | no |
-| runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
-| runners_machine_iam_instance_profile_name | IAM instance profile name to assign to the spot instance which runs the build. | string | `` | no |
-| runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
-| runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
-| runners_off_peak_idle_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `0` | no |
-| runners_off_peak_idle_time | Off peak idle time of the runners, will be used in the runner config.toml. | string | `0` | no |
-| runners_off_peak_periods | Off peak periods of the runners, will be used in the runner config.toml. | string | `` | no |
-| runners_off_peak_timezone | Off peak idle time zone of the runners, will be used in the runner config.toml. | string | `` | no |
-| runners_output_limit | Set maximum build log size in kilobytes, by default set to 4096 (4MB) | string | `4096` | no |
-| runners_post_build_script | Commands to be executed on the Runner just after executing the build, but before executing after_script. | string | `` | no |
-| runners_pre_build_script | Script to execute in the pipeline just before the build, will be used in the runner config.toml | string | `` | no |
-| runners_pre_clone_script | Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. | string | `` | no |
-| runners_privilled | Runners will run in privilled mode, will be used in the runner config.toml | string | `true` | no |
-| runners_request_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | string | `1` | no |
-| runners_root_size | Runnner instance root size in GB. | string | `16` | no |
-| runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
-| runners_use_private_address | Restrict runners to use only private address | string | `true` | no |
-| ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
-| subnet_ids_gitlab_runner | Subnets used for hosting the gitlab-runner. | list | - | yes |
-| subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
-| tags | Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt. | map | `<map>` | no |
-| userdata_post_install | User-data script snippet to insert after gitlab-runner install | string | `` | no |
-| userdata_pre_install | User-data script snippet to insert before gitlab-runner install | string | `` | no |
-| vpc_id | The VPC that is used for the instances. | string | - | yes |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| runner_agent_role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
-| runner_as_group_name | Name of the autoscaling group for the gitlab-runner instance |
-| runner_cache_bucket_arn | ARN of the S3 for the build cache. |
+| aws_region | AWS region. | string | `eu-west-1` | no |
+| environment | A name that indentifies the environment, will used as prefix and for taggin. | string | `ci-runners` | no |
+| gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
+| private_ssh_key_filename |  | string | `generated/id_rsa` | no |
+| public_ssh_key_filename |  | string | `generated/id_rsa.pub` | no |
+| runner_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
+| runner_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 
 ## Example
 

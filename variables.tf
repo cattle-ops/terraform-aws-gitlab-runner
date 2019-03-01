@@ -68,6 +68,7 @@ variable "runners_gitlab_url" {
 variable "runners_token" {
   description = "Token for the runner, will be used in the runner config.toml"
   type        = "string"
+  default     = "__REPLACED_BY_USER_DATA__"
 }
 
 variable "runners_limit" {
@@ -265,4 +266,24 @@ variable "ami_owners" {
   description = "A list of owners used to select the AMI for the instance."
   type        = "list"
   default     = ["amazon"]
+}
+
+variable "gitlab_runner_registration_config" {
+  description = "Configurtion to register the runner. See the README for an example, or the examples."
+  type        = "map"
+
+  default = {
+    registration_token = ""
+    tag_list           = ""
+    description        = ""
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+}
+
+variable "secure_parameter_store_runner_token_key" {
+  type        = "string"
+  description = "The key name used store the Gitlab runner token in Secure Paramater Store"
+  default     = "runner-token"
 }

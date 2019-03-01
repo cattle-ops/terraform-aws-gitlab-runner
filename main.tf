@@ -82,12 +82,22 @@ data "template_file" "gitlab_runner" {
   template = "${file("${path.module}/template/gitlab-runner.tpl")}"
 
   vars {
-    gitlab_runner_version  = "${var.gitlab_runner_version}"
-    docker_machine_version = "${var.docker_machine_version}"
-    runners_config         = "${data.template_file.runners.rendered}"
-    runners_executor       = "${var.runners_executor}"
-    pre_install            = "${var.userdata_pre_install}"
-    post_install           = "${var.userdata_post_install}"
+    gitlab_runner_version                   = "${var.gitlab_runner_version}"
+    docker_machine_version                  = "${var.docker_machine_version}"
+    runners_config                          = "${data.template_file.runners.rendered}"
+    runners_executor                        = "${var.runners_executor}"
+    pre_install                             = "${var.userdata_pre_install}"
+    post_install                            = "${var.userdata_post_install}"
+    runners_gitlab_url                      = "${var.runners_gitlab_url}"
+    runners_token                           = "${var.runners_token}"
+    secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
+    secure_parameter_store_region           = "${var.aws_region}"
+    gitlab_runner_registration_token        = "${var.gitlab_runner_registration_config["registration_token"]}"
+    giltab_runner_description               = "${var.gitlab_runner_registration_config["description"]}"
+    gitlab_runner_tag_list                  = "${var.gitlab_runner_registration_config["tag_list"]}"
+    gitlab_runner_locked_to_project         = "${var.gitlab_runner_registration_config["locked_to_project"]}"
+    gitlab_runner_run_untagged              = "${var.gitlab_runner_registration_config["run_untagged"]}"
+    gitlab_runner_maximum_timeout           = "${var.gitlab_runner_registration_config["maximum_timeout"]}"
   }
 }
 
@@ -144,7 +154,6 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                = "${var.environment}-as-group"
   vpc_zone_identifier = ["${var.subnet_ids_gitlab_runner}"]
 
-  # vpc_zone_identifier       = ["${var.subnets}"]
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -262,4 +271,24 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.service_linked_role.arn}"
+}
+
+################################################################################
+### AWS Systems Manager access to store runner token once regsitered
+################################################################################
+data "template_file" "ssm_policy" {
+  template = "${file("${path.module}/policies/instance-secure-parameter-role-policy.json")}"
+}
+
+resource "aws_iam_policy" "ssm" {
+  name        = "${var.environment}-ssm"
+  path        = "/"
+  description = "Policy for runner token param access via SSM"
+
+  policy = "${data.template_file.ssm_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "${aws_iam_policy.ssm.arn}"
 }

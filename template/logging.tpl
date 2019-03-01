@@ -24,6 +24,12 @@ log_group_name = ${environment}
 datetime_format = %b %d %H:%M:%S
 initial_position = start_of_file
 
+[/var/log/user-data.log]
+file = /var/log/user-data.log
+log_stream_name = {instanceId}/user-data
+log_group_name = ${environment}
+initial_position = start_of_file
+
 EOF
 
 # Set the region to send CloudWatch Logs data to (the region where the instance is located)

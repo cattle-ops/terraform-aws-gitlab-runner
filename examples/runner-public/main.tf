@@ -29,5 +29,13 @@ module "runner" {
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
-  runners_token      = "${var.runner_token}"
+
+  gitlab_runner_registration_config = {
+    registration_token = "<ADD YOUR REGISTRATION TOKEN HERE>"
+    tag_list           = "docker.m3"
+    description        = "auto register"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
 }
