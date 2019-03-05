@@ -1,8 +1,9 @@
-resource "aws_key_pair" "key" {
-  key_name   = "${var.environment}-gitlab-runner"
-  public_key = "${var.ssh_public_key}"
+locals {
+  callers_ip                  = ["${chomp(data.http.ip.body)}/32"]
+  any_any_cidr_block          = ["0.0.0.0/0"]
+  specified_cidr_blocks       = "${concat(local.callers_ip, var.specified_cidr_blocks)}"
+  cidr_blocks_allowed_inbound = "${split(",", var.allow_all_inbound ? join(",", local.any_any_cidr_block) : join(",", local.specified_cidr_blocks))}"
 }
-
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
@@ -11,7 +12,7 @@ resource "aws_security_group" "runner" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
   }
 
   egress {
@@ -31,12 +32,16 @@ resource "aws_security_group" "docker_machine" {
   tags = "${local.tags}"
 }
 
+data "http" "ip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
 resource "aws_security_group_rule" "docker" {
   type        = "ingress"
   from_port   = 2376
   to_port     = 2376
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
@@ -46,7 +51,7 @@ resource "aws_security_group_rule" "ssh" {
   from_port   = 22
   to_port     = 22
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
@@ -54,9 +59,9 @@ resource "aws_security_group_rule" "ssh" {
 resource "aws_security_group_rule" "out_all" {
   type        = "egress"
   from_port   = 0
-  to_port     = 65535
+  to_port     = 0
   protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
@@ -167,9 +172,10 @@ data "template_file" "runners" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                = "${var.environment}-as-group"
-  vpc_zone_identifier = ["${var.subnet_ids_gitlab_runner}"]
+  name = "${var.environment}-as-group"
 
+  # vpc_zone_identifier = ["${split(",",var.subnet_ids_gitlab_runner)}"]
+  vpc_zone_identifier       = ["${var.subnet_ids_gitlab_runner}"]
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -188,8 +194,10 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_configuration" "gitlab_runner_instance" {
-  security_groups      = ["${aws_security_group.runner.id}"]
-  key_name             = "${aws_key_pair.key.key_name}"
+  security_groups = ["${aws_security_group.runner.id}"]
+
+  # key_name             = "${aws_key_pair.key.key_name}"
+  key_name             = "${var.ssh_key_name}"
   image_id             = "${data.aws_ami.runner.id}"
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
