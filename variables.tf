@@ -103,8 +103,8 @@ variable "runners_image" {
   default     = "docker:18.03.1-ce"
 }
 
-variable "runners_privilled" {
-  description = "Runners will run in privileged mode, will be used in the runner config.toml"
+variable "runners_privileged" {
+  description = "Runners will run in privilled mode, will be used in the runner config.toml"
   type        = "string"
   default     = "true"
 }
@@ -293,4 +293,29 @@ variable "secure_parameter_store_runner_token_key" {
   type        = "string"
   description = "The key name used store the Gitlab runner token in Secure Paramater Store"
   default     = "runner-token"
+}
+
+variable "gitlab_runner_registration_config" {
+  description = "Configurtion to register the runner. See the README for an example, or the examples."
+  type        = "map"
+
+  default = {
+    registration_token = ""
+    tag_list           = ""
+    description        = ""
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+}
+
+variable "secure_parameter_store_runner_token_key" {
+  type        = "string"
+  description = "The key name used store the Gitlab runner token in Secure Paramater Store"
+  default     = "runner-token"
+}
+
+variable "allow_ssh_to_runner_instance_sg" {
+  type = "string"
+  description = "Security group to attach to the runner instance ssh sg to allow remote access."
 }

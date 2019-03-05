@@ -15,7 +15,7 @@ check_interval = 0
   [runners.docker]
     tls_verify = false
     image = "${runners_image}"
-    privileged = ${runners_privilled}
+    privileged = ${runners_privileged}
     disable_cache = false
     volumes = ["/cache"]
     shm_size = 0
