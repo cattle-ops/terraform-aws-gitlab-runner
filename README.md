@@ -164,6 +164,7 @@ module "gitlab-runner" {
 | runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
 | runners_image | Image to run builds, will be used in the runner config.toml | string | `docker:18.03.1-ce` | no |
 | runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
+| runners_machine_iam_instance_profile_name | IAM instance profile name to assign to the spot instance which runs the build. | string | `` | no |
 | runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
 | runners_off_peak_idle_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `0` | no |

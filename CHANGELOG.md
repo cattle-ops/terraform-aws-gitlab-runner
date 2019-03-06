@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Bugfix: Correct example for docker_machine_options #36 (@declension)
+- Added: AWS Zone variable #35 (@declension)
 
 ## [2.3.0] - 2019-03-27
 - Bugfix: Added a profile for the docker machine runners. #41
