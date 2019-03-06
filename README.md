@@ -115,6 +115,7 @@ module "gitlab-runner" {
 | ami_filter | AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration. | list | `<list>` | no |
 | ami_owners | A list of owners used to select the AMI for the instance. | list | `<list>` | no |
 | aws_region | AWS region. | string | - | yes |
+| aws_zone | AWS availability zone. | string | 'a' | no |
 | cache_bucket_prefix | Prefix for s3 cache bucket name. | string | `` | no |
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
 | cache_shared | Enables cache sharing between runners, false by default. | string | `false` | no |

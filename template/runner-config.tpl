@@ -35,6 +35,7 @@ check_interval = 0
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
       "amazonec2-region=${aws_region}",
+      "amazonec2-zone=${aws_zone}",
       "amazonec2-vpc-id=${runners_vpc_id}",
       "amazonec2-subnet-id=${runners_subnet_id}",
       "amazonec2-private-address-only=${runners_use_private_address}",

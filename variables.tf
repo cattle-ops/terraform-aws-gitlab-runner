@@ -3,6 +3,12 @@ variable "aws_region" {
   type        = "string"
 }
 
+variable "aws_zone" {
+  description = "AWS availability zone (typically 'a', 'b', or 'c')."
+  type        = "string"
+  default     = "a"
+}
+
 variable "environment" {
   description = "A name that identifies the environment, will used as prefix and for tagging."
   type        = "string"
