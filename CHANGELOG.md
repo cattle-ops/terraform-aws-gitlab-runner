@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Changed: Upgrade default runner agent to 11.8.0 and docker machine to 0.16.1
 - Bugfix: Correct example for docker_machine_options #36 (@declension)
 - Added: AWS Zone variable #35 (@declension)
 

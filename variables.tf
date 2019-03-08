@@ -52,7 +52,7 @@ variable "docker_machine_spot_price_bid" {
 
 variable "docker_machine_version" {
   description = "Version of docker-machine."
-  default     = "0.16.0"
+  default     = "0.16.1"
 }
 
 variable "runners_name" {
@@ -220,7 +220,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version for the gitlab runner."
   type        = "string"
-  default     = "11.6.0"
+  default     = "11.8.0"
 }
 
 variable "enable_cloudwatch_logging" {
