@@ -115,29 +115,30 @@ module "gitlab-runner" {
 | ami_filter | AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration. | list | `<list>` | no |
 | ami_owners | A list of owners used to select the AMI for the instance. | list | `<list>` | no |
 | aws_region | AWS region. | string | - | yes |
+| aws_zone | AWS availability zone (typically 'a', 'b', or 'c'). | string | `a` | no |
 | cache_bucket_prefix | Prefix for s3 cache bucket name. | string | `` | no |
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
 | cache_shared | Enables cache sharing between runners, false by default. | string | `false` | no |
 | create_runners_iam_instance_profile |  | string | `true` | no |
 | docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
-| docker_machine_options | Additional to set options for docker machien. Each element of the list should be key and value. E.g. '["--amazonec2-zone=a"]' | list | `<list>` | no |
+| docker_machine_options | Additional to set options for docker machine. Each element of the list should be key and value. E.g. '["amazonec2-zone=a"]' | list | `<list>` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
 | docker_machine_user | User name for the user to create spot instances to host docker-machine. | string | `docker-machine` | no |
-| docker_machine_version | Version of docker-machine. | string | `0.16.0` | no |
+| docker_machine_version | Version of docker-machine. | string | `0.16.1` | no |
 | enable_cloudwatch_logging | Enable or disable the CloudWatch logging. | string | `1` | no |
 | environment | A name that identifies the environment, will used as prefix and for tagging. | string | - | yes |
-| gitlab_runner_version | Version for the gitlab runner. | string | `11.6.0` | no |
+| gitlab_runner_version | Version for the gitlab runner. | string | `11.8.0` | no |
 | instance_role_json | Instance role json for the runner agent ec2 instance to override the default. | string | `` | no |
 | instance_role_runner_json | Instance role json for the docker machine runners to override the default. | string | `` | no |
 | instance_type | Instance type used for the gitlab-runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml | string | `10` | no |
+| runners_executor | The executor to use. Currently supports docker+machine or docker | string | `docker+machine` | no |
 | runners_gitlab_url | URL of the gitlab instance to connect to. | string | - | yes |
 | runners_iam_instance_profile_name | IAM instance profile name of the runners, will be used in the runner config.toml | string | `` | no |
 | runners_idle_count | Idle count of the runners, will be used in the runner config.toml | string | `0` | no |
 | runners_idle_time | Idle time of the runners, will be used in the runner config.toml | string | `600` | no |
 | runners_image | Image to run builds, will be used in the runner config.toml | string | `docker:18.03.1-ce` | no |
 | runners_limit | Limit for the runners, will be used in the runner config.toml | string | `0` | no |
-| runners_machine_iam_instance_profile_name | IAM instance profile name to assign to the spot instance which runs the build. | string | `` | no |
 | runners_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `false` | no |
 | runners_name | Name of the runner, will be used in the runner config.toml | string | - | yes |
 | runners_off_peak_idle_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `0` | no |
@@ -154,8 +155,8 @@ module "gitlab-runner" {
 | runners_token | Token for the runner, will be used in the runner config.toml | string | - | yes |
 | runners_use_private_address | Restrict runners to use only private address | string | `true` | no |
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
-| subnet_ids_gitlab_runner | Subnets used for hosting the gitlab-runner. | list | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
+| subnet_ids_gitlab_runner | Subnet used for hosting the gitlab-runner. | list | - | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt. | map | `<map>` | no |
 | userdata_post_install | User-data script snippet to insert after gitlab-runner install | string | `` | no |
 | userdata_pre_install | User-data script snippet to insert before gitlab-runner install | string | `` | no |

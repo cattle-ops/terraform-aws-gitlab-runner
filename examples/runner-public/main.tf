@@ -5,7 +5,7 @@ module "vpc" {
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
 
-  azs            = ["eu-west-1a"]
+  azs            = ["eu-west-1b"]
   public_subnets = ["10.1.101.0/24"]
 
   tags = {
@@ -26,6 +26,7 @@ module "runner" {
   vpc_id                   = "${module.vpc.vpc_id}"
   subnet_ids_gitlab_runner = "${module.vpc.public_subnets}"
   subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
+  aws_zone                 = "b"
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
