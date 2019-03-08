@@ -107,6 +107,7 @@ data "template_file" "runners" {
 
     runners_vpc_id              = "${var.vpc_id}"
     runners_subnet_id           = "${var.subnet_id_runners}"
+    runners_aws_zone            = "${var.aws_zone}"
     runners_instance_type       = "${var.docker_machine_instance_type}"
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name = "${aws_security_group.docker_machine.name}"
