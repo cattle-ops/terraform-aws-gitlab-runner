@@ -20,12 +20,12 @@ variable "vpc_id" {
 }
 
 variable "subnet_id_runners" {
-  description = "List of subnets used for hosting the gitlab-runners."
+  description = "Subnet used to host the docker-machine gitlab-runners."
   type        = "string"
 }
 
 variable "subnet_ids_gitlab_runner" {
-  description = "Subnet used for hosting the GitLab runner."
+  description = "List of subnets used for hosting the gitlab-runners."
   type        = "list"
 }
 
@@ -67,7 +67,7 @@ variable "runners_executor" {
 }
 
 variable "runners_gitlab_url" {
-  description = "URL of the GitLab instance to connect to."
+  description = "URL of the Gitlab instance to connect to."
   type        = "string"
 }
 
@@ -220,7 +220,7 @@ variable "cache_shared" {
 }
 
 variable "gitlab_runner_version" {
-  description = "Version of the GitLab runner."
+  description = "Version of the Gitlab runner."
   type        = "string"
   default     = "11.8.0"
 }
@@ -232,7 +232,7 @@ variable "enable_cloudwatch_logging" {
 
 variable "tags" {
   type        = "map"
-  description = "Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt."
+  description = "Map of tags that will be added to module created resources. By default resources will be tagged with 'name' and 'environemnt'."
   default     = {}
 }
 
@@ -248,13 +248,13 @@ variable "docker_machine_options" {
 }
 
 variable "instance_role_json" {
-  description = "Docker machine runner instance override policy, expected to be in JSON format."
+  description = "Runner agent instance override policy, expected to be in JSON format. "
   type        = "string"
   default     = ""
 }
 
 variable "instance_role_runner_json" {
-  description = "Instance role json for the docker machine runners to override the default."
+  description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = "string"
   default     = ""
 }
@@ -289,6 +289,11 @@ variable "gitlab_runner_registration_config" {
   }
 }
 
+variable "allow_all_inbound" {
+  description = "Boolean used to enable all inbound traffic"
+  default     = false
+}
+
 variable "secure_parameter_store_runner_token_key" {
   type        = "string"
   description = "The key name used store the Gitlab runner token in Secure Paramater Store"
@@ -296,7 +301,7 @@ variable "secure_parameter_store_runner_token_key" {
 }
 
 variable "gitlab_runner_registration_config" {
-  description = "Configurtion to register the runner. See the README for an example, or the examples."
+  description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
   type        = "map"
 
   default = {
@@ -316,6 +321,6 @@ variable "secure_parameter_store_runner_token_key" {
 }
 
 variable "allow_ssh_to_runner_instance_sg" {
-  type = "string"
+  type        = "string"
   description = "Security group to attach to the runner instance ssh sg to allow remote access."
 }
