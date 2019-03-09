@@ -67,7 +67,7 @@ resource "aws_security_group_rule" "out_all" {
   from_port   = 0
   to_port     = 0
   protocol    = "-1"
-  cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
+  cidr_blocks = ["0.0.0.0/0"]
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
