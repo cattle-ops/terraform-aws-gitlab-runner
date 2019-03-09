@@ -19,7 +19,7 @@ module "runner" {
   aws_region  = "${var.aws_region}"
   environment = "${var.environment}"
 
-  ssh_public_key = "${local_file.public_ssh_key.content}"
+  ssh_key_name = "${local.key_pair_name}"
 
   runners_use_private_address = false
 

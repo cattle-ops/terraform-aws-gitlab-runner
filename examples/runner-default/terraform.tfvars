@@ -1,4 +1,4 @@
-key_name = "gitlab-runner"
+key_pair_name = "gitlab-runner"
 
 environment = "ci-test"
 

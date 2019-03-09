@@ -17,4 +17,11 @@ provider "null" {
 
 provider "tls" {
   version = "1.2"
+<<<<<<< HEAD
+=======
+}
+
+provider "http" {
+  version = "1.0"
+>>>>>>> Updates examples
 }

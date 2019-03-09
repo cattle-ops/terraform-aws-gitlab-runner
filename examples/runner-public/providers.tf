@@ -18,3 +18,7 @@ provider "null" {
 provider "tls" {
   version = "1.2"
 }
+
+provider "http" {
+  version = "1.0"
+}
