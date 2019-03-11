@@ -262,6 +262,7 @@ module "gitlab-runner" {
 | Name | Description |
 |------|-------------|
 | runner\_agent\_role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
+| runner\_as\_group\_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner\_cache\_bucket\_arn | ARN of the S3 for the build cache. |
 
 ## Example
