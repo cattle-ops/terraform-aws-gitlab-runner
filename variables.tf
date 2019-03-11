@@ -323,6 +323,7 @@ variable "allow_ssh_to_runner_instance_sg" {
 variable "ssh_key_name" {
   type        = "string"
   description = "Name of the SSH key to associate with the instances."
+  default     = ""
 }
 
 variable "specified_cidr_blocks" {

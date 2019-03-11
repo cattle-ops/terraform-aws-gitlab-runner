@@ -7,6 +7,7 @@ locals {
   any_any_cidr_block          = ["0.0.0.0/0"]
   specified_cidr_blocks       = "${concat(local.callers_ip, var.specified_cidr_blocks)}"
   cidr_blocks_allowed_inbound = "${split(",", var.allow_all_inbound ? join(",", local.any_any_cidr_block) : join(",", local.specified_cidr_blocks))}"
+  key_pair_not_specified      = "${var.ssh_key_name == ""}"
 }
 
 resource "aws_security_group" "runner" {
@@ -53,6 +54,7 @@ resource "aws_security_group_rule" "docker" {
 }
 
 resource "aws_security_group_rule" "ssh" {
+  count       = "${local.key_pair_not_specified ? 0 : 1}"
   type        = "ingress"
   from_port   = 22
   to_port     = 22
