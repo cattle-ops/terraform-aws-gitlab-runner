@@ -22,7 +22,7 @@ curl -L https://github.com/docker/machine/releases/download/v${docker_machine_ve
   ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
 
 
-token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --with-decryption | jq -r ".Parameters | .[0] | .Value")
 if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]]
 then
   token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
