@@ -10,6 +10,7 @@ locals {
   key_pair_not_specified      = "${var.ssh_key_name == ""}"
 }
 
+# sg for the instance that calls docker-machine to deploy additional instances
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
@@ -32,6 +33,8 @@ resource "aws_security_group" "runner" {
   tags = "${local.tags}"
 }
 
+# sg of the runner created instances that run the ci-jobs
+
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = "${var.vpc_id}"
@@ -44,22 +47,22 @@ data "http" "ip" {
 }
 
 resource "aws_security_group_rule" "docker" {
-  type        = "ingress"
-  from_port   = 2376
-  to_port     = 2376
-  protocol    = "tcp"
-  cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
+  type                     = "ingress"
+  from_port                = 2376
+  to_port                  = 2376
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.runner.id}"
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "ssh" {
-  count       = "${local.key_pair_not_specified ? 0 : 1}"
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = ["${local.cidr_blocks_allowed_inbound}"]
+  count                    = "${local.key_pair_not_specified ? 0 : 1}"
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.runner.id}"
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
