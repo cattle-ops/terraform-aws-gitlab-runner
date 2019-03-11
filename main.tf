@@ -133,28 +133,35 @@ data "template_file" "gitlab_runner" {
 }
 
 locals {
-  // Convert list to a string seperated and prepend by a comma
-  docker_machine_options_string           = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
-  runners_off_peak_periods_string         = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
-  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
+  // Convert list to a string separated and prepended by a comma
+  docker_machine_options_string   = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+  runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
+}
+
+# validate that the specified runner subnet is in the target AZ
+data "aws_subnet" "runners" {
+  id                = "${var.subnet_id_runners}"
+  availability_zone = "${var.aws_region}${var.aws_zone}"
 }
 
 data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
   vars {
-    aws_region = "${var.aws_region}"
-    gitlab_url = "${var.runners_gitlab_url}"
+    aws_region  = "${var.aws_region}"
+    gitlab_url  = "${var.runners_gitlab_url}"
+    environment = "${var.environment}"
 
-    runners_vpc_id                    = "${var.vpc_id}"
-    runners_subnet_id                 = "${var.subnet_id_runners}"
-    runners_aws_zone                  = "${var.aws_zone}"
-    runners_instance_type             = "${var.docker_machine_instance_type}"
-    runners_spot_price_bid            = "${var.docker_machine_spot_price_bid}"
-    runners_security_group_name       = "${aws_security_group.docker_machine.name}"
-    runners_monitoring                = "${var.runners_monitoring}"
-    runners_instance_profile          = "${aws_iam_instance_profile.docker_machine.name}"
-    docker_machine_options            = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
+    runners_vpc_id              = "${var.vpc_id}"
+    runners_subnet_id           = "${data.aws_subnet.runners.id}"
+    runners_aws_zone            = "${var.aws_zone}"
+    runners_instance_type       = "${var.docker_machine_instance_type}"
+    runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
+    runners_security_group_name = "${aws_security_group.docker_machine.name}"
+    runners_monitoring          = "${var.runners_monitoring}"
+
+    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
+
     runners_name                      = "${var.runners_name}"
     runners_tags                      = "${local.tags_string},Name,${var.environment}-docker-machine"
     runners_token                     = "${var.runners_token}"
