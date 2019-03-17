@@ -3,11 +3,7 @@
 ################################################################################
 
 locals {
-  callers_ip                  = ["${chomp(data.http.ip.body)}/32"]
-  any_any_cidr_block          = ["0.0.0.0/0"]
-  specified_cidr_blocks       = "${concat(local.callers_ip, var.specified_cidr_blocks)}"
-  cidr_blocks_allowed_inbound = "${split(",", var.allow_all_inbound ? join(",", local.any_any_cidr_block) : join(",", local.specified_cidr_blocks))}"
-  key_pair_not_specified      = "${var.ssh_key_name == ""}"
+  key_pair_not_specified = "${var.ssh_key_name == ""}"
 }
 
 # sg for the instance that calls docker-machine to deploy additional instances
@@ -16,11 +12,13 @@ resource "aws_security_group" "runner" {
   vpc_id      = "${var.vpc_id}"
 
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["${local.cidr_blocks_allowed_inbound}"]
-    security_groups = ["${var.allow_ssh_to_runner_instance_sg}"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr_blocks_allowed_inbound}"]
+
+    # Needs an usages example
+    # security_groups = ["${var.allow_ssh_to_runner_instance_sg}"]
   }
 
   egress {
@@ -34,16 +32,11 @@ resource "aws_security_group" "runner" {
 }
 
 # sg of the runner created instances that run the ci-jobs
-
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = "${var.vpc_id}"
 
   tags = "${local.tags}"
-}
-
-data "http" "ip" {
-  url = "http://ipv4.icanhazip.com"
 }
 
 resource "aws_security_group_rule" "docker" {
@@ -142,10 +135,10 @@ locals {
 }
 
 # validate that the specified runner subnet is in the target AZ
-data "aws_subnet" "runners" {
-  id                = "${var.subnet_id_runners}"
-  availability_zone = "${var.aws_region}${var.aws_zone}"
-}
+# data "aws_subnet" "runners" {
+#   id                = "${var.subnet_id_runners}"
+#   availability_zone = "${var.aws_region}${var.aws_zone}"
+# }
 
 data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
@@ -156,7 +149,7 @@ data "template_file" "runners" {
     environment = "${var.environment}"
 
     runners_vpc_id              = "${var.vpc_id}"
-    runners_subnet_id           = "${data.aws_subnet.runners.id}"
+    runners_subnet_id           = "${var.subnet_id_runners}"
     runners_aws_zone            = "${var.aws_zone}"
     runners_instance_type       = "${var.docker_machine_instance_type}"
     runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"

@@ -13,13 +13,25 @@ module "vpc" {
   }
 }
 
+data "http" "ip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
+locals {
+  #   callers_ip                  =
+  # any_any_cidr_block          = ["0.0.0.0/0"]
+  # specified_cidr_blocks       = "${concat(local.callers_ip, var.specified_cidr_blocks)}"
+  # cidr_blocks_allowed_inbound = "${split(",", var.allow_all_inbound ? join(",", local.any_any_cidr_block) : join(",", local.specified_cidr_blocks))}"
+  cidr_blocks_allowed_inbound = ["${chomp(data.http.ip.body)}/32"]
+}
+
 module "runner" {
   source = "../../"
 
   aws_region  = "${var.aws_region}"
   environment = "${var.environment}"
 
-  ssh_key_name = "${local.key_pair_name}"
+  ssh_key_name = "${aws_key_pair.this.key_name}"
 
   runners_use_private_address = false
 
@@ -28,11 +40,12 @@ module "runner" {
   subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
   aws_zone                 = "b"
 
-  runners_name       = "${var.runner_name}"
-  runners_gitlab_url = "${var.gitlab_url}"
+  cidr_blocks_allowed_inbound = ["${local.cidr_blocks_allowed_inbound}"]
+  runners_name                = "${var.runner_name}"
+  runners_gitlab_url          = "${var.gitlab_url}"
 
   gitlab_runner_registration_config = {
-    registration_token = "<ADD YOUR REGISTRATION TOKEN HERE>"
+    registration_token = "ReEdqkFQ-UNzjozA63EC"
     tag_list           = "docker.m3"
     description        = "auto register"
     locked_to_project  = "true"

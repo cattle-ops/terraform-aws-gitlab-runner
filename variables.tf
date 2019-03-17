@@ -331,3 +331,7 @@ variable "specified_cidr_blocks" {
   description = "List of additional subnets in CDIR notation to allow inbound ssh access to the gitlab-runner host."
   default     = []
 }
+
+variable "cidr_blocks_allowed_inbound" {
+  type        = "list"
+}

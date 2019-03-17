@@ -1,4 +1,5 @@
-key_pair_name = "gitlab-runner"
+# key_pair_name = "gitlab-runner"
+write_private_key = true
 
 environment = "runner-public"
 
@@ -8,5 +9,3 @@ aws_region = "eu-west-1"
 runner_name = "docker.m3"
 
 gitlab_url = "https://gitlab.com"
-
-runner_token = "3939146918cced54ecf1dd08e6b87e"
