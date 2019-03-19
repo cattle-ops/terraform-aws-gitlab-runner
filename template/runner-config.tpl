@@ -42,7 +42,7 @@ check_interval = 0
       "amazonec2-request-spot-instance=true",
       "amazonec2-spot-price=${runners_spot_price_bid}",
       "amazonec2-security-group=${runners_security_group_name}",
-      "amazonec2-tags=environment,${environment}",
+      "amazonec2-tags=${runners_tags}",
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-root-size=${runners_root_size}"
       ${docker_machine_options}
