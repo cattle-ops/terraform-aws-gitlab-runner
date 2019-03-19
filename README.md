@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/npalm/terraform-aws-gitlab-runner.svg?branch=master)](https://travis-ci.com/npalm/terraform-aws-gitlab-runner)
+[![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # Terraform module for GitLab auto scaling runners on Spot instances
 
@@ -157,7 +158,7 @@ module "gitlab-runner" {
 | ssh_public_key | Public SSH key used for the gitlab-runner ec2 instance. | string | - | yes |
 | subnet_id_runners | Subnet used to hosts the docker-machine runners. | string | - | yes |
 | subnet_ids_gitlab_runner | Subnet used for hosting the gitlab-runner. | list | - | yes |
-| tags | Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt. | map | `<map>` | no |
+| tags | Map of tags that will be added to created resources. By default resources will be tagged with name and environnemnt. | map | `<map>` | no |
 | userdata_post_install | User-data script snippet to insert after gitlab-runner install | string | `` | no |
 | userdata_pre_install | User-data script snippet to insert before gitlab-runner install | string | `` | no |
 | vpc_id | The VPC that is used for the instances. | string | - | yes |
