@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Bugfix: Add tags to spot instances #39
+- Changed: Updated terraform providers in examples and default terraform version
 
 ## [2.2.0] - 2019-03-08
 - Changed: Upgrade default runner agent to 11.8.0 and docker machine to 0.16.1
