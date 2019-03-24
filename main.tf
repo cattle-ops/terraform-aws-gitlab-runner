@@ -61,6 +61,20 @@ resource "aws_security_group_rule" "out_all" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
+resource "aws_ssm_parameter" "runner_registration_token" {
+  name  = "${local.secure_parameter_store_runner_token_key}"
+  type  = "SecureString"
+  value = "null"
+
+  tags = "${local.tags}"
+
+  lifecycle {
+    ignore_changes = [
+      "value",
+    ]
+  }
+}
+
 data "template_file" "user_data" {
   template = "${file("${path.module}/template/user-data.tpl")}"
 
@@ -90,7 +104,7 @@ data "template_file" "gitlab_runner" {
     post_install                            = "${var.userdata_post_install}"
     runners_gitlab_url                      = "${var.runners_gitlab_url}"
     runners_token                           = "${var.runners_token}"
-    secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
+    secure_parameter_store_runner_token_key = "${local.secure_parameter_store_runner_token_key}"
     secure_parameter_store_region           = "${var.aws_region}"
     gitlab_runner_registration_token        = "${var.gitlab_runner_registration_config["registration_token"]}"
     giltab_runner_description               = "${var.gitlab_runner_registration_config["description"]}"
@@ -103,8 +117,9 @@ data "template_file" "gitlab_runner" {
 
 locals {
   // Convert list to a string seperated and prepend by a comma
-  docker_machine_options_string   = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
-  runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
+  docker_machine_options_string           = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+  runners_off_peak_periods_string         = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
+  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
 }
 
 data "template_file" "runners" {
