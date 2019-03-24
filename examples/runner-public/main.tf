@@ -32,9 +32,9 @@ module "runner" {
   runners_gitlab_url = "${var.gitlab_url}"
 
   gitlab_runner_registration_config = {
-    registration_token = "<ADD YOUR REGISTRATION TOKEN HERE>"
-    tag_list           = "docker.m3"
-    description        = "auto register"
+    registration_token = "${var.registration_token}"
+    tag_list           = "docker_spot_runner"
+    description        = "runner public - auto"
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"

@@ -10,33 +10,33 @@ variable "aws_zone" {
 }
 
 variable "environment" {
-  description = "A name that identifies the environment, will used as prefix and for tagging."
+  description = "A name that identifies the environment, used as prefix and for tagging."
   type        = "string"
 }
 
 variable "vpc_id" {
-  description = "The VPC that is used for the instances."
+  description = "The target VPC for the docker-machine and runner instances."
   type        = "string"
 }
 
 variable "subnet_id_runners" {
-  description = "Subnet used to hosts the docker-machine runners."
+  description = "List of subnets used for hosting the gitlab-runners."
   type        = "string"
 }
 
 variable "subnet_ids_gitlab_runner" {
-  description = "Subnet used for hosting the gitlab-runner."
+  description = "Subnet used for hosting the GitLab runner."
   type        = "list"
 }
 
 variable "instance_type" {
-  description = "Instance type used for the gitlab-runner."
+  description = "Instance type used for the GitLab runner."
   type        = "string"
   default     = "t2.micro"
 }
 
 variable "ssh_public_key" {
-  description = "Public SSH key used for the gitlab-runner ec2 instance."
+  description = "Public SSH key used for the GitLab runner ec2 instance."
   type        = "string"
 }
 
@@ -67,7 +67,7 @@ variable "runners_executor" {
 }
 
 variable "runners_gitlab_url" {
-  description = "URL of the gitlab instance to connect to."
+  description = "URL of the GitLab instance to connect to."
   type        = "string"
 }
 
@@ -104,7 +104,7 @@ variable "runners_image" {
 }
 
 variable "runners_privilled" {
-  description = "Runners will run in privilled mode, will be used in the runner config.toml"
+  description = "Runners will run in privileged mode, will be used in the runner config.toml"
   type        = "string"
   default     = "true"
 }
@@ -136,12 +136,13 @@ variable "runners_off_peak_periods" {
 }
 
 variable "runners_root_size" {
-  description = "Runnner instance root size in GB."
+  description = "Runner instance root size in GB."
   default     = 16
 }
 
 variable "create_runners_iam_instance_profile" {
-  default = true
+  description = "Boolean to control the creation of the runners IAM instance profile"
+  default     = true
 }
 
 variable "runners_iam_instance_profile_name" {
@@ -174,29 +175,29 @@ variable "runners_request_concurrency" {
 }
 
 variable "runners_output_limit" {
-  description = "Set maximum build log size in kilobytes, by default set to 4096 (4MB)"
+  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)"
   default     = "4096"
 }
 
 variable "userdata_pre_install" {
-  description = "User-data script snippet to insert before gitlab-runner install"
+  description = "User-data script snippet to insert before GitLab runner install"
   type        = "string"
   default     = ""
 }
 
 variable "userdata_post_install" {
-  description = "User-data script snippet to insert after gitlab-runner install"
+  description = "User-data script snippet to insert after GitLab runner install"
   type        = "string"
   default     = ""
 }
 
 variable "runners_use_private_address" {
-  description = "Restrict runners to use only private address"
+  description = "Restrict runners to the use of a private IP address"
   default     = "true"
 }
 
 variable "docker_machine_user" {
-  description = "User name for the user to create spot instances to host docker-machine."
+  description = "Username of the user used to create the spot instances that host docker-machine."
   type        = "string"
   default     = "docker-machine"
 }
@@ -219,14 +220,14 @@ variable "cache_shared" {
 }
 
 variable "gitlab_runner_version" {
-  description = "Version for the gitlab runner."
+  description = "Version of the GitLab runner."
   type        = "string"
   default     = "11.8.0"
 }
 
 variable "enable_cloudwatch_logging" {
-  description = "Enable or disable the CloudWatch logging."
-  default     = 1
+  description = "Boolean used to enable or disable the CloudWatch logging."
+  default     = true
 }
 
 variable "tags" {
@@ -236,18 +237,18 @@ variable "tags" {
 }
 
 variable "allow_iam_service_linked_role_creation" {
-  description = "Attach policy to runner instance to create service linked roles."
+  description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
   default     = true
 }
 
 variable "docker_machine_options" {
-  description = "Additional to set options for docker machine. Each element of the list should be key and value. E.g. '[\"amazonec2-zone=a\"]'"
+  description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
   type        = "list"
   default     = []
 }
 
 variable "instance_role_json" {
-  description = "Instance role json for the runner agent ec2 instance to override the default."
+  description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = "string"
   default     = ""
 }
@@ -259,7 +260,7 @@ variable "instance_role_runner_json" {
 }
 
 variable "ami_filter" {
-  description = "AMI filter to select the AMI used to host the gitlab runner agent. By default the pattern `amzn-ami-hvm-2018.03*-x86_64-ebs` is used for the name. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks *not* working for this configuration."
+  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks to *not* be working for this configuration."
   type        = "list"
 
   default = [{
@@ -269,22 +270,22 @@ variable "ami_filter" {
 }
 
 variable "ami_owners" {
-  description = "A list of owners used to select the AMI for the instance."
+  description = "The list of owners used to select the AMI of Gitlab runner agent instances."
   type        = "list"
   default     = ["amazon"]
 }
 
 variable "gitlab_runner_registration_config" {
-  description = "Configurtion to register the runner. See the README for an example, or the examples."
+  description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
   type        = "map"
 
   default = {
     registration_token = ""
     tag_list           = ""
     description        = ""
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
+    locked_to_project  = ""
+    run_untagged       = ""
+    maximum_timeout    = ""
   }
 }
 
