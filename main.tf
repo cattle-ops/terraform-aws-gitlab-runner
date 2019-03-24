@@ -111,20 +111,19 @@ data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
   vars {
-    aws_region  = "${var.aws_region}"
-    gitlab_url  = "${var.runners_gitlab_url}"
-    environment = "${var.environment}"
+    aws_region = "${var.aws_region}"
+    gitlab_url = "${var.runners_gitlab_url}"
 
-    runners_vpc_id              = "${var.vpc_id}"
-    runners_subnet_id           = "${var.subnet_id_runners}"
-    runners_instance_type       = "${var.docker_machine_instance_type}"
-    runners_spot_price_bid      = "${var.docker_machine_spot_price_bid}"
-    runners_security_group_name = "${aws_security_group.docker_machine.name}"
-    runners_monitoring          = "${var.runners_monitoring}"
-
-    docker_machine_options = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
-
+    runners_vpc_id                    = "${var.vpc_id}"
+    runners_subnet_id                 = "${var.subnet_id_runners}"
+    runners_aws_zone                  = "${var.aws_zone}"
+    runners_instance_type             = "${var.docker_machine_instance_type}"
+    runners_spot_price_bid            = "${var.docker_machine_spot_price_bid}"
+    runners_security_group_name       = "${aws_security_group.docker_machine.name}"
+    runners_monitoring                = "${var.runners_monitoring}"
+    docker_machine_options            = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
     runners_name                      = "${var.runners_name}"
+    runners_tags                      = "${local.tags_string}"
     runners_token                     = "${var.runners_token}"
     runners_executor                  = "${var.runners_executor}"
     runners_limit                     = "${var.runners_limit}"

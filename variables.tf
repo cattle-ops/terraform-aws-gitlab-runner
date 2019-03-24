@@ -3,6 +3,12 @@ variable "aws_region" {
   type        = "string"
 }
 
+variable "aws_zone" {
+  description = "AWS availability zone (typically 'a', 'b', or 'c')."
+  type        = "string"
+  default     = "a"
+}
+
 variable "environment" {
   description = "A name that identifies the environment, will used as prefix and for tagging."
   type        = "string"
@@ -46,7 +52,7 @@ variable "docker_machine_spot_price_bid" {
 
 variable "docker_machine_version" {
   description = "Version of docker-machine."
-  default     = "0.16.0"
+  default     = "0.16.1"
 }
 
 variable "runners_name" {
@@ -215,7 +221,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version for the gitlab runner."
   type        = "string"
-  default     = "11.6.0"
+  default     = "11.8.0"
 }
 
 variable "enable_cloudwatch_logging" {
@@ -235,7 +241,7 @@ variable "allow_iam_service_linked_role_creation" {
 }
 
 variable "docker_machine_options" {
-  description = "Additional to set options for docker machien. Each element of the list should be key and value. E.g. '[\"--amazonec2-zone=a\"]'"
+  description = "Additional to set options for docker machine. Each element of the list should be key and value. E.g. '[\"amazonec2-zone=a\"]'"
   type        = "list"
   default     = []
 }
