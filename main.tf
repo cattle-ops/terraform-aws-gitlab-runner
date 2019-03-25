@@ -61,6 +61,7 @@ resource "aws_security_group_rule" "out_all" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
+# Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = "${local.secure_parameter_store_runner_token_key}"
   type  = "SecureString"
@@ -138,7 +139,7 @@ data "template_file" "runners" {
     runners_monitoring                = "${var.runners_monitoring}"
     docker_machine_options            = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
     runners_name                      = "${var.runners_name}"
-    runners_tags                      = "${local.tags_string}"
+    runners_tags                      = "${local.tags_string},Name,${var.environment}-docker-machine"
     runners_token                     = "${var.runners_token}"
     runners_executor                  = "${var.runners_executor}"
     runners_limit                     = "${var.runners_limit}"
