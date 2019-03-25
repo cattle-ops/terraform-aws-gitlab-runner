@@ -111,9 +111,10 @@ data "template_file" "runners" {
     runners_spot_price_bid            = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name       = "${aws_security_group.docker_machine.name}"
     runners_monitoring                = "${var.runners_monitoring}"
+    runners_instance_profile          = "${aws_iam_instance_profile.docker_machine.name}"
     docker_machine_options            = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
     runners_name                      = "${var.runners_name}"
-    runners_tags                      = "${local.tags_string}"
+    runners_tags                      = "${local.tags_string},Name,${var.environment}-docker-machine"
     runners_token                     = "${var.runners_token}"
     runners_executor                  = "${var.runners_executor}"
     runners_limit                     = "${var.runners_limit}"
@@ -194,27 +195,27 @@ resource "aws_iam_role" "instance" {
 }
 
 ################################################################################
-### docker machine instance policy
+### Policies for runner agent instance to create docker machines via spot req.
 ################################################################################
-data "template_file" "docker_machine_policy" {
+data "template_file" "instance_docker_machine_policy" {
   template = "${file("${path.module}/policies/instance-docker-machine-policy.json")}"
 }
 
-resource "aws_iam_policy" "docker_machine" {
+resource "aws_iam_policy" "instance_docker_machine_policy" {
   name        = "${var.environment}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
 
-  policy = "${data.template_file.docker_machine_policy.rendered}"
+  policy = "${data.template_file.instance_docker_machine_policy.rendered}"
 }
 
-resource "aws_iam_role_policy_attachment" "docker_machine" {
+resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
   role       = "${aws_iam_role.instance.name}"
-  policy_arn = "${aws_iam_policy.docker_machine.arn}"
+  policy_arn = "${aws_iam_policy.instance_docker_machine_policy.arn}"
 }
 
 ################################################################################
-### docker machine policy to access the shared cache
+### Policy to access the shared for the runner agent instance
 ################################################################################
 data "template_file" "docker_machine_cache_policy" {
   template = "${file("${path.module}/policies/cache.json")}"
@@ -232,9 +233,26 @@ resource "aws_iam_policy" "docker_machine_cache" {
   policy = "${data.template_file.docker_machine_cache_policy.rendered}"
 }
 
-resource "aws_iam_role_policy_attachment" "docker_machine_cache" {
+resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.docker_machine_cache.arn}"
+}
+
+################################################################################
+### docker machine instance policy
+################################################################################
+data "template_file" "dockermachine_role_trust_policy" {
+  template = "${file("${path.module}/policies/instance-role-trust-policy.json")}"
+}
+
+resource "aws_iam_role" "docker_machine" {
+  name               = "${var.environment}-docker-marchine-role"
+  assume_role_policy = "${data.template_file.dockermachine_role_trust_policy.rendered}"
+}
+
+resource "aws_iam_instance_profile" "docker_machine" {
+  name = "${var.environment}-dockermachine-profile"
+  role = "${aws_iam_role.docker_machine.name}"
 }
 
 ################################################################################
