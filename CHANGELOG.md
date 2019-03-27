@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Bugfix: Added a profile for the docker machine runners. #41
+- Changed: Changed the name of runner instance, added `docker-machine` to the name.
 
 ## [2.2.1] - 2019-03-19
 - Bugfix: Add tags to spot instances #39
