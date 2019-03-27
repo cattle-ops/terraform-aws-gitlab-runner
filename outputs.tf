@@ -12,3 +12,8 @@ output "runner_agent_role" {
   description = "ARN of the rule used for the ec2 instance for the GitLab runner agent."
   value       = "${aws_iam_role.instance.arn}"
 }
+
+output "runner_role" {
+  description = "ARN of the rule used for the docker machine runners."
+  value       = "${aws_iam_role.docker_machine.arn}"
+}
