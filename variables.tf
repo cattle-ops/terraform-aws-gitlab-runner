@@ -315,6 +315,18 @@ variable "gitlab_runner_registration_config" {
 }
 
 variable "allow_ssh_to_runner_instance_sg" {
+  type        = "list"
+  description = "List of security groups to attach to the runner instance ssh sg to allow remote access."
+  default     = []
+}
+
+variable "allow_ssh_to_runner_instance_cidr" {
+  type        = "list"
+  description = "List of IP addresses in CIDR notation to attach to the runner instance ssh sg to allow remote access."
+  default     = []
+}
+
+variable "allow_ssh_to_runner_instance_sg" {
   type        = "string"
   description = "Security group to attach to the runner instance ssh sg to allow remote access."
   default     = ""

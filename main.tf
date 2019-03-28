@@ -3,6 +3,9 @@
 ################################################################################
 
 locals {
+  callers_ip             = ["${chomp(data.http.ip.body)}/32"]
+  specified_cidr_blocks  = "${concat(local.callers_ip, var.specified_cidr_blocks)}"
+  ssh_cidrs_specified    = "${length(var.allow_ssh_to_runner_instance_cidr) == 0}"
   key_pair_not_specified = "${var.ssh_key_name == ""}"
 }
 
@@ -10,16 +13,6 @@ locals {
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${var.cidr_blocks_allowed_inbound}"]
-
-    # Needs an usages example
-    # security_groups = ["${var.allow_ssh_to_runner_instance_sg}"]
-  }
 
   egress {
     from_port   = 0
@@ -29,6 +22,30 @@ resource "aws_security_group" "runner" {
   }
 
   tags = "${local.tags}"
+}
+
+resource "aws_security_group_rule" "runner_ssh_sg" {
+  count = "${length(var.allow_ssh_to_runner_instance_sg)}"
+
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = "${var.allow_ssh_to_runner_instance_sg[count.index]}"
+
+  security_group_id = "${aws_security_group.runner.id}"
+}
+
+resource "aws_security_group_rule" "runner_ssh_cidr" {
+  count = "${length(var.allow_ssh_to_runner_instance_cidr)}"
+
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["${var.allow_ssh_to_runner_instance_cidr[count.index]}"]
+
+  security_group_id = "${aws_security_group.runner.id}"
 }
 
 # sg of the runner created instances that run the ci-jobs
