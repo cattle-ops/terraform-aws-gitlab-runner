@@ -294,3 +294,8 @@ variable "secure_parameter_store_runner_token_key" {
   description = "The key name used store the Gitlab runner token in Secure Paramater Store"
   default     = "runner-token"
 }
+
+variable "enable_manage_gitlab_token" {
+  description = "Manage the GitLab token in SSM, if `true` the token SSM parameter will be manged by terraform, a destroy removes the parameter for the runner token. When `false` the token will not be manged by terraform. The runner process will still store the token in SSM but a terraform destroy will not remove the token."
+  default     = true
+}

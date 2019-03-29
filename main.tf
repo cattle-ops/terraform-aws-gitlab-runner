@@ -312,10 +312,14 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 ### AWS Systems Manager access to store runner token once regsitered
 ################################################################################
 data "template_file" "ssm_policy" {
+  count = "${var.enable_manage_gitlab_token ? 1 : 0}"
+
   template = "${file("${path.module}/policies/instance-secure-parameter-role-policy.json")}"
 }
 
 resource "aws_iam_policy" "ssm" {
+  count = "${var.enable_manage_gitlab_token ? 1 : 0}"
+
   name        = "${var.environment}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"

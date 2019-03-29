@@ -75,7 +75,7 @@ To register the runner automatically set the variable `gitlab_runner_registratio
   }
 ```
 
-For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup required values in the parameter store. If the value is null a new runner will be created. 
+For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup required values in the parameter store. If the value is null a new runner will be created.
 
 ```
 # set the following variables, look up the variables in your Terraform config.
@@ -131,6 +131,7 @@ module "gitlab-runner" {
 }
 ```
 
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -150,6 +151,7 @@ module "gitlab-runner" {
 | docker_machine_user | Username of the user used to create the spot instances that host docker-machine. | string | `docker-machine` | no |
 | docker_machine_version | Version of docker-machine. | string | `0.16.1` | no |
 | enable_cloudwatch_logging | Boolean used to enable or disable the CloudWatch logging. | string | `true` | no |
+| enable_manage_gitlab_token | Manage the GitLab token in SSM, if `true` the token SSM parameter will be manged by terraform, a destroy removes the parameter for the runner token. When `false` the token will not be manged by terraform. The runner process will still store the token in SSM but a terraform destroy will not remove the token. | string | `true` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | - | yes |
 | gitlab_runner_registration_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
 | gitlab_runner_version | Version of the GitLab runner. | string | `11.8.0` | no |
@@ -195,6 +197,7 @@ module "gitlab-runner" {
 | runner_agent_role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
 | runner_as_group_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner_cache_bucket_arn | ARN of the S3 for the build cache. |
+| runner_role | ARN of the rule used for the docker machine runners. |
 
 ## Example
 
