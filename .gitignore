@@ -14,4 +14,4 @@
 config-terraform.sh
 
 *.out
-example/*.secrets*.tfvars
+*.secrets*.tfvars
