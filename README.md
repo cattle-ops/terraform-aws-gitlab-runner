@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/npalm/terraform-aws-gitlab-runner.svg?branch=master)](https://travis-ci.com/npalm/terraform-aws-gitlab-runner)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-# Terraform module for GitLab auto scaling runners on Spot instances
+# Terraform module for GitLab auto scaling runners on AWS spot instances
 
 > *NEW*: The runner will register itself automatically to GitLab. No need to register the runner first, see also the [examples](./examples)
 
