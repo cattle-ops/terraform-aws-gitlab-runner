@@ -109,25 +109,38 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 ### Usage module.
 
 ```hcl
-module "gitlab-runner" {
+
+
+module "runner" {
   source = "npalm/gitlab-runner/aws"
-  version = "1.0.0"
+  version = "3.0.0"
 
-  aws_region              = "${var.aws_region}"
-  environment             = "${var.environment}"
-  ssh_public_key          = "${file("${var.ssh_key_file}")}"
+  aws_region      = "${var.aws_region}"
+  environment     = "${var.environment}"
+  ssh_public_key  = "${file("${var.ssh_key_file}")}"
 
-  vpc_id                  = "${module.vpc.vpc_id}"
+  vpc_id                   = "${module.vpc.vpc_id}"
   subnet_ids_gitlab_runner = "${module.vpc.private_subnets}"
-  subnet_id_runners       = "${element(module.vpc.private_subnets, 0)}"
+  subnet_id_runners        = "${element(module.vpc.private_subnets, 0)}"
 
-  runners_name             = "${var.runner_name}"
-  runners_gitlab_url       = "${var.gitlab_url}"
-  runners_token            = "${var.runner_token}"
+  runners_name       = "my-spot-runner"
+  runners_gitlab_url = "https://www.gitlab.com"
 
-  # Optional
-  runners_off_peak_timezone = "Europe/Amsterdam"
-  runners_off_peak_periods  = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
+  gitlab_runner_registration_config = {
+    registration_token = "<YOUR_TOKEN>"
+    tag_list           = "docker_spot_runner"
+    description        = "Docker AWS Spot runner"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+
+  runners_off_peak_timezone   = "Europe/Amsterdam"
+  runners_off_peak_idle_count = 0
+  runners_off_peak_idle_time  = 60
+
+  # working 9 to 5 :)
+  runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 ```
 
