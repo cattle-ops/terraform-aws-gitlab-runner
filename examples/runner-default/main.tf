@@ -11,7 +11,6 @@ module "vpc" {
 
   enable_nat_gateway = true
   single_nat_gateway = true
-
   enable_s3_endpoint = true
 
   tags = {
@@ -33,7 +32,6 @@ module "runner" {
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
-  runners_name       = "${var.runner_name}"
 
   gitlab_runner_registration_config = {
     registration_token = "${var.registration_token}"

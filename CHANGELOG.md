@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Changed: The runner will register itself based on the registration token. No need to preregister the runner before running terraform. See the [README](README.md) for more details.
 
 ## [2.3.0] - 2019-03-27
 - Bugfix: Added a profile for the docker machine runners. #41
