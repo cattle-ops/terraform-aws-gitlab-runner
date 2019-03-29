@@ -7,7 +7,7 @@ This repo contains a Terraform module and examples to run a [GitLab CI multi run
 
 ![GitLab Runners](https://github.com/npalm/assets/raw/master/images/2017-12-06_gitlab-multi-runner-aws.png)
 
-The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/) The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled.
+The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/) The created runner will have by default a shared cache in S3 and logging is streamed to CloudWatch. The cache in S3 will expire in X days, see configuration. The logging can be disabled. The post mentioned that you have to register the the runner before running the Terraform scripts. Since version 3+ this is not needed anymore you can pass the runner configuration including the runner registration token.
 
 Besides the auto scaling option (docker+machine executor) the docker executor is supported as well for a single node.
 
@@ -60,7 +60,7 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 
 ### Configuration GitLab runner token
 
-By default the runner is registered the first time. In previous version this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the parameter store.
+By default the runner is registered the first time. In previous version this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the parameter store. See [example](examples/runner-pre-registered/) for more details.
 
 To register the runner automatically set the variable `gitlab_runner_registration_config["token"]` which you can find in your GitLab project, group or global settings. For a generic runner you can find the token in the admin section. By default the runner will be locked to project, not run untagged. Below an example of the configuration map.
 
@@ -75,7 +75,7 @@ To register the runner automatically set the variable `gitlab_runner_registratio
   }
 ```
 
-For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup required values in the parameter store. If the value is null a new runner will be created.
+For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup required values in the parameter store. If the value is null a new runner will be created. 
 
 ```
 # set the following variables, look up the variables in your Terraform config.
@@ -86,9 +86,9 @@ parameter-name=<${var.environment}>-<${var.secure_parameter_store_runner_token_k
 
 aws ssm put-parameter --overwrite --type SecureString  --name "${parameter-name}" --value ${token} --region "${aws-region}"
 ```
-Once you have created the parameter, you have to remove the variable `runners_token` from your config. Then next time your gitlab runner instance is created it look up the token from the paramater store.
+Once you have created the parameter, you have to remove the variable `runners_token` from your config. Then next time your gitlab runner instance is created it look up the token from the parameter store.
 
-Finally the runner still support the manual runner creation, no changes are required. Please keep in mind that this setup will be removed.
+Finally the runner still support the manual runner creation, no changes are required. Please keep in mind that this setup will be removed in future releases.
 
 
 ## Usage

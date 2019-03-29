@@ -63,6 +63,8 @@ resource "aws_security_group_rule" "out_all" {
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
+  # count = "${var.manage_ssm_runner_token}"
+
   name  = "${local.secure_parameter_store_runner_token_key}"
   type  = "SecureString"
   value = "null"
