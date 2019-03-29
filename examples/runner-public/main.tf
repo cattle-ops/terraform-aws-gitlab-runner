@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.59.0"
+  version = "1.60.0"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -30,5 +30,13 @@ module "runner" {
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
-  runners_token      = "${var.runner_token}"
+
+  gitlab_runner_registration_config = {
+    registration_token = "${var.registration_token}"
+    tag_list           = "docker_spot_runner"
+    description        = "runner public - auto"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
 }

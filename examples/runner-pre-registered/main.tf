@@ -11,6 +11,7 @@ module "vpc" {
 
   enable_nat_gateway = true
   single_nat_gateway = true
+
   enable_s3_endpoint = true
 
   tags = {
@@ -32,15 +33,7 @@ module "runner" {
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
-
-  gitlab_runner_registration_config = {
-    registration_token = "${var.registration_token}"
-    tag_list           = "docker_spot_runner"
-    description        = "runner default - auto"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-  }
+  runners_token      = "${var.runner_token}"
 
   runners_off_peak_timezone   = "Europe/Amsterdam"
   runners_off_peak_idle_count = 0

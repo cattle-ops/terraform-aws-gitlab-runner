@@ -1,4 +1,4 @@
-# Example - Runner - Public subnets
+# Example - Spot Runner - Public subnets
 
 Example how create a gitlab runner, running in a public subnet.
 

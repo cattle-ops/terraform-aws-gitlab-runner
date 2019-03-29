@@ -6,7 +6,7 @@ variable "aws_region" {
 
 variable "environment" {
   description = "A name that indentifies the environment, will used as prefix and for taggin."
-  default     = "ci-runners"
+  default     = "runners-docker"
   type        = "string"
 }
 
@@ -21,14 +21,13 @@ variable "private_ssh_key_filename" {
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = "string"
+  default     = "docker"
 }
 
 variable "gitlab_url" {
   description = "URL of the gitlab instance to connect to."
   type        = "string"
+  default     = "https://www.gitlab.com"
 }
 
-variable "runner_token" {
-  description = "Token for the runner, will be used in the runner config.toml"
-  type        = "string"
-}
+variable "registration_token" {}
