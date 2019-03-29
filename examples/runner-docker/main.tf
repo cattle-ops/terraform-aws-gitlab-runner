@@ -5,8 +5,9 @@ module "vpc" {
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
 
-  azs            = ["eu-west-1a"]
-  public_subnets = ["10.1.101.0/24"]
+  azs                = ["eu-west-1a"]
+  public_subnets     = ["10.1.101.0/24"]
+  enable_s3_endpoint = true
 
   tags = {
     Environment = "${var.environment}"
@@ -30,5 +31,13 @@ module "runner" {
   runners_executor   = "docker"
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
-  runners_token      = "${var.runner_token}"
+
+  gitlab_runner_registration_config = {
+    registration_token = "${var.registration_token}"
+    tag_list           = "docker_runner"
+    description        = "runner docker - auto"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
 }
