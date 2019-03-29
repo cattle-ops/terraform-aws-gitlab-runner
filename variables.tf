@@ -36,7 +36,7 @@ variable "instance_type" {
 }
 
 variable "ssh_public_key" {
-  description = "Public SSH key used for the GitLab runner ec2 instance."
+  description = "Public SSH key used for the GitLab runner EC2 instance."
   type        = "string"
 }
 
@@ -56,12 +56,12 @@ variable "docker_machine_version" {
 }
 
 variable "runners_name" {
-  description = "Name of the runner, will be used in the runner config.toml"
+  description = "Name of the runner, will be used in the runner config.toml."
   type        = "string"
 }
 
 variable "runners_executor" {
-  description = "The executor to use. Currently supports docker+machine or docker"
+  description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = "string"
   default     = "docker+machine"
 }
@@ -72,28 +72,28 @@ variable "runners_gitlab_url" {
 }
 
 variable "runners_token" {
-  description = "Token for the runner, will be used in the runner config.toml"
+  description = "Token for the runner, will be used in the runner config.toml."
   type        = "string"
   default     = "__REPLACED_BY_USER_DATA__"
 }
 
 variable "runners_limit" {
-  description = "Limit for the runners, will be used in the runner config.toml"
+  description = "Limit for the runners, will be used in the runner config.toml."
   default     = 0
 }
 
 variable "runners_concurrent" {
-  description = "Concurrent value for the runners, will be used in the runner config.toml"
+  description = "Concurrent value for the runners, will be used in the runner config.toml."
   default     = 10
 }
 
 variable "runners_idle_time" {
-  description = "Idle time of the runners, will be used in the runner config.toml"
+  description = "Idle time of the runners, will be used in the runner config.toml."
   default     = 600
 }
 
 variable "runners_idle_count" {
-  description = "Idle count of the runners, will be used in the runner config.toml"
+  description = "Idle count of the runners, will be used in the runner config.toml."
   default     = 0
 }
 
