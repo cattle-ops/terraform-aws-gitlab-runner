@@ -103,7 +103,7 @@ variable "runners_image" {
   default     = "docker:18.03.1-ce"
 }
 
-variable "runners_privilled" {
+variable "runners_privileged" {
   description = "Runners will run in privileged mode, will be used in the runner config.toml"
   type        = "string"
   default     = "true"
@@ -232,7 +232,7 @@ variable "enable_cloudwatch_logging" {
 
 variable "tags" {
   type        = "map"
-  description = "Map of tags that will be added to created resources. By default resources will be taggen with name and environemnt."
+  description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
   default     = {}
 }
 
@@ -291,11 +291,11 @@ variable "gitlab_runner_registration_config" {
 
 variable "secure_parameter_store_runner_token_key" {
   type        = "string"
-  description = "The key name used store the Gitlab runner token in Secure Paramater Store"
+  description = "The key name used store the Gitlab runner token in Secure Parameter Store"
   default     = "runner-token"
 }
 
 variable "enable_manage_gitlab_token" {
-  description = "Manage the GitLab token in SSM, if `true` the token SSM parameter will be manged by terraform, a destroy removes the parameter for the runner token. When `false` the token will not be manged by terraform. The runner process will still store the token in SSM but a terraform destroy will not remove the token."
+  description = "Boolean to enable the management of the GitLab token in SSM. If `true` the Gitlab token will be managed via terraform state. If `false` the token will still be stored in SSM however, it will not be managed via terraform."
   default     = true
 }
