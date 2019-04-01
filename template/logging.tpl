@@ -1,5 +1,5 @@
 echo 'installing additional software for logging'
-# installing in a loop to ensure the cli is intalled.
+# installing in a loop to ensure the cli is installed.
 for i in {1..7}
 do
   echo "Attempt: ---- " $i

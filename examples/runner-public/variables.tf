@@ -5,7 +5,7 @@ variable "aws_region" {
 }
 
 variable "environment" {
-  description = "A name that indentifies the environment, will used as prefix and for taggin."
+  description = "A name that identifies the environment, will used as prefix and for tagging."
   default     = "runner-public"
   type        = "string"
 }

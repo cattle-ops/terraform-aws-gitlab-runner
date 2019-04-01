@@ -119,7 +119,7 @@ data "template_file" "gitlab_runner" {
 }
 
 locals {
-  // Convert list to a string seperated and prepend by a comma
+  // Convert list to a string separated and prepend by a comma
   docker_machine_options_string           = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
   runners_off_peak_periods_string         = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
   secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
@@ -148,7 +148,7 @@ data "template_file" "runners" {
     runners_limit                     = "${var.runners_limit}"
     runners_concurrent                = "${var.runners_concurrent}"
     runners_image                     = "${var.runners_image}"
-    runners_privilled                 = "${var.runners_privilled}"
+    runners_privileged                = "${var.runners_privileged}"
     runners_idle_count                = "${var.runners_idle_count}"
     runners_idle_time                 = "${var.runners_idle_time}"
     runners_off_peak_timezone         = "${var.runners_off_peak_timezone}"
@@ -242,7 +242,7 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 }
 
 ################################################################################
-### Policy to access the shared for the runner agent instance
+### Policy for the docker machine instance to access cache
 ################################################################################
 data "template_file" "docker_machine_cache_policy" {
   template = "${file("${path.module}/policies/cache.json")}"
@@ -273,12 +273,12 @@ data "template_file" "dockermachine_role_trust_policy" {
 }
 
 resource "aws_iam_role" "docker_machine" {
-  name               = "${var.environment}-docker-marchine-role"
+  name               = "${var.environment}-docker-machine-role"
   assume_role_policy = "${data.template_file.dockermachine_role_trust_policy.rendered}"
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  name = "${var.environment}-dockermachine-profile"
+  name = "${var.environment}-docker-machine-profile"
   role = "${aws_iam_role.docker_machine.name}"
 }
 
@@ -309,7 +309,7 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 }
 
 ################################################################################
-### AWS Systems Manager access to store runner token once regsitered
+### AWS Systems Manager access to store runner token once registered
 ################################################################################
 data "template_file" "ssm_policy" {
   count = "${var.enable_manage_gitlab_token ? 1 : 0}"
