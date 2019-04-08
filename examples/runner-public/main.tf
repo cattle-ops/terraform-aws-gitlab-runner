@@ -28,8 +28,9 @@ module "runner" {
   subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
   aws_zone                 = "b"
 
-  runners_name       = "${var.runner_name}"
-  runners_gitlab_url = "${var.gitlab_url}"
+  runners_name             = "${var.runner_name}"
+  runners_gitlab_url       = "${var.gitlab_url}"
+  runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   gitlab_runner_registration_config = {
     registration_token = "${var.registration_token}"
