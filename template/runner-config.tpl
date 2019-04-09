@@ -6,6 +6,7 @@ check_interval = 0
   url = "${gitlab_url}"
   token = "${runners_token}"
   executor = "${runners_executor}"
+  environment = ${runners_environment_vars}
   pre_build_script = "${runners_pre_build_script}"
   post_build_script = "${runners_post_build_script}"
   pre_clone_script = "${runners_pre_clone_script}"
@@ -15,7 +16,7 @@ check_interval = 0
   [runners.docker]
     tls_verify = false
     image = "${runners_image}"
-    privileged = ${runners_privilled}
+    privileged = ${runners_privileged}
     disable_cache = false
     volumes = ["/cache"]
     shm_size = 0
