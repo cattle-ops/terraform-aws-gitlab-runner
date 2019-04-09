@@ -109,6 +109,11 @@ variable "runners_privileged" {
   default     = "true"
 }
 
+variable "runners_shm_size" {
+  description = "shm_size for the runners.  will be used in the runner config.toml"
+  default     = 0
+}
+
 variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   default     = false

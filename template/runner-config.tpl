@@ -19,7 +19,7 @@ check_interval = 0
     privileged = ${runners_privileged}
     disable_cache = false
     volumes = ["/cache"]
-    shm_size = 0
+    shm_size = ${runners_shm_size}
   [runners.cache]
     Type = "s3"
     Shared = ${shared_cache}

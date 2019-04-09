@@ -149,6 +149,7 @@ data "template_file" "runners" {
     runners_concurrent                = "${var.runners_concurrent}"
     runners_image                     = "${var.runners_image}"
     runners_privileged                = "${var.runners_privileged}"
+    runners_shm_size                  = "${var.runners_shm_size}"
     runners_idle_count                = "${var.runners_idle_count}"
     runners_idle_time                 = "${var.runners_idle_time}"
     runners_off_peak_timezone         = "${var.runners_off_peak_timezone}"
