@@ -191,6 +191,7 @@ module "runner" {
 | runners_privileged | Runners will run in privileged mode, will be used in the runner config.toml | string | `true` | no |
 | runners_request_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | string | `1` | no |
 | runners_root_size | Runner instance root size in GB. | string | `16` | no |
+| runners_shm_size | shm_size for the runners.  will be used in the runner config.toml | string | `0` | no |
 | runners_token | Token for the runner, will be used in the runner config.toml. | string | `__REPLACED_BY_USER_DATA__` | no |
 | runners_use_private_address | Restrict runners to the use of a private IP address | string | `true` | no |
 | secure_parameter_store_runner_token_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `runner-token` | no |
