@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.1.0] - 2019-03-09
+- Added: Option to set environment variables for the runners, see the variable `runners_environment_vars`. An example added to the `public-runner` example. 
 
 ## [3.0.0] - 2019-03-29
 - Changed: The runner will register itself based on the registration token. No need to preregister the runner before running terraform. See the [README](README.md) for configuration and migration. #33
@@ -105,7 +107,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.1.0...HEAD
+[3.1.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/2.3.0...3.0.0
 [2.3.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/2.2.1...2.3.0
 [2.2.1]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/2.2.0...2.2.1

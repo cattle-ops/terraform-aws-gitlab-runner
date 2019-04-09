@@ -142,6 +142,7 @@ module "runner" {
 }
 ```
 
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -164,11 +165,12 @@ module "runner" {
 | enable_manage_gitlab_token | Boolean to enable the management of the GitLab token in SSM. If `true` the Gitlab token will be managed via terraform state. If `false` the token will still be stored in SSM however, it will not be managed via terraform. | string | `true` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | - | yes |
 | gitlab_runner_registration_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
-| gitlab_runner_version | Version of the GitLab runner. | string | `11.8.0` | no |
+| gitlab_runner_version | Version of the GitLab runner. | string | `11.9.1` | no |
 | instance_role_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `` | no |
 | instance_role_runner_json | Instance role json for the docker machine runners to override the default. | string | `` | no |
 | instance_type | Instance type used for the GitLab runner. | string | `t2.micro` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | string | `10` | no |
+| runners_environment_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list | `<list>` | no |
 | runners_executor | The executor to use. Currently supports `docker+machine` or `docker`. | string | `docker+machine` | no |
 | runners_gitlab_url | URL of the GitLab instance to connect to. | string | - | yes |
 | runners_iam_instance_profile_name | IAM instance profile name of the runners, will be used in the runner config.toml | string | `` | no |
@@ -191,7 +193,7 @@ module "runner" {
 | runners_root_size | Runner instance root size in GB. | string | `16` | no |
 | runners_token | Token for the runner, will be used in the runner config.toml. | string | `__REPLACED_BY_USER_DATA__` | no |
 | runners_use_private_address | Restrict runners to the use of a private IP address | string | `true` | no |
-| secure_parameter_store_runner_token_key | The key name used store the Gitlab runner token in Secure Paramater Store | string | `runner-token` | no |
+| secure_parameter_store_runner_token_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `runner-token` | no |
 | ssh_public_key | Public SSH key used for the GitLab runner EC2 instance. | string | - | yes |
 | subnet_id_runners | List of subnets used for hosting the gitlab-runners. | string | - | yes |
 | subnet_ids_gitlab_runner | Subnet used for hosting the GitLab runner. | list | - | yes |
