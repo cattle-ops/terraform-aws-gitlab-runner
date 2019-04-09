@@ -151,6 +151,12 @@ variable "runners_iam_instance_profile_name" {
   default     = ""
 }
 
+variable "runners_environment_vars" {
+  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml"
+  type        = "list"
+  default     = []
+}
+
 variable "runners_pre_build_script" {
   description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
   type        = "string"
