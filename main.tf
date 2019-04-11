@@ -7,21 +7,29 @@ resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = "${local.tags}"
+}
+
+resource "aws_security_group_rule" "ssh_runner" {
+  count = "${var.gitlab_runner_ssh_access}"
+
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = "${var.gitlab_runner_ssh_cidr_blocks}"
+
+  security_group_id = "${aws_security_group.runner.id}"
+}
+
+resource "aws_security_group_rule" "out_all_runner" {
+  type        = "egress"
+  from_port   = 0
+  to_port     = 65535
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.runner.id}"
 }
 
 resource "aws_security_group" "docker_machine" {
@@ -41,7 +49,7 @@ resource "aws_security_group_rule" "docker" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
-resource "aws_security_group_rule" "ssh" {
+resource "aws_security_group_rule" "ssh_docker_machine" {
   type        = "ingress"
   from_port   = 22
   to_port     = 22
@@ -51,7 +59,7 @@ resource "aws_security_group_rule" "ssh" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
-resource "aws_security_group_rule" "out_all" {
+resource "aws_security_group_rule" "out_all_docker_machine" {
   type        = "egress"
   from_port   = 0
   to_port     = 65535
