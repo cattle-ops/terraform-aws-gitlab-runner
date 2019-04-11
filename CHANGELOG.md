@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Changed: Default version of GitLab runner set to 11.9.2
 
 ## [3.2.0] - 2019-03-09
 - Added: Option to set shm_size for the runners, default remains 0.
