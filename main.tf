@@ -11,7 +11,7 @@ resource "aws_security_group" "runner" {
 }
 
 resource "aws_security_group_rule" "ssh_runner" {
-  count = "${var.gitlab_runner_ssh_access}"
+  count = "${var.enable_gitlab_runner_ssh_access}"
 
   type        = "ingress"
   from_port   = 22
