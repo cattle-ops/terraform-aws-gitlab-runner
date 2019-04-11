@@ -111,7 +111,7 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 ```hcl
 module "runner" {
   source = "npalm/gitlab-runner/aws"
-  version = "3.0.0"
+  version = "3.2.0"
 
   aws_region      = "${var.aws_region}"
   environment     = "${var.environment}"
