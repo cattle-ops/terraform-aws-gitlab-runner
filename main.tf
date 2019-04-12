@@ -10,7 +10,7 @@ resource "aws_security_group" "runner" {
   tags = "${local.tags}"
 }
 
-resource "aws_security_group_rule" "ssh_runner" {
+resource "aws_security_group_rule" "ssh" {
   count = "${var.enable_gitlab_runner_ssh_access}"
 
   type        = "ingress"
@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "ssh_runner" {
   security_group_id = "${aws_security_group.runner.id}"
 }
 
-resource "aws_security_group_rule" "out_all_runner" {
+resource "aws_security_group_rule" "out_all" {
   type        = "egress"
   from_port   = 0
   to_port     = 65535
@@ -49,7 +49,7 @@ resource "aws_security_group_rule" "docker" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
-resource "aws_security_group_rule" "ssh_docker_machine" {
+resource "aws_security_group_rule" "ssh" {
   type        = "ingress"
   from_port   = 22
   to_port     = 22
@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "ssh_docker_machine" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
-resource "aws_security_group_rule" "out_all_docker_machine" {
+resource "aws_security_group_rule" "out_all" {
   type        = "egress"
   from_port   = 0
   to_port     = 65535
