@@ -141,8 +141,6 @@ module "runner" {
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 ```
-
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -165,10 +163,11 @@ module "runner" {
 | enable_manage_gitlab_token | Boolean to enable the management of the GitLab token in SSM. If `true` the Gitlab token will be managed via terraform state. If `false` the token will still be stored in SSM however, it will not be managed via terraform. | string | `true` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | - | yes |
 | gitlab_runner_registration_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
-| gitlab_runner_version | Version of the GitLab runner. | string | `11.9.1` | no |
+| gitlab_runner_version | Version of the GitLab runner. | string | `11.9.2` | no |
 | instance_role_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `` | no |
 | instance_role_runner_json | Instance role json for the docker machine runners to override the default. | string | `` | no |
-| instance_type | Instance type used for the GitLab runner. | string | `t2.micro` | no |
+| instance_type | Instance type used for the GitLab runner. | string | `t3.micro` | no |
+| runner_instance_spot_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `` | no |
 | runners_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | string | `10` | no |
 | runners_environment_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list | `<list>` | no |
 | runners_executor | The executor to use. Currently supports `docker+machine` or `docker`. | string | `docker+machine` | no |
