@@ -197,6 +197,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   image_id             = "${data.aws_ami.runner.id}"
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
+  spot_price           = "${var.runner_instance_spot_price}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
 
   associate_public_ip_address = false

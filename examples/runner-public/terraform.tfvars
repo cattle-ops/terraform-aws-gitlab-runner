@@ -9,4 +9,4 @@ runner_name = "docker.m3"
 
 gitlab_url = "https://gitlab.com"
 
-runner_token = "3939146918cced54ecf1dd08e6b87e"
+registration_token = "-Xmv8rN6dGtSQ6TjWSnf"

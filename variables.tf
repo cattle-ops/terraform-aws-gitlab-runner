@@ -35,6 +35,12 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "runner_instance_spot_price" {
+  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
+  type        = "string"
+  default     = ""
+}
+
 variable "ssh_public_key" {
   description = "Public SSH key used for the GitLab runner EC2 instance."
   type        = "string"
