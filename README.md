@@ -156,7 +156,7 @@ module "runner" {
 | cache_expiration_days | Number of days before cache objects expires. | string | `1` | no |
 | cache_shared | Enables cache sharing between runners, false by default. | string | `false` | no |
 | create_runners_iam_instance_profile | Boolean to control the creation of the runners IAM instance profile | string | `true` | no |
-| docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m4.large` | no |
+| docker_machine_instance_type | Instance type used for the instances hosting docker-machine. | string | `m5.large` | no |
 | docker_machine_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list | `<list>` | no |
 | docker_machine_spot_price_bid | Spot price bid. | string | `0.04` | no |
 | docker_machine_user | Username of the user used to create the spot instances that host docker-machine. | string | `docker-machine` | no |
