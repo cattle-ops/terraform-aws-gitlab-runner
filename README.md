@@ -141,6 +141,7 @@ module "runner" {
 }
 ```
 
+
 ## Example
 
 A few [examples](examples) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples` directory.
