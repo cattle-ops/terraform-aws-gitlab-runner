@@ -3,6 +3,14 @@ resource "aws_key_pair" "key" {
   public_key = "${var.ssh_public_key}"
 }
 
+locals {
+  # workaround for "conditional operator cannot be used with list values"
+  runner_ssh_config = {
+    enabled  = "${var.gitlab_runner_ssh_cidr_blocks}"
+    disabled = "${list()}"
+  }
+}
+
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
@@ -11,7 +19,7 @@ resource "aws_security_group" "runner" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = "${local.runner_ssh_config["${var.enable_gitlab_runner_ssh_access == 1 ? "enabled" : "disabled"}"]}"
   }
 
   egress {

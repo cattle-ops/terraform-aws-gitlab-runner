@@ -242,6 +242,17 @@ variable "gitlab_runner_version" {
   default     = "11.9.2"
 }
 
+variable "enable_gitlab_runner_ssh_access" {
+  description = "Enables SSH Access to the gitlab runner instance."
+  default     = false
+}
+
+variable "gitlab_runner_ssh_cidr_blocks" {
+  description = "List of CIDR blocks to allow SSH Access from to the gitlab runner instance."
+  type        = "list"
+  default     = ["0.0.0.0/0"]
+}
+
 variable "enable_cloudwatch_logging" {
   description = "Boolean used to enable or disable the CloudWatch logging."
   default     = true
