@@ -205,6 +205,8 @@ terraform destroy
 | instance\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_role\_runner\_json | Instance role json for the docker machine runners to override the default. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
+| name\_runners\_docker\_machine |  | string | `""` | no |
+| overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | map | `<map>` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | string | `"10"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list | `<list>` | no |
