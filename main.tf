@@ -3,24 +3,9 @@ resource "aws_key_pair" "key" {
   public_key = "${var.ssh_public_key}"
 }
 
-locals {
-  # workaround for "conditional operator cannot be used with list values"
-  runner_ssh_config = {
-    enabled  = "${var.gitlab_runner_ssh_cidr_blocks}"
-    disabled = "${list()}"
-  }
-}
-
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = "${local.runner_ssh_config["${var.enable_gitlab_runner_ssh_access == 1 ? "enabled" : "disabled"}"]}"
-  }
 
   egress {
     from_port   = 0
@@ -30,6 +15,26 @@ resource "aws_security_group" "runner" {
   }
 
   tags = "${local.tags}"
+}
+
+resource "aws_security_group" "runner_ssh" {
+  count       = "${var.enable_gitlab_runner_ssh_access ? 1 : 0}"
+  name_prefix = "${var.environment}-security-group"
+  vpc_id      = "${var.vpc_id}"
+
+  tags = "${local.tags}"
+}
+
+resource "aws_security_group_rule" "runner_ssh" {
+  count = "${var.enable_gitlab_runner_ssh_access ? 1 : 0}"
+
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["${var.gitlab_runner_ssh_cidr_blocks}"]
+
+  security_group_id = "${aws_security_group.runner_ssh.id}"
 }
 
 resource "aws_security_group" "docker_machine" {
@@ -71,8 +76,6 @@ resource "aws_security_group_rule" "out_all" {
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
-  # count = "${var.manage_ssm_runner_token}"
-
   name  = "${local.secure_parameter_store_runner_token_key}"
   type  = "SecureString"
   value = "null"
