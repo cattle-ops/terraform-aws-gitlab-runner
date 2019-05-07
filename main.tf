@@ -9,18 +9,19 @@ locals {
     enabled  = "${var.gitlab_runner_ssh_cidr_blocks}"
     disabled = "${list()}"
   }
-    // Convert list to a string separated and prepend by a comma
-    docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
 
-    // Ensure off peak is optional
-    runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
+  // Convert list to a string separated and prepend by a comma
+  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
 
-    // Define key for runner token for SSM
-    secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
+  // Ensure off peak is optional
+  runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
 
-    // custom names for instances and security groups
-    name_runner_instance = "${var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]}"
-    name_sg              = "${var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]}"
+  // Define key for runner token for SSM
+  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
+
+  // custom names for instances and security groups
+  name_runner_instance = "${var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]}"
+  name_sg              = "${var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]}"
 }
 
 resource "aws_security_group" "runner" {
@@ -193,11 +194,11 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = "${aws_launch_configuration.gitlab_runner_instance.name}"
 
-tags = [
+  tags = [
     "${concat( 
         data.null_data_source.tags.*.outputs, 
         list(map("key", "Name", "value", local.name_runner_instance, "propagate_at_launch", true)))}",
-    ]
+  ]
 }
 
 data "aws_ami" "runner" {
