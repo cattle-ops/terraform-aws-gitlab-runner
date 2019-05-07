@@ -42,4 +42,10 @@ module "runner" {
     run_untagged       = "false"
     maximum_timeout    = "3600"
   }
+
+  overrides = {
+    name_sg                     = "my-security-group"
+    name_runner_agent_instance  = "my-runner-agent"
+    name_docker_machine_runners = "my-runners-dm"
+  }
 }
