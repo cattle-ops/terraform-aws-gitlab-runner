@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-- Changed: Default version of GitLab runner set to 11.9.2
+## [3.3.0] - 2019-05-20
+- Changed: Default version of GitLab runner set to 11.10.1
+- Added: Option to enable / disable SSH login
+- Added: Option to use spot instances for runner instance
+- Changed: Default instance type is now m5.large
+- Added: Custom names for instance and security groups
 
 ## [3.2.0] - 2019-03-09
 - Added: Option to set shm_size for the runners, default remains 0.
@@ -112,7 +116,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.2.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.3.0...HEAD
+[3.3.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.2.0...3.3.0
 [3.2.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.1.0...3.2.0
 [3.1.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/2.3.0...3.0.0
