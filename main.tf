@@ -3,16 +3,24 @@ resource "aws_key_pair" "key" {
   public_key = "${var.ssh_public_key}"
 }
 
+locals {
+  // Convert list to a string separated and prepend by a comma
+  docker_machine_options_string = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
+
+  // Ensure off peak is optional
+  runners_off_peak_periods_string = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
+
+  // Define key for runner token for SSM
+  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
+
+  // custom names for instances and security groups
+  name_runner_instance = "${var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]}"
+  name_sg              = "${var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]}"
+}
+
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   egress {
     from_port   = 0
@@ -21,14 +29,26 @@ resource "aws_security_group" "runner" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = "${local.tags}"
+  tags = "${merge(local.tags, map("Name", format("%s", local.name_sg)))}"
+}
+
+resource "aws_security_group_rule" "runner_ssh" {
+  count = "${var.enable_gitlab_runner_ssh_access ? 1 : 0}"
+
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["${var.gitlab_runner_ssh_cidr_blocks}"]
+
+  security_group_id = "${aws_security_group.runner.id}"
 }
 
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = "${var.vpc_id}"
 
-  tags = "${local.tags}"
+  tags = "${merge(local.tags, map("Name", format("%s", local.name_sg)))}"
 }
 
 resource "aws_security_group_rule" "docker" {
@@ -63,8 +83,6 @@ resource "aws_security_group_rule" "out_all" {
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
-  # count = "${var.manage_ssm_runner_token}"
-
   name  = "${local.secure_parameter_store_runner_token_key}"
   type  = "SecureString"
   value = "null"
@@ -118,13 +136,6 @@ data "template_file" "gitlab_runner" {
   }
 }
 
-locals {
-  // Convert list to a string separated and prepend by a comma
-  docker_machine_options_string           = "${format(",%s", join(",", formatlist("%q", var.docker_machine_options)))}"
-  runners_off_peak_periods_string         = "${var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)}"
-  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
-}
-
 data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
@@ -142,7 +153,7 @@ data "template_file" "runners" {
     runners_instance_profile          = "${aws_iam_instance_profile.docker_machine.name}"
     docker_machine_options            = "${length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string}"
     runners_name                      = "${var.runners_name}"
-    runners_tags                      = "${local.tags_string},Name,${var.environment}-docker-machine"
+    runners_tags                      = "${var.overrides["name_docker_machine_runners"] == "" ? format("%s,Name,%s-docker-machine", local.tags_string, var.environment) : format("%s,Name,%s", local.tags_string, var.overrides["name_docker_machine_runners"])}"
     runners_token                     = "${var.runners_token}"
     runners_executor                  = "${var.runners_executor}"
     runners_limit                     = "${var.runners_limit}"
@@ -180,7 +191,11 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = "${aws_launch_configuration.gitlab_runner_instance.name}"
 
-  tags = ["${data.null_data_source.tags.*.outputs}"]
+  tags = [
+    "${concat( 
+        data.null_data_source.tags.*.outputs, 
+        list(map("key", "Name", "value", local.name_runner_instance, "propagate_at_launch", true)))}",
+  ]
 }
 
 data "aws_ami" "runner" {
@@ -197,6 +212,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   image_id             = "${data.aws_ami.runner.id}"
   user_data            = "${data.template_file.user_data.rendered}"
   instance_type        = "${var.instance_type}"
+  spot_price           = "${var.runner_instance_spot_price}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
 
   associate_public_ip_address = false

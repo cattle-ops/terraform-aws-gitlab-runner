@@ -32,7 +32,13 @@ variable "subnet_ids_gitlab_runner" {
 variable "instance_type" {
   description = "Instance type used for the GitLab runner."
   type        = "string"
-  default     = "t2.micro"
+  default     = "t3.micro"
+}
+
+variable "runner_instance_spot_price" {
+  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
+  type        = "string"
+  default     = ""
 }
 
 variable "ssh_public_key" {
@@ -42,7 +48,7 @@ variable "ssh_public_key" {
 
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
-  default     = "m4.large"
+  default     = "m5.large"
 }
 
 variable "docker_machine_spot_price_bid" {
@@ -233,7 +239,18 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = "string"
-  default     = "11.9.1"
+  default     = "11.10.1"
+}
+
+variable "enable_gitlab_runner_ssh_access" {
+  description = "Enables SSH Access to the gitlab runner instance."
+  default     = false
+}
+
+variable "gitlab_runner_ssh_cidr_blocks" {
+  description = "List of CIDR blocks to allow SSH Access from to the gitlab runner instance."
+  type        = "list"
+  default     = ["0.0.0.0/0"]
 }
 
 variable "enable_cloudwatch_logging" {
@@ -309,4 +326,18 @@ variable "secure_parameter_store_runner_token_key" {
 variable "enable_manage_gitlab_token" {
   description = "Boolean to enable the management of the GitLab token in SSM. If `true` the Gitlab token will be managed via terraform state. If `false` the token will still be stored in SSM however, it will not be managed via terraform."
   default     = true
+}
+
+variable "name_runners_docker_machine" {
+  default = ""
+}
+
+variable "overrides" {
+  description = "This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent."
+
+  default = {
+    name_sg                     = ""
+    name_runner_agent_instance  = ""
+    name_docker_machine_runners = ""
+  }
 }

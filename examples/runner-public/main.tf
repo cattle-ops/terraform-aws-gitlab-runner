@@ -28,6 +28,8 @@ module "runner" {
   subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
   aws_zone                 = "b"
 
+  runner_instance_spot_price = "0.006"
+
   runners_name             = "${var.runner_name}"
   runners_gitlab_url       = "${var.gitlab_url}"
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
@@ -39,5 +41,11 @@ module "runner" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
+  }
+
+  overrides = {
+    name_sg                     = "my-security-group"
+    name_runner_agent_instance  = "my-runner-agent"
+    name_docker_machine_runners = "my-runners-dm"
   }
 }
