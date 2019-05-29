@@ -240,6 +240,14 @@ resource "aws_iam_role" "instance" {
 }
 
 ################################################################################
+### Policies for runner agent instance to allow SSM
+################################################################################
+resource "aws_iam_role_policy_attachment" "ecs_ssm" {
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+}
+
+################################################################################
 ### Policies for runner agent instance to create docker machines via spot req.
 ################################################################################
 data "template_file" "instance_docker_machine_policy" {
