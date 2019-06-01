@@ -15,5 +15,5 @@ output "runner_agent_role" {
 
 output "runner_role" {
   description = "ARN of the rule used for the docker machine runners."
-  value       = "${aws_iam_role.docker_machine.arn}"
+  value       = "${aws_iam_role.docker_machine.*.arn}"
 }
