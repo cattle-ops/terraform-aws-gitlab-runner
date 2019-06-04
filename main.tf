@@ -215,7 +215,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   spot_price           = "${var.runner_instance_spot_price}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
 
-  associate_public_ip_address = false
+  associate_public_ip_address = "${!var.runners_use_private_address}"
 
   lifecycle {
     create_before_destroy = true
