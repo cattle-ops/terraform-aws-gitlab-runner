@@ -225,6 +225,12 @@ variable "cache_bucket_prefix" {
   default     = ""
 }
 
+variable "cache_bucket_versioning" {
+  description = "Boolean used to enable versioning on the cache bucket, false by default."
+  type        = "string"
+  default     = "false"
+}
+
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
   default     = 1

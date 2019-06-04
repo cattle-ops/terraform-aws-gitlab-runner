@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "build_cache" {
   force_destroy = true
 
   versioning {
-    enabled = false
+    enabled = "${var.cache_bucket_versioning}"
   }
 
   lifecycle_rule {
@@ -19,6 +19,10 @@ resource "aws_s3_bucket" "build_cache" {
     prefix = "runner/"
 
     expiration {
+      days = "${var.cache_expiration_days}"
+    }
+
+    noncurrent_version_expiration {
       days = "${var.cache_expiration_days}"
     }
   }
