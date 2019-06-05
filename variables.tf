@@ -48,12 +48,12 @@ variable "ssh_public_key" {
 
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
-  default     = "m5.large"
+  default     = "m5a.large"
 }
 
 variable "docker_machine_spot_price_bid" {
   description = "Spot price bid."
-  default     = "0.04"
+  default     = "0.06"
 }
 
 variable "docker_machine_version" {
@@ -239,7 +239,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = "string"
-  default     = "11.10.1"
+  default     = "11.11.2"
 }
 
 variable "enable_gitlab_runner_ssh_access" {

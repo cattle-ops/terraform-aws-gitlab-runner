@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unrleases
+- Changed:
+  - Update default runner type, GitLab runner version, and versions in examples.
+  - Buffix #75 runner is not reachable when runners_use_private_address = false 
+  - Buffix - Missing typ - @Orkin
+  - Bugfix #72 - Detect and retry when docker machine download fails eliasdorneles
+  - Bugfix #68 - add count to prevent resource creation failing  @philippefuentes
+  - Bugfix #70 - update policy to allow runners to start when not using spot instances  @philippefuentes
+
 ## [3.3.0] - 2019-05-20
 - Changed: Default version of GitLab runner set to 11.10.1
 - Added: Option to enable / disable SSH login
