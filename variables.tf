@@ -48,12 +48,12 @@ variable "ssh_public_key" {
 
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
-  default     = "m5.large"
+  default     = "m5a.large"
 }
 
 variable "docker_machine_spot_price_bid" {
   description = "Spot price bid."
-  default     = "0.04"
+  default     = "0.06"
 }
 
 variable "docker_machine_version" {
@@ -239,7 +239,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = "string"
-  default     = "11.10.1"
+  default     = "11.11.2"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -334,6 +334,7 @@ variable "name_runners_docker_machine" {
 
 variable "overrides" {
   description = "This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent."
+  type        = "map"
 
   default = {
     name_sg                     = ""

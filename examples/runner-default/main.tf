@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.60.0"
+  version = "1.66.0"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -32,6 +32,8 @@ module "runner" {
 
   runners_name       = "${var.runner_name}"
   runners_gitlab_url = "${var.gitlab_url}"
+
+  docker_machine_spot_price_bid = "0.06"
 
   gitlab_runner_registration_config = {
     registration_token = "${var.registration_token}"

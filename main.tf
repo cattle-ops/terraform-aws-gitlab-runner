@@ -192,8 +192,8 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   launch_configuration      = "${aws_launch_configuration.gitlab_runner_instance.name}"
 
   tags = [
-    "${concat( 
-        data.null_data_source.tags.*.outputs, 
+    "${concat(
+        data.null_data_source.tags.*.outputs,
         list(map("key", "Name", "value", local.name_runner_instance, "propagate_at_launch", true)))}",
   ]
 }
@@ -215,7 +215,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   spot_price           = "${var.runner_instance_spot_price}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
 
-  associate_public_ip_address = false
+  associate_public_ip_address = "${!var.runners_use_private_address}"
 
   lifecycle {
     create_before_destroy = true
@@ -346,6 +346,8 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
+  count = "${var.enable_manage_gitlab_token ? 1 : 0}"
+
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.ssm.arn}"
 }
