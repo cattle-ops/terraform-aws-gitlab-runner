@@ -298,15 +298,13 @@ data "template_file" "dockermachine_role_trust_policy" {
 }
 
 resource "aws_iam_role" "docker_machine" {
-  count              = "${var.create_runners_iam_instance_profile ? 1 : 0}"
   name               = "${var.environment}-docker-machine-role"
   assume_role_policy = "${data.template_file.dockermachine_role_trust_policy.rendered}"
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  count = "${var.create_runners_iam_instance_profile ? 1 : 0}"
-  name  = "${var.environment}-docker-machine-profile"
-  role  = "${aws_iam_role.docker_machine.name}"
+  name = "${var.environment}-docker-machine-profile"
+  role = "${aws_iam_role.docker_machine.name}"
 }
 
 ################################################################################
