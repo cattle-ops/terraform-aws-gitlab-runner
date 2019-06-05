@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [3.3.0] - 2019-06-06
+## [3.4.0] - 2019-06-06
 - Changed:
   - Update default runner type, GitLab runner version, and versions in examples.
   - Buffix #75 runner is not reachable when runners_use_private_address = false 
