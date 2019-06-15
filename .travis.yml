@@ -8,5 +8,5 @@ jobs:
   include:
     - stage: verify
       script: ./ci/bin/verify.sh
-    # - stage: verify
-    #   script: ./ci/bin/verify-examples.sh examples
+    - stage: verify
+      script: ./ci/bin/verify-examples.sh examples
