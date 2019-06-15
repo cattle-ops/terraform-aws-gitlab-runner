@@ -1,15 +1,16 @@
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
 resource "aws_s3_bucket" "build_cache" {
   bucket = "${var.cache_bucket_prefix}${data.aws_caller_identity.current.account_id}-gitlab-runner-cache"
   acl    = "private"
 
-  tags = "${local.tags}"
+  tags = local.tags
 
   force_destroy = true
 
   versioning {
-    enabled = "${var.cache_bucket_versioning}"
+    enabled = var.cache_bucket_versioning
   }
 
   lifecycle_rule {
@@ -19,11 +20,12 @@ resource "aws_s3_bucket" "build_cache" {
     prefix = "runner/"
 
     expiration {
-      days = "${var.cache_expiration_days}"
+      days = var.cache_expiration_days
     }
 
     noncurrent_version_expiration {
-      days = "${var.cache_expiration_days}"
+      days = var.cache_expiration_days
     }
   }
 }
+

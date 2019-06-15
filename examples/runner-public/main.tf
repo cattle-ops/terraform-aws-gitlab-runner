@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.66.0"
+  version = "2.5"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -11,32 +11,32 @@ module "vpc" {
   map_public_ip_on_launch = "false"
 
   tags = {
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
 }
 
 module "runner" {
   source = "../../"
 
-  aws_region  = "${var.aws_region}"
-  environment = "${var.environment}"
+  aws_region  = var.aws_region
+  environment = var.environment
 
-  ssh_public_key              = "${local_file.public_ssh_key.content}"
+  ssh_public_key              = local_file.public_ssh_key.content
   runners_use_private_address = false
 
-  vpc_id                   = "${module.vpc.vpc_id}"
-  subnet_ids_gitlab_runner = "${module.vpc.public_subnets}"
-  subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids_gitlab_runner = module.vpc.public_subnets
+  subnet_id_runners        = element(module.vpc.public_subnets, 0)
   aws_zone                 = "b"
 
   docker_machine_spot_price_bid = "0.1"
 
-  runners_name             = "${var.runner_name}"
-  runners_gitlab_url       = "${var.gitlab_url}"
+  runners_name             = var.runner_name
+  runners_gitlab_url       = var.gitlab_url
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   gitlab_runner_registration_config = {
-    registration_token = "${var.registration_token}"
+    registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"
     locked_to_project  = "true"
@@ -50,3 +50,4 @@ module "runner" {
     name_docker_machine_runners = "my-runners-dm"
   }
 }
+
