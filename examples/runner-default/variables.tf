@@ -1,12 +1,12 @@
 variable "aws_region" {
   description = "AWS region."
-  type        = "string"
+  type        = string
   default     = "eu-west-1"
 }
 
 variable "environment" {
   description = "A name that identifies the environment, will used as prefix and for tagging."
-  type        = "string"
+  type        = string
   default     = "runners-default"
 }
 
@@ -20,14 +20,16 @@ variable "private_ssh_key_filename" {
 
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = "default-auto"
 }
 
 variable "gitlab_url" {
   description = "URL of the gitlab instance to connect to."
-  type        = "string"
+  type        = string
   default     = "https://gitlab.com"
 }
 
-variable "registration_token" {}
+variable "registration_token" {
+}
+
