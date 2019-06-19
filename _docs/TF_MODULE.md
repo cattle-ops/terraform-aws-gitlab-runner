@@ -8,12 +8,13 @@
 | aws\_region | AWS region. | string | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | string | `"a"` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | string | `""` | no |
+| cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | string | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | string | `"1"` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | string | `"false"` | no |
 | create\_runners\_iam\_instance\_profile | Boolean to control the creation of the runners IAM instance profile | string | `"true"` | no |
-| docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5.large"` | no |
+| docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list | `<list>` | no |
-| docker\_machine\_spot\_price\_bid | Spot price bid. | string | `"0.04"` | no |
+| docker\_machine\_spot\_price\_bid | Spot price bid. | string | `"0.06"` | no |
 | docker\_machine\_user | Username of the user used to create the spot instances that host docker-machine. | string | `"docker-machine"` | no |
 | docker\_machine\_version | Version of docker-machine. | string | `"0.16.1"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | string | `"true"` | no |
@@ -22,10 +23,12 @@
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access from to the gitlab runner instance. | list | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"11.9.2"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"11.11.2"` | no |
 | instance\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_role\_runner\_json | Instance role json for the docker machine runners to override the default. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
+| name\_runners\_docker\_machine |  | string | `""` | no |
+| overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | map | `<map>` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | string | `"10"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list | `<list>` | no |
