@@ -120,6 +120,12 @@ variable "runners_shm_size" {
   default     = 0
 }
 
+variable "runners_pull_policy" {
+  description = "pull_policy for the runners.  will be used in the runner config.toml"
+  type        = "string"
+  default     = "always"
+}
+
 variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   default     = false

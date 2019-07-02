@@ -2,7 +2,7 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> *WIP*: Work in progress, conversion to Terraform 0.12 #73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
+> *WIP*: Work in progress, conversion to Terraform 0.12 \#73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
 
 > *NEW*: The runner will register itself automatically to GitLab. No need to register the runner first, see also the [examples](./examples)
 
@@ -231,6 +231,7 @@ terraform destroy
 | runners\_pre\_build\_script | Script to execute in the pipeline just before the build, will be used in the runner config.toml | string | `""` | no |
 | runners\_pre\_clone\_script | Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. | string | `""` | no |
 | runners\_privileged | Runners will run in privileged mode, will be used in the runner config.toml | string | `"true"` | no |
+| runners\_pull\_policy | pull_policy for the runners.  will be used in the runner config.toml | string | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | string | `"1"` | no |
 | runners\_root\_size | Runner instance root size in GB. | string | `"16"` | no |
 | runners\_shm\_size | shm_size for the runners.  will be used in the runner config.toml | string | `"0"` | no |
