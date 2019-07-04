@@ -47,7 +47,8 @@ check_interval = 0
       "amazonec2-tags=${runners_tags}",
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-iam-instance-profile=${runners_instance_profile}",
-      "amazonec2-root-size=${runners_root_size}"
+      "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]
     OffPeakTimezone = "${runners_off_peak_timezone}"

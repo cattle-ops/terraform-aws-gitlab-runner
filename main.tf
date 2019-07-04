@@ -147,6 +147,7 @@ data "template_file" "runners" {
     runners_subnet_id                 = "${var.subnet_id_runners}"
     runners_aws_zone                  = "${var.aws_zone}"
     runners_instance_type             = "${var.docker_machine_instance_type}"
+    runners_ami                       = "${data.aws_ami.docker-machine.id}"
     runners_spot_price_bid            = "${var.docker_machine_spot_price_bid}"
     runners_security_group_name       = "${aws_security_group.docker_machine.name}"
     runners_monitoring                = "${var.runners_monitoring}"
@@ -197,6 +198,14 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
         data.null_data_source.tags.*.outputs,
         list(map("key", "Name", "value", local.name_runner_instance, "propagate_at_launch", true)))}",
   ]
+}
+
+data "aws_ami" "docker-machine" {
+  most_recent = true
+
+  filter = "${var.runner_ami_filter}"
+
+  owners = ["${var.runner_ami_owners}"]
 }
 
 data "aws_ami" "runner" {

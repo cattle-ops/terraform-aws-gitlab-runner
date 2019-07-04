@@ -4,9 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.6.0 - 2019-07-04
+- Changed
+  - Add option to specify pull policy for docker images by the runner. @roock
+  - Docker machine AMI image will be by default latest ubuntu 16.06, can be overwritten via variables @roock
+  - Improved CI docs generation script @roock
+
 ## 3.5.0 - 2019-06-19
 - Changed
-  - Documentation #85: Misleading Variable-Description @	solutionDrive-Alt
+  - Documentation #85: Misleading Variable-Description @solutionDrive-Alt
   - Bugfix #70: docker-machine fails starting runners when `amazonec2-request-spot-instance=false` @philippefuentes
   - Bugfix #72: Detect and retry when docker machine installation fails @eliasdorneles
   - Changed: Default version of GitLab runner set to 11.11.2
