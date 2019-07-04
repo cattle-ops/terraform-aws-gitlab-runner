@@ -315,6 +315,24 @@ variable "ami_owners" {
   default     = ["amazon"]
 }
 
+variable "runner_ami_filter" {
+  description = "List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI."
+  type        = "list"
+
+  default = [{
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+  }]
+}
+
+variable "runner_ami_owners" {
+  description = "The list of owners used to select the AMI of Gitlab runner docker-machine instances."
+  type        = "list"
+
+  # Canonical
+  default = ["099720109477"]
+}
+
 variable "gitlab_runner_registration_config" {
   description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
   type        = "map"
