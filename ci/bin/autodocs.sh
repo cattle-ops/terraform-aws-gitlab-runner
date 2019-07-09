@@ -23,7 +23,7 @@ do
 
         # generate the tf documentation
         echo "generating docs for: $i"
-        terraform-docs markdown table $i > $docs_dir/TF_MODULE.md
+        ci/bin/terraform-docs.sh markdown $i > $docs_dir/TF_MODULE.md
 
         # merge the tf docs with the main readme
         pandoc --wrap=none -f gfm -t gfm $docs_dir/README.md -A $docs_dir/TF_MODULE.md > $i/README.md
@@ -37,6 +37,6 @@ do
         fi
 
     elif [[ ! -d "$docs_dir" && $i != *".terraform"* ]]; then
-        terraform-docs markdown table $i > README.md
+        ci/bin/terraform-docs.sh markdown $i > README.md
     fi
 done
