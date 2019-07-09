@@ -158,6 +158,7 @@ data "template_file" "runners" {
     runners_aws_zone            = var.aws_zone
     runners_instance_type       = var.docker_machine_instance_type
     runners_spot_price_bid      = var.docker_machine_spot_price_bid
+    runners_ami                 = data.aws_ami.docker-machine.id
     runners_security_group_name = aws_security_group.docker_machine.name
     runners_monitoring          = var.runners_monitoring
     runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
@@ -198,6 +199,20 @@ data "template_file" "runners" {
     bucket_name                       = aws_s3_bucket.build_cache.bucket
     shared_cache                      = var.cache_shared
   }
+}
+
+data "aws_ami" "docker-machine" {
+  most_recent = "true"
+
+  dynamic "filter" {
+    for_each = var.runner_ami_filter
+    content {
+      name   = filter.key
+      values = filter.value
+    }
+  }
+
+  owners = var.runner_ami_owners
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
