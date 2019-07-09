@@ -20,7 +20,7 @@ check_interval = 0
     disable_cache = false
     volumes = ["/cache"]
     shm_size = ${runners_shm_size}
-    pull_policy = ${runners_pull_policy}
+    pull_policy = "${runners_pull_policy}"
   [runners.cache]
     Type = "s3"
     Shared = ${shared_cache}
