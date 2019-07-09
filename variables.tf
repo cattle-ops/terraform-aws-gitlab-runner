@@ -335,7 +335,7 @@ variable "secure_parameter_store_runner_token_key" {
 }
 
 variable "enable_manage_gitlab_token" {
-  description = "Boolean to enable the management of the GitLab token in SSM. If `true` the Gitlab token will be managed via terraform state. If `false` the token will still be stored in SSM however, it will not be managed via terraform."
+  description = "Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
   default     = true
 }
 
