@@ -116,8 +116,14 @@ variable "runners_privileged" {
 }
 
 variable "runners_shm_size" {
-  description = "shm_size for the runners.  will be used in the runner config.toml"
+  description = "shm_size for the runners, will be used in the runner config.toml"
   default     = 0
+}
+
+variable "runners_pull_policy" {
+  description = "pull_policy for the runners, will be used in the runner config.toml"
+  type        = string
+  default     = "always"
 }
 
 variable "runners_monitoring" {
