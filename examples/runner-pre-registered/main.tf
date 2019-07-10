@@ -39,7 +39,7 @@ module "runner" {
   runners_gitlab_url = var.gitlab_url
   runners_token      = var.runner_token
 
-  runners_off_peak_timezone   = "Europe/Amsterdam"
+  runners_off_peak_timezone   = var.timezone
   runners_off_peak_idle_count = 0
   runners_off_peak_idle_time  = 60
 
