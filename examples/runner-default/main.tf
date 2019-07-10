@@ -48,7 +48,7 @@ module "runner" {
     maximum_timeout    = "3600"
   }
 
-  runners_off_peak_timezone   = "Europe/Amsterdam"
+  runners_off_peak_timezone   = "${var.timezone}"
   runners_off_peak_idle_count = 0
   runners_off_peak_idle_time  = 60
 

@@ -17,3 +17,4 @@ The terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv)
 | public\_ssh\_key\_filename |  | string | `"generated/id_rsa.pub"` | no |
 | registration\_token |  | string | n/a | yes |
 | runner\_name | Name of the runner, will be used in the runner config.toml | string | `"default-auto"` | no |
+| timezone | Name of the timezone that the runner will be used in. | string | `"Europe/Amsterdam"` | no |

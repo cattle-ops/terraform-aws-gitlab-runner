@@ -32,3 +32,9 @@ variable "runner_token" {
   description = "Token for the runner, will be used in the runner config.toml"
   type        = "string"
 }
+
+variable "timezone" {
+  description = "Name of the timezone that the runner will be used in."
+  type        = "string"
+  default     = "Europe/Amsterdam"
+}
