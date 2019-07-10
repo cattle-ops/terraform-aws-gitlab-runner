@@ -1,3 +1,7 @@
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.5"
@@ -5,7 +9,7 @@ module "vpc" {
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
 
-  azs                = ["eu-west-1a"]
+  azs                = [data.aws_availability_zones.available.names[0]]
   public_subnets     = ["10.1.101.0/24"]
   enable_s3_endpoint = true
 
