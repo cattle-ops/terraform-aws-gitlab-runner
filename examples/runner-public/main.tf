@@ -39,6 +39,9 @@ module "runner" {
   runners_gitlab_url       = var.gitlab_url
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
+  runners_privileged = "false"
+  runners_mount_docker_socket = "true"
+
   gitlab_runner_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"

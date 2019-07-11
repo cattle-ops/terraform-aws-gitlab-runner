@@ -18,7 +18,7 @@ check_interval = 0
     image = "${runners_image}"
     privileged = ${runners_privileged}
     disable_cache = false
-    volumes = ["/cache"]
+    volumes = ["/cache"%{ if runners_mount_docker_socket == "true" },"${runners_docker_socket}"%{ endif ~}]
     shm_size = ${runners_shm_size}
     pull_policy = "${runners_pull_policy}"
   [runners.cache]

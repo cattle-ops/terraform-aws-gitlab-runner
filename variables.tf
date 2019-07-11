@@ -115,6 +115,18 @@ variable "runners_privileged" {
   default     = "true"
 }
 
+variable "runners_mount_docker_socket" {
+  description = "Runners will mount volume with Docker socket, will be used in the runner config.toml"
+  type        = "string"
+  default     = "false"
+}
+
+variable "runners_docker_socket" {
+  description = "Location of Docker socket on host if socket mount if enabled, will be used in the runner config.toml"
+  type        = "string"
+  default     = "/var/run/docker.sock:/var/run/docker.sock"
+}
+
 variable "runners_shm_size" {
   description = "shm_size for the runners, will be used in the runner config.toml"
   default     = 0

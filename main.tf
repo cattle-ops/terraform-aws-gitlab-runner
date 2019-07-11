@@ -162,6 +162,8 @@ data "template_file" "runners" {
     runners_security_group_name = aws_security_group.docker_machine.name
     runners_monitoring          = var.runners_monitoring
     runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
+    runners_mount_docker_socket = var.runners_mount_docker_socket
+    runners_docker_socket       = var.runners_docker_socket
     docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
     runners_name                = var.runners_name
     runners_tags = var.overrides["name_docker_machine_runners"] == "" ? format(
