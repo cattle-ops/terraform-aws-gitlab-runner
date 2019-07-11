@@ -381,5 +381,4 @@ variable "cache_bucket" {
     policy = ""
     bucket = ""
   }
-
 }

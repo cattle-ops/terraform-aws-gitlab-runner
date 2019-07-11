@@ -178,6 +178,7 @@ data "template_file" "runners" {
     runners_pre_clone_script          = "${var.runners_pre_clone_script}"
     runners_request_concurrency       = "${var.runners_request_concurrency}"
     runners_output_limit              = "${var.runners_output_limit}"
+
     # bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
     bucket_name  = "${local.bucket_name}"
     shared_cache = "${var.cache_shared}"
@@ -274,6 +275,7 @@ locals {
   bucket_name   = "${var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]}"
   bucket_policy = "${var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]}"
 }
+
 module "cache" {
   source = "cache"
 
@@ -285,7 +287,6 @@ module "cache" {
   cache_bucket_versioning = "${var.cache_bucket_versioning}"
   cache_expiration_days   = "${var.cache_expiration_days}"
 }
-
 
 # variable "environment" {
 #   description = "A name that identifies the environment, used as prefix and for tagging."
@@ -329,6 +330,7 @@ module "cache" {
 
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   role = "${aws_iam_role.instance.name}"
+
   # policy_arn = "${aws_iam_policy.docker_machine_cache.arn}"
   policy_arn = "${local.bucket_policy}"
 }

@@ -82,11 +82,12 @@ module "runner2" {
     run_untagged       = "false"
     maximum_timeout    = "3600"
   }
+
   cache_shared = "true"
+
   cache_bucket = {
     create = false
     policy = "${module.runner.runner_cache_bucket_policy_arn}"
     bucket = "${module.runner.runner_cache_bucket_name}"
   }
-
 }
