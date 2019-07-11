@@ -178,10 +178,8 @@ data "template_file" "runners" {
     runners_pre_clone_script          = "${var.runners_pre_clone_script}"
     runners_request_concurrency       = "${var.runners_request_concurrency}"
     runners_output_limit              = "${var.runners_output_limit}"
-
-    # bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
-    bucket_name  = "${local.bucket_name}"
-    shared_cache = "${var.cache_shared}"
+    bucket_name                       = "${local.bucket_name}"
+    shared_cache                      = "${var.cache_shared}"
   }
 }
 
@@ -288,46 +286,9 @@ module "cache" {
   cache_expiration_days   = "${var.cache_expiration_days}"
 }
 
-# variable "environment" {
-#   description = "A name that identifies the environment, used as prefix and for tagging."
-#   type        = "string"
-# }
-# variable "cache_bucket_prefix" {
-#   description = "Prefix for s3 cache bucket name."
-#   type        = "string"
-#   default     = ""
-# }
-
-# variable "cache_bucket_versioning" {
-#   description = "Boolean used to enable versioning on the cache bucket, false by default."
-#   type        = "string"
-#   default     = "false"
-# }
-
-# variable "cache_expiration_days" {
-#   description = "Number of days before cache objects expires."
-#   default     = 1
-# }
-
 ################################################################################
 ### Policy for the docker machine instance to access cache
 ################################################################################
-# data "template_file" "docker_machine_cache_policy" {
-#   template = "${file("${path.module}/policies/cache.json")}"
-
-#   vars {
-#     s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
-#   }
-# }
-
-# resource "aws_iam_policy" "docker_machine_cache" {
-#   name        = "${var.environment}-docker-machine-cache"
-#   path        = "/"
-#   description = "Policy for docker machine instance to access cache"
-
-#   policy = "${data.template_file.docker_machine_cache_policy.rendered}"
-# }
-
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   role = "${aws_iam_role.instance.name}"
 

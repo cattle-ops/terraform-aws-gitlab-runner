@@ -8,14 +8,6 @@ output "runner_cache_bucket_arn" {
   value       = "${module.cache.arn}"
 }
 
-output "runner_cache_bucket_name" {
-  value = "${module.cache.bucket}"
-}
-
-output "runner_cache_bucket_policy_arn" {
-  value = "${module.cache.policy_arn}"
-}
-
 output "runner_agent_role" {
   description = "ARN of the rule used for the ec2 instance for the GitLab runner agent."
   value       = "${aws_iam_role.instance.arn}"

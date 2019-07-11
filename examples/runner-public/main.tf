@@ -19,6 +19,11 @@ module "vpc" {
   }
 }
 
+module "cache" {
+  source      = "../../cache"
+  environment = "${var.environment}"
+}
+
 module "runner" {
   source = "../../"
 
@@ -54,6 +59,12 @@ module "runner" {
   }
 
   cache_shared = "true"
+
+  cache_bucket = {
+    create = false
+    policy = "${module.cache.policy_arn}"
+    bucket = "${module.cache.bucket}"
+  }
 }
 
 module "runner2" {
@@ -87,7 +98,7 @@ module "runner2" {
 
   cache_bucket = {
     create = false
-    policy = "${module.runner.runner_cache_bucket_policy_arn}"
-    bucket = "${module.runner.runner_cache_bucket_name}"
+    policy = "${module.cache.policy_arn}"
+    bucket = "${module.cache.bucket}"
   }
 }
