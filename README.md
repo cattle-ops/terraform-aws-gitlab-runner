@@ -214,7 +214,6 @@ terraform destroy
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | list(string) | `<list>` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | string | `"10"` | no |
-| runners\_mount\_docker_socket | Runners will mount volume with Docker socket, will be used in the runner config.toml | string | `""` | no |
 | runners\_docker\_socket | Location of Docker socket on host if socket mount if enabled, will be used in the runner config.toml | string | `"/var/run/docker.sock"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list(string) | `<list>` | no |
 | runners\_executor | The executor to use. Currently supports `docker+machine` or `docker`. | string | `"docker+machine"` | no |
@@ -225,6 +224,7 @@ terraform destroy
 | runners\_image | Image to run builds, will be used in the runner config.toml | string | `"docker:18.03.1-ce"` | no |
 | runners\_limit | Limit for the runners, will be used in the runner config.toml. | string | `"0"` | no |
 | runners\_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `"false"` | no |
+| runners\_mount\_docker_socket | Runners will mount volume with Docker socket, will be used in the runner config.toml | string | `""` | no |
 | runners\_name | Name of the runner, will be used in the runner config.toml. | string | n/a | yes |
 | runners\_off\_peak\_idle\_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `"0"` | no |
 | runners\_off\_peak\_idle\_time | Off peak idle time of the runners, will be used in the runner config.toml. | string | `"0"` | no |
