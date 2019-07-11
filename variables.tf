@@ -372,3 +372,14 @@ variable "overrides" {
     name_docker_machine_runners = ""
   }
 }
+
+variable "cache_bucket" {
+  description = "Create a bucket for the cache, to share cache cross multiple runners disable the creation and inject the bucket and policy for the chache."
+
+  default = {
+    create = true
+    policy = ""
+    bucket = ""
+  }
+
+}
