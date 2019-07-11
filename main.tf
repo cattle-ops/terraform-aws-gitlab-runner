@@ -178,8 +178,9 @@ data "template_file" "runners" {
     runners_pre_clone_script          = "${var.runners_pre_clone_script}"
     runners_request_concurrency       = "${var.runners_request_concurrency}"
     runners_output_limit              = "${var.runners_output_limit}"
-    bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
-    shared_cache                      = "${var.cache_shared}"
+    # bucket_name                       = "${aws_s3_bucket.build_cache.bucket}"
+    bucket_name  = "${module.cache.bucket}"
+    shared_cache = "${var.cache_shared}"
   }
 }
 
@@ -195,8 +196,8 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
 
   tags = [
     "${concat(
-        data.null_data_source.tags.*.outputs,
-        list(map("key", "Name", "value", local.name_runner_instance, "propagate_at_launch", true)))}",
+      data.null_data_source.tags.*.outputs,
+    list(map("key", "Name", "value", local.name_runner_instance, "propagate_at_launch", true)))}",
   ]
 }
 
@@ -225,7 +226,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   spot_price           = "${var.runner_instance_spot_price}"
   iam_instance_profile = "${aws_iam_instance_profile.instance.name}"
 
-  associate_public_ip_address = "${!var.runners_use_private_address}"
+  associate_public_ip_address = "${! var.runners_use_private_address}"
 
   lifecycle {
     create_before_destroy = true
@@ -269,28 +270,61 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
   policy_arn = "${aws_iam_policy.instance_docker_machine_policy.arn}"
 }
 
+module "cache" {
+  source = "cache"
+
+  environment             = "${var.environment}"
+  tags                    = "${local.tags}"
+  cache_bucket_prefix     = "${var.cache_bucket_prefix}"
+  cache_bucket_versioning = "${var.cache_bucket_versioning}"
+  cache_expiration_days   = "${var.cache_expiration_days}"
+}
+
+
+# variable "environment" {
+#   description = "A name that identifies the environment, used as prefix and for tagging."
+#   type        = "string"
+# }
+# variable "cache_bucket_prefix" {
+#   description = "Prefix for s3 cache bucket name."
+#   type        = "string"
+#   default     = ""
+# }
+
+# variable "cache_bucket_versioning" {
+#   description = "Boolean used to enable versioning on the cache bucket, false by default."
+#   type        = "string"
+#   default     = "false"
+# }
+
+# variable "cache_expiration_days" {
+#   description = "Number of days before cache objects expires."
+#   default     = 1
+# }
+
 ################################################################################
 ### Policy for the docker machine instance to access cache
 ################################################################################
-data "template_file" "docker_machine_cache_policy" {
-  template = "${file("${path.module}/policies/cache.json")}"
+# data "template_file" "docker_machine_cache_policy" {
+#   template = "${file("${path.module}/policies/cache.json")}"
 
-  vars {
-    s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
-  }
-}
+#   vars {
+#     s3_cache_arn = "${aws_s3_bucket.build_cache.arn}"
+#   }
+# }
 
-resource "aws_iam_policy" "docker_machine_cache" {
-  name        = "${var.environment}-docker-machine-cache"
-  path        = "/"
-  description = "Policy for docker machine instance to access cache"
+# resource "aws_iam_policy" "docker_machine_cache" {
+#   name        = "${var.environment}-docker-machine-cache"
+#   path        = "/"
+#   description = "Policy for docker machine instance to access cache"
 
-  policy = "${data.template_file.docker_machine_cache_policy.rendered}"
-}
+#   policy = "${data.template_file.docker_machine_cache_policy.rendered}"
+# }
 
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
-  role       = "${aws_iam_role.instance.name}"
-  policy_arn = "${aws_iam_policy.docker_machine_cache.arn}"
+  role = "${aws_iam_role.instance.name}"
+  # policy_arn = "${aws_iam_policy.docker_machine_cache.arn}"
+  policy_arn = "${module.cache.policy_arn}"
 }
 
 ################################################################################
