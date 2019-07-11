@@ -1,4 +1,3 @@
-
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = "string"
@@ -29,4 +28,3 @@ variable "tags" {
 variable "create_cache_bucket" {
   default = true
 }
-
