@@ -52,4 +52,41 @@ module "runner" {
     name_runner_agent_instance  = "my-runner-agent"
     name_docker_machine_runners = "my-runners-dm"
   }
+
+  cache_shared = "true"
+}
+
+module "runner2" {
+  source = "../../"
+
+  aws_region  = "${var.aws_region}"
+  environment = "${var.environment}-2"
+
+  ssh_public_key              = "${local_file.public_ssh_key.content}"
+  runners_use_private_address = false
+
+  vpc_id                   = "${module.vpc.vpc_id}"
+  subnet_ids_gitlab_runner = "${module.vpc.public_subnets}"
+  subnet_id_runners        = "${element(module.vpc.public_subnets, 0)}"
+
+  docker_machine_spot_price_bid = "0.1"
+
+  runners_name       = "${var.runner_name}"
+  runners_gitlab_url = "${var.gitlab_url}"
+
+  gitlab_runner_registration_config = {
+    registration_token = "${var.registration_token}"
+    tag_list           = "docker_spot_runner_2"
+    description        = "runner public - auto"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+  cache_shared = "true"
+  cache_bucket = {
+    create = false
+    policy = "${module.runner.runner_cache_bucket_policy_arn}"
+    bucket = "${module.runner.runner_cache_bucket_name}"
+  }
+
 }

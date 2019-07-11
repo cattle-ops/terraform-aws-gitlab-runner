@@ -5,3 +5,7 @@ output "policy_arn" {
 output "bucket" {
   value = "${element(concat(aws_s3_bucket.build_cache.*.bucket, list("")), 0)}"
 }
+
+output "arn" {
+  value = "${element(concat(aws_s3_bucket.build_cache.*.arn, list("")), 0)}"
+}
