@@ -31,7 +31,6 @@ module "runner" {
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets
   subnet_id_runners        = element(module.vpc.public_subnets, 0)
-  aws_zone                 = "b"
 
   docker_machine_spot_price_bid = "0.1"
 
@@ -39,7 +38,7 @@ module "runner" {
   runners_gitlab_url       = var.gitlab_url
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
-  runners_privileged = "false"
+  runners_privileged          = "false"
   runners_mount_docker_socket = "true"
 
   gitlab_runner_registration_config = {
