@@ -2,6 +2,7 @@ variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = "string"
 }
+
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = "string"
