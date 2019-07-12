@@ -233,6 +233,26 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
 }
 
 ################################################################################
+### Create cache bucket
+################################################################################
+locals {
+  bucket_name   = "${var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]}"
+  bucket_policy = "${var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]}"
+}
+
+module "cache" {
+  source = "cache"
+
+  environment = "${var.environment}"
+  tags        = "${local.tags}"
+
+  create_cache_bucket     = "${var.cache_bucket["create"]}"
+  cache_bucket_prefix     = "${var.cache_bucket_prefix}"
+  cache_bucket_versioning = "${var.cache_bucket_versioning}"
+  cache_expiration_days   = "${var.cache_expiration_days}"
+}
+
+################################################################################
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
@@ -267,23 +287,6 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.instance_docker_machine_policy.arn}"
-}
-
-locals {
-  bucket_name   = "${var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]}"
-  bucket_policy = "${var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]}"
-}
-
-module "cache" {
-  source = "cache"
-
-  environment = "${var.environment}"
-  tags        = "${local.tags}"
-
-  create_cache_bucket     = "${var.cache_bucket["create"]}"
-  cache_bucket_prefix     = "${var.cache_bucket_prefix}"
-  cache_bucket_versioning = "${var.cache_bucket_versioning}"
-  cache_expiration_days   = "${var.cache_expiration_days}"
 }
 
 ################################################################################

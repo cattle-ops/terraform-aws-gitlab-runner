@@ -2,13 +2,19 @@ data "aws_caller_identity" "current" {
   count = "${var.create_cache_bucket ? 1 : 0}"
 }
 
+locals {
+  tags = "${merge(map("Name", format("%s", var.environment)),
+              map("Environment", format("%s", var.environment)),
+              var.tags)}"
+}
+
 resource "aws_s3_bucket" "build_cache" {
   count = "${var.create_cache_bucket ? 1 : 0}"
 
   bucket = "${var.cache_bucket_prefix}${data.aws_caller_identity.current.account_id}-gitlab-runner-cache"
   acl    = "private"
 
-  tags = "${var.tags}"
+  tags = "${local.tags}"
 
   force_destroy = true
 

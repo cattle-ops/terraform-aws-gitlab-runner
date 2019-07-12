@@ -1,11 +1,14 @@
 output "policy_arn" {
-  value = "${element(concat(aws_iam_policy.docker_machine_cache.*.arn, list("")), 0)}"
+  description = "Policy for users of the cache (bucket)."
+  value       = "${element(concat(aws_iam_policy.docker_machine_cache.*.arn, list("")), 0)}"
 }
 
 output "bucket" {
-  value = "${element(concat(aws_s3_bucket.build_cache.*.bucket, list("")), 0)}"
+  description = "Name of the created bucket."
+  value       = "${element(concat(aws_s3_bucket.build_cache.*.bucket, list("")), 0)}"
 }
 
 output "arn" {
-  value = "${element(concat(aws_s3_bucket.build_cache.*.arn, list("")), 0)}"
+  description = "The ARN of the created bucket."
+  value       = "${element(concat(aws_s3_bucket.build_cache.*.arn, list("")), 0)}"
 }
