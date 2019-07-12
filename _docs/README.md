@@ -94,6 +94,13 @@ Once you have created the parameter, you must remove the variable `runners_token
 
 Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be removed in future releases.
 
+### GitLab runner cache
+
+By default the module creates a a cache for the runner in S3. Old objects are automatically remove via a configurable life cycle policy on the bucket.
+
+Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache cross multiple runners. For this purpose the cache is implemented as sub module. For more details see the [cache module](./cache). An example implementation of this use case can be find in the [runner-public](./examples/runner-public) example.
+
+
 ## Usage
 
 ### Configuration
