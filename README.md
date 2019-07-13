@@ -6,13 +6,31 @@
 
 > *NEW*: The runner will register itself automatically to GitLab. No need to register the runner first, see also the [examples](./examples)
 
-This repo contains a Terraform module and examples to run a [GitLab CI multi runner](https://docs.gitlab.com/runner/) on AWS Spot instances. See the blog post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/) for a detailed description of the setup.
+This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-![GitLab Runners](https://github.com/npalm/assets/raw/master/images/2017-12-06_gitlab-multi-runner-aws.png)
+The runners created by the module using by default spot instances for running the builds using the `docker+machine` executor.
 
-The setup is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/) The gitlab-ci runners that this project creates will be configured to use a shared cache via S3 by default. Additionally their logs will be streamed to CloudWatch. The s3 stored cache expiration is configurable and is set to expire in X days by default. Logging can be disabled. The accompanying post mentions that you have to register the the runner before running the Terraform scripts. Since version 3+ this is no longer required. You can simply define the runner configuration, including the runner registration token, via terraform.
+- Shared cache in S3 with life cycle management to clear objects after x days.
+- Logs streamed to CloudWatch.
+- Runner agents registered automatically.
 
-In addition to the auto scaling option (docker+machine executor) the docker executor is supported for a single node.
+The runner support 3 main scenario's:
+
+### GitLab CI docker-machine runner - one runner agent
+In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html) using spot instances. Runners will scale automatically based on configuration. The module creates by default a S3 cache that is shared cross runners (spot instances). 
+
+![runners-default](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-default.png)
+
+### GitLab CI docker-machine runner - multiple runner agents
+In this scenario the multiple runner agents can be created with different configuration by instantiating the module multiple times. Runners will scale automatically based on configuration. The S3 cache can be shared cross runners by managing the cache outside the module.
+
+![runners-cache](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-cache.png)
+
+### GitLab Ci docker runner
+In this scenario *not* docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the agent. No auto scaling is supported.
+
+![runners-docker](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-docker.png)
+
 
 ## Prerequisites
 
