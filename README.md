@@ -130,53 +130,16 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 
 ### Usage module
 
+Below a basic examples of usages of the module. The dependencies such as a VPC, and SSH keys have a look at the [default example](./examples/runner-default).
+
 ``` hcl
-
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-locals {
-  environment = "runners"
-}
-
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "1.66.0"
-
-  name = "vpc-${local.environment}"
-  cidr = "10.0.0.0/16"
-
-  azs             = ["eu-west-1a"]
-  private_subnets = ["10.0.1.0/24"]
-  public_subnets  = ["10.0.101.0/24"]
-
-  enable_nat_gateway = true
-  single_nat_gateway = true
-  enable_s3_endpoint = true
-
-  tags = {
-    Environment = "spot-runners"
-  }
-}
-
-resource "tls_private_key" "ssh" {
-  algorithm = "RSA"
-}
-
-resource "local_file" "public_ssh_key" {
-  depends_on = ["tls_private_key.ssh"]
-
-  content  = "${tls_private_key.ssh.public_key_openssh}"
-  filename = "${var.public_ssh_key_filename}"
-}
 
 module "runner" {
   source = "npalm/gitlab-runner/aws"
   version = "3.6.0"
 
   aws_region  = "eu-west-1"
-  environment = "${local.environment}"
+  environment = "spot-runners"
 
   ssh_public_key = "${local_file.public_ssh_key.content}"
 
