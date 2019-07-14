@@ -2,37 +2,37 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-
 > *WIP*: Work in progress, conversion to Terraform 0.12 \#73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
 
-> *NEW*: Multiple instnaces of the runner can be created that share the same cache. See [example](./examples/runner-public)
-> *MIGRATIONS*: Since 3.7 the runner cache is handled by sub module. To avoid re-creation of the bucket while upgrading a state migration is need. Please see the migration script `./migrations/migration-state-3.7.x.sh`
+> *NEW*: Multiple instnaces of the runner can be created that share the same cache. See [example](./examples/runner-public) *MIGRATIONS*: Since 3.7 the runner cache is handled by sub module. To avoid re-creation of the bucket while upgrading a state migration is need. Please see the migration script `./migrations/migration-state-3.7.x.sh`
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
 The runners created by the module using by default spot instances for running the builds using the `docker+machine` executor.
 
-- Shared cache in S3 with life cycle management to clear objects after x days.
-- Logs streamed to CloudWatch.
-- Runner agents registered automatically.
+  - Shared cache in S3 with life cycle management to clear objects after x days.
+  - Logs streamed to CloudWatch.
+  - Runner agents registered automatically.
 
 The runner support 3 main scenario's:
 
 ### GitLab CI docker-machine runner - one runner agent
-In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html) using spot instances. Runners will scale automatically based on configuration. The module creates by default a S3 cache that is shared cross runners (spot instances). 
+
+In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html) using spot instances. Runners will scale automatically based on configuration. The module creates by default a S3 cache that is shared cross runners (spot instances).
 
 ![runners-default](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-default.png)
 
 ### GitLab CI docker-machine runner - multiple runner agents
+
 In this scenario the multiple runner agents can be created with different configuration by instantiating the module multiple times. Runners will scale automatically based on configuration. The S3 cache can be shared cross runners by managing the cache outside the module.
 
 ![runners-cache](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-cache.png)
 
 ### GitLab Ci docker runner
+
 In this scenario *not* docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the agent. No auto scaling is supported.
 
 ![runners-docker](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-docker.png)
-
 
 ## Prerequisites
 
@@ -54,9 +54,7 @@ tfenv install <version>
 
 ### AWS
 
-Ensure you have setup you AWS credentials. The module requires access to IAM, EC2, CloudWatch, S3 and SSM. 
-
-
+Ensure you have setup you AWS credentials. The module requires access to IAM, EC2, CloudWatch, S3 and SSM.
 
 ### Service linked roles
 
@@ -179,12 +177,9 @@ THe version of Terraform is locked down via tfenv, see the `.terraform-version` 
 
 The examples are configured with defaults that should wrk in general. THe samples are in general configured for the region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be find in GitLab in the runner section (global, group or repo scope). Create a file `terrafrom.tfvars` and the registration token.
 
-```
-registration_token = "MY_TOKEN"
-```
+    registration_token = "MY_TOKEN"
 
 ### Run
-
 
 Run `terraform init` to initialize Terraform. Next you can run `terraform plan` to inspect the resources that will be created.
 
