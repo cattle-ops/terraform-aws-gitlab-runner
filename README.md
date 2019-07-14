@@ -2,6 +2,9 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=2 orderedList=false} -->
+
+
 > *WIP*: Work in progress, conversion to Terraform 0.12 \#73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
 
 > *NEW*: The runner will register itself automatically to GitLab. No need to register the runner first, see also the [examples](./examples)
