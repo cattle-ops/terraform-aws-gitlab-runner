@@ -6,6 +6,6 @@ In this scenario the runner agent is running on a single EC2 node and runners ar
 
 This examples shows:
 - Usages of public / private subnets.
-- Usages of runner fff Peak time mode configuration.
+- Usages of runner of peak time mode configuration.
 - Registration via GitLab token.
 - Auto scaling using `docker+machine` executor.
