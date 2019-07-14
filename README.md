@@ -182,7 +182,7 @@ The examples are configured with defaults that should wrk in general. THe sample
 registration_token = "MY_TOKEN"
 ```
 
-### Create runner
+### Run
 
 
 Run `terraform init` to initialize Terraform. Next you can run `terraform plan` to inspect the resources that will be created.
