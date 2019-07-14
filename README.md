@@ -2,8 +2,26 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=2 orderedList=false} -->
-
+- [Terraform module for GitLab auto scaling runners on AWS spot instances](#Terraform-module-for-GitLab-auto-scaling-runners-on-AWS-spot-instances)
+    - [GitLab CI docker-machine runner - one runner agent](#GitLab-CI-docker-machine-runner---one-runner-agent)
+    - [GitLab CI docker-machine runner - multiple runner agents](#GitLab-CI-docker-machine-runner---multiple-runner-agents)
+    - [GitLab Ci docker runner](#GitLab-Ci-docker-runner)
+  - [Prerequisites](#Prerequisites)
+    - [Terraform](#Terraform)
+    - [AWS](#AWS)
+    - [Service linked roles](#Service-linked-roles)
+    - [GitLab runner token configuration](#GitLab-runner-token-configuration)
+    - [GitLab runner cache](#GitLab-runner-cache)
+  - [Usage](#Usage)
+    - [Configuration](#Configuration)
+    - [Usage module](#Usage-module)
+  - [Examples](#Examples)
+    - [SSH keys](#SSH-keys)
+    - [Versions](#Versions)
+    - [Configure](#Configure)
+    - [Create runner](#Create-runner)
+  - [Inputs](#Inputs)
+  - [Outputs](#Outputs)
 
 > *WIP*: Work in progress, conversion to Terraform 0.12 \#73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
 
@@ -184,7 +202,7 @@ The examples are configured with defaults that should wrk in general. THe sample
 registration_token = "MY_TOKEN"
 ```
 
-## Create runner
+### Create runner
 
 
 Run `terraform init` to initialize Terraform. Next you can run `terraform plan` to inspect the resources that will be created.
