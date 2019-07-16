@@ -46,7 +46,7 @@ check_interval = 0
       "amazonec2-security-group=${runners_security_group_name}",
       "amazonec2-tags=${runners_tags}",
       "amazonec2-monitoring=${runners_monitoring}",
-      "amazonec2-iam-instance-profile=${runners_instance_profile}",
+      "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
       "amazonec2-root-size=${runners_root_size}",
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
