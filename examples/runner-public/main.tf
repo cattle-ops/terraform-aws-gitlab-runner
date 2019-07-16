@@ -90,7 +90,7 @@ module "runner2" {
 
   gitlab_runner_registration_config = {
     registration_token = var.registration_token
-    tag_list           = "docker_spot_runner"
+    tag_list           = "docker_spot_runner_2"
     description        = "runner public - auto"
     locked_to_project  = "true"
     run_untagged       = "false"
