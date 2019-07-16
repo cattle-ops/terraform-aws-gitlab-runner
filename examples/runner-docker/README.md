@@ -1,6 +1,8 @@
 # Example - Runner - Docker runner
 
-Example how create a gitlab runner using the docker executor on a single node, running in a private subnet.
+In this scenario the docker executor is used to schedule the builds. Builds will run on the same EC2 instance as the agent. No auto scaling is supported.
+
+![runners-docker](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-docker.png)
 
 ## Prerequisite
 
