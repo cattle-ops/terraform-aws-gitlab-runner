@@ -59,6 +59,7 @@
 | runners\_token | Token for the runner, will be used in the runner config.toml. | string | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | string | `"true"` | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `"runner-token"` | no |
+| ssh\_key\_pair | Set this to use existing AWS key pair | string | `""` | no |
 | ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | string | n/a | yes |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | string | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | list(string) | n/a | yes |
