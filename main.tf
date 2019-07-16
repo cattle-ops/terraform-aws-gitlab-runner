@@ -198,7 +198,7 @@ data "template_file" "runners" {
     runners_pre_clone_script          = var.runners_pre_clone_script
     runners_request_concurrency       = var.runners_request_concurrency
     runners_output_limit              = var.runners_output_limit
-    bucket_name                       = aws_s3_bucket.build_cache.bucket
+    bucket_name                       = local.bucket_name
     shared_cache                      = var.cache_shared
   }
 }
@@ -270,6 +270,27 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   }
 }
 
+
+################################################################################
+### Create cache bucket
+################################################################################
+locals {
+  bucket_name   = var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]
+  bucket_policy = var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]
+}
+
+module "cache" {
+  source = "./cache"
+
+  environment = var.environment
+  tags        = local.tags
+
+  create_cache_bucket     = var.cache_bucket["create"]
+  cache_bucket_prefix     = var.cache_bucket_prefix
+  cache_bucket_versioning = var.cache_bucket_versioning
+  cache_expiration_days   = var.cache_expiration_days
+}
+
 ################################################################################
 ### Trust policy
 ################################################################################
@@ -312,25 +333,10 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 ################################################################################
 ### Policy for the docker machine instance to access cache
 ################################################################################
-data "template_file" "docker_machine_cache_policy" {
-  template = file("${path.module}/policies/cache.json")
-
-  vars = {
-    s3_cache_arn = aws_s3_bucket.build_cache.arn
-  }
-}
-
-resource "aws_iam_policy" "docker_machine_cache" {
-  name        = "${var.environment}-docker-machine-cache"
-  path        = "/"
-  description = "Policy for docker machine instance to access cache"
-
-  policy = data.template_file.docker_machine_cache_policy.rendered
-}
 
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   role       = aws_iam_role.instance.name
-  policy_arn = aws_iam_policy.docker_machine_cache.arn
+  policy_arn = local.bucket_policy
 }
 
 ################################################################################
