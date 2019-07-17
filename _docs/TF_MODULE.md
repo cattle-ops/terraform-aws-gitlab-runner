@@ -7,6 +7,7 @@
 | ami\_owners | The list of owners used to select the AMI of Gitlab runner agent instances. | list | `<list>` | no |
 | aws\_region | AWS region. | string | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | string | `"a"` | no |
+| cache\_bucket | Configuration to control the creation of th the cache bucket. By default the bucket will be crated and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details. | map | `<map>` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | string | `""` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | string | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | string | `"1"` | no |

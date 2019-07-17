@@ -1,3 +1,7 @@
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "1.60.0"
@@ -5,7 +9,7 @@ module "vpc" {
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
 
-  azs             = ["eu-west-1a"]
+  azs             = ["${data.aws_availability_zones.available.names[0]}"]
   private_subnets = ["10.0.1.0/24"]
   public_subnets  = ["10.0.101.0/24"]
 
@@ -35,7 +39,7 @@ module "runner" {
   runners_gitlab_url = "${var.gitlab_url}"
   runners_token      = "${var.runner_token}"
 
-  runners_off_peak_timezone   = "Europe/Amsterdam"
+  runners_off_peak_timezone   = "${var.timezone}"
   runners_off_peak_idle_count = 0
   runners_off_peak_idle_time  = 60
 
