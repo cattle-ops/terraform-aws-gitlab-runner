@@ -1,4 +1,5 @@
 resource "aws_key_pair" "key" {
+  count      = var.ssh_key_pair == "" ? 0 : 1
   key_name   = "${var.environment}-gitlab-runner"
   public_key = var.ssh_public_key
 }
@@ -256,7 +257,7 @@ data "aws_ami" "runner" {
 
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = [aws_security_group.runner.id]
-  key_name             = aws_key_pair.key.key_name
+  key_name             = var.ssh_key_pair == "" ? aws_key_pair.key[0].key_name : var.ssh_key_pair
   image_id             = data.aws_ami.runner.id
   user_data            = data.template_file.user_data.rendered
   instance_type        = var.instance_type
