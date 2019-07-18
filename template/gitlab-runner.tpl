@@ -44,10 +44,6 @@ then
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value $token --region "${secure_parameter_store_region}"
 fi
 
-#Install docker-ecr-credentials-helper
-curl -LO https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.3.1/linux-amd64/docker-credential-ecr-login
-chmod +x docker-credential-ecr-login && mv docker-credential-ecr-login /bin/docker-credential-ecr-login
-
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
 
 ${post_install}
