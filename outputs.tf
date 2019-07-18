@@ -5,7 +5,7 @@ output "runner_as_group_name" {
 
 output "runner_cache_bucket_arn" {
   description = "ARN of the S3 for the build cache."
-  value       = aws_s3_bucket.build_cache.arn
+  value       = module.cache.arn
 }
 
 output "runner_agent_role" {

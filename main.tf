@@ -1,4 +1,5 @@
 resource "aws_key_pair" "key" {
+  count      = var.ssh_key_pair == "" ? 0 : 1
   key_name   = "${var.environment}-gitlab-runner"
   public_key = var.ssh_public_key
 }
@@ -198,7 +199,7 @@ data "template_file" "runners" {
     runners_pre_clone_script          = var.runners_pre_clone_script
     runners_request_concurrency       = var.runners_request_concurrency
     runners_output_limit              = var.runners_output_limit
-    bucket_name                       = aws_s3_bucket.build_cache.bucket
+    bucket_name                       = local.bucket_name
     shared_cache                      = var.cache_shared
   }
 }
@@ -256,7 +257,7 @@ data "aws_ami" "runner" {
 
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = [aws_security_group.runner.id]
-  key_name             = aws_key_pair.key.key_name
+  key_name             = var.ssh_key_pair == "" ? aws_key_pair.key[0].key_name : var.ssh_key_pair
   image_id             = data.aws_ami.runner.id
   user_data            = data.template_file.user_data.rendered
   instance_type        = var.instance_type
@@ -268,6 +269,27 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+
+################################################################################
+### Create cache bucket
+################################################################################
+locals {
+  bucket_name   = var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]
+  bucket_policy = var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]
+}
+
+module "cache" {
+  source = "./cache"
+
+  environment = var.environment
+  tags        = local.tags
+
+  create_cache_bucket     = var.cache_bucket["create"]
+  cache_bucket_prefix     = var.cache_bucket_prefix
+  cache_bucket_versioning = var.cache_bucket_versioning
+  cache_expiration_days   = var.cache_expiration_days
 }
 
 ################################################################################
@@ -312,25 +334,10 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 ################################################################################
 ### Policy for the docker machine instance to access cache
 ################################################################################
-data "template_file" "docker_machine_cache_policy" {
-  template = file("${path.module}/policies/cache.json")
-
-  vars = {
-    s3_cache_arn = aws_s3_bucket.build_cache.arn
-  }
-}
-
-resource "aws_iam_policy" "docker_machine_cache" {
-  name        = "${var.environment}-docker-machine-cache"
-  path        = "/"
-  description = "Policy for docker machine instance to access cache"
-
-  policy = data.template_file.docker_machine_cache_policy.rendered
-}
 
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   role       = aws_iam_role.instance.name
-  policy_arn = aws_iam_policy.docker_machine_cache.arn
+  policy_arn = local.bucket_policy
 }
 
 ################################################################################
