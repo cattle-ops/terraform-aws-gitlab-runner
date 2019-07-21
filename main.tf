@@ -1,5 +1,5 @@
 resource "aws_key_pair" "key" {
-  count      = var.ssh_key_pair == "" ? 0 : 1
+  count      = var.ssh_key_pair == "" ? 1 : 0
   key_name   = "${var.environment}-gitlab-runner"
   public_key = var.ssh_public_key
 }
@@ -344,7 +344,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 data "template_file" "dockermachine_role_trust_policy" {
-  template = file("${path.module}/policies/instance-role-trust-policy.json")
+  template = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : file("${path.module}/policies/instance-role-trust-policy.json")
 }
 
 resource "aws_iam_role" "docker_machine" {
