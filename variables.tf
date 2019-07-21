@@ -294,13 +294,13 @@ variable "docker_machine_options" {
 }
 
 variable "instance_role_json" {
-  description = "Docker machine runner instance override policy, expected to be in JSON format."
+  description = "Default runner instance override policy, expected to be in JSON format."
   type        = "string"
   default     = ""
 }
 
-variable "instance_role_runner_json" {
-  description = "Instance role json for the docker machine runners to override the default."
+variable "docker_machine_role_json" {
+  description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = "string"
   default     = ""
 }

@@ -15,6 +15,7 @@
 | create\_runners\_iam\_instance\_profile | Boolean to control the creation of the runners IAM instance profile | string | `"true"` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list | `<list>` | no |
+| docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | string | `"0.06"` | no |
 | docker\_machine\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the docker machine runner instance. | list | `<list>` | no |
 | docker\_machine\_user | Username of the user used to create the spot instances that host docker-machine. | string | `"docker-machine"` | no |
@@ -26,8 +27,7 @@
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list | `<list>` | no |
 | gitlab\_runner\_version | Version of the GitLab runner. | string | `"11.11.2"` | no |
-| instance\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
-| instance\_role\_runner\_json | Instance role json for the docker machine runners to override the default. | string | `""` | no |
+| instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | name\_runners\_docker\_machine |  | string | `""` | no |
 | overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | map | `<map>` | no |

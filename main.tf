@@ -303,7 +303,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 data "template_file" "dockermachine_role_trust_policy" {
-  template = "${file("${path.module}/policies/instance-role-trust-policy.json")}"
+  template = "${length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : file("${path.module}/policies/instance-role-trust-policy.json")}"
 }
 
 resource "aws_iam_role" "docker_machine" {
