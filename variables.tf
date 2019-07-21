@@ -123,13 +123,13 @@ variable "runners_privileged" {
 
 variable "runners_mount_docker_socket" {
   description = "Runners will mount volume with Docker socket, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = "false"
 }
 
 variable "runners_docker_socket" {
   description = "Location of Docker socket on host if socket mount if enabled, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = "/var/run/docker.sock:/var/run/docker.sock"
 }
 
@@ -319,7 +319,7 @@ variable "instance_role_json" {
 
 variable "docker_machine_role_json" {
   description = "Docker machine runner instance override policy, expected to be in JSON format."
-  type        = "string"
+  type        = string
   default     = ""
 }
 
@@ -399,7 +399,7 @@ variable "overrides" {
 
 variable "cache_bucket" {
   description = "Configuration to control the creation of th the cache bucket. By default the bucket will be crated and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
-  type        = "map"
+  type        = map
 
   default = {
     create = true
