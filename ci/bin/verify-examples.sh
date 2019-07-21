@@ -16,6 +16,6 @@ for example in ${EXAMPLES} ; do
     echo no tf files
     exit 1
   fi
-  validate ${example}
   verifyModulesAndPlugins ${example}
+  validate ${example}
 done
