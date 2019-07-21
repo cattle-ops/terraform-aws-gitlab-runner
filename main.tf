@@ -51,7 +51,7 @@ resource "aws_security_group" "docker_machine" {
   tags = "${merge(local.tags, map("Name", format("%s", local.name_sg)))}"
 }
 
-resource "aws_security_group_rule" "docker" {
+resource "aws_security_group_rule" "docker_machine_docker" {
   type        = "ingress"
   from_port   = 2376
   to_port     = 2376
@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "docker" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
-resource "aws_security_group_rule" "ssh" {
+resource "aws_security_group_rule" "docker_machine_ssh" {
   type        = "ingress"
   from_port   = 22
   to_port     = 22
