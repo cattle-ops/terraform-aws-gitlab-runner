@@ -256,8 +256,8 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = "${var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]}"
-  bucket_policy = "${var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]}"
+  bucket_name   = var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]
+  bucket_policy = var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]
 }
 
 module "cache" {
