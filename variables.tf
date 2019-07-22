@@ -351,7 +351,6 @@ variable "runner_ami_owners" {
   default = ["099720109477"]
 }
 
-
 variable "gitlab_runner_registration_config" {
   description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
   type        = map(string)

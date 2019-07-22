@@ -12,7 +12,7 @@ This examples shows:
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor.
 
-## Prerequisite
+![runners-default](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-default.png)
 
 The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv). If you are not using `tfenv` please check `.terraform-version` for the tested version.
 

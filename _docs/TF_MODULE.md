@@ -34,8 +34,8 @@
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | map(list(string)) | `<map>` | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | list(string) | `<list>` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
+| runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | list | `<list>` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | string | `"10"` | no |
-| runners\_docker\_socket | Location of Docker socket on host if socket mount if enabled, will be used in the runner config.toml | string | `"/var/run/docker.sock:/var/run/docker.sock"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list(string) | `<list>` | no |
 | runners\_executor | The executor to use. Currently supports `docker+machine` or `docker`. | string | `"docker+machine"` | no |
 | runners\_gitlab\_url | URL of the GitLab instance to connect to. | string | n/a | yes |
@@ -45,7 +45,6 @@
 | runners\_image | Image to run builds, will be used in the runner config.toml | string | `"docker:18.03.1-ce"` | no |
 | runners\_limit | Limit for the runners, will be used in the runner config.toml. | string | `"0"` | no |
 | runners\_monitoring | Enable detailed cloudwatch monitoring for spot instances. | string | `"false"` | no |
-| runners\_mount\_docker\_socket | Runners will mount volume with Docker socket, will be used in the runner config.toml | string | `"false"` | no |
 | runners\_name | Name of the runner, will be used in the runner config.toml. | string | n/a | yes |
 | runners\_off\_peak\_idle\_count | Off peak idle count of the runners, will be used in the runner config.toml. | string | `"0"` | no |
 | runners\_off\_peak\_idle\_time | Off peak idle time of the runners, will be used in the runner config.toml. | string | `"0"` | no |
@@ -64,7 +63,7 @@
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | string | `"true"` | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `"runner-token"` | no |
 | ssh\_key\_pair | Set this to use existing AWS key pair | string | `""` | no |
-| ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | string | n/a | yes |
+| ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | string | `""` | no |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | string | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | list(string) | n/a | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | map(string) | `<map>` | no |
@@ -76,8 +75,11 @@
 
 | Name | Description |
 |------|-------------|
-| runner\_agent\_role | ARN of the role used for the ec2 instance for the GitLab runner agent. |
+| runner\_agent\_role\_arn | ARN of the role used for the ec2 instance for the GitLab runner agent. |
+| runner\_agent\_role\_name | Name of the role used for the ec2 instance for the GitLab runner agent. |
 | runner\_as\_group\_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner\_cache\_bucket\_arn | ARN of the S3 for the build cache. |
-| runner\_role | ARN of the role used for the docker machine runners. |
+| runner\_cache\_bucket\_name | Name of the S3 for the build cache. |
+| runner\_role\_arn | ARN of the role used for the docker machine runners. |
+| runner\_role\_name | Name of the role used for the docker machine runners. |
 

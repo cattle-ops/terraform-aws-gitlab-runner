@@ -38,3 +38,9 @@ variable "timezone" {
   type        = string
   default     = "Europe/Amsterdam"
 }
+
+variable "timezone" {
+  description = "Name of the timezone that the runner will be used in."
+  type        = string
+  default     = "Europe/Amsterdam"
+}
