@@ -4,24 +4,6 @@ resource "aws_key_pair" "key" {
   public_key = var.ssh_public_key
 }
 
-locals {
-  // Convert list to a string separated and prepend by a comma
-  docker_machine_options_string = format(
-    ",%s",
-    join(",", formatlist("%q", var.docker_machine_options)),
-  )
-
-  // Ensure off peak is optional
-  runners_off_peak_periods_string = var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)
-
-  // Define key for runner token for SSM
-  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
-
-  // custom names for instances and security groups
-  name_runner_instance = var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]
-  name_sg              = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
-}
-
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = var.vpc_id
@@ -163,8 +145,7 @@ data "template_file" "runners" {
     runners_security_group_name = aws_security_group.docker_machine.name
     runners_monitoring          = var.runners_monitoring
     runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
-    runners_mount_docker_socket = var.runners_mount_docker_socket
-    runners_docker_socket       = var.runners_docker_socket
+    runners_additional_volumes  = local.runners_additional_volumes
     docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
     runners_name                = var.runners_name
     runners_tags = var.overrides["name_docker_machine_runners"] == "" ? format(
@@ -412,4 +393,3 @@ resource "aws_iam_role_policy_attachment" "ssm" {
   role       = aws_iam_role.instance.name
   policy_arn = aws_iam_policy.ssm[0].arn
 }
-

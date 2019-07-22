@@ -50,6 +50,7 @@ variable "ssh_key_pair" {
 variable "ssh_public_key" {
   description = "Public SSH key used for the GitLab runner EC2 instance."
   type        = string
+  default     = ""
 }
 
 variable "docker_machine_instance_type" {
@@ -121,16 +122,10 @@ variable "runners_privileged" {
   default     = "true"
 }
 
-variable "runners_mount_docker_socket" {
-  description = "Runners will mount volume with Docker socket, will be used in the runner config.toml"
-  type        = string
-  default     = "false"
-}
-
-variable "runners_docker_socket" {
-  description = "Location of Docker socket on host if socket mount if enabled, will be used in the runner config.toml"
-  type        = string
-  default     = "/var/run/docker.sock:/var/run/docker.sock"
+variable "runners_additional_volumes" {
+  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
+  type        = list
+  default     = []
 }
 
 variable "runners_shm_size" {
