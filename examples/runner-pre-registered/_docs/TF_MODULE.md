@@ -10,5 +10,4 @@
 | runner\_name | Name of the runner, will be used in the runner config.toml | string | n/a | yes |
 | runner\_token | Token for the runner, will be used in the runner config.toml | string | n/a | yes |
 | timezone | Name of the timezone that the runner will be used in. | string | `"Europe/Amsterdam"` | no |
-| timezone | Name of the timezone that the runner will be used in. | string | `"Europe/Amsterdam"` | no |
 
