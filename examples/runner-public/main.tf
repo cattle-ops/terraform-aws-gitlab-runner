@@ -44,7 +44,7 @@ module "runner" {
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   runners_privileged          = "false"
-  runners_mount_docker_socket = "true"
+  runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   gitlab_runner_registration_config = {
     registration_token = var.registration_token
