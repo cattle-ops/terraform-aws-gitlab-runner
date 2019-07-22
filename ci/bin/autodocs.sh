@@ -5,7 +5,6 @@
 pandoc -v &> /dev/null || { echo >&2 "ERROR: Pandoc not installed" ; exit 1 ; }
 terraform-docs --version &> /dev/null || { echo >&2 "ERROR: terraform-docs not installed" ; exit 1 ; }
 
-
 IFS=$'\n'
 # create an array of all unique directories containing .tf files 
 arr=($(find . -name '*.tf' | xargs -I % sh -c 'dirname %' | sort -u))
