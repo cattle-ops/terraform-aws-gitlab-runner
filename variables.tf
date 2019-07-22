@@ -260,7 +260,13 @@ variable "enable_gitlab_runner_ssh_access" {
 }
 
 variable "gitlab_runner_ssh_cidr_blocks" {
-  description = "List of CIDR blocks to allow SSH Access from to the gitlab runner instance."
+  description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
+  type        = "list"
+  default     = ["0.0.0.0/0"]
+}
+
+variable "docker_machine_ssh_cidr_blocks" {
+  description = "List of CIDR blocks to allow SSH Access to the docker machine runner instance."
   type        = "list"
   default     = ["0.0.0.0/0"]
 }
@@ -288,13 +294,13 @@ variable "docker_machine_options" {
 }
 
 variable "instance_role_json" {
-  description = "Docker machine runner instance override policy, expected to be in JSON format."
+  description = "Default runner instance override policy, expected to be in JSON format."
   type        = "string"
   default     = ""
 }
 
-variable "instance_role_runner_json" {
-  description = "Instance role json for the docker machine runners to override the default."
+variable "docker_machine_role_json" {
+  description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = "string"
   default     = ""
 }
