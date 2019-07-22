@@ -35,6 +35,6 @@ variable "registration_token" {
 
 variable "timezone" {
   description = "Name of the timezone that the runner will be used in."
-  type        = "string"
+  type        = string
   default     = "Europe/Amsterdam"
 }

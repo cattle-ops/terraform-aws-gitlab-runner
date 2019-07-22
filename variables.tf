@@ -273,7 +273,13 @@ variable "enable_gitlab_runner_ssh_access" {
 }
 
 variable "gitlab_runner_ssh_cidr_blocks" {
-  description = "List of CIDR blocks to allow SSH Access from to the gitlab runner instance."
+  description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "docker_machine_ssh_cidr_blocks" {
+  description = "List of CIDR blocks to allow SSH Access to the docker machine runner instance."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
@@ -301,13 +307,13 @@ variable "docker_machine_options" {
 }
 
 variable "instance_role_json" {
-  description = "Docker machine runner instance override policy, expected to be in JSON format."
+  description = "Default runner instance override policy, expected to be in JSON format."
   type        = string
   default     = ""
 }
 
-variable "instance_role_runner_json" {
-  description = "Instance role json for the docker machine runners to override the default."
+variable "docker_machine_role_json" {
+  description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = string
   default     = ""
 }
@@ -388,7 +394,7 @@ variable "overrides" {
 
 variable "cache_bucket" {
   description = "Configuration to control the creation of th the cache bucket. By default the bucket will be crated and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
-  type        = "map"
+  type        = map
 
   default = {
     create = true
