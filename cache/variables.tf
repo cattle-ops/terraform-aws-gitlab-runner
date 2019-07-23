@@ -17,6 +17,7 @@ variable "cache_bucket_versioning" {
 
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
+  type        = number
   default     = 1
 }
 

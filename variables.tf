@@ -55,16 +55,19 @@ variable "ssh_public_key" {
 
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
+  type        = string
   default     = "m5a.large"
 }
 
 variable "docker_machine_spot_price_bid" {
   description = "Spot price bid."
+  type        = string
   default     = "0.06"
 }
 
 variable "docker_machine_version" {
   description = "Version of docker-machine."
+  type        = string
   default     = "0.16.1"
 }
 
@@ -92,21 +95,25 @@ variable "runners_token" {
 
 variable "runners_limit" {
   description = "Limit for the runners, will be used in the runner config.toml."
+  type        = number
   default     = 0
 }
 
 variable "runners_concurrent" {
   description = "Concurrent value for the runners, will be used in the runner config.toml."
+  type        = number
   default     = 10
 }
 
 variable "runners_idle_time" {
   description = "Idle time of the runners, will be used in the runner config.toml."
+  type        = number
   default     = 600
 }
 
 variable "runners_idle_count" {
   description = "Idle count of the runners, will be used in the runner config.toml."
+  type        = number
   default     = 0
 }
 
@@ -118,8 +125,8 @@ variable "runners_image" {
 
 variable "runners_privileged" {
   description = "Runners will run in privileged mode, will be used in the runner config.toml"
-  type        = string
-  default     = "true"
+  type        = bool
+  default     = true
 }
 
 variable "runners_additional_volumes" {
@@ -141,21 +148,25 @@ variable "runners_pull_policy" {
 
 variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
+  type        = bool
   default     = false
 }
 
 variable "runners_off_peak_timezone" {
   description = "Off peak idle time zone of the runners, will be used in the runner config.toml."
+  type        = string
   default     = ""
 }
 
 variable "runners_off_peak_idle_count" {
   description = "Off peak idle count of the runners, will be used in the runner config.toml."
+  type        = number
   default     = 0
 }
 
 variable "runners_off_peak_idle_time" {
   description = "Off peak idle time of the runners, will be used in the runner config.toml."
+  type        = number
   default     = 0
 }
 
@@ -167,11 +178,13 @@ variable "runners_off_peak_periods" {
 
 variable "runners_root_size" {
   description = "Runner instance root size in GB."
+  type        = number
   default     = 16
 }
 
 variable "create_runners_iam_instance_profile" {
   description = "Boolean to control the creation of the runners IAM instance profile"
+  type        = bool
   default     = true
 }
 
@@ -207,12 +220,14 @@ variable "runners_pre_clone_script" {
 
 variable "runners_request_concurrency" {
   description = "Limit number of concurrent requests for new jobs from GitLab (default 1)"
-  default     = "1"
+  type        = number
+  default     = 1
 }
 
 variable "runners_output_limit" {
   description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)"
-  default     = "4096"
+  type        = number
+  default     = 4096
 }
 
 variable "userdata_pre_install" {
@@ -229,7 +244,8 @@ variable "userdata_post_install" {
 
 variable "runners_use_private_address" {
   description = "Restrict runners to the use of a private IP address"
-  default     = "true"
+  type        = bool
+  default     = true
 }
 
 variable "docker_machine_user" {
@@ -246,19 +262,20 @@ variable "cache_bucket_prefix" {
 
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = string
-  default     = "false"
+  type        = bool
+  default     = false
 }
 
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
+  type        = number
   default     = 1
 }
 
 variable "cache_shared" {
   description = "Enables cache sharing between runners, false by default."
-  type        = string
-  default     = "false"
+  type        = bool
+  default     = false
 }
 
 variable "gitlab_runner_version" {
@@ -269,6 +286,7 @@ variable "gitlab_runner_version" {
 
 variable "enable_gitlab_runner_ssh_access" {
   description = "Enables SSH Access to the gitlab runner instance."
+  type        = bool
   default     = false
 }
 
@@ -286,17 +304,19 @@ variable "docker_machine_ssh_cidr_blocks" {
 
 variable "enable_cloudwatch_logging" {
   description = "Boolean used to enable or disable the CloudWatch logging."
+  type        = bool
   default     = true
 }
 
 variable "tags" {
-  type        = map(string)
   description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
+  type        = map(string)
   default     = {}
 }
 
 variable "allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
+  type        = bool
   default     = true
 }
 
@@ -366,18 +386,15 @@ variable "gitlab_runner_registration_config" {
 }
 
 variable "secure_parameter_store_runner_token_key" {
-  type        = string
   description = "The key name used store the Gitlab runner token in Secure Parameter Store"
+  type        = string
   default     = "runner-token"
 }
 
 variable "enable_manage_gitlab_token" {
   description = "Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
+  type        = bool
   default     = true
-}
-
-variable "name_runners_docker_machine" {
-  default = ""
 }
 
 variable "overrides" {
