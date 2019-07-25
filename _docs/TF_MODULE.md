@@ -26,7 +26,7 @@
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"11.11.2"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.1.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | name\_runners\_docker\_machine |  | string | `""` | no |
