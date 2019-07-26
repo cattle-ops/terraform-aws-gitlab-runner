@@ -115,6 +115,12 @@ variable "runners_privileged" {
   default     = "true"
 }
 
+variable "runners_volumes" {
+  description = "Specify additional volumes that should be mounted (same syntax as Docker’s -v flag)"
+  type        = "list"
+  default     = ["/cache"]
+}
+
 variable "runners_shm_size" {
   description = "shm_size for the runners.  will be used in the runner config.toml"
   default     = 0
@@ -251,7 +257,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = "string"
-  default     = "11.11.2"
+  default     = "12.1.0"
 }
 
 variable "enable_gitlab_runner_ssh_access" {

@@ -223,7 +223,7 @@ terraform destroy
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"11.11.2"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.1.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | name\_runners\_docker\_machine |  | string | `""` | no |
@@ -257,6 +257,7 @@ terraform destroy
 | runners\_shm\_size | shm_size for the runners.  will be used in the runner config.toml | string | `"0"` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | string | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | string | `"true"` | no |
+| runners\_volumes | Specify additional volumes that should be mounted (same syntax as Docker’s -v flag) | list | `<list>` | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `"runner-token"` | no |
 | ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | string | n/a | yes |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | string | n/a | yes |

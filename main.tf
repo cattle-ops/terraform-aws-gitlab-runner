@@ -161,6 +161,7 @@ data "template_file" "runners" {
     runners_concurrent                = "${var.runners_concurrent}"
     runners_image                     = "${var.runners_image}"
     runners_privileged                = "${var.runners_privileged}"
+    runners_volumes                   = "${length(var.runners_volumes) == 0 ? "[]" : format("[\"%s\"]", join("\", \"", var.runners_volumes))}"
     runners_shm_size                  = "${var.runners_shm_size}"
     runners_pull_policy               = "${var.runners_pull_policy}"
     runners_idle_count                = "${var.runners_idle_count}"
