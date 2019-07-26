@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.9.0 - 2019-07-26
+- Changed
+  - Update default runner version to 12.1.0 (#106)
+- Added
+  - Add runners_volumes variable (#105) @kevinrambaud
+
+## 3.8.0 - 2019-07-22
+- Added
+  - Variable `docker_machine_ssh_cidr_blocks` to set CIDR for ingress on docker machine SSH rules. @kevinrambaud #101
+  -  Variable `docker_machine_role_json` allowing role policy customization #kevinrambaud #100
+
+## 3.7.0 - 2019-07-17
+- Changed
+  - Creation of multiple instances of the runner is now supported. Cache is therefor moved to an internal module. Pleas see the example `runner-public` for a concrete sample. The change should have no effect if you apply the state migration script `migragations/migration-state-3.7.x.sh`.
+  - Examples are more generic by removing the time zone and AZ zone to variables. @@theBenForce
+
+## 3.6.0 - 2019-07-04
+- Changed
+  - Add option to specify pull policy for docker images by the runner. @roock
+  - Docker machine AMI image will be by default latest ubuntu 16.06, can be overwritten via variables @roock
+  - Improved CI docs generation script @roock
+
+## 3.5.0 - 2019-06-19
+- Changed
+  - Documentation #85: Misleading Variable-Description @solutionDrive-Alt
+  - Bugfix #70: docker-machine fails starting runners when `amazonec2-request-spot-instance=false` @philippefuentes
+  - Bugfix #72: Detect and retry when docker machine installation fails @eliasdorneles
+  - Changed: Default version of GitLab runner set to 11.11.2
 
 ## 3.7.0 - 2019-07-17
 - Changed
@@ -144,7 +172,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.7.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.9.0...HEAD
+[3.9.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.8.0...3.9.0
+[3.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.7.0...3.8.0
 [3.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.6.0...3.7.0
 [3.6.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.5.0...3.6.0
 [3.5.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.4.0...3.5.0
