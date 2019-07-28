@@ -100,8 +100,10 @@ data "template_file" "user_data" {
   template = "${file("${path.module}/template/user-data.tpl")}"
 
   vars {
-    logging       = "${var.enable_cloudwatch_logging ? data.template_file.logging.rendered : ""}"
-    gitlab_runner = "${data.template_file.gitlab_runner.rendered}"
+    logging             = "${var.enable_cloudwatch_logging ? data.template_file.logging.rendered : ""}"
+    gitlab_runner       = "${data.template_file.gitlab_runner.rendered}"
+    user_data_trace_log = "${var.enable_runner_user_data_trace_log}"
+
   }
 }
 
