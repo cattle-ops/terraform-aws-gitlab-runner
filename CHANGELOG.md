@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Not releases
+- Chnaged
+  - THe user data script for the EC2 runner agent instance is not logging anymore on trace level. To enable bash xtrace set `enable_runner_user_data_trace_log` to `true`. #49
+
 ## 3.9.0 - 2019-07-26
 - Changed
   - Update default runner version to 12.1.0 (#106)
