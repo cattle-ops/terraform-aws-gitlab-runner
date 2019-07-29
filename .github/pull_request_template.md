@@ -8,4 +8,4 @@ YES | NO - If yes please describe the mirgration.
 Please mentioned the examples you have verified.
 
 ## Documentation
-Please ensure you pdate the README in `_docs/README.md`. The README.md in the root can be update by running the script `ci/bin/autodocs.sh`
+Please ensure you update the README in `_docs/README.md`. The README.md in the root can be update by running the script `ci/bin/autodocs.sh`
