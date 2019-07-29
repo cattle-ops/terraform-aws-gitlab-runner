@@ -38,6 +38,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Bugfix #72: Detect and retry when docker machine installation fails @eliasdorneles
   - Changed: Default version of GitLab runner set to 11.11.2
 
+## 3.7.0 - 2019-07-17
+- Changed
+  - Creation of multiple instances of the runner is now supported. Cache is therefor moved to an internal module. Pleas see the example `runner-public` for a concrete sample. The change should have no effect if you apply the state migration script `migragations/migration-state-3.7.x.sh`.
+  - Examples are more generic by removing the time zone and AZ zone to variables. @@theBenForce
+
+## 3.6.0 - 2019-07-04
+- Changed
+  - Add option to specify pull policy for docker images by the runner. @roock
+  - Docker machine AMI image will be by default latest ubuntu 16.06, can be overwritten via variables @roock
+  - Improved CI docs generation script @roock
+
+## 3.5.0 - 2019-06-19
+- Changed
+  - Documentation #85: Misleading Variable-Description @solutionDrive-Alt
+  - Bugfix #70: docker-machine fails starting runners when `amazonec2-request-spot-instance=false` @philippefuentes
+  - Bugfix #72: Detect and retry when docker machine installation fails @eliasdorneles
+  - Changed: Default version of GitLab runner set to 11.11.2
+
 ## [3.4.0] - 2019-06-06
 - Changed:
   - Update default runner type, GitLab runner version, and versions in examples.

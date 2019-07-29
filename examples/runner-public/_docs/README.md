@@ -15,4 +15,3 @@ This examples shows:
 ## Prerequisite
 
 The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv). If you are not using `tfenv` please check `.terraform-version` for the tested version.
-

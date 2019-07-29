@@ -2,5 +2,5 @@
 
 source $(dirname $0)/terraform.sh
 
-validate
 verifyModulesAndPlugins
+validate
