@@ -31,8 +31,8 @@ do
         pandoc --wrap=none -f gfm -t gfm $docs_dir/README.md -A $docs_dir/TF_MODULE.md > $i/README.md
         
         # Create a absolute link for terraform registry
-        sed -i -e "s|__GIT_REF__|${GIT_REF}|" $i/README.md
-
+        sed -i ".bak" -e "s|__GIT_REF__|${GIT_REF}|" $i/README.md
+        rm -rf $i/README.md.bak
 
         # do some cleanup
         # because sed on macOS is special..
