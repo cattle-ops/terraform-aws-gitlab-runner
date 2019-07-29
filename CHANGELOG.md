@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.0.0 - 2019-07-29
+
+### Terraform 0.12
+
+Module is available as Terraform 0.12 module, pin to version 4.x. Please submit pull-requests to the `develop` branch.
+
+Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migrate the runner, execute the following steps.
+
+- Update to Terraform 0.12
+- Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
+- Update the module from 3.10.0 to 4.0.0, next run `terraform init`
+- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+
+### Terraform 0.11
+
+Module is available as Terraform 0.11 module, pin module to version 3.x. Please submit pull-requests to the `terraform011` branch.
+
 ## 3.10.0 - 2019-07-29
 - Chnaged
   - THe user data script for the EC2 runner agent instance is not logging anymore on trace level. To enable bash xtrace set `enable_runner_user_data_trace_log` to `true`. #49
@@ -177,7 +194,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.10.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.10.0...4.0.0
 [3.10.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.9.0...3.10.0
 [3.9.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.8.0...3.9.0
 [3.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/3.7.0...3.8.0
