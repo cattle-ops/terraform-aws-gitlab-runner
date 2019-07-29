@@ -135,14 +135,9 @@ variable "runners_additional_volumes" {
   default     = []
 }
 
-variable "runners_volumes" {
-  description = "Specify additional volumes that should be mounted (same syntax as Docker’s -v flag)"
-  type        = "list"
-  default     = ["/cache"]
-}
-
 variable "runners_shm_size" {
   description = "shm_size for the runners, will be used in the runner config.toml"
+  type        = number
   default     = 0
 }
 
