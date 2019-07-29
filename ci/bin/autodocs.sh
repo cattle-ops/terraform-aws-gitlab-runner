@@ -1,5 +1,7 @@
 #!/bin/bash
 
+GIT_REF=${GIT_REF:-develop}
+
 # script to auto-generate terraform documentation
 
 pandoc -v &> /dev/null || { echo >&2 "ERROR: Pandoc not installed" ; exit 1 ; }
@@ -27,6 +29,10 @@ do
 
         # merge the tf docs with the main readme
         pandoc --wrap=none -f gfm -t gfm $docs_dir/README.md -A $docs_dir/TF_MODULE.md > $i/README.md
+        
+        # Create a absolute link for terraform registry
+        sed -i ".bak" -e "s|__GIT_REF__|${GIT_REF}|" $i/README.md
+        rm -rf $i/README.md.bak
 
         # do some cleanup
         # because sed on macOS is special..
