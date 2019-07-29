@@ -2,9 +2,25 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> *WIP*: Work in progress, conversion to Terraform 0.12 \#73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
+> *NEW*: Terraform 0.12 is supported.
 
-> *NEW*: Multiple instnaces of the runner can be created that share the same cache. See [example](./examples/runner-public) *MIGRATIONS*: Since 3.7 the runner cache is handled by sub module. To avoid re-creation of the bucket while upgrading a state migration is need. Please see the migration script `./migrations/migration-state-3.7.x.sh`
+## Terraform versions
+
+### Terraform 0.12
+Module is available as Terraform 0.12 module, pin to version 4.x. Please submit pull-requests to the `develop` branch.
+
+Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migrate the runner, execute the following steps.
+
+- Update to Terraform 0.12
+- Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
+- Update the module from 3.10.0 to 4.0.0, next run `terraform init`
+- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+
+### Terraform 0.11
+Module is available as Terraform 0.11 module, pin module to version 3.x. Please submit pull-requests to the `terraform011` branch.
+
+
+## The module
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
@@ -133,31 +149,30 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 Below a basic examples of usages of the module. The dependencies such as a VPC, and SSH keys have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-default).
 
 ``` hcl
-
 module "runner" {
-  source = "npalm/gitlab-runner/aws"
-  version = "3.6.0"
+  source = "../../"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
 
-  ssh_public_key = "${local_file.public_ssh_key.content}"
+  ssh_public_key = local_file.public_ssh_key.content
 
-  vpc_id                   = "${module.vpc.vpc_id}"
-  subnet_ids_gitlab_runner = "${module.vpc.private_subnets}"
-  subnet_id_runners        = "${element(module.vpc.private_subnets, 0)}"
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids_gitlab_runner = module.vpc.private_subnets
+  subnet_id_runners        = element(module.vpc.private_subnets, 0)
 
-  runners_name       = "aws-spot-instance-runner"
+  runners_name       = "docker-default"
   runners_gitlab_url = "https://gitlab.com"
 
   gitlab_runner_registration_config = {
-    registration_token = "${var.registration_token}"
-    tag_list           = "docker_spot_runner"
-    description        = "runner default - auto"
+    registration_token = "my-token
+    tag_list           = "docker"
+    description        = "runner default"
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
   }
+
 }
 ```
 
