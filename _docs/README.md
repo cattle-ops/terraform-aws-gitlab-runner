@@ -2,12 +2,24 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> *WIP*: Work in progress, conversion to Terraform 0.12 \#73. Feel free to checkout branch [Terraform 0.12](https://github.com/npalm/terraform-aws-gitlab-runner/tree/feature/terraform-0.12).
+> *NEW*: Terraform 0.12 is supported.
 
-> *NEW*: Multiple instnaces of the runner can be created that share the same cache. See [example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public)
-> *MIGRATIONS*: Since 3.7 the runner cache is handled by sub module. To avoid re-creation of the bucket while upgrading a state migration is need. Please see the migration script `./migrations/migration-state-3.7.x.sh`
+## Terraform versions
 
-This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
+### Terraform 0.12
+Module is available as Terraform 0.12 module, pin to version 4.x. Please submit pull-requests to the `develop` branch.
+
+Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migrate the runner, execute the following steps.
+
+- Update to Terraform 0.12
+- Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
+- Update the module from 3.10.0 to 4.0.0, next run `terraform init`
+- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+
+### Terraform 0.11
+Module is available as Terraform 0.11 module, pin module to version 3.x. Please submit pull-requests to the `terraform011` branch.
+
+## The module
 
 The runners created by the module using by default spot instances for running the builds using the `docker+machine` executor.
 
@@ -113,7 +125,7 @@ Finally, the runner still supports the manual runner creation. No changes are re
 
 By default the module creates a a cache for the runner in S3. Old objects are automatically remove via a configurable life cycle policy on the bucket.
 
-Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache cross multiple runners. For this purpose the cache is implemented as sub module. For more details see the [cache module](./cache). An example implementation of this use case can be find in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
+Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache cross multiple runners. For this purpose the cache is implemented as sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/cache). An example implementation of this use case can be find in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
 
 ## Usage
 
@@ -164,7 +176,7 @@ module "runner" {
 
 ## Examples
 
-A few [examples](examples) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory.
+A few [examples]([examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory.
 
 ### SSH keys
 
