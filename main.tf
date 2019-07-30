@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "out_all" {
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
-  type  = "SecureString"
+  type  = "${var.parameter_store_type}"
   value = "null"
 
   tags = local.tags
@@ -122,6 +122,7 @@ data "template_file" "gitlab_runner" {
     runners_token                           = var.runners_token
     secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
     secure_parameter_store_region           = var.aws_region
+    parameter_store_type                    = var.parameter_store_type
     gitlab_runner_registration_token        = var.gitlab_runner_registration_config["registration_token"]
     giltab_runner_description               = var.gitlab_runner_registration_config["description"]
     gitlab_runner_tag_list                  = var.gitlab_runner_registration_config["tag_list"]
