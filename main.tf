@@ -1,7 +1,3 @@
-locals {
-  policy_folder = (contains(["cn-northwest-1", "cn-north-1"], var.aws_region) ? "policies-cn-regions" : "policies")
-}
-
 resource "aws_key_pair" "key" {
   count      = var.ssh_key_pair == "" ? 1 : 0
   key_name   = "${var.environment}-gitlab-runner"

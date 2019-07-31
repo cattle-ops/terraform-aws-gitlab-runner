@@ -1,4 +1,7 @@
 locals {
+  // Check if the desired region is located within china and adapt the policies folder accordingly
+  policy_folder = (contains(["cn-northwest-1", "cn-north-1"], var.aws_region) ? "policies-cn-regions" : "policies")
+
   // Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
     ",%s",
