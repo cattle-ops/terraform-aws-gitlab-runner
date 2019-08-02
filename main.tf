@@ -283,7 +283,11 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 data "template_file" "instance_role_trust_policy" {
-  template = length(var.instance_role_json) > 0 ? var.instance_role_json : file("${path.module}/${local.policy_folder}/instance-role-trust-policy.json")
+  template = length(var.instance_role_json) > 0 ? var.instance_role_json : file("${path.module}/template/instance-role-trust-policy.json.tpl")
+
+  vars = {
+    ec2_endpoint_url = local.ec2_endpoint_url
+  }
 }
 
 resource "aws_iam_role" "instance" {
@@ -326,8 +330,12 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 data "template_file" "dockermachine_role_trust_policy" {
-  template = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : file("${path.module}/${local.policy_folder}/instance-role-trust-policy.json",
+  template = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : file("${path.module}/template/instance-role-trust-policy.json.tpl",
   )
+
+  vars = {
+    ec2_endpoint_url = local.ec2_endpoint_url
+  }
 }
 
 resource "aws_iam_role" "docker_machine" {
@@ -346,8 +354,12 @@ resource "aws_iam_instance_profile" "docker_machine" {
 data "template_file" "service_linked_role" {
   count = var.allow_iam_service_linked_role_creation ? 1 : 0
 
-  template = file("${path.module}/${local.policy_folder}/service-linked-role-create-policy.json",
+  template = file("${path.module}/template/service-linked-role-create-policy.json.tpl",
   )
+
+  vars = {
+    arn_region = local.arn_region
+  }
 }
 
 resource "aws_iam_policy" "service_linked_role" {
@@ -371,8 +383,12 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 ### AWS Systems Manager access to store runner token once registered
 ################################################################################
 data "template_file" "ssm_policy" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-  template = file("${path.module}/${local.policy_folder}/instance-secure-parameter-role-policy.json", )
+  count    = var.enable_manage_gitlab_token ? 1 : 0
+  template = file("${path.module}/template/instance-secure-parameter-role-policy.json.tpl", )
+
+  vars = {
+    arn_region = local.arn_region
+  }
 }
 
 resource "aws_iam_policy" "ssm" {

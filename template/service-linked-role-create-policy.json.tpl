@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Action": "iam:CreateServiceLinkedRole",
-      "Resource": "arn:aws-cn:iam::*:role/aws-service-role/*"
+      "Resource": "arn:${arn_region}:iam::*:role/aws-service-role/*"
     }
   ]
 }

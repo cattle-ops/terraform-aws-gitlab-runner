@@ -13,7 +13,7 @@
             "Action": [
                 "ssm:GetParameters"
             ],
-            "Resource": "arn:aws:ssm:*"
+            "Resource": "arn:${arn_region}:ssm:*"
         }
     ]
 }

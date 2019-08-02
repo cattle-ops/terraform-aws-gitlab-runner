@@ -11,7 +11,7 @@
         "logs:DescribeLogStreams"
       ],
       "Resource": [
-        "arn:aws-cn:logs:*:*:*"
+        "arn:${arn_region}:logs:*:*:*"
       ]
     }
   ]
