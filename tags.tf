@@ -9,11 +9,9 @@ locals {
     var.tags,
   )
 
-  tags_string = replace(
-    replace(jsonencode(local.tags), "/[\\{\\}\"\\s]/", ""),
-    ":",
-    ",",
-  )
+  tags_string = join(",", flatten([
+    for key in keys(local.tags) : [key, lookup(local.tags, key)]
+  ]))
 }
 
 data "null_data_source" "tags" {
