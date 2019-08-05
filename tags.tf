@@ -9,8 +9,8 @@ locals {
     var.tags,
   )
 
-  tags_string = join(",",flatten([
-    for key in keys(local.tags) : [ key, lookup(local.tags,key) ]
+  tags_string = join(",", flatten([
+    for key in keys(local.tags) : [key, lookup(local.tags, key)]
   ]))
 }
 
