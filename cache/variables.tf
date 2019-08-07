@@ -11,8 +11,8 @@ variable "cache_bucket_prefix" {
 
 variable "cache_bucket_name_include_account_id" {
   description = "Boolean to add current account ID to cache bucket name."
-  type        = string
-  default     = "true"
+  type        = bool
+  default     = true
 }
 
 variable "cache_bucket_versioning" {
