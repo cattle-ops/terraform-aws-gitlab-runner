@@ -9,6 +9,12 @@ variable "cache_bucket_prefix" {
   default     = ""
 }
 
+variable "cache_bucket_name_include_account_id" {
+  description = "Boolean to add current account ID to cache bucket name."
+  type        = bool
+  default     = true
+}
+
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = string
