@@ -15,3 +15,7 @@ config-terraform.sh
 
 *.out
 *.secrets*.tfvars
+
+# GO
+# Dependency directories (remove the comment below to include it)
+vendor/
