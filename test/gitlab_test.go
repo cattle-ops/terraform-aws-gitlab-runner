@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -55,6 +57,14 @@ func TestRunnerDefault(t *testing.T) {
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer terraform.Destroy(t, terraformOptions)
 
+	// Create AWS session
+	awsSession, err := session.NewSession(&aws.Config{
+		Region: aws.String(conf.AwsRegion)},
+	)
+
+	// delete spot requests and instances
+	defer cancelSpotRequests(t, ec2.New(awsSession), conf.EnvironmentName)
+
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
 
@@ -77,18 +87,11 @@ func TestRunnerDefault(t *testing.T) {
 	})
 
 	// wait till pipeline succeeds
-	retry(t, checkPipeline, RetryOptions{
-		waitTime: 2 * 1000,
+	pipelineSuccess, err := waitAndRetry(t, checkPipeline, RetryOptions{
+		waitTime:   2 * 1000, // 2 seconds
+		maxRetries: 300,      // 10 minutes
 	})
-
-	// Create AWS session
-	awsSession, err := session.NewSession(&aws.Config{
-		Region: aws.String(conf.AwsRegion)},
-	)
-	svc := ec2.New(awsSession)
-
-	// delete spot requests and instances
-	err = cancelSpotRequests(t, svc, conf.EnvironmentName)
+	assert.True(t, pipelineSuccess)
 
 	if err != nil {
 		log.Fatal("Something wrong :( - TODO handle errors", err)
@@ -126,23 +129,25 @@ type RetryOptions struct {
 
 func checkPipeline(t *testing.T) (result bool, err error) {
 	p, _, err := git.Pipelines.GetPipeline(project.ID, pipeline.ID)
-	logger.Log(t, fmt.Sprintf("Waiting for pipeline, current status: `%s`. Check on GitLab: `%s`", p.Status, p.WebURL))
+	logger.Log(t, fmt.Sprintf("Waiting for pipeline, status: `%s`. See: `%s`", p.Status, p.WebURL))
 	return p.Status == "success", err
 }
 
 type Func func(t *testing.T) (retry bool, err error)
 
-func retry(t *testing.T, fn Func, options RetryOptions) (err error) {
+func waitAndRetry(t *testing.T, fn Func, options RetryOptions) (result bool, err error) {
 	if options.backOff == 0 {
 		options.backOff = 1
 	}
 
-	r, err := fn(t)
-	if !r && (options.maxRetries == 0 || options.attempts < options.maxRetries) {
+	result, err = fn(t)
+	retry := !result && (err == nil)
+	retry = retry && (options.maxRetries == 0 || options.attempts < options.maxRetries)
+	if retry {
 		options.waitTime = options.waitTime * options.backOff
 		options.attempts++
 		time.Sleep(time.Duration(options.waitTime) * time.Millisecond)
-		retry(t, fn, options)
+		result, err = waitAndRetry(t, fn, options)
 	}
-	return err
+	return result, err
 }
