@@ -3,7 +3,6 @@ package test
 import (
 	"fmt"
 	"log"
-	"strings"
 	"terratest/modules/logger"
 	"terratest/modules/terraform"
 	"testing"
@@ -11,9 +10,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/joho/godotenv"
 	"github.com/npalm/terraform-aws-gitlab-runner/test/config"
 	"github.com/xanzy/go-gitlab"
@@ -57,14 +53,6 @@ func TestRunnerDefault(t *testing.T) {
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer terraform.Destroy(t, terraformOptions)
 
-	// Create AWS session
-	awsSession, err := session.NewSession(&aws.Config{
-		Region: aws.String(conf.AwsRegion)},
-	)
-
-	// delete spot requests and instances
-	defer cancelSpotRequests(t, ec2.New(awsSession), conf.EnvironmentName)
-
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
 
@@ -97,26 +85,6 @@ func TestRunnerDefault(t *testing.T) {
 		log.Fatal("Something wrong :( - TODO handle errors", err)
 		return
 	}
-
-}
-
-func cancelSpotRequests(t *testing.T, svc *ec2.EC2, environmentName string) (err error) {
-	spot, err := svc.DescribeSpotInstanceRequests(&ec2.DescribeSpotInstanceRequestsInput{})
-
-	for _, s := range spot.SpotInstanceRequests {
-		if strings.HasPrefix(*s.LaunchSpecification.IamInstanceProfile.Name, environmentName) {
-			logger.Log(t, fmt.Sprintf("Cancel sport request and terminatie instance : %s", *s.InstanceId))
-
-			_, err = svc.CancelSpotInstanceRequests(&ec2.CancelSpotInstanceRequestsInput{
-				SpotInstanceRequestIds: aws.StringSlice([]string{*s.SpotInstanceRequestId}),
-			})
-			_, err = svc.TerminateInstances(&ec2.TerminateInstancesInput{
-				InstanceIds: aws.StringSlice([]string{*s.InstanceId}),
-			})
-
-		}
-	}
-	return err
 
 }
 
