@@ -2,9 +2,9 @@ package test
 
 import (
 	"fmt"
+	"github.com/gruntwork-io/terratest/modules/logger"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"log"
-	"terratest/modules/logger"
-	"terratest/modules/terraform"
 	"testing"
 	"time"
 
