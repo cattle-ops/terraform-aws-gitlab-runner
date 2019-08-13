@@ -2,8 +2,8 @@ package config
 
 import (
 	"fmt"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"os"
-	"terratest/modules/random"
 )
 
 // Config ...
