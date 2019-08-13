@@ -45,7 +45,7 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 
 ## 3.7.0 - 2019-07-17
 - Changed
-  - Creation of multiple instances of the runner is now supported. Cache is therefor moved to an internal module. Pleas see the example `runner-public` for a concrete sample. The change should have no effect if you apply the state migration script `migragations/migration-state-3.7.x.sh`.
+  - Creation of multiple instances of the runner is now supported. Cache is therefore moved to an internal module. Pleas see the example `runner-public` for a concrete sample. The change should have no effect if you apply the state migration script `migragations/migration-state-3.7.x.sh`.
   - Examples are more generic by removing the time zone and AZ zone to variables. @@theBenForce
 
 ## 3.6.0 - 2019-07-04
@@ -63,7 +63,7 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 
 ## 3.7.0 - 2019-07-17
 - Changed
-  - Creation of multiple instances of the runner is now supported. Cache is therefor moved to an internal module. Pleas see the example `runner-public` for a concrete sample. The change should have no effect if you apply the state migration script `migragations/migration-state-3.7.x.sh`.
+  - Creation of multiple instances of the runner is now supported. Cache is therefore moved to an internal module. Pleas see the example `runner-public` for a concrete sample. The change should have no effect if you apply the state migration script `migragations/migration-state-3.7.x.sh`.
   - Examples are more generic by removing the time zone and AZ zone to variables. @@theBenForce
 
 ## 3.6.0 - 2019-07-04
@@ -82,7 +82,7 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 ## [3.4.0] - 2019-06-06
 - Changed:
   - Update default runner type, GitLab runner version, and versions in examples.
-  - Buffix #75 runner is not reachable when runners_use_private_address = false 
+  - Buffix #75 runner is not reachable when runners_use_private_address = false
   - Buffix - Missing typ - @Orkin
   - Bugfix #72 - Detect and retry when docker machine download fails eliasdorneles
   - Bugfix #68 - add count to prevent resource creation failing  @philippefuentes
