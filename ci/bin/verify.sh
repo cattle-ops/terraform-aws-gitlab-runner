@@ -3,4 +3,4 @@
 source $(dirname $0)/terraform.sh
 
 verifyModulesAndPlugins
-validate
+formatCheck
