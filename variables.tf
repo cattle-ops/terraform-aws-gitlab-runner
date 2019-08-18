@@ -261,6 +261,12 @@ variable "cache_bucket_prefix" {
   default     = ""
 }
 
+variable "cache_bucket_name_include_account_id" {
+  description = "Boolean to add current account ID to cache bucket name."
+  type        = bool
+  default     = true
+}
+
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = bool
@@ -410,7 +416,7 @@ variable "overrides" {
 }
 
 variable "cache_bucket" {
-  description = "Configuration to control the creation of th the cache bucket. By default the bucket will be crated and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
+  description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
   type        = map
 
   default = {

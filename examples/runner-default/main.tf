@@ -49,7 +49,7 @@ module "runner" {
   }
 
   tags = {
-    "tf-aws-gitlab-runner:example" = "runner-default"
+    "tf-aws-gitlab-runner:example"           = "runner-default"
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
@@ -57,7 +57,22 @@ module "runner" {
   runners_off_peak_idle_count = 0
   runners_off_peak_idle_time  = 60
 
+  runners_privileged = "true"
+  # runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+  runners_additional_volumes = ["/certs/client"]
+
+
   # working 9 to 5 :)
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 
+
+
+resource "null_resource" "cancel_spot_requests" {
+  # Cancel active and open spot requests, terminate instances
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "../../ci/bin/cancel-spot-instances.sh ${var.environment}"
+  }
+}
