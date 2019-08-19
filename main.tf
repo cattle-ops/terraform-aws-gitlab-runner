@@ -168,6 +168,7 @@ data "template_file" "runners" {
     runners_pull_policy               = var.runners_pull_policy
     runners_idle_count                = var.runners_idle_count
     runners_idle_time                 = var.runners_idle_time
+    runners_max_builds                = local.runners_max_builds_string
     runners_off_peak_timezone         = var.runners_off_peak_timezone
     runners_off_peak_idle_count       = var.runners_off_peak_idle_count
     runners_off_peak_idle_time        = var.runners_off_peak_idle_time
