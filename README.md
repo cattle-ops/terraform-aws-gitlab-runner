@@ -258,6 +258,7 @@ terraform destroy
 | runners\_idle\_time | Idle time of the runners, will be used in the runner config.toml. | number | `"600"` | no |
 | runners\_image | Image to run builds, will be used in the runner config.toml | string | `"docker:18.03.1-ce"` | no |
 | runners\_limit | Limit for the runners, will be used in the runner config.toml. | number | `"0"` | no |
+| runners\_max\_builds | Max builds for each runner after which it will be removed, will be used in the runner config.toml. | number | `"0"` | no |
 | runners\_monitoring | Enable detailed cloudwatch monitoring for spot instances. | bool | `"false"` | no |
 | runners\_name | Name of the runner, will be used in the runner config.toml. | string | n/a | yes |
 | runners\_off\_peak\_idle\_count | Off peak idle count of the runners, will be used in the runner config.toml. | number | `"0"` | no |
