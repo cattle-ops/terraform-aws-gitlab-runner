@@ -117,6 +117,12 @@ variable "runners_idle_count" {
   default     = 0
 }
 
+variable "runners_max_builds" {
+  description = "Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration."
+  type        = number
+  default     = 0
+}
+
 variable "runners_image" {
   description = "Image to run builds, will be used in the runner config.toml"
   type        = string

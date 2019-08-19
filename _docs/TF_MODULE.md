@@ -8,6 +8,7 @@
 | aws\_region | AWS region. | string | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | string | `"a"` | no |
 | cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details. | map | `<map>` | no |
+| cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | bool | `"true"` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | string | `""` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | bool | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | number | `"1"` | no |
@@ -44,6 +45,7 @@
 | runners\_idle\_time | Idle time of the runners, will be used in the runner config.toml. | number | `"600"` | no |
 | runners\_image | Image to run builds, will be used in the runner config.toml | string | `"docker:18.03.1-ce"` | no |
 | runners\_limit | Limit for the runners, will be used in the runner config.toml. | number | `"0"` | no |
+| runners\_max\_builds | Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration. | number | `"0"` | no |
 | runners\_monitoring | Enable detailed cloudwatch monitoring for spot instances. | bool | `"false"` | no |
 | runners\_name | Name of the runner, will be used in the runner config.toml. | string | n/a | yes |
 | runners\_off\_peak\_idle\_count | Off peak idle count of the runners, will be used in the runner config.toml. | number | `"0"` | no |
@@ -82,3 +84,4 @@
 | runner\_cache\_bucket\_name | Name of the S3 for the build cache. |
 | runner\_role\_arn | ARN of the role used for the docker machine runners. |
 | runner\_role\_name | Name of the role used for the docker machine runners. |
+
