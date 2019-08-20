@@ -445,5 +445,5 @@ variable "ec2_volume_type" {
 
 variable "ec2_volume_size" {
   description = "The size of the root volume of the EC2 instance used for the runners"
-  default = 8
+  default     = 8
 }
