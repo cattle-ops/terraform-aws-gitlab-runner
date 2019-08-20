@@ -449,8 +449,8 @@ variable "schedule_config" {
   type        = map
   default = {
     scale_in_recurrence  = "0 18 * * 1-5"
-    scale_in_count   = 0
+    scale_in_count       = 0
     scale_out_recurrence = "0 8 * * 1-5"
-    scale_out_count  = 1
+    scale_out_count      = 1
   }
 }

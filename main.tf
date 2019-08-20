@@ -231,6 +231,7 @@ resource "aws_autoscaling_schedule" "scale_in" {
   recurrence             = var.schedule_config["scale_in_recurrence"]
   min_size               = var.schedule_config["scale_in_count"]
   desired_capacity       = var.schedule_config["scale_in_count"]
+  max_size               = var.schedule_config["scale_in_count"]
 }
 
 resource "aws_autoscaling_schedule" "scale_out" {
@@ -240,6 +241,7 @@ resource "aws_autoscaling_schedule" "scale_out" {
   recurrence             = var.schedule_config["scale_out_recurrence"]
   min_size               = var.schedule_config["scale_out_count"]
   desired_capacity       = var.schedule_config["scale_out_count"]
+  max_size               = var.schedule_config["scale_out_count"]
 }
 
 data "aws_ami" "runner" {
