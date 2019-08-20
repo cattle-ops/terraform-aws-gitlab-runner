@@ -437,3 +437,12 @@ variable "enable_runner_user_data_trace_log" {
   type        = bool
   default     = false
 }
+
+variable "ec2_volume_type" {
+  description = "The type of volume used for the root volume of the EC2 instance used for the runners"
+  default     = "gp2"
+}
+
+variable "ec2_volume_size" {
+  description = "The size of the root volume of the EC2 instance used for the runners"
+}

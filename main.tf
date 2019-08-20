@@ -246,6 +246,11 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   instance_type        = var.instance_type
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
+  root_block_device {
+    volume_type = "${var.ec2_volume_type}"
+    volume_size = "${var.ec2_volume_size}"
+
+  }
 
   associate_public_ip_address = false == var.runners_use_private_address
 
