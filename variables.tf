@@ -439,7 +439,7 @@ variable "enable_runner_user_data_trace_log" {
 }
 
 variable "enable_schedule" {
-  description = "Flag used to enable/disable auto scaling group schedule."
+  description = "Flag used to enable/disable auto scaling group schedule for the runner instance. "
   type        = bool
   default     = false
 }
