@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## 4.4.0 - 2019-08-21
+
+- Added
+  - Allow for configurable root block size #123 @bsuv
+  - Enable ASG scheduling #119 @bsuv
+
+
 ## 4.3.0 - 2019-08-19
 
 - Added
@@ -215,7 +222,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.3.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.4.0...HEAD
+[4.4.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.3.0...4.4.0
 [4.3.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.1.0...4.2.0
 [4.1.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.0.0...4.1.0
