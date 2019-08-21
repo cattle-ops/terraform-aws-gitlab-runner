@@ -438,16 +438,6 @@ variable "enable_runner_user_data_trace_log" {
   default     = false
 }
 
-variable "ec2_volume_type" {
-  description = "The type of volume used for the root volume of the EC2 instance used for the runners"
-  default     = "gp2"
-}
-
-variable "ec2_volume_size" {
-  description = "The size of the root volume of the EC2 instance used for the runners"
-  default     = 8
-}
-
 variable "enable_schedule" {
   description = "Flag used to enable/disable auto scaling group schedule for the runner instance. "
   type        = bool
@@ -465,3 +455,8 @@ variable "schedule_config" {
   }
 }
 
+variable "runner_root_block_device" {
+  description = "The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `iops`"
+  type        = map(string)
+  default     = {}
+}
