@@ -437,3 +437,20 @@ variable "enable_runner_user_data_trace_log" {
   type        = bool
   default     = false
 }
+
+variable "enable_schedule" {
+  description = "Flag used to enable/disable auto scaling group schedule for the runner instance. "
+  type        = bool
+  default     = false
+}
+
+variable "schedule_config" {
+  description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
+  type        = map
+  default = {
+    scale_in_recurrence  = "0 18 * * 1-5"
+    scale_in_count       = 0
+    scale_out_recurrence = "0 8 * * 1-5"
+    scale_out_count      = 1
+  }
+}
