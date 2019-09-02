@@ -237,7 +237,9 @@ terraform destroy
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | bool | `"true"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | bool | `"false"` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | bool | `"true"` | no |
+| enable\_runner\_ssm\_access | Add IAM policies to the runner agent instance to connect via the Session Manager. | bool | `"false"` | no |
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | bool | `"false"` | no |
+| enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | bool | `"false"` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map(string) | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list(string) | `<list>` | no |
@@ -248,6 +250,7 @@ terraform destroy
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | map(list(string)) | `<map>` | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | list(string) | `<list>` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
+| runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `iops` | map(string) | `<map>` | no |
 | runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | list | `<list>` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | number | `"10"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list(string) | `<list>` | no |
@@ -276,6 +279,7 @@ terraform destroy
 | runners\_shm\_size | shm_size for the runners, will be used in the runner config.toml | number | `"0"` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | string | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | bool | `"true"` | no |
+| schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. | map | `<map>` | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `"runner-token"` | no |
 | ssh\_key\_pair | Set this to use existing AWS key pair | string | `""` | no |
 | ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | string | `""` | no |

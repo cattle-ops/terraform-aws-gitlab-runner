@@ -460,3 +460,9 @@ variable "runner_root_block_device" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_runner_ssm_access" {
+  description = "Add IAM policies to the runner agent instance to connect via the Session Manager."
+  type        = bool
+  default     = false
+}

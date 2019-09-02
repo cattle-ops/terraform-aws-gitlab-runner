@@ -1,5 +1,5 @@
 resource "aws_key_pair" "key" {
-  count      = var.ssh_key_pair == "" ? 1 : 0
+  count      = var.ssh_key_pair == "" && var.ssh_public_key != "" ? 1 : 0
   key_name   = "${var.environment}-gitlab-runner"
   public_key = var.ssh_public_key
 }
@@ -258,9 +258,16 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
+locals {
+  # Key magic, if public key is provided usthe public key, if key pair is proviced use key pair. Otherwise null
+  is_ssh_public_key = var.ssh_key_pair == "" && var.ssh_public_key != "" ? aws_key_pair.key[0].key_name : ""
+  is_key_pair_name  = local.is_ssh_public_key != "" ? local.is_ssh_public_key : var.ssh_key_pair
+  key_pair_name     = local.is_key_pair_name != "" ? local.is_key_pair_name : null
+}
+
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = [aws_security_group.runner.id]
-  key_name             = var.ssh_key_pair == "" ? aws_key_pair.key[0].key_name : var.ssh_key_pair
+  key_name             = local.key_pair_name
   image_id             = data.aws_ami.runner.id
   user_data            = data.template_file.user_data.rendered
   instance_type        = var.instance_type
@@ -342,6 +349,43 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
   role       = aws_iam_role.instance.name
   policy_arn = aws_iam_policy.instance_docker_machine_policy.arn
 }
+
+################################################################################
+### Policies for runner agent instance to allow connection via Session Manager
+################################################################################
+
+data "template_file" "instance_session_manager_policy" {
+  count = var.enable_runner_ssm_access ? 1 : 0
+
+  template = file(
+    "${path.module}/policies/instance-session-manager-policy.json",
+  )
+}
+
+resource "aws_iam_policy" "instance_session_manager_policy" {
+  count = var.enable_runner_ssm_access ? 1 : 0
+
+  name        = "${var.environment}-session-manager"
+  path        = "/"
+  description = "Policy session manager."
+
+  policy = data.template_file.instance_session_manager_policy[0].rendered
+}
+
+resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
+  count = var.enable_runner_ssm_access ? 1 : 0
+
+  role       = aws_iam_role.instance.name
+  policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
+  count = var.enable_runner_ssm_access ? 1 : 0
+
+  role       = aws_iam_role.instance.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 
 ################################################################################
 ### Policy for the docker machine instance to access cache
