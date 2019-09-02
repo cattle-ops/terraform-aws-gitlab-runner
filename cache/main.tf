@@ -12,12 +12,14 @@ locals {
     },
     var.tags,
   )
+
+  cache_bucket_name = var.cache_bucket_name_include_account_id ? "${var.cache_bucket_prefix}${data.aws_caller_identity.current[0].account_id}-gitlab-runner-cache" : "${var.cache_bucket_prefix}-gitlab-runner-cache"
 }
 
 resource "aws_s3_bucket" "build_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
-  bucket = "${var.cache_bucket_prefix}${data.aws_caller_identity.current[0].account_id}-gitlab-runner-cache"
+  bucket = local.cache_bucket_name
   acl    = "private"
 
   tags = local.tags

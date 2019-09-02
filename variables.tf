@@ -117,6 +117,12 @@ variable "runners_idle_count" {
   default     = 0
 }
 
+variable "runners_max_builds" {
+  description = "Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration."
+  type        = number
+  default     = 0
+}
+
 variable "runners_image" {
   description = "Image to run builds, will be used in the runner config.toml"
   type        = string
@@ -259,6 +265,12 @@ variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
   default     = ""
+}
+
+variable "cache_bucket_name_include_account_id" {
+  description = "Boolean to add current account ID to cache bucket name."
+  type        = bool
+  default     = true
 }
 
 variable "cache_bucket_versioning" {
@@ -416,7 +428,7 @@ variable "overrides" {
 }
 
 variable "cache_bucket" {
-  description = "Configuration to control the creation of th the cache bucket. By default the bucket will be crated and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
+  description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
   type        = map
 
   default = {
@@ -430,4 +442,27 @@ variable "enable_runner_user_data_trace_log" {
   description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
   default     = false
+}
+
+variable "enable_schedule" {
+  description = "Flag used to enable/disable auto scaling group schedule for the runner instance. "
+  type        = bool
+  default     = false
+}
+
+variable "schedule_config" {
+  description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
+  type        = map
+  default = {
+    scale_in_recurrence  = "0 18 * * 1-5"
+    scale_in_count       = 0
+    scale_out_recurrence = "0 8 * * 1-5"
+    scale_out_count      = 1
+  }
+}
+
+variable "runner_root_block_device" {
+  description = "The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `iops`"
+  type        = map(string)
+  default     = {}
 }

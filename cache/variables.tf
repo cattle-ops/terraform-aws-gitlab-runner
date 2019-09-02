@@ -9,6 +9,12 @@ variable "cache_bucket_prefix" {
   default     = ""
 }
 
+variable "cache_bucket_name_include_account_id" {
+  description = "Boolean to add current account ID to cache bucket name."
+  type        = bool
+  default     = true
+}
+
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = string
@@ -28,8 +34,7 @@ variable "tags" {
 }
 
 variable "create_cache_bucket" {
-  description = "This module is by default included in the runner module. To disable the creation of the bucket this paramter can be disabled."
+  description = "This module is by default included in the runner module. To disable the creation of the bucket this parameter can be disabled."
   type        = string
   default     = true
 }
-

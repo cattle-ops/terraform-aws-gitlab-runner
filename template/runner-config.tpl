@@ -32,6 +32,7 @@ check_interval = 0
   [runners.machine]
     IdleCount = ${runners_idle_count}
     IdleTime = ${runners_idle_time}
+    ${runners_max_builds}
     MachineDriver = "amazonec2"
     MachineName = "runner-%s"
     MachineOptions = [
