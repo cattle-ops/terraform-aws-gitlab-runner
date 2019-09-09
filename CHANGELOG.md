@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## Unrelease
+- Set docker machine version by default to 0.16.2 #131 @npalm
 - Add SSM session manager support #121 #126 @npalm
 - Move to github actions #130 @npalm
 - Enable s3 encryption #129 @hendrixra
