@@ -68,7 +68,7 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_version" {
   description = "Version of docker-machine."
   type        = string
-  default     = "0.16.1"
+  default     = "0.16.2"
 }
 
 variable "runners_name" {
