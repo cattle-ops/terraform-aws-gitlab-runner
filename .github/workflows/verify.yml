@@ -1,0 +1,24 @@
+name: Verify
+on: [push]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: verify
+      run: |
+        ./ci/bin/install.sh
+        ./ci/bin/verify.sh
+
+  verify-examples:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: verify-examples
+      run: |
+        ./ci/bin/install.sh
+        ./ci/bin/verify-examples.sh
+
