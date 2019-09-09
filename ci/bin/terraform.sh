@@ -3,7 +3,7 @@
 TARGET_DIR=/opt
 PATH=${PATH}:${TARGET_DIR}
 
-TERRAFORM_VERSION=${1:-"0.12.3"}
+TERRAFORM_VERSION=${1:-"0.12.8"}
 OS=${2:-"linux"}
 TERRAFORM_URL="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip"
 
