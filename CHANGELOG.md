@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## Unrelease
+- Add SSM session manager support #121 #126 @npalm
+- Move to github actions #130 @npalm
+- Enable s3 encryption #129 @hendrixra
+- Bump gitlab-runner to 12.2.0 #128 @mpsq
+
 ## 4.4.0 - 2019-08-21
 
 - Added
