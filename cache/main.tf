@@ -44,6 +44,14 @@ resource "aws_s3_bucket" "build_cache" {
       days = var.cache_expiration_days
     }
   }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 data "template_file" "docker_machine_cache_policy" {
