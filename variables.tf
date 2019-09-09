@@ -68,7 +68,7 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_version" {
   description = "Version of docker-machine."
   type        = string
-  default     = "0.16.1"
+  default     = "0.16.2"
 }
 
 variable "runners_name" {
@@ -294,7 +294,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.1.0"
+  default     = "12.2.0"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -365,7 +365,6 @@ variable "ami_owners" {
   type        = list(string)
   default     = ["amazon"]
 }
-
 
 variable "runner_ami_filter" {
   description = "List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI."
@@ -459,4 +458,10 @@ variable "runner_root_block_device" {
   description = "The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `iops`"
   type        = map(string)
   default     = {}
+}
+
+variable "enable_runner_ssm_access" {
+  description = "Add IAM policies to the runner agent instance to connect via the Session Manager."
+  type        = bool
+  default     = false
 }

@@ -124,6 +124,15 @@ Once you have created the parameter, you must remove the variable `runners_token
 
 Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be removed in future releases.
 
+### Access runner instance
+
+A few option are provide the runner instance
+1. Provide a public ssh key to access the runner by setting ``.
+2. Provide a EC2 key pair to access the runner by setting ``.
+3. Access via the Session Manager (SSM) by setting `enable_runner_ssm_access` to `true`. The policy to allow access via SSM is not very restrictive. 
+4. By setting non of the above no keys or extra policies will be attached to the instance. You can still configure you own policies by attaching them to `runner_agent_role_arn`.
+
+
 ### GitLab runner cache
 
 By default the module creates a a cache for the runner in S3. Old objects are automatically remove via a configurable life cycle policy on the bucket.
