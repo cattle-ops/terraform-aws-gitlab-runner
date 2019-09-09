@@ -28,14 +28,13 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key = local_file.public_ssh_key.content
-
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.private_subnets
   subnet_id_runners        = element(module.vpc.private_subnets, 0)
 
-  runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
+  runners_name             = var.runner_name
+  runners_gitlab_url       = var.gitlab_url
+  enable_runner_ssm_access = true
 
   docker_machine_spot_price_bid = "0.06"
 

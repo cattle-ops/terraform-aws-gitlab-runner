@@ -24,12 +24,13 @@
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | bool | `"true"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | bool | `"false"` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | bool | `"true"` | no |
+| enable\_runner\_ssm\_access | Add IAM policies to the runner agent instance to connect via the Session Manager. | bool | `"false"` | no |
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | bool | `"false"` | no |
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | bool | `"false"` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map(string) | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list(string) | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.1.0"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.2.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | map(string) | `<map>` | no |

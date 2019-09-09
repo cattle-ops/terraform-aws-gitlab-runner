@@ -20,7 +20,8 @@ resource "null_resource" "file_permission" {
   depends_on = [local_file.private_ssh_key]
 
   provisioner "local-exec" {
-    command = format("chmod 600 %s", var.private_ssh_key_filename)
+    command     = format("chmod 600 %s", var.private_ssh_key_filename)
+    interpreter = ["/bin/bash", "-c"]
   }
 }
 

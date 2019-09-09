@@ -7,7 +7,7 @@ In this scenario the multiple runner agents can be created with different config
 This examples shows:
 
   - Usages of public subnets.
-  - Useages of multiple runner instances sharing a common cache.
+  - Usages of multiple runner instances sharing a common cache.
   - Overrides for tag naming.
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor.
