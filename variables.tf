@@ -189,12 +189,6 @@ variable "runners_root_size" {
   default     = 16
 }
 
-variable "create_runners_iam_instance_profile" {
-  description = "Boolean to control the creation of the runners IAM instance profile"
-  type        = bool
-  default     = true
-}
-
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = string
@@ -255,12 +249,6 @@ variable "runners_use_private_address" {
   default     = true
 }
 
-variable "docker_machine_user" {
-  description = "Username of the user used to create the spot instances that host docker-machine."
-  type        = string
-  default     = "docker-machine"
-}
-
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
@@ -294,7 +282,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.2.0"
+  default     = "12.4.1"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -305,12 +293,6 @@ variable "enable_gitlab_runner_ssh_access" {
 
 variable "gitlab_runner_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
-variable "docker_machine_ssh_cidr_blocks" {
-  description = "List of CIDR blocks to allow SSH Access to the docker machine runner instance."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
@@ -371,7 +353,7 @@ variable "runner_ami_filter" {
   type        = map(list(string))
 
   default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+    name = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }
 }
 
@@ -394,6 +376,7 @@ variable "gitlab_runner_registration_config" {
     locked_to_project  = ""
     run_untagged       = ""
     maximum_timeout    = ""
+    access_level       = ""
   }
 }
 
@@ -465,3 +448,24 @@ variable "enable_runner_ssm_access" {
   type        = bool
   default     = false
 }
+
+variable "kms_key_logs" {
+  description = "KMS Key for encryption logs"
+}
+
+variable "bucket_access_logs" {
+  description = "S3 bucket to enable access logs in s3 cache bucket"
+}
+
+variable "runners_volumes_tmpfs" {
+  description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
+  type        = list
+  default     = []
+}
+
+variable "runners_services_volumes_tmpfs" {
+  description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
+  type        = list
+  default     = []
+}
+

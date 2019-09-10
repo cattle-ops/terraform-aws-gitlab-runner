@@ -100,6 +100,16 @@ data "template_file" "user_data" {
   }
 }
 
+data "template_cloudinit_config" "user_data_encrypted" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = "${data.template_file.user_data.rendered}"
+  }
+}
+
 data "template_file" "logging" {
   template = file("${path.module}/template/logging.tpl")
 
@@ -222,6 +232,9 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
     ],
   )
 
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
@@ -269,7 +282,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   security_groups      = [aws_security_group.runner.id]
   key_name             = local.key_pair_name
   image_id             = data.aws_ami.runner.id
-  user_data            = data.template_file.user_data.rendered
+  user_data_base64     = data.template_cloudinit_config.user_data_encrypted.rendered
   instance_type        = var.instance_type
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
@@ -280,6 +293,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
       volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
       volume_size           = lookup(root_block_device.value, "volume_size", 8)
       iops                  = lookup(root_block_device.value, "iops", null)
+      encrypted             = lookup(root_block_device.value, "encrypted", true)
     }
   }
 
@@ -309,6 +323,7 @@ module "cache" {
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+  bucket_access_logs                   = var.bucket_access_logs
 }
 
 ################################################################################
@@ -335,6 +350,10 @@ data "template_file" "instance_docker_machine_policy" {
   template = file(
     "${path.module}/policies/instance-docker-machine-policy.json",
   )
+
+  vars = {
+    iam_pass_role = aws_iam_role.instance.arn
+  }
 }
 
 resource "aws_iam_policy" "instance_docker_machine_policy" {

@@ -11,8 +11,10 @@ resource "aws_iam_role_policy" "instance" {
 }
 
 resource "aws_cloudwatch_log_group" "environment" {
-  count = var.enable_cloudwatch_logging ? 1 : 0
-  name  = var.environment
+  count             = var.enable_cloudwatch_logging ? 1 : 0
+  name              = var.environment
+  retention_in_days = 14
+  kms_key_id        = var.kms_key_logs
 
   tags = local.tags
 }

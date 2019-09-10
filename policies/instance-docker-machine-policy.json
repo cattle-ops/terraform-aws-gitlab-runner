@@ -17,11 +17,15 @@
           "ec2:RequestSpotInstances",
           "ec2:CancelSpotInstanceRequests",
           "ec2:DescribeSubnets",
-          "ec2:AssociateIamInstanceProfile",
-          "iam:PassRole"
+          "ec2:AssociateIamInstanceProfile"
         ],
         "Effect": "Allow",
         "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": "iam:PassRole",
+        "Resource": "${iam_pass_role}"
       }
     ]
   }
