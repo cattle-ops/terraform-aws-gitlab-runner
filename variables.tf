@@ -294,7 +294,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.2.0"
+  default     = "12.3.0"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -394,6 +394,7 @@ variable "gitlab_runner_registration_config" {
     locked_to_project  = ""
     run_untagged       = ""
     maximum_timeout    = ""
+    access_level       = ""
   }
 }
 

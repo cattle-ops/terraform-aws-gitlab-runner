@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unrelease
 
+## 4.6.0 - 2019-09-30
+- Add access_level option to registration call in runner template #134 @willychenchen 
+- Bump gitlab-runner default version to 12.3.0 #135 @loustler 
+
 ## 4.5.0 - 2019-09-09
 - Set docker machine version by default to 0.16.2 #131 @npalm
 - Add SSM session manager support #121 #126 @npalm
 - Move to github actions #130 @npalm
-- Enable s3 encryption #129 @hendrixra
+- Enable s3 encryption #129 @hendrixroa
 - Bump gitlab-runner to 12.2.0 #128 @mpsq
 
 ## 4.4.0 - 2019-08-21
@@ -231,7 +235,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.5.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6.0...HEAD
+[4.6.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.5.0...4.6.0
 [4.5.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.4.0...4.5.0
 [4.4.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.3.0...4.4.0
 [4.3.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.2.0...4.3.0
