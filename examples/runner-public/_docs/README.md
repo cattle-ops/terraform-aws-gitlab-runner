@@ -10,6 +10,7 @@ This examples shows:
 - Overrides for tag naming.
 - Registration via GitLab token.
 - Auto scaling using `docker+machine` executor.
+- Register runner as [protected](https://docs.gitlab.com/ee/ci/runners/#protected-runners). 
 
 
 ## Prerequisite

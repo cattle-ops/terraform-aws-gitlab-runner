@@ -128,6 +128,7 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_locked_to_project         = var.gitlab_runner_registration_config["locked_to_project"]
     gitlab_runner_run_untagged              = var.gitlab_runner_registration_config["run_untagged"]
     gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
+    gitlab_runner_access_level              = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
   }
 }
 
