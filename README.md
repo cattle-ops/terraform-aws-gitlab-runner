@@ -106,7 +106,7 @@ gitlab_runner_registration_config = {
   locked_to_project  = "true"
   run_untagged       = "false"
   maximum_timeout    = "3600"
-  access_level       = "<not_protected OR ref_protected, ref_protected runner will only run on pipelines triggered on protected branches>"
+  access_level       = "<not_protected OR ref_protected, ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected>"
 }
 ```
 
@@ -182,7 +182,6 @@ module "runner" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
-    access_level       = "not_protected"
   }
 
 }
