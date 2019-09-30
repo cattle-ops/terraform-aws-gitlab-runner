@@ -45,7 +45,6 @@ module "runner" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
-    access_level       = "not_protected"
   }
 
   tags = {

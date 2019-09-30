@@ -53,7 +53,7 @@ module "runner" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
-    access_level       = "not_protected"
+    access_level       = "ref_protected"
   }
 
   overrides = {
@@ -96,7 +96,6 @@ module "runner2" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
-    access_level       = "not_protected"
   }
 
   cache_shared = "true"
