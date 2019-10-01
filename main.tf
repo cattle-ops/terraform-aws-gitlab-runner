@@ -183,11 +183,6 @@ data "template_file" "runners" {
     runners_volumes                   = "${length(var.runners_volumes) == 0 ? "[]" : format("[\"%s\"]", join("\", \"", var.runners_volumes))}"
     runners_volumes_tmpfs             = "${chomp(join("", data.template_file.volumes_tmpfs.*.rendered))}"
     runners_services_volumes_tmpfs    = "${chomp(join("", data.template_file.services_volumes_tmpfs.*.rendered))}"
-    #runners_volumes_tmpfs             = "${join("\n", var.runners_services_volumes_tmpfs)}"
-    #runners_services_volumes_tmpfs    = ""
-
-
-    #${join(",", data.template_file.data_json.*.rendered)
     runners_shm_size                  = "${var.runners_shm_size}"
     runners_pull_policy               = "${var.runners_pull_policy}"
     runners_idle_count                = "${var.runners_idle_count}"
