@@ -124,20 +124,12 @@ variable "runners_volumes" {
 variable "runners_volumes_tmpfs" {
   type = "list"
   default = []
-  # default = [
-  #   { "/var/lib/postgresql" = "rw,noexec" },
-  #   { "/cache1" = "rw,noexec"},
-  # ]
 }
 
 
 variable "runners_services_volumes_tmpfs" {
   type = "list"
   default = []
-  # default = [
-  #   { "/var/lib/mysql" = "rw,noexec" },
-  #   { "/cache2" = "rw,noexec"},
-  # ]
 }
 
 variable "runners_shm_size" {
