@@ -121,6 +121,25 @@ variable "runners_volumes" {
   default     = ["/cache"]
 }
 
+variable "runners_volumes_tmpfs" {
+  type = "list"
+  default = []
+  # default = [
+  #   { "/var/lib/postgresql" = "rw,noexec" },
+  #   { "/cache1" = "rw,noexec"},
+  # ]
+}
+
+
+variable "runners_services_volumes_tmpfs" {
+  type = "list"
+  default = []
+  # default = [
+  #   { "/var/lib/mysql" = "rw,noexec" },
+  #   { "/cache2" = "rw,noexec"},
+  # ]
+}
+
 variable "runners_shm_size" {
   description = "shm_size for the runners.  will be used in the runner config.toml"
   default     = 0
