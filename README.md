@@ -311,3 +311,5 @@ terraform destroy
 | runner\_cache\_bucket\_name | Name of the S3 for the build cache. |
 | runner\_role\_arn | ARN of the role used for the docker machine runners. |
 | runner\_role\_name | Name of the role used for the docker machine runners. |
+| runner\_agent\_sg\_id | ID of the security group attached to the GitLab runner agent. |
+| runner\_sg\_id | ID of the security group attached to the docker machine runners. |
