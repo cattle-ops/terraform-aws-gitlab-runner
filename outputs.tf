@@ -39,8 +39,6 @@ output "runner_agent_sg_id" {
 }
 
 output "runner_sg_id" {
-  description = "ID of the security group used to the docker machine runners."
+  description = "ID of the security group attached to the docker machine runners."
   value       = aws_security_group.docker_machine.id
 }
-
-
