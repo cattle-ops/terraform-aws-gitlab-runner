@@ -270,12 +270,12 @@ terraform destroy
 | runners\_pull\_policy | pull_policy for the runners.  will be used in the runner config.toml | string | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | string | `"1"` | no |
 | runners\_root\_size | Runner instance root size in GB. | string | `"16"` | no |
-| runners\_services\_volumes\_tmpfs |  | list | `<list>` | no |
+| runners\_services\_volumes\_tmpfs | Mount temporary file systems to service containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | list | `<list>` | no |
 | runners\_shm\_size | shm_size for the runners.  will be used in the runner config.toml | string | `"0"` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | string | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | string | `"true"` | no |
 | runners\_volumes | Specify additional volumes that should be mounted (same syntax as Docker’s -v flag) | list | `<list>` | no |
-| runners\_volumes\_tmpfs |  | list | `<list>` | no |
+| runners\_volumes\_tmpfs | Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | list | `<list>` | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `"runner-token"` | no |
 | ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | string | n/a | yes |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | string | n/a | yes |
@@ -289,7 +289,6 @@ terraform destroy
 
 | Name | Description |
 |------|-------------|
-| bla |  |
 | runner\_agent\_role | ARN of the rule used for the ec2 instance for the GitLab runner agent. |
 | runner\_as\_group\_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner\_cache\_bucket\_arn | ARN of the S3 for the build cache. |
