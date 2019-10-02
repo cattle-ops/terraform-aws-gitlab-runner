@@ -56,12 +56,32 @@ resource "aws_security_group_rule" "docker_machine_docker" {
   from_port   = 2376
   to_port     = 2376
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  source_security_group_id = "${aws_security_group.runner.id}"
+
+  security_group_id = "${aws_security_group.docker_machine.id}"
+}
+
+resource "aws_security_group_rule" "docker_machine_docker_additional" {
+  type        = "ingress"
+  from_port   = 2376
+  to_port     = 2376
+  protocol    = "tcp"
+  cidr_blocks = ["${var.docker_machine_docker_cidr_blocks}"]
 
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "docker_machine_ssh" {
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  source_security_group_id = "${aws_security_group.runner.id}"
+
+  security_group_id = "${aws_security_group.docker_machine.id}"
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_additional" {
   type        = "ingress"
   from_port   = 22
   to_port     = 22
