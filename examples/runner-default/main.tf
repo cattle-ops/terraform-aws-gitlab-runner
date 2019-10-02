@@ -48,6 +48,10 @@ module "runner" {
     maximum_timeout    = "3600"
   }
 
+  runners_volumes_tmpfs = {
+    "/var/opt/cache" = "rw,noexec"
+  }
+
   runners_services_volumes_tmpfs = {
     "/var/lib/mysql" = "rw,noexec"
   }
