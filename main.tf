@@ -52,7 +52,7 @@ resource "aws_security_group_rule" "docker_machine_docker" {
   from_port   = 2376
   to_port     = 2376
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = var.docker_machine_docker_cidr_blocks
 
   security_group_id = aws_security_group.docker_machine.id
 }

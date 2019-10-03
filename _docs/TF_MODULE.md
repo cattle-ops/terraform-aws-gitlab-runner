@@ -14,6 +14,7 @@
 | cache\_expiration\_days | Number of days before cache objects expires. | number | `"1"` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | bool | `"false"` | no |
 | create\_runners\_iam\_instance\_profile | Boolean to control the creation of the runners IAM instance profile | bool | `"true"` | no |
+| docker\_machine\_docker\_cidr\_blocks | List of CIDR blocks to allow Docker Access to the docker machine runner instance. | list(string) | `<list>` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list(string) | `<list>` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
@@ -88,4 +89,3 @@
 | runner\_cache\_bucket\_name | Name of the S3 for the build cache. |
 | runner\_role\_arn | ARN of the role used for the docker machine runners. |
 | runner\_role\_name | Name of the role used for the docker machine runners. |
-
