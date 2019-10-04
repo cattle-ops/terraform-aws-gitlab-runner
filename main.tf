@@ -47,12 +47,22 @@ resource "aws_security_group" "docker_machine" {
   )
 }
 
-resource "aws_security_group_rule" "docker_machine_docker" {
-  type        = "ingress"
-  from_port   = 2376
-  to_port     = 2376
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+resource "aws_security_group_rule" "docker_machine_docker_runner" {
+  type                     = "ingress"
+  from_port                = 2376
+  to_port                  = 2376
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.runner.id
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_docker_self" {
+  type      = "ingress"
+  from_port = 2376
+  to_port   = 2376
+  protocol  = "tcp"
+  self      = true
 
   security_group_id = aws_security_group.docker_machine.id
 }
