@@ -48,13 +48,13 @@ module "runner" {
     maximum_timeout    = "3600"
   }
 
-  runners_volumes_tmpfs = {
-    "/var/opt/cache" = "rw,noexec"
-  }
+  runners_volumes_tmpfs = [
+    { "/var/opt/cache" = "rw,noexec"},
+  ]
 
-  runners_services_volumes_tmpfs = {
-    "/var/lib/mysql" = "rw,noexec"
-  }
+  runners_services_volumes_tmpfs = [
+    { "/var/lib/mysql" = "rw,noexec" },
+  ]
 
   runners_off_peak_timezone   = "${var.timezone}"
   runners_off_peak_idle_count = 0
