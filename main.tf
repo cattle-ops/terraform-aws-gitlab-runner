@@ -142,6 +142,24 @@ data "template_file" "gitlab_runner" {
   }
 }
 
+data "template_file" "services_volumes_tmpfs" {
+  template = file("${path.module}/template/volumes.tpl")
+  count    = length(var.runners_services_volumes_tmpfs)
+  vars = {
+    volume  = element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)
+    options = element(values(var.runners_services_volumes_tmpfs[count.index]), 0)
+  }
+}
+
+data "template_file" "volumes_tmpfs" {
+  template = file("${path.module}/template/volumes.tpl")
+  count    = length(var.runners_volumes_tmpfs)
+  vars = {
+    volume  = element(keys(var.runners_volumes_tmpfs[count.index]), 0)
+    options = element(values(var.runners_volumes_tmpfs[count.index]), 0)
+  }
+}
+
 data "template_file" "runners" {
   template = file("${path.module}/template/runner-config.tpl")
 
@@ -193,6 +211,8 @@ data "template_file" "runners" {
     runners_pre_clone_script          = var.runners_pre_clone_script
     runners_request_concurrency       = var.runners_request_concurrency
     runners_output_limit              = var.runners_output_limit
+    runners_volumes_tmpfs             = chomp(join("", data.template_file.volumes_tmpfs.*.rendered))
+    runners_services_volumes_tmpfs    = chomp(join("", data.template_file.services_volumes_tmpfs.*.rendered))
     bucket_name                       = local.bucket_name
     shared_cache                      = var.cache_shared
   }
