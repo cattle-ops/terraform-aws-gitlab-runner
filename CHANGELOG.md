@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.11.0 = 2019-10-04
+- Addition Options to specify tmpfs volumes in main and service containers @roock
+
 ## 3.10.0 - 2019-07-29
 - Chnaged
   - THe user data script for the EC2 runner agent instance is not logging anymore on trace level. To enable bash xtrace set `enable_runner_user_data_trace_log` to `true`. #49
