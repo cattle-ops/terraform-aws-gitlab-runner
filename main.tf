@@ -137,6 +137,24 @@ data "template_file" "gitlab_runner" {
   }
 }
 
+data "template_file" "services_volumes_tmpfs" {
+  template = "${file("${path.module}/template/volumes.tpl")}"
+  count    = "${length(var.runners_services_volumes_tmpfs)}"
+  vars {
+    volume = "${element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)}"
+    options = "${element(values(var.runners_services_volumes_tmpfs[count.index]), 0)}"
+  }
+}
+
+data "template_file" "volumes_tmpfs" {
+  template = "${file("${path.module}/template/volumes.tpl")}"
+  count    = "${length(var.runners_volumes_tmpfs)}"
+  vars {
+    volume = "${element(keys(var.runners_volumes_tmpfs[count.index]), 0)}"
+    options = "${element(values(var.runners_volumes_tmpfs[count.index]), 0)}"
+  }
+}
+
 data "template_file" "runners" {
   template = "${file("${path.module}/template/runner-config.tpl")}"
 
@@ -163,6 +181,8 @@ data "template_file" "runners" {
     runners_image                     = "${var.runners_image}"
     runners_privileged                = "${var.runners_privileged}"
     runners_volumes                   = "${length(var.runners_volumes) == 0 ? "[]" : format("[\"%s\"]", join("\", \"", var.runners_volumes))}"
+    runners_volumes_tmpfs             = "${chomp(join("", data.template_file.volumes_tmpfs.*.rendered))}"
+    runners_services_volumes_tmpfs    = "${chomp(join("", data.template_file.services_volumes_tmpfs.*.rendered))}"
     runners_shm_size                  = "${var.runners_shm_size}"
     runners_pull_policy               = "${var.runners_pull_policy}"
     runners_idle_count                = "${var.runners_idle_count}"

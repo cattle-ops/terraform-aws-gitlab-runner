@@ -21,6 +21,10 @@ check_interval = 0
     volumes = ${runners_volumes}
     shm_size = ${runners_shm_size}
     pull_policy = "${runners_pull_policy}"
+  [runners.docker.tmpfs]
+${runners_volumes_tmpfs}
+  [runners.docker.services_tmpfs]
+${runners_services_volumes_tmpfs}
   [runners.cache]
     Type = "s3"
     Shared = ${shared_cache}
