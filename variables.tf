@@ -309,6 +309,12 @@ variable "gitlab_runner_ssh_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "docker_machine_docker_cidr_blocks" {
+  description = "List of CIDR blocks to allow Docker Access to the docker machine runner instance."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "docker_machine_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access to the docker machine runner instance."
   type        = list(string)
@@ -465,4 +471,16 @@ variable "enable_runner_ssm_access" {
   description = "Add IAM policies to the runner agent instance to connect via the Session Manager."
   type        = bool
   default     = false
+}
+
+variable "runners_volumes_tmpfs" {
+  description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
+  type        = "list"
+  default     = []
+}
+
+variable "runners_services_volumes_tmpfs" {
+  description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
+  type        = "list"
+  default     = []
 }
