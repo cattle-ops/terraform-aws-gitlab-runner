@@ -68,11 +68,37 @@ resource "aws_security_group_rule" "docker_machine_docker_self" {
 }
 
 resource "aws_security_group_rule" "docker_machine_ssh" {
+  count = var.docker_machine_ssh_restrict_ingress_to_runner ? 0 : 1
+
   type        = "ingress"
   from_port   = 22
   to_port     = 22
   protocol    = "tcp"
   cidr_blocks = var.docker_machine_ssh_cidr_blocks
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_runner" {
+  count = var.docker_machine_ssh_restrict_ingress_to_runner ? 1 : 0
+
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.runner.id
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_self" {
+  count = var.docker_machine_ssh_restrict_ingress_to_runner ? 1 : 0
+
+  type      = "ingress"
+  from_port = 22
+  to_port   = 22
+  protocol  = "tcp"
+  self      = true
 
   security_group_id = aws_security_group.docker_machine.id
 }

@@ -309,16 +309,16 @@ variable "gitlab_runner_ssh_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
-variable "docker_machine_docker_cidr_blocks" {
-  description = "List of CIDR blocks to allow Docker Access to the docker machine runner instance."
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
 variable "docker_machine_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access to the docker machine runner instance."
   type        = list(string)
   default     = ["0.0.0.0/0"]
+}
+
+variable "docker_machine_ssh_restrict_ingress_to_runner" {
+  description = "Instead of using cidr blocks to control docker machine SSH ingress access, limit access to only the runner via its security group"
+  type        = bool
+  default     = false
 }
 
 variable "enable_cloudwatch_logging" {
