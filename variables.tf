@@ -255,12 +255,6 @@ variable "runners_use_private_address" {
   default     = true
 }
 
-variable "docker_machine_user" {
-  description = "Username of the user used to create the spot instances that host docker-machine."
-  type        = string
-  default     = "docker-machine"
-}
-
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
