@@ -463,12 +463,12 @@ variable "enable_runner_ssm_access" {
 
 variable "runners_volumes_tmpfs" {
   description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type        = "list"
+  type        = list
   default     = []
 }
 
 variable "runners_services_volumes_tmpfs" {
   description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type        = "list"
+  type        = list
   default     = []
 }
