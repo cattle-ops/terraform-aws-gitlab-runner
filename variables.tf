@@ -189,12 +189,6 @@ variable "runners_root_size" {
   default     = 16
 }
 
-variable "create_runners_iam_instance_profile" {
-  description = "Boolean to control the creation of the runners IAM instance profile"
-  type        = bool
-  default     = true
-}
-
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = string
