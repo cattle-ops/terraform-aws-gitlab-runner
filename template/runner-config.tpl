@@ -21,7 +21,7 @@ check_interval = 0
     volumes = ["/cache"${runners_additional_volumes}]
     shm_size = ${runners_shm_size}
     pull_policy = "${runners_pull_policy}"
-  [runners.docker.tmpfs] 
+  [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
   [runners.docker.services_tmpfs]
     ${runners_services_volumes_tmpfs}
@@ -45,7 +45,8 @@ check_interval = 0
       "amazonec2-zone=${runners_aws_zone}",
       "amazonec2-vpc-id=${runners_vpc_id}",
       "amazonec2-subnet-id=${runners_subnet_id}",
-      "amazonec2-private-address-only=${runners_use_private_address}",
+      "amazonec2-private-address-only=${runners_use_private_address_only}",
+      "amazonec2-use-private-address=${runners_use_private_address}",
       "amazonec2-request-spot-instance=true",
       "amazonec2-spot-price=${runners_spot_price_bid}",
       "amazonec2-security-group=${runners_security_group_name}",
