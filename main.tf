@@ -215,7 +215,7 @@ data "template_file" "runners" {
     runners_root_size                 = var.runners_root_size
     runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
     runners_use_private_address_only  = var.runners_use_private_address
-    runners_use_private_address       = var.runners_use_private_address ? false : true
+    runners_use_private_address       = ! var.runners_use_private_address
     runners_environment_vars          = jsonencode(var.runners_environment_vars)
     runners_pre_build_script          = var.runners_pre_build_script
     runners_post_build_script         = var.runners_post_build_script
