@@ -67,12 +67,22 @@ resource "aws_security_group_rule" "docker_machine_docker_self" {
   security_group_id = aws_security_group.docker_machine.id
 }
 
-resource "aws_security_group_rule" "docker_machine_ssh" {
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = var.docker_machine_ssh_cidr_blocks
+resource "aws_security_group_rule" "docker_machine_ssh_runner" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.runner.id
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_self" {
+  type      = "ingress"
+  from_port = 22
+  to_port   = 22
+  protocol  = "tcp"
+  self      = true
 
   security_group_id = aws_security_group.docker_machine.id
 }
@@ -204,7 +214,8 @@ data "template_file" "runners" {
     runners_off_peak_periods_string   = local.runners_off_peak_periods_string
     runners_root_size                 = var.runners_root_size
     runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
-    runners_use_private_address       = var.runners_use_private_address
+    runners_use_private_address_only  = var.runners_use_private_address
+    runners_use_private_address       = ! var.runners_use_private_address
     runners_environment_vars          = jsonencode(var.runners_environment_vars)
     runners_pre_build_script          = var.runners_pre_build_script
     runners_post_build_script         = var.runners_post_build_script
