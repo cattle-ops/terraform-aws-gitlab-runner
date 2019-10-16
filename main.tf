@@ -142,7 +142,7 @@ data "template_file" "gitlab_runner" {
     runners_token                           = var.runners_token
     secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
     secure_parameter_store_region           = var.aws_region
-    gitlab_runner_registration_token        = var.gitlab_runner_registration_config["registration_token"]
+    gitlab_runner_registration_token        = replace(var.gitlab_runner_registration_config["registration_token"], "_", "-")
     giltab_runner_description               = var.gitlab_runner_registration_config["description"]
     gitlab_runner_tag_list                  = var.gitlab_runner_registration_config["tag_list"]
     gitlab_runner_locked_to_project         = var.gitlab_runner_registration_config["locked_to_project"]

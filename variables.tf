@@ -366,7 +366,7 @@ variable "runner_ami_owners" {
 }
 
 variable "gitlab_runner_registration_config" {
-  description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
+  description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. Note `registration_token` needs to follow the pattern of `0-9a-zA-Z . -`"
   type        = map(string)
 
   default = {
