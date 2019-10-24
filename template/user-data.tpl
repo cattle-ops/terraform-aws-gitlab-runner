@@ -11,6 +11,8 @@ tee /etc/hosts <<EOL
 127.0.0.1   localhost localhost.localdomain `hostname`
 EOL
 
+${eip}
+
 for i in {1..7}
 do
   echo "Attempt: ---- " $i
@@ -20,3 +22,4 @@ done
 ${logging}
 
 ${gitlab_runner}
+
