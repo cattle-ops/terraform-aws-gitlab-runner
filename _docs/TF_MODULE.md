@@ -13,12 +13,10 @@
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | bool | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | number | `"1"` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | bool | `"false"` | no |
-| docker\_machine\_docker\_cidr\_blocks | List of CIDR blocks to allow Docker Access to the docker machine runner instance. | list(string) | `<list>` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list(string) | `<list>` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | string | `"0.06"` | no |
-| docker\_machine\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the docker machine runner instance. | list(string) | `<list>` | no |
 | docker\_machine\_version | Version of docker-machine. | string | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | bool | `"true"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | bool | `"false"` | no |
