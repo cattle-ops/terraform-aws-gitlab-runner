@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/npalm/terraform-aws-gitlab-runner.svg?branch=master)](https://travis-ci.com/npalm/terraform-aws-gitlab-runner) [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Terraform registry](https://img.shields.io/github/v/release/npalm/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/npalm/gitlab-runner/aws/) [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Actions](https://github.com/npalm/terraform-aws-gitlab-runner/workflows/Verify/badge.svg)](https://github.com/npalm/terraform-aws-gitlab-runner/actions)
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
@@ -231,7 +231,7 @@ terraform destroy
 | docker\_machine\_spot\_price\_bid | Spot price bid. | string | `"0.06"` | no |
 | docker\_machine\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the docker machine runner instance. | list | `<list>` | no |
 | docker\_machine\_user | Username of the user used to create the spot instances that host docker-machine. | string | `"docker-machine"` | no |
-| docker\_machine\_version | Version of docker-machine. | string | `"0.16.1"` | no |
+| docker\_machine\_version | Version of docker-machine. | string | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | string | `"true"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | string | `"false"` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | string | `"true"` | no |
@@ -239,7 +239,7 @@ terraform destroy
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.1.0"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.4.1"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | name\_runners\_docker\_machine |  | string | `""` | no |

@@ -52,52 +52,47 @@ resource "aws_security_group" "docker_machine" {
 }
 
 resource "aws_security_group_rule" "docker_machine_docker" {
-  type        = "ingress"
-  from_port   = 2376
-  to_port     = 2376
-  protocol    = "tcp"
+  type                     = "ingress"
+  from_port                = 2376
+  to_port                  = 2376
+  protocol                 = "tcp"
   source_security_group_id = "${aws_security_group.runner.id}"
-
-  security_group_id = "${aws_security_group.docker_machine.id}"
+  security_group_id        = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "docker_machine_docker_additional" {
-  type        = "ingress"
-  from_port   = 2376
-  to_port     = 2376
-  protocol    = "tcp"
-  cidr_blocks = ["${var.docker_machine_docker_cidr_blocks}"]
-
+  type              = "ingress"
+  from_port         = 2376
+  to_port           = 2376
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.docker_machine_docker_cidr_blocks}"]
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "docker_machine_ssh" {
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
   source_security_group_id = "${aws_security_group.runner.id}"
-
-  security_group_id = "${aws_security_group.docker_machine.id}"
+  security_group_id        = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "docker_machine_ssh_additional" {
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = ["${var.docker_machine_ssh_cidr_blocks}"]
-
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.docker_machine_ssh_cidr_blocks}"]
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "out_all" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 65535
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-
+  type              = "egress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
@@ -160,8 +155,9 @@ data "template_file" "gitlab_runner" {
 data "template_file" "services_volumes_tmpfs" {
   template = "${file("${path.module}/template/volumes.tpl")}"
   count    = "${length(var.runners_services_volumes_tmpfs)}"
+
   vars {
-    volume = "${element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)}"
+    volume  = "${element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)}"
     options = "${element(values(var.runners_services_volumes_tmpfs[count.index]), 0)}"
   }
 }
@@ -169,8 +165,9 @@ data "template_file" "services_volumes_tmpfs" {
 data "template_file" "volumes_tmpfs" {
   template = "${file("${path.module}/template/volumes.tpl")}"
   count    = "${length(var.runners_volumes_tmpfs)}"
+
   vars {
-    volume = "${element(keys(var.runners_volumes_tmpfs[count.index]), 0)}"
+    volume  = "${element(keys(var.runners_volumes_tmpfs[count.index]), 0)}"
     options = "${element(values(var.runners_volumes_tmpfs[count.index]), 0)}"
   }
 }

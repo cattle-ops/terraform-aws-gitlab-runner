@@ -4,8 +4,8 @@ data "aws_caller_identity" "current" {
 
 locals {
   tags = "${merge(map("Name", format("%s", var.environment)),
-              map("Environment", format("%s", var.environment)),
-              var.tags)}"
+    map("Environment", format("%s", var.environment)),
+  var.tags)}"
 }
 
 resource "aws_s3_bucket" "build_cache" {

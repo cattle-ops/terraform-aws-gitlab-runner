@@ -58,7 +58,7 @@ variable "docker_machine_spot_price_bid" {
 
 variable "docker_machine_version" {
   description = "Version of docker-machine."
-  default     = "0.16.1"
+  default     = "0.16.2"
 }
 
 variable "runners_name" {
@@ -123,15 +123,14 @@ variable "runners_volumes" {
 
 variable "runners_volumes_tmpfs" {
   description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type = "list"
-  default = []
+  type        = "list"
+  default     = []
 }
-
 
 variable "runners_services_volumes_tmpfs" {
   description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type = "list"
-  default = []
+  type        = "list"
+  default     = []
 }
 
 variable "runners_shm_size" {
@@ -270,7 +269,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = "string"
-  default     = "12.1.0"
+  default     = "12.4.1"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -352,7 +351,7 @@ variable "runner_ami_filter" {
 
   default = [{
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }]
 }
 

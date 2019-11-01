@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+- Upgrade docker machine to 16.2
+- Upgrade docker machine to ubuntu-bionic-18.04
+- Upgrade gitlab runner to 12.4.1
+- Add github actions
+- Fixing Docker Machine Cerficiation Generation #144 @roock 
+- Limit Traffic to Docker Machine instances to docker and ssh ports to whitelist plus security group of Gitlab Runner #150 @roock
+
 ## 3.11.0 = 2019-10-04
 - Addition Options to specify tmpfs volumes in main and service containers @roock
 

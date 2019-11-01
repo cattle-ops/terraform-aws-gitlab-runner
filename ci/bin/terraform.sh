@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 
 TARGET_DIR=/opt
-PATH=${PATH}:${TARGET_DIR}
+PATH=${TARGET_DIR}:${PATH}
 
-TERRAFORM_VERSION=${1:-"0.11.13"}
+TERRAFORM_VERSION=${1:-"0.11.14"}
 OS=${2:-"linux"}
 TERRAFORM_URL="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip"
 
 installTerraform() {
   echo "Downloading terraform: ${TERRAFORM_URL}"
 
-  curl '-#' -fL -o ${TARGET_DIR}/terraform.zip ${TERRAFORM_URL} && \
-    unzip -q -d ${TARGET_DIR}/ ${TARGET_DIR}/terraform.zip && \
-
-  terraform --version
+  curl '-#' -fL -o ${TARGET_DIR}/terraform.zip ${TERRAFORM_URL} &&
+    unzip -q -d ${TARGET_DIR}/ ${TARGET_DIR}/terraform.zip &&
+    terraform --version
 }
 
 verifyModulesAndPlugins() {
@@ -22,8 +21,8 @@ verifyModulesAndPlugins() {
 }
 
 formatCheck() {
-  RESULT=$(terraform fmt -write=false)
-  if [[ ! -z ${RESULT} ]] ; then
+  RESULT=$(terraform fmt -write=false -diff=true)
+  if [[ ! -z ${RESULT} ]]; then
     echo The following files are formatted incorrectly: $RESULT
     exit 1
   fi
