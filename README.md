@@ -161,7 +161,7 @@ Below a basic examples of usages of the module. The dependencies such as a VPC, 
 
 ``` hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/4.7.0
+  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
   source  = "npalm/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
