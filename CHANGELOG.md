@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unrelease
 
+- Upgraded GitLab runner to 12.4.1
+- Upgraded terraform version, vpc version and provider versions for the sampels
+- fix type create cache bucket #151 @geota
+- Delete unused create_runners_iam_instance_profile #147 @alexharv07
+- Remove docker_machine_user variable #146 @alexharv074
+- Fixing Docker Machine certificate Generation #143 #145 @npalm @roock
+- Add option to limit docker machine ssh ingress access to only the runner #142 @bishtawi
+
+## 4.7.0 - 2019-10-04
+- Add option for tmpfs #104 #141 #137
+- Lock down docker port access to only the runner security group #140 @bishtawi
+- Add variable docker_machine_docker_cidr_blocks allowing docker ingress restriction #139 @bishtawi 
+- Adding outputs for agent and runner security groups #138 @hatemosphere
+
+
 ## 4.6.0 - 2019-09-30
 - Add access_level option to registration call in runner template #134 @willychenchen 
 - Bump gitlab-runner default version to 12.3.0 #135 @loustler 

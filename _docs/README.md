@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.com/npalm/terraform-aws-gitlab-runner.svg?branch=master)](https://travis-ci.com/npalm/terraform-aws-gitlab-runner) [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![terraform registry](https://img.shields.io/badge/status-demo-orange.svg)](https://registry.terraform.io/modules/npalm/gitlab-runner/aws/)
+
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
@@ -160,7 +162,8 @@ Below a basic examples of usages of the module. The dependencies such as a VPC, 
 
 ``` hcl
 module "runner" {
-  source = "../../"
+  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/4.7.0
+  source  = "npalm/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
