@@ -21,6 +21,9 @@ verifyModulesAndPlugins() {
 }
 
 formatCheck() {
+  terraform --version
+  echo $pwd
+  terraform fmt -write=false
   RESULT=$(terraform fmt -write=false)
   if [[ ! -z ${RESULT} ]]; then
     echo The following files are formatted incorrectly: $RESULT
@@ -30,7 +33,6 @@ formatCheck() {
 
 validate() {
   echo "Validating and checking format of terraform code in $PWD"
-  terraform --version
   terraform validate -check-variables=false
   formatCheck
 }
