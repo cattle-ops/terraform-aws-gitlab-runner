@@ -5,11 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## Unrelease
-`
+## Unreleased
+
 - Upgraded the runners (docker-machine) to ubuntu 18.04. You can stay on 16.04 by setting: `runner_ami_filter = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]`
 - Upgraded GitLab runner to 12.4.1
-- Upgraded terraform version, vpc version and provider versions for the sampels
+- Upgraded terraform version, vpc version and provider versions for the examples.
 - fix type create cache bucket #151 @geota
 - Delete unused create_runners_iam_instance_profile #147 @alexharv07
 - Remove docker_machine_user variable #146 @alexharv074
