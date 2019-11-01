@@ -58,7 +58,7 @@ variable "docker_machine_spot_price_bid" {
 
 variable "docker_machine_version" {
   description = "Version of docker-machine."
-  default     = "0.16.1"
+  default     = "0.16.2"
 }
 
 variable "runners_name" {
@@ -345,7 +345,7 @@ variable "runner_ami_filter" {
 
   default = [{
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }]
 }
 
