@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## Unrelease
-
+`
+- Upgraded the runners (docker-machine) to ubuntu 18.04. You can stay on 16.04 by setting: `runner_ami_filter = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]`
 - Upgraded GitLab runner to 12.4.1
 - Upgraded terraform version, vpc version and provider versions for the sampels
 - fix type create cache bucket #151 @geota
