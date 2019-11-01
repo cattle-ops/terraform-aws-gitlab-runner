@@ -1,8 +1,8 @@
 name: Verify
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
-  verify:
+  verify-module:
     runs-on: ubuntu-latest
 
     steps:
