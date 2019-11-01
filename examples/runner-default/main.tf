@@ -49,11 +49,15 @@ module "runner" {
   }
 
   runners_volumes_tmpfs = [
-    { "/var/opt/cache" = "rw,noexec"},
+    {
+      "/var/opt/cache" = "rw,noexec"
+    },
   ]
 
   runners_services_volumes_tmpfs = [
-    { "/var/lib/mysql" = "rw,noexec" },
+    {
+      "/var/lib/mysql" = "rw,noexec"
+    },
   ]
 
   runners_off_peak_timezone   = "${var.timezone}"
