@@ -123,15 +123,14 @@ variable "runners_volumes" {
 
 variable "runners_volumes_tmpfs" {
   description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type = "list"
-  default = []
+  type        = "list"
+  default     = []
 }
-
 
 variable "runners_services_volumes_tmpfs" {
   description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type = "list"
-  default = []
+  type        = "list"
+  default     = []
 }
 
 variable "runners_shm_size" {

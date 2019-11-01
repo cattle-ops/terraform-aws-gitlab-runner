@@ -140,8 +140,9 @@ data "template_file" "gitlab_runner" {
 data "template_file" "services_volumes_tmpfs" {
   template = "${file("${path.module}/template/volumes.tpl")}"
   count    = "${length(var.runners_services_volumes_tmpfs)}"
+
   vars {
-    volume = "${element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)}"
+    volume  = "${element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)}"
     options = "${element(values(var.runners_services_volumes_tmpfs[count.index]), 0)}"
   }
 }
@@ -149,8 +150,9 @@ data "template_file" "services_volumes_tmpfs" {
 data "template_file" "volumes_tmpfs" {
   template = "${file("${path.module}/template/volumes.tpl")}"
   count    = "${length(var.runners_volumes_tmpfs)}"
+
   vars {
-    volume = "${element(keys(var.runners_volumes_tmpfs[count.index]), 0)}"
+    volume  = "${element(keys(var.runners_volumes_tmpfs[count.index]), 0)}"
     options = "${element(values(var.runners_volumes_tmpfs[count.index]), 0)}"
   }
 }
