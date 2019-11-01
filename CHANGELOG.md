@@ -5,7 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## Unrelease
+## Unreleased
+
+## 4.8.0 - 2019-11-01
+- Upgraded the runners (docker-machine) to ubuntu 18.04. You can stay on 16.04 by setting: `runner_ami_filter = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]`
+- Upgraded GitLab runner to 12.4.1
+- Upgraded terraform version, vpc version and provider versions for the examples
+- fix type create cache bucket #151 @geota
+- Delete unused create_runners_iam_instance_profile #147 @alexharv07
+- Remove docker_machine_user variable #146 @alexharv074
+- Fixing Docker Machine certificate Generation #143 #145 @npalm @roock
+- Add option to limit docker machine ssh ingress access to only the runner #142 @bishtawi
+
+## 4.7.0 - 2019-10-04
+- Add option for tmpfs #104 #141 #137
+- Lock down docker port access to only the runner security group #140 @bishtawi
+- Add variable docker_machine_docker_cidr_blocks allowing docker ingress restriction #139 @bishtawi 
+- Adding outputs for agent and runner security groups #138 @hatemosphere
+
 
 ## 4.6.0 - 2019-09-30
 - Add access_level option to registration call in runner template #134 @willychenchen 
@@ -235,7 +252,9 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6=8.0...HEAD
+[4.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.7.0...4.8.0
+[4.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6.0...4.7.0
 [4.6.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.5.0...4.6.0
 [4.5.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.4.0...4.5.0
 [4.4.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.3.0...4.4.0

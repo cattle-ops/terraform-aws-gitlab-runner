@@ -1,6 +1,4 @@
-data "aws_caller_identity" "current" {
-  count = var.create_cache_bucket ? 1 : 0
-}
+data "aws_caller_identity" "current" {}
 
 locals {
   tags = merge(
@@ -13,7 +11,7 @@ locals {
     var.tags,
   )
 
-  cache_bucket_name = var.cache_bucket_name_include_account_id ? "${var.cache_bucket_prefix}${data.aws_caller_identity.current[0].account_id}-gitlab-runner-cache" : "${var.cache_bucket_prefix}-gitlab-runner-cache"
+  cache_bucket_name = var.cache_bucket_name_include_account_id ? "${var.cache_bucket_prefix}${data.aws_caller_identity.current.account_id}-gitlab-runner-cache" : "${var.cache_bucket_prefix}-gitlab-runner-cache"
 }
 
 resource "aws_s3_bucket" "build_cache" {
@@ -73,4 +71,3 @@ resource "aws_iam_policy" "docker_machine_cache" {
 
   policy = data.template_file.docker_machine_cache_policy[0].rendered
 }
-
