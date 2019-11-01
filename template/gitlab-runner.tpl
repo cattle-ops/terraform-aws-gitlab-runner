@@ -23,7 +23,12 @@ curl  --fail --retry 6 -L https://github.com/docker/machine/releases/download/v$
 
 # Create a dummy machine so that the cert is generated properly
 # See: https://gitlab.com/gitlab-org/gitlab-runner/issues/3676
+export USER=root
+export HOME=/root
 docker-machine create --driver none --url localhost dummy-machine
+docker-machine rm -y dummy-machine
+unset HOME
+unset USER
 
 
 token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")

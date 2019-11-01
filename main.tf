@@ -52,15 +52,33 @@ resource "aws_security_group" "docker_machine" {
 }
 
 resource "aws_security_group_rule" "docker_machine_docker" {
+  type                     = "ingress"
+  from_port                = 2376
+  to_port                  = 2376
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.runner.id}"
+  security_group_id        = "${aws_security_group.docker_machine.id}"
+}
+
+resource "aws_security_group_rule" "docker_machine_docker_additional" {
   type              = "ingress"
   from_port         = 2376
   to_port           = 2376
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = ["${var.docker_machine_docker_cidr_blocks}"]
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
 resource "aws_security_group_rule" "docker_machine_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.runner.id}"
+  security_group_id        = "${aws_security_group.docker_machine.id}"
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_additional" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
@@ -70,12 +88,11 @@ resource "aws_security_group_rule" "docker_machine_ssh" {
 }
 
 resource "aws_security_group_rule" "out_all" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 65535
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-
+  type              = "egress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
@@ -193,7 +210,8 @@ data "template_file" "runners" {
     runners_off_peak_periods_string   = "${local.runners_off_peak_periods_string}"
     runners_root_size                 = "${var.runners_root_size}"
     runners_iam_instance_profile_name = "${var.runners_iam_instance_profile_name}"
-    runners_use_private_address       = "${var.runners_use_private_address}"
+    runners_use_private_address       = "${var.runners_use_private_address == 0 ? 1 : 0 }"
+    runners_use_private_address_only  = "${var.runners_use_private_address}"
     runners_environment_vars          = "${jsonencode(var.runners_environment_vars)}"
     runners_pre_build_script          = "${var.runners_pre_build_script}"
     runners_post_build_script         = "${var.runners_post_build_script}"
