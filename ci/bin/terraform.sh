@@ -30,6 +30,7 @@ formatCheck() {
 
 validate() {
   echo "Validating and checking format of terraform code in $PWD"
+  terraform --version
   terraform validate -check-variables=false
   formatCheck
 }
