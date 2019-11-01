@@ -21,10 +21,7 @@ verifyModulesAndPlugins() {
 }
 
 formatCheck() {
-  terraform --version
-  echo $pwd
-  terraform fmt -diff=true -write=false
-  RESULT=$(terraform fmt -write=false)
+  RESULT=$(terraform fmt -write=false -diff=true)
   if [[ ! -z ${RESULT} ]]; then
     echo The following files are formatted incorrectly: $RESULT
     exit 1
