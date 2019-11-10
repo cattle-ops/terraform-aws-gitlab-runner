@@ -460,3 +460,21 @@ variable "runners_services_volumes_tmpfs" {
   type        = list
   default     = []
 }
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "enable_kms" {
+  description = "Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key."
+  type        = bool
+  default     = false
+}
+
+variable "kms_deletion_window_in_days" {
+  description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
+  type        = number
+  default     = 7
+}
