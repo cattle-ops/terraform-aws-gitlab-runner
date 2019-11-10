@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.5"
+  version = "2.17"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -56,11 +56,16 @@ module "runner" {
   runners_off_peak_idle_count = 0
   runners_off_peak_idle_time  = 60
 
-  runners_privileged = "true"
-  # runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+  runners_privileged         = "true"
   runners_additional_volumes = ["/certs/client"]
 
+  runners_volumes_tmpfs = [
+    { "/var/opt/cache" = "rw,noexec" },
+  ]
 
+  runners_services_volumes_tmpfs = [
+    { "/var/lib/mysql" = "rw,noexec" },
+  ]
   # working 9 to 5 :)
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }

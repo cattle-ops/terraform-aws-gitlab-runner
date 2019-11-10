@@ -14,13 +14,10 @@
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | bool | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | number | `"1"` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | bool | `"false"` | no |
-| create\_runners\_iam\_instance\_profile | Boolean to control the creation of the runners IAM instance profile | bool | `"true"` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list(string) | `<list>` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | string | `"0.06"` | no |
-| docker\_machine\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the docker machine runner instance. | list(string) | `<list>` | no |
-| docker\_machine\_user | Username of the user used to create the spot instances that host docker-machine. | string | `"docker-machine"` | no |
 | docker\_machine\_version | Version of docker-machine. | string | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | bool | `"true"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | bool | `"false"` | no |
@@ -31,7 +28,7 @@
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map(string) | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list(string) | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.2.0"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.4.1"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | kms\_key\_logs | KMS Key for encryption logs | string | n/a | yes |
@@ -65,9 +62,11 @@
 | runners\_pull\_policy | pull_policy for the runners, will be used in the runner config.toml | string | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | number | `"1"` | no |
 | runners\_root\_size | Runner instance root size in GB. | number | `"16"` | no |
+| runners\_services\_volumes\_tmpfs | Mount temporary file systems to service containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | list | `<list>` | no |
 | runners\_shm\_size | shm_size for the runners, will be used in the runner config.toml | number | `"0"` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | string | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | bool | `"true"` | no |
+| runners\_volumes\_tmpfs | Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | list | `<list>` | no |
 | schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. | map | `<map>` | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | string | `"runner-token"` | no |
 | ssh\_key\_pair | Set this to use existing AWS key pair | string | `""` | no |
@@ -85,9 +84,11 @@
 |------|-------------|
 | runner\_agent\_role\_arn | ARN of the role used for the ec2 instance for the GitLab runner agent. |
 | runner\_agent\_role\_name | Name of the role used for the ec2 instance for the GitLab runner agent. |
+| runner\_agent\_sg\_id | ID of the security group attached to the GitLab runner agent. |
 | runner\_as\_group\_name | Name of the autoscaling group for the gitlab-runner instance |
 | runner\_cache\_bucket\_arn | ARN of the S3 for the build cache. |
 | runner\_cache\_bucket\_name | Name of the S3 for the build cache. |
 | runner\_role\_arn | ARN of the role used for the docker machine runners. |
 | runner\_role\_name | Name of the role used for the docker machine runners. |
+| runner\_sg\_id | ID of the security group attached to the docker machine runners. |
 

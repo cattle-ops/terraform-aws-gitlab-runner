@@ -47,22 +47,42 @@ resource "aws_security_group" "docker_machine" {
   )
 }
 
-resource "aws_security_group_rule" "docker_machine_docker" {
-  type        = "ingress"
-  from_port   = 2376
-  to_port     = 2376
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+resource "aws_security_group_rule" "docker_machine_docker_runner" {
+  type                     = "ingress"
+  from_port                = 2376
+  to_port                  = 2376
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.runner.id
 
   security_group_id = aws_security_group.docker_machine.id
 }
 
-resource "aws_security_group_rule" "docker_machine_ssh" {
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = var.docker_machine_ssh_cidr_blocks
+resource "aws_security_group_rule" "docker_machine_docker_self" {
+  type      = "ingress"
+  from_port = 2376
+  to_port   = 2376
+  protocol  = "tcp"
+  self      = true
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_runner" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.runner.id
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ssh_self" {
+  type      = "ingress"
+  from_port = 22
+  to_port   = 22
+  protocol  = "tcp"
+  self      = true
 
   security_group_id = aws_security_group.docker_machine.id
 }
@@ -138,6 +158,25 @@ data "template_file" "gitlab_runner" {
     gitlab_runner_locked_to_project         = var.gitlab_runner_registration_config["locked_to_project"]
     gitlab_runner_run_untagged              = var.gitlab_runner_registration_config["run_untagged"]
     gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
+    gitlab_runner_access_level              = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
+  }
+}
+
+data "template_file" "services_volumes_tmpfs" {
+  template = file("${path.module}/template/volumes.tpl")
+  count    = length(var.runners_services_volumes_tmpfs)
+  vars = {
+    volume  = element(keys(var.runners_services_volumes_tmpfs[count.index]), 0)
+    options = element(values(var.runners_services_volumes_tmpfs[count.index]), 0)
+  }
+}
+
+data "template_file" "volumes_tmpfs" {
+  template = file("${path.module}/template/volumes.tpl")
+  count    = length(var.runners_volumes_tmpfs)
+  vars = {
+    volume  = element(keys(var.runners_volumes_tmpfs[count.index]), 0)
+    options = element(values(var.runners_volumes_tmpfs[count.index]), 0)
   }
 }
 
@@ -185,13 +224,16 @@ data "template_file" "runners" {
     runners_off_peak_periods_string   = local.runners_off_peak_periods_string
     runners_root_size                 = var.runners_root_size
     runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
-    runners_use_private_address       = var.runners_use_private_address
+    runners_use_private_address_only  = var.runners_use_private_address
+    runners_use_private_address       = ! var.runners_use_private_address
     runners_environment_vars          = jsonencode(var.runners_environment_vars)
     runners_pre_build_script          = var.runners_pre_build_script
     runners_post_build_script         = var.runners_post_build_script
     runners_pre_clone_script          = var.runners_pre_clone_script
     runners_request_concurrency       = var.runners_request_concurrency
     runners_output_limit              = var.runners_output_limit
+    runners_volumes_tmpfs             = chomp(join("", data.template_file.volumes_tmpfs.*.rendered))
+    runners_services_volumes_tmpfs    = chomp(join("", data.template_file.services_volumes_tmpfs.*.rendered))
     bucket_name                       = local.bucket_name
     shared_cache                      = var.cache_shared
   }

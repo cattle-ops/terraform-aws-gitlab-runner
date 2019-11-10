@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.5"
+  version = "2.17"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -53,6 +53,7 @@ module "runner" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
+    access_level       = "ref_protected"
   }
 
   overrides = {
