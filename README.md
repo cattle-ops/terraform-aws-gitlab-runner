@@ -237,7 +237,7 @@ terraform destroy
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | bool | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | number | `"1"` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | bool | `"false"` | no |
-| cloudwatch\_logging\_retention\_in\_days | Retention for cloudwatch logs. Defaults to unlimited | number | `"365"` | no |
+| cloudwatch\_logging\_retention\_in\_days | Retention for cloudwatch logs. Defaults to unlimited | number | `"0"` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list(string) | `<list>` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |

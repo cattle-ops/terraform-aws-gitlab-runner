@@ -306,7 +306,7 @@ variable "enable_cloudwatch_logging" {
 variable "cloudwatch_logging_retention_in_days" {
   description = "Retention for cloudwatch logs. Defaults to unlimited"
   type        = number
-  default     = 365
+  default     = 0
 }
 
 variable "tags" {
