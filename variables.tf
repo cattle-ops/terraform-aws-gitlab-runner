@@ -303,6 +303,12 @@ variable "enable_cloudwatch_logging" {
   default     = true
 }
 
+variable "cloudwatch_logging_retention_in_days" {
+  description = "Retention for cloudwatch logs. Defaults to unlimited"
+  type        = number
+  default     = 365
+}
+
 variable "tags" {
   description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
   type        = map(string)
