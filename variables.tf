@@ -249,6 +249,12 @@ variable "runners_use_private_address" {
   default     = true
 }
 
+variable "runners_request_spot_instance" {
+  description = "Whether or not to request spot instances via docker-machine"
+  type        = bool
+  default     = true
+}
+
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
