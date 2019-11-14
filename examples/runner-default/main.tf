@@ -68,8 +68,6 @@ module "runner" {
   ]
   # working 9 to 5 :)
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
-
-  runners_request_spot_instance = false
 }
 
 
