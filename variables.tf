@@ -249,6 +249,12 @@ variable "runners_use_private_address" {
   default     = true
 }
 
+variable "runners_request_spot_instance" {
+  description = "Whether or not to request spot instances via docker-machine"
+  type        = bool
+  default     = true
+}
+
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
@@ -301,6 +307,12 @@ variable "enable_cloudwatch_logging" {
   description = "Boolean used to enable or disable the CloudWatch logging."
   type        = bool
   default     = true
+}
+
+variable "cloudwatch_logging_retention_in_days" {
+  description = "Retention for cloudwatch logs. Defaults to unlimited"
+  type        = number
+  default     = 0
 }
 
 variable "tags" {
@@ -459,4 +471,22 @@ variable "runners_services_volumes_tmpfs" {
   description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
   type        = list
   default     = []
+}
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "enable_kms" {
+  description = "Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key."
+  type        = bool
+  default     = false
+}
+
+variable "kms_deletion_window_in_days" {
+  description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
+  type        = number
+  default     = 7
 }

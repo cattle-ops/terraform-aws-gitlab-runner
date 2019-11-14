@@ -237,6 +237,7 @@ terraform destroy
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | bool | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | number | `"1"` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | bool | `"false"` | no |
+| cloudwatch\_logging\_retention\_in\_days | Retention for cloudwatch logs. Defaults to unlimited | number | `"0"` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | string | `"m5a.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | list(string) | `<list>` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | string | `""` | no |
@@ -244,6 +245,7 @@ terraform destroy
 | docker\_machine\_version | Version of docker-machine. | string | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | bool | `"true"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | bool | `"false"` | no |
+| enable\_kms | Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key. | bool | `"false"` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | bool | `"true"` | no |
 | enable\_runner\_ssm\_access | Add IAM policies to the runner agent instance to connect via the Session Manager. | bool | `"false"` | no |
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | bool | `"false"` | no |
@@ -254,6 +256,8 @@ terraform destroy
 | gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.4.1"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
+| kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | number | `"7"` | no |
+| kms\_key\_id | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | string | `""` | no |
 | overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | map(string) | `<map>` | no |
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | map(list(string)) | `<map>` | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | list(string) | `<list>` | no |
@@ -283,6 +287,7 @@ terraform destroy
 | runners\_privileged | Runners will run in privileged mode, will be used in the runner config.toml | bool | `"true"` | no |
 | runners\_pull\_policy | pull_policy for the runners, will be used in the runner config.toml | string | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | number | `"1"` | no |
+| runners\_request\_spot\_instance | Whether or not to request spot instances via docker-machine | bool | `"true"` | no |
 | runners\_root\_size | Runner instance root size in GB. | number | `"16"` | no |
 | runners\_services\_volumes\_tmpfs | Mount temporary file systems to service containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | list | `<list>` | no |
 | runners\_shm\_size | shm_size for the runners, will be used in the runner config.toml | number | `"0"` | no |
