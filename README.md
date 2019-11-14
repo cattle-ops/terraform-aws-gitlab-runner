@@ -287,6 +287,7 @@ terraform destroy
 | runners\_privileged | Runners will run in privileged mode, will be used in the runner config.toml | bool | `"true"` | no |
 | runners\_pull\_policy | pull_policy for the runners, will be used in the runner config.toml | string | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | number | `"1"` | no |
+| runners\_request\_spot\_instance | Whether or not to request spot instances via docker-machine | bool | `"true"` | no |
 | runners\_root\_size | Runner instance root size in GB. | number | `"16"` | no |
 | runners\_services\_volumes\_tmpfs | Mount temporary file systems to service containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | list | `<list>` | no |
 | runners\_shm\_size | shm_size for the runners, will be used in the runner config.toml | number | `"0"` | no |
