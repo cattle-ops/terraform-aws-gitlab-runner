@@ -249,6 +249,12 @@ variable "runners_use_private_address" {
   default     = true
 }
 
+variable "runners_request_spot_instance" {
+  description = "Whether or not to request spot instances via docker-machine"
+  type        = bool
+  default     = true
+}
+
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
@@ -301,6 +307,12 @@ variable "enable_cloudwatch_logging" {
   description = "Boolean used to enable or disable the CloudWatch logging."
   type        = bool
   default     = true
+}
+
+variable "cloudwatch_logging_retention_in_days" {
+  description = "Retention for cloudwatch logs. Defaults to unlimited"
+  type        = number
+  default     = 0
 }
 
 variable "tags" {
