@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_key_pair" "key" {
   count      = var.ssh_key_pair == "" && var.ssh_public_key != "" ? 1 : 0
   key_name   = "${var.environment}-gitlab-runner"
