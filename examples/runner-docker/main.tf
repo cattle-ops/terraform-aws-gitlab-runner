@@ -44,4 +44,6 @@ module "runner" {
     run_untagged       = "false"
     maximum_timeout    = "3600"
   }
+
+  enable_eip = "true"
 }
