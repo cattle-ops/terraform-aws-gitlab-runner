@@ -53,6 +53,15 @@ fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
 
+# A small script to remove this runner from being registered with Gitlab. 
+echo "curl --request DELETE --header \"PRIVATE-TOKEN: ${token}\" \"${runners_gitlab_url}/api/v4/runners/6\"" > /etc/init.d/remove_gitlab_registration.sh
+
+# Symlink the script into the runlevel 0 (shutdown) and 6 (reboot) directories
+# This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
+ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc0.d/k99remove_runner
+ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc6.d/k99remove_runner
+chmod a+x /etc/init.d/remove_gitlab_registration.sh
+
 ${post_install}
 
 service gitlab-runner restart
