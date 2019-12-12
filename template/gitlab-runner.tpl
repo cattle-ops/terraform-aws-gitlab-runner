@@ -55,7 +55,7 @@ sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config
 
 # A small script to remove this runner from being registered with Gitlab. 
 echo -e "#!/bin/bash\ncurl --request DELETE \"${runners_gitlab_url}/api/v4/runners\" --form \"token=$token\"" > /etc/init.d/remove_gitlab_registration.sh
-echo "aws ssm delete-parameter --name \"${secure_parameter_store_runner_token_key}\" --region \"${secure_parameter_store_region}\"" >> /etc/init.d/remove_gitlab_registration.sh
+echo "aws ssm put-parameter --overwrite --type SecureString  --name \"${secure_parameter_store_runner_token_key}\" --region \"${secure_parameter_store_region}\" --value=\"null\"" >> /etc/init.d/remove_gitlab_registration.sh
 
 # Symlink the script into the runlevel 0 (shutdown) and 6 (reboot) directories
 # This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
