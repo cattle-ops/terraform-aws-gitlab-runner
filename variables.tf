@@ -418,3 +418,9 @@ variable "enable_runner_user_data_trace_log" {
   description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   default     = false
 }
+
+variable "enable_eip" {
+  description = "Enable the assignment of an EIP to the gitlab runner instance"
+  default     = false
+  type        = "string"
+}

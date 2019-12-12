@@ -96,6 +96,10 @@ resource "aws_security_group_rule" "out_all" {
   security_group_id = "${aws_security_group.docker_machine.id}"
 }
 
+resource "aws_eip" "gitlab_runner" {
+  count = "${var.enable_eip ? 1 : 0}"
+}
+
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = "${local.secure_parameter_store_runner_token_key}"
@@ -115,6 +119,7 @@ data "template_file" "user_data" {
   template = "${file("${path.module}/template/user-data.tpl")}"
 
   vars {
+    eip                 = "${var.enable_eip ? data.template_file.eip.rendered : ""}"
     logging             = "${var.enable_cloudwatch_logging ? data.template_file.logging.rendered : ""}"
     gitlab_runner       = "${data.template_file.gitlab_runner.rendered}"
     user_data_trace_log = "${var.enable_runner_user_data_trace_log}"
@@ -126,6 +131,14 @@ data "template_file" "logging" {
 
   vars {
     environment = "${var.environment}"
+  }
+}
+
+data "template_file" "eip" {
+  template = "${file("${path.module}/template/eip.tpl")}"
+
+  vars {
+    eip = "${join(",", aws_eip.gitlab_runner.*.public_ip)}"
   }
 }
 
@@ -406,4 +419,30 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 
   role       = "${aws_iam_role.instance.name}"
   policy_arn = "${aws_iam_policy.ssm.arn}"
+}
+
+################################################################################
+### AWS assign EIP
+################################################################################
+data "template_file" "eip_policy" {
+  count = "${var.enable_eip ? 1 : 0}"
+
+  template = "${file("${path.module}/policies/instance-eip.json")}"
+}
+
+resource "aws_iam_policy" "eip" {
+  count = "${var.enable_eip ? 1 : 0}"
+
+  name        = "${var.environment}-eip"
+  path        = "/"
+  description = "Policy for runner to assign EIP"
+
+  policy = "${data.template_file.eip_policy.rendered}"
+}
+
+resource "aws_iam_role_policy_attachment" "eip" {
+  count = "${var.enable_eip ? 1 : 0}"
+
+  role       = "${aws_iam_role.instance.name}"
+  policy_arn = "${aws_iam_policy.eip.arn}"
 }

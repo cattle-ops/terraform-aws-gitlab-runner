@@ -17,3 +17,8 @@ output "runner_role" {
   description = "ARN of the rule used for the docker machine runners."
   value       = "${aws_iam_role.docker_machine.arn}"
 }
+
+output "runner_eip" {
+  description = "EIP of the Gitlab Runner"
+  value       = "${join(",", aws_eip.gitlab_runner.*.public_ip)}"
+}
