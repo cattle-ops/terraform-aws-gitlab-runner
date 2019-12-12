@@ -59,8 +59,8 @@ echo "aws ssm put-parameter --overwrite --type SecureString  --name \"${secure_p
 
 # Symlink the script into the runlevel 0 (shutdown) and 6 (reboot) directories
 # This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
-ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc0.d/k99remove_runner
-ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc6.d/k99remove_runner
+ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc0.d/K99remove_runner
+ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc6.d/K99remove_runner
 chmod a+x /etc/init.d/remove_gitlab_registration.sh
 
 ${post_install}
