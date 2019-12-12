@@ -54,14 +54,57 @@ fi
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
 
 # A small script to remove this runner from being registered with Gitlab. 
-echo -e "#!/bin/bash\ncurl --request DELETE \"${runners_gitlab_url}/api/v4/runners\" --form \"token=$token\"" > /etc/init.d/remove_gitlab_registration.sh
-echo "aws ssm put-parameter --overwrite --type SecureString  --name \"${secure_parameter_store_runner_token_key}\" --region \"${secure_parameter_store_region}\" --value=\"null\"" >> /etc/init.d/remove_gitlab_registration.sh
+cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
+#!/bin/bash
+# chkconfig: 35 99 03
+# description: cleans up gitlab runner key
+# processname: remove_runner_key
+#              /etc/rc.d/init.d/remove_gitlab_registration
+lockfile=/var/lock/subsys/remove_runner_key
+
+
+start() {
+    touch $lockfile
+}
+
+stop() {
+    echo -n "Removing Gitlab Runner Token"
+    aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" && \
+        curl --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token"
+    retval=$?
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {}
+
+reload() {}
+
+status() {}
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    status)
+        $1
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart}"
+        exit 2
+        ;;
+REM
 
 # Symlink the script into the runlevel 0 (shutdown) and 6 (reboot) directories
 # This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
-ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc0.d/K99remove_runner
-ln -s /etc/init.d/remove_gitlab_registration.sh /etc/rc6.d/K99remove_runner
-chmod a+x /etc/init.d/remove_gitlab_registration.sh
+chmod a+x /etc/init.d/remove_gitlab_registration
+chkconfig --add remove_gitlab_registration
 
 ${post_install}
 
