@@ -35,6 +35,7 @@ module "runner" {
   runners_name             = var.runner_name
   runners_gitlab_url       = var.gitlab_url
   enable_runner_ssm_access = true
+  enable_eip               = true
 
   docker_machine_spot_price_bid = "0.06"
 

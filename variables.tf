@@ -490,3 +490,9 @@ variable "kms_deletion_window_in_days" {
   type        = number
   default     = 7
 }
+
+variable "enable_eip" {
+  description = "Enable the assignment of an EIP to the gitlab runner instance"
+  default     = false
+  type        = bool
+}
