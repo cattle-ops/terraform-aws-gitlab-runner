@@ -62,16 +62,17 @@ cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
 #              /etc/rc.d/init.d/remove_gitlab_registration
 lockfile=/var/lock/subsys/remove_gitlab_registration
 
-
+# This lockfile is necessary so that we'll run the cleanup later.
 start() {
     logger "Setting up Runner Removal Lockfile"
     touch \$lockfile
 }
 
+# Overwrite token in SSM with null and remove runner from Gitlab
 stop() {
     logger "Removing Gitlab Runner Token"
     aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" 2>&1 | logger &
-    curl --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
+    curl -sS --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
     retval=\$?
     rm -f \$lockfile
     return \$retval
@@ -85,6 +86,7 @@ reload() {
   start
 }
 
+# Do nothing - there's no status.
 status() {
   :
 }
@@ -109,11 +111,15 @@ case "\$1" in
 esac
 REM
 
-# Use chkconfig to link into the runlevel 0 (shutdown) directories
-# This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
 chmod a+x /etc/init.d/remove_gitlab_registration
+
+# Use chkconfig to link into the runlevel 0 (shutdown) directories
+# This adds "start" scripts to levels 1,3,5, and 6, and a "stop" to the others.
+# This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
 chkconfig --add remove_gitlab_registration
-touch /var/lock/subsys/remove_gitlab_registration
+
+# As noted above, this does nothing more than make the lockfile.
+service remove_gitlab_registration start
 
 ${post_install}
 
