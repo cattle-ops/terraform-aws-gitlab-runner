@@ -56,7 +56,7 @@ sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config
 # A small script to remove this runner from being registered with Gitlab. 
 cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
 #!/bin/bash
-# chkconfig: 35 99 03
+# chkconfig: 1356 99 03
 # description: cleans up gitlab runner key
 # processname: remove_runner_key
 #              /etc/rc.d/init.d/remove_gitlab_registration
@@ -78,11 +78,11 @@ stop() {
 }
 
 restart() {
-  :
+  start
 }
 
 reload() {
-  :
+  start
 }
 
 status() {
@@ -109,10 +109,11 @@ case "\$1" in
 esac
 REM
 
-# Use chkconfig to link into the runlevel 0 (shutdown) and 6 (reboot) directories
+# Use chkconfig to link into the runlevel 0 (shutdown) directories
 # This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
 chmod a+x /etc/init.d/remove_gitlab_registration
 chkconfig --add remove_gitlab_registration
+touch /var/lock/subsys/remove_gitlab_registration
 
 ${post_install}
 
