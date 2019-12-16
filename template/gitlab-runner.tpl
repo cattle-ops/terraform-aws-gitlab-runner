@@ -78,10 +78,11 @@ stop() {
     return \$retval
 }
 
+# Map these to start just to be redunant.
+# We don't want to run Stop outside of shutdown.
 restart() {
   start
 }
-
 reload() {
   start
 }
