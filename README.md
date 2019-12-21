@@ -231,7 +231,7 @@ terraform destroy
 | ami\_owners | The list of owners used to select the AMI of Gitlab runner agent instances. | list(string) | `<list>` | no |
 | aws\_region | AWS region. | string | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | string | `"a"` | no |
-| cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details. | map | `<map>` | no |
+| cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | map | `<map>` | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | bool | `"true"` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | string | `""` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | bool | `"false"` | no |
