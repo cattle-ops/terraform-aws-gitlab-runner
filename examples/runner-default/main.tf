@@ -71,13 +71,14 @@ module "runner" {
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 
-
-
 resource "null_resource" "cancel_spot_requests" {
   # Cancel active and open spot requests, terminate instances
+  triggers = {
+    environment = var.environment
+  }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "../../ci/bin/cancel-spot-instances.sh ${var.environment}"
+    command = "../../ci/bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }
