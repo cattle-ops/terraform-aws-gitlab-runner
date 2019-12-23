@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## Unreleased
+- Change: default version of the runner to 12.6.0
+- Fix: External references from destroy provisioners are deprecated (examples)
+- Fix: typos cache bucket (#172) @@thorec
+- Fix: missing double quotes (#171) ggrangia
+- Change: default for gitlab_url to https://gitlab.com (#170) @riccardomc
+- Change: Encrypt runner root device by default (#168) …
+- Added: allow eip for runner (#166) 
 
 ## 4.9.0 - 2019-11-14
 - Make use of on-demand instances in docker-machine #158 @skorfmann
