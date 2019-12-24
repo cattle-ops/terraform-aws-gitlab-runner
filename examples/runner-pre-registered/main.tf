@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.17"
+  version = "2.21"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -46,4 +46,3 @@ module "runner" {
   # working 9 to 5 :)
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
-

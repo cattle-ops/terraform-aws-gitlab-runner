@@ -288,7 +288,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.4.1"
+  default     = "12.6.0"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -416,7 +416,7 @@ variable "overrides" {
 }
 
 variable "cache_bucket" {
-  description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache cross multiple runners disable the cration of the cache and provice a policy and bucket name. See the public runner example for more details."
+  description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details."
   type        = map
 
   default = {
@@ -450,7 +450,7 @@ variable "schedule_config" {
 }
 
 variable "runner_root_block_device" {
-  description = "The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `iops`"
+  description = "The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`"
   type        = map(string)
   default     = {}
 }
@@ -489,4 +489,10 @@ variable "kms_deletion_window_in_days" {
   description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
   type        = number
   default     = 7
+}
+
+variable "enable_eip" {
+  description = "Enable the assignment of an EIP to the gitlab runner instance"
+  default     = false
+  type        = bool
 }

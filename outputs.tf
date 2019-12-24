@@ -42,3 +42,8 @@ output "runner_sg_id" {
   description = "ID of the security group attached to the docker machine runners."
   value       = aws_security_group.docker_machine.id
 }
+
+output "runner_eip" {
+  description = "EIP of the Gitlab Runner"
+  value       = element(concat(aws_eip.gitlab_runner.*.public_ip, [""]), 0)
+}

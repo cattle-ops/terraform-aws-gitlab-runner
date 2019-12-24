@@ -116,9 +116,18 @@ data "template_file" "user_data" {
   template = file("${path.module}/template/user-data.tpl")
 
   vars = {
+    eip                 = var.enable_eip ? data.template_file.eip.rendered : ""
     logging             = var.enable_cloudwatch_logging ? data.template_file.logging.rendered : ""
     gitlab_runner       = data.template_file.gitlab_runner.rendered
     user_data_trace_log = var.enable_runner_user_data_trace_log
+  }
+}
+
+data "template_file" "eip" {
+  template = file("${path.module}/template/eip.tpl")
+
+  vars = {
+    eip = join(",", aws_eip.gitlab_runner.*.public_ip)
   }
 }
 
@@ -324,6 +333,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
       delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
       volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
       volume_size           = lookup(root_block_device.value, "volume_size", 8)
+      encrypted             = lookup(root_block_device.value, "encrypted", true)
       iops                  = lookup(root_block_device.value, "iops", null)
     }
   }
@@ -486,6 +496,10 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
   policy_arn = aws_iam_policy.service_linked_role[0].arn
 }
 
+resource "aws_eip" "gitlab_runner" {
+  count = var.enable_eip ? 1 : 0
+}
+
 ################################################################################
 ### AWS Systems Manager access to store runner token once registered
 ################################################################################
@@ -512,4 +526,28 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 
   role       = aws_iam_role.instance.name
   policy_arn = aws_iam_policy.ssm[0].arn
+}
+
+################################################################################
+### AWS assign EIP
+################################################################################
+data "template_file" "eip_policy" {
+  template = file("${path.module}/policies/instance-eip.json")
+}
+
+resource "aws_iam_policy" "eip" {
+  count = var.enable_eip ? 1 : 0
+
+  name        = "${var.environment}-eip"
+  path        = "/"
+  description = "Policy for runner to assign EIP"
+
+  policy = data.template_file.eip_policy.rendered
+}
+
+resource "aws_iam_role_policy_attachment" "eip" {
+  count = var.enable_eip ? 1 : 0
+
+  role       = aws_iam_role.instance.name
+  policy_arn = aws_iam_policy.eip[0].arn
 }

@@ -1,6 +1,6 @@
 provider "aws" {
   region  = var.aws_region
-  version = "2.34"
+  version = "2.41"
 }
 
 provider "template" {
@@ -18,4 +18,3 @@ provider "null" {
 provider "tls" {
   version = "2.1.1"
 }
-

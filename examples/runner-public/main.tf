@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.17"
+  version = "2.21"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -109,9 +109,12 @@ module "runner2" {
 
 resource "null_resource" "cancel_spot_requests" {
   # Cancel active and open spot requests, terminate instances
+  triggers = {
+    environment = var.environment
+  }
 
   provisioner "local-exec" {
-    when    = "destroy"
-    command = "../../ci/bin/cancel-spot-instances.sh ${var.environment}"
+    when    = destroy
+    command = "../../ci/bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }

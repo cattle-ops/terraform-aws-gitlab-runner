@@ -4,14 +4,15 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.17"
+  version = "2.21"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
 
-  azs                = [data.aws_availability_zones.available.names[0]]
-  public_subnets     = ["10.1.101.0/24"]
-  enable_s3_endpoint = true
+  azs                     = [data.aws_availability_zones.available.names[0]]
+  public_subnets          = ["10.1.101.0/24"]
+  enable_s3_endpoint      = true
+  map_public_ip_on_launch = false
 
   tags = {
     Environment = var.environment
@@ -24,9 +25,8 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key = local_file.public_ssh_key.content
-
   runners_use_private_address = false
+  enable_eip                  = true
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets

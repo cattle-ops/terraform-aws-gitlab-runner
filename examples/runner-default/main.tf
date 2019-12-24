@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.17"
+  version = "2.21"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -35,6 +35,7 @@ module "runner" {
   runners_name             = var.runner_name
   runners_gitlab_url       = var.gitlab_url
   enable_runner_ssm_access = true
+  enable_eip               = true
 
   docker_machine_spot_price_bid = "0.06"
 
@@ -70,13 +71,14 @@ module "runner" {
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
 
-
-
 resource "null_resource" "cancel_spot_requests" {
   # Cancel active and open spot requests, terminate instances
+  triggers = {
+    environment = var.environment
+  }
 
   provisioner "local-exec" {
-    when    = "destroy"
-    command = "../../ci/bin/cancel-spot-instances.sh ${var.environment}"
+    when    = destroy
+    command = "../../ci/bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }
