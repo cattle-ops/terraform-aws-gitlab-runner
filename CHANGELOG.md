@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## Unreleased
+
+## 4.10.0 - 2019-12-24
 - Change: default version of the runner to 12.6.0
 - Fix: External references from destroy provisioners are deprecated (examples)
 - Fix: typos cache bucket (#172) @@thorec
@@ -264,7 +266,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.9.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.10.0...HEAD
+[4.10.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.9.0...4.10.0
 [4.9.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.8.0...4.9.0
 [4.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.7.0...4.8.0
 [4.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6.0...4.7.0
