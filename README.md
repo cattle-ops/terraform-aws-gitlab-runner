@@ -177,7 +177,7 @@ module "runner" {
   runners_gitlab_url = "https://gitlab.com"
 
   gitlab_runner_registration_config = {
-    registration_token = "my-token"
+    registration_token = "my-token
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
@@ -254,7 +254,7 @@ terraform destroy
 | environment | A name that identifies the environment, used as prefix and for tagging. | string | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | map(string) | `<map>` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | list(string) | `<list>` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.5.0"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | string | `"12.6.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | string | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | string | `"t3.micro"` | no |
 | kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | number | `"7"` | no |
@@ -263,7 +263,7 @@ terraform destroy
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | map(list(string)) | `<map>` | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | list(string) | `<list>` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
-| runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `iops` | map(string) | `<map>` | no |
+| runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops` | map(string) | `<map>` | no |
 | runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | list | `<list>` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | number | `"10"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list(string) | `<list>` | no |
