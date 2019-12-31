@@ -57,7 +57,7 @@ In this scenario *not* docker machine is used but docker to schedule the builds.
 
 Ensure you have Terraform installed the modules is based on Terraform 0.11, see `.terraform-version` for the used version. A handy tool to mange your Terraform version is [tfenv](https://github.com/kamatama41/tfenv).
 
-On macOS it is simple to install `tfenv` using brew.
+On macOS it is simple to install `tfenv` using `brew`.
 
 ``` sh
 brew install tfenv
@@ -71,7 +71,17 @@ tfenv install <version>
 
 ### AWS
 
-Ensure you have setup you AWS credentials. The module requires access to IAM, EC2, CloudWatch, S3 and SSM.
+Ensure you have setup your AWS credentials. The module requires access to IAM, EC2, CloudWatch, S3 and SSM.
+
+### JQ & AWS CLI
+
+In order to be able to destroy the module, you will need to run from a host with both `jq` and `aws` installed and accessible in the environment.
+
+On macOS it is simple to install them using `brew`.
+
+``` sh
+brew install jq awscli
+```
 
 ### Service linked roles
 
@@ -94,7 +104,7 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 
 ### GitLab runner token configuration
 
-By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the parameter store. See [example](examples/runner-pre-registered/) for more details.
+By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the AWS parameter store. See [example](examples/runner-pre-registered/) for more details.
 
 To register the runner automatically set the variable `gitlab_runner_registration_config["token"]`. This token value can be found in your GitLab project, group, or global settings. For a generic runner you can find the token in the admin section. By default the runner will be locked to the target project, not run untagged. Below is an example of the configuration map.
 
@@ -110,7 +120,7 @@ gitlab_runner_registration_config = {
 }
 ```
 
-For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the required values via the parameter store. If the value is `null` a new runner will be created.
+For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
 
 ``` sh
 # set the following variables, look up the variables in your Terraform config.

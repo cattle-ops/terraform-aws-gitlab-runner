@@ -112,6 +112,15 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   }
 }
 
+resource "null_resource" "remove_runner" {
+  depends_on = [aws_ssm_parameter.runner_registration_token]
+  provisioner "local-exec" {
+    when       = destroy
+    on_failure = continue
+    command    = "${path.module}/bin/remove-runner.sh ${var.aws_region} ${var.runners_gitlab_url} ${local.secure_parameter_store_runner_token_key}"
+  }
+}
+
 data "template_file" "user_data" {
   template = file("${path.module}/template/user-data.tpl")
 
