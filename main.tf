@@ -256,7 +256,7 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                      = var.enable_forced_updates ? "${var.environment}-as-group" :"${aws_launch_configuration.gitlab_runner_instance.name}-asg"
+  name                      = var.enable_forced_updates ? "${var.environment}-as-group" : "${aws_launch_configuration.gitlab_runner_instance.name}-asg"
   vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
