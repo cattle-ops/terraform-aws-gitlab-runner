@@ -43,4 +43,4 @@ module "runner" {
 |------|-------------|
 | arn | The ARN of the created bucket. |
 | bucket | Name of the created bucket. |
-| policy\_arn | Policy for users of the cache (bucket). |
+| policy\_arn | Policy for users of the cache \(bucket\). |

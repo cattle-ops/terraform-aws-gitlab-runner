@@ -496,3 +496,9 @@ variable "enable_eip" {
   default     = false
   type        = bool
 }
+
+variable "enable_forced_updates" {
+  description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
+  default     = false
+  type        = bool
+}
