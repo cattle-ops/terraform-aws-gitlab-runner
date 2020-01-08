@@ -53,6 +53,75 @@ fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
 
+# A small script to remove this runner from being registered with Gitlab. 
+cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
+#!/bin/bash
+# chkconfig: 1356 99 03
+# description: cleans up gitlab runner key
+# processname: remove_runner_key
+#              /etc/rc.d/init.d/remove_gitlab_registration
+lockfile=/var/lock/subsys/remove_gitlab_registration
+
+# This lockfile is necessary so that we'll run the cleanup later.
+start() {
+    logger "Setting up Runner Removal Lockfile"
+    touch \$lockfile
+}
+
+# Overwrite token in SSM with null and remove runner from Gitlab
+stop() {
+    logger "Removing Gitlab Runner Token"
+    aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" 2>&1 | logger &
+    curl -sS --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
+    retval=\$?
+    rm -f \$lockfile
+    return \$retval
+}
+
+# Map these to start just to be redunant.
+# We don't want to run Stop outside of shutdown.
+restart() {
+  start
+}
+reload() {
+  start
+}
+
+# Do nothing - there's no status.
+status() {
+  :
+}
+
+case "\$1" in
+    start)
+        \$1
+        ;;
+    stop)
+        \$1
+        ;;
+    restart)
+        \$1
+        ;;
+    status)
+        \$1
+        ;;
+    *)
+        echo "Usage: \$0 {start|stop|status|restart}"
+        exit 2
+        ;;
+esac
+REM
+
+chmod a+x /etc/init.d/remove_gitlab_registration
+
+# Use chkconfig to link into the runlevel 0 (shutdown) directories
+# This adds "start" scripts to levels 1,3,5, and 6, and a "stop" to the others.
+# This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
+chkconfig --add remove_gitlab_registration
+
+# As noted above, this does nothing more than make the lockfile.
+service remove_gitlab_registration start
+
 ${post_install}
 
 service gitlab-runner restart
