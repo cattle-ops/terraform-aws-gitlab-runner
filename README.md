@@ -255,6 +255,7 @@ terraform destroy
 | docker\_machine\_version | Version of docker-machine. | string | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | bool | `"true"` | no |
 | enable\_eip | Enable the assignment of an EIP to the gitlab runner instance | bool | `"false"` | no |
+| enable\_forced\_updates | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | bool | `"false"` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | bool | `"false"` | no |
 | enable\_kms | Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key. | bool | `"false"` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | bool | `"true"` | no |
