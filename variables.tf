@@ -321,6 +321,18 @@ variable "tags" {
   default     = {}
 }
 
+variable "agent_tags" {
+  description = "Map of tags that will be added to agent EC2 instances."
+  type        = map(string)
+  default     = {}
+}
+
+variable "runner_tags" {
+  description = "Map of tags that will be added to runner EC2 instances."
+  type        = map(string)
+  default     = {}
+}
+
 variable "allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
   type        = bool

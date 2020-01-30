@@ -209,12 +209,14 @@ data "template_file" "runners" {
     docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
     runners_name                = var.runners_name
     runners_tags = var.overrides["name_docker_machine_runners"] == "" ? format(
-      "%s,Name,%s-docker-machine",
+      "%s,%s,Name,%s-docker-machine",
       local.tags_string,
+      local.runner_tags_string,
       var.environment,
       ) : format(
-      "%s,Name,%s",
+      "%s,%s,Name,%s",
       local.tags_string,
+      local.runner_tags_string,
       var.overrides["name_docker_machine_runners"],
     )
     runners_token                     = var.runners_token
@@ -282,6 +284,11 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
         "propagate_at_launch" = true
       },
     ],
+    [for key in keys(var.agent_tags) : {
+      "key"                 = key,
+      "value"               = lookup(var.agent_tags, key),
+      "propagate_at_launch" = true
+    }]
   )
 
 }
