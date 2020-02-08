@@ -313,6 +313,8 @@ terraform destroy
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | string | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | list(string) | n/a | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | map(string) | `<map>` | no |
+| agent_tags | Map of tags that will be added to agent EC2 instances. | map(string) | `<map>` | no |
+| runner_tags | Map of tags that will be added to runner EC2 instances. | map(string) | `<map>` | no |
 | userdata\_post\_install | User-data script snippet to insert after GitLab runner install | string | `""` | no |
 | userdata\_pre\_install | User-data script snippet to insert before GitLab runner install | string | `""` | no |
 | vpc\_id | The target VPC for the docker-machine and runner instances. | string | n/a | yes |
