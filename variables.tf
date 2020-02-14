@@ -291,10 +291,12 @@ variable "ami_filter" {
   description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks to *not* be working for this configuration."
   type        = "list"
 
-  default = [{
-    name   = "name"
-    values = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
-  }]
+  default = [
+    {
+      name   = "name"
+      values = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
+    }
+  ]
 }
 
 variable "ami_owners" {
