@@ -1,49 +1,49 @@
 variable "aws_region" {
   description = "AWS region."
-  type        = "string"
+  type        = string
 }
 
 variable "aws_zone" {
   description = "AWS availability zone (typically 'a', 'b', or 'c')."
-  type        = "string"
+  type        = string
   default     = "a"
 }
 
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
-  type        = "string"
+  type        = string
 }
 
 variable "vpc_id" {
   description = "The target VPC for the docker-machine and runner instances."
-  type        = "string"
+  type        = string
 }
 
 variable "subnet_id_runners" {
   description = "List of subnets used for hosting the gitlab-runners."
-  type        = "string"
+  type        = string
 }
 
 variable "subnet_ids_gitlab_runner" {
   description = "Subnet used for hosting the GitLab runner."
-  type        = "list"
+  type        = list(string)
 }
 
 variable "instance_type" {
   description = "Instance type used for the GitLab runner."
-  type        = "string"
+  type        = string
   default     = "t3.micro"
 }
 
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "ssh_public_key" {
   description = "Public SSH key used for the GitLab runner EC2 instance."
-  type        = "string"
+  type        = string
 }
 
 variable "docker_machine_instance_type" {
@@ -63,23 +63,23 @@ variable "docker_machine_version" {
 
 variable "runners_name" {
   description = "Name of the runner, will be used in the runner config.toml."
-  type        = "string"
+  type        = string
 }
 
 variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
-  type        = "string"
+  type        = string
   default     = "docker+machine"
 }
 
 variable "runners_gitlab_url" {
   description = "URL of the GitLab instance to connect to."
-  type        = "string"
+  type        = string
 }
 
 variable "runners_token" {
   description = "Token for the runner, will be used in the runner config.toml."
-  type        = "string"
+  type        = string
   default     = "__REPLACED_BY_USER_DATA__"
 }
 
@@ -105,13 +105,13 @@ variable "runners_idle_count" {
 
 variable "runners_image" {
   description = "Image to run builds, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = "docker:18.03.1-ce"
 }
 
 variable "runners_privileged" {
   description = "Runners will run in privileged mode, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = "true"
 }
 
@@ -142,7 +142,7 @@ variable "runners_off_peak_idle_time" {
 
 variable "runners_off_peak_periods" {
   description = "Off peak periods of the runners, will be used in the runner config.toml."
-  type        = "string"
+  type        = string
   default     = ""
 }
 
@@ -158,31 +158,31 @@ variable "create_runners_iam_instance_profile" {
 
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "runners_environment_vars" {
   description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "runners_pre_build_script" {
   description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "runners_post_build_script" {
   description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "runners_pre_clone_script" {
   description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
-  type        = "string"
+  type        = string
   default     = ""
 }
 
@@ -198,13 +198,13 @@ variable "runners_output_limit" {
 
 variable "userdata_pre_install" {
   description = "User-data script snippet to insert before GitLab runner install"
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "userdata_post_install" {
   description = "User-data script snippet to insert after GitLab runner install"
-  type        = "string"
+  type        = string
   default     = ""
 }
 
@@ -215,13 +215,13 @@ variable "runners_use_private_address" {
 
 variable "docker_machine_user" {
   description = "Username of the user used to create the spot instances that host docker-machine."
-  type        = "string"
+  type        = string
   default     = "docker-machine"
 }
 
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
-  type        = "string"
+  type        = string
   default     = ""
 }
 
@@ -232,13 +232,13 @@ variable "cache_expiration_days" {
 
 variable "cache_shared" {
   description = "Enables cache sharing between runners, false by default."
-  type        = "string"
+  type        = string
   default     = "false"
 }
 
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
-  type        = "string"
+  type        = string
   default     = "11.10.1"
 }
 
@@ -249,7 +249,7 @@ variable "enable_gitlab_runner_ssh_access" {
 
 variable "gitlab_runner_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access from to the gitlab runner instance."
-  type        = "list"
+  type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
@@ -259,7 +259,7 @@ variable "enable_cloudwatch_logging" {
 }
 
 variable "tags" {
-  type        = "map"
+  type        = map(string)
   description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
   default     = {}
 }
@@ -271,43 +271,46 @@ variable "allow_iam_service_linked_role_creation" {
 
 variable "docker_machine_options" {
   description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "instance_role_json" {
   description = "Docker machine runner instance override policy, expected to be in JSON format."
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "instance_role_runner_json" {
   description = "Instance role json for the docker machine runners to override the default."
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "ami_filter" {
   description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks to *not* be working for this configuration."
-  type        = "list"
+  type        = list(object({
+    name = string
+    values = list(string)
+  }))
 
   default = [
     {
       name   = "name"
       values = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
-    }
+    },
   ]
 }
 
 variable "ami_owners" {
   description = "The list of owners used to select the AMI of Gitlab runner agent instances."
-  type        = "list"
+  type        = list(string)
   default     = ["amazon"]
 }
 
 variable "gitlab_runner_registration_config" {
   description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
-  type        = "map"
+  type        = map(string)
 
   default = {
     registration_token = ""
@@ -320,7 +323,7 @@ variable "gitlab_runner_registration_config" {
 }
 
 variable "secure_parameter_store_runner_token_key" {
-  type        = "string"
+  type        = string
   description = "The key name used store the Gitlab runner token in Secure Parameter Store"
   default     = "runner-token"
 }
@@ -336,7 +339,7 @@ variable "name_runners_docker_machine" {
 
 variable "overrides" {
   description = "This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent."
-  type        = "map"
+  type        = map(string)
 
   default = {
     name_sg                     = ""
