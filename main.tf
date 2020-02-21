@@ -465,6 +465,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ################################################################################
 
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
+  count      = var.cache_bucket["create"] ? 1 : 0
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }
