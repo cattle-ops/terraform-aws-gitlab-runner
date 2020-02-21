@@ -2,6 +2,7 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
+| agent\_tags | Map of tags that will be added to agent EC2 instances. | map(string) | `<map>` | no |
 | allow\_iam\_service\_linked\_role\_creation | Boolean used to control attaching the policy to a runner instance to create service linked roles. | bool | `"true"` | no |
 | ami\_filter | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86\_64-ebs` looks to \*not\* be working for this configuration. | map(list(string)) | `<map>` | no |
 | ami\_owners | The list of owners used to select the AMI of Gitlab runner agent instances. | list(string) | `<list>` | no |
@@ -39,10 +40,13 @@
 | overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name\_sg` overwrite the `Name` tag for all security groups created by this module. `name\_runner\_agent\_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name\_docker\_machine\_runners` ovverrid the `Name` tag spot instances created by the runner agent. | map(string) | `<map>` | no |
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | map(list(string)) | `<map>` | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | list(string) | `<list>` | no |
+| runner\_instance\_ebs\_optimized | Enable the GitLab runner instance to be EBS-optimized. | bool | `"true"` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | string | `""` | no |
 | runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete\_on\_termination`, `volume\_type`, `volume\_size`, `encrypted`, `iops` | map(string) | `<map>` | no |
+| runner\_tags | Map of tags that will be added to runner EC2 instances. | map(string) | `<map>` | no |
 | runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | list | `<list>` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | number | `"10"` | no |
+| runners\_ebs\_optimized | Enable runners to be EBS-optimized. | bool | `"true"` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | list(string) | `<list>` | no |
 | runners\_executor | The executor to use. Currently supports `docker+machine` or `docker`. | string | `"docker+machine"` | no |
 | runners\_gitlab\_url | URL of the GitLab instance to connect to. | string | n/a | yes |

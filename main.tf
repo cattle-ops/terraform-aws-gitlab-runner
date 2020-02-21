@@ -204,6 +204,7 @@ data "template_file" "runners" {
     runners_ami                 = data.aws_ami.docker-machine.id
     runners_security_group_name = aws_security_group.docker_machine.name
     runners_monitoring          = var.runners_monitoring
+    runners_ebs_optimized       = var.runners_ebs_optimized
     runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
     runners_additional_volumes  = local.runners_additional_volumes
     docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
@@ -341,6 +342,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   image_id             = data.aws_ami.runner.id
   user_data            = data.template_file.user_data.rendered
   instance_type        = var.instance_type
+  ebs_optimized        = var.runner_instance_ebs_optimized
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
   dynamic "root_block_device" {

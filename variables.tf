@@ -35,6 +35,12 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "runner_instance_ebs_optimized" {
+  description = "Enable the GitLab runner instance to be EBS-optimized."
+  type        = bool
+  default     = true
+}
+
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
@@ -157,6 +163,12 @@ variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   type        = bool
   default     = false
+}
+
+variable "runners_ebs_optimized" {
+  description = "Enable runners to be EBS-optimized."
+  type        = bool
+  default     = true
 }
 
 variable "runners_off_peak_timezone" {
