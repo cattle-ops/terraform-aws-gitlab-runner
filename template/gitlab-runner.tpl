@@ -9,9 +9,18 @@ ${pre_install}
 
 if [[ `echo ${runners_executor}` == "docker" ]]
 then
-  yum install docker -y
-  usermod -a -G docker ec2-user
-  service docker start
+  echo 'installing docker'
+  if grep -q ':2$' /etc/system-release-cpe  ; then
+    # AWS Linux 2 provides docker via extras only and uses systemd (https://aws.amazon.com/amazon-linux-2/release-notes/)
+    amazon-linux-extras install docker
+    usermod -a -G docker ec2-user
+    systemctl enable docker
+    systemctl start docker
+  else
+    yum install docker -y
+    usermod -a -G docker ec2-user
+    service docker start
+  fi
 fi
 
 curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
