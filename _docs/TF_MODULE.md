@@ -4,7 +4,7 @@
 |------|-------------|:----:|:-----:|:-----:|
 | agent\_tags | Map of tags that will be added to agent EC2 instances. | map(string) | `<map>` | no |
 | allow\_iam\_service\_linked\_role\_creation | Boolean used to control attaching the policy to a runner instance to create service linked roles. | bool | `"true"` | no |
-| ami\_filter | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks to *not* be working for this configuration. | map(list(string)) | `<map>` | no |
+| ami\_filter | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image. | map(list(string)) | `<map>` | no |
 | ami\_owners | The list of owners used to select the AMI of Gitlab runner agent instances. | list(string) | `<list>` | no |
 | aws\_region | AWS region. | string | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | string | `"a"` | no |

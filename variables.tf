@@ -370,11 +370,11 @@ variable "docker_machine_role_json" {
 }
 
 variable "ami_filter" {
-  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks to *not* be working for this configuration."
+  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
   type        = map(list(string))
 
   default = {
-    name = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
+    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
   }
 }
 
