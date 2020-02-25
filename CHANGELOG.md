@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.11.0 - 2020-02-25
+- Change: Update terraform-docs to support 0.8.x #185
+- Change: Support Amazon Linux #184 by @chludwig-haufe
+- Change: Bump gitlab runner version to 12.7.1 from 12.6.0 #183 @loustler 
+- Fix: Fix error create bucket false #182 @katiatalh w
+- Change: Add inputs for EBS-optimized #181 @chrizkim
+- Change: Added agent- and runner-only tags #179 @Glen-Moonpig
+- Change: Improving Spot Cancelation script. #174 @pshuman-heb
+- Change: Forcing updates of Instances on Config change. #173 @pshuman-heb
+
 ## 4.10.0 - 2019-12-24
 - Change: default version of the runner to 12.6.0
 - Fix: External references from destroy provisioners are deprecated (examples)
@@ -266,8 +276,9 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.10.0...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.0...HEAD
 [4.10.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.9.0...4.10.0
+[4.11.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.10.0...4.11.0
 [4.9.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.8.0...4.9.0
 [4.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.7.0...4.8.0
 [4.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6.0...4.7.0

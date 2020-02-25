@@ -35,6 +35,12 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "runner_instance_ebs_optimized" {
+  description = "Enable the GitLab runner instance to be EBS-optimized."
+  type        = bool
+  default     = true
+}
+
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
@@ -157,6 +163,12 @@ variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   type        = bool
   default     = false
+}
+
+variable "runners_ebs_optimized" {
+  description = "Enable runners to be EBS-optimized."
+  type        = bool
+  default     = true
 }
 
 variable "runners_off_peak_timezone" {
@@ -288,7 +300,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.6.0"
+  default     = "12.7.1"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -321,6 +333,18 @@ variable "tags" {
   default     = {}
 }
 
+variable "agent_tags" {
+  description = "Map of tags that will be added to agent EC2 instances."
+  type        = map(string)
+  default     = {}
+}
+
+variable "runner_tags" {
+  description = "Map of tags that will be added to runner EC2 instances."
+  type        = map(string)
+  default     = {}
+}
+
 variable "allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
   type        = bool
@@ -346,11 +370,11 @@ variable "docker_machine_role_json" {
 }
 
 variable "ami_filter" {
-  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Currently Amazon Linux 2 `amzn2-ami-hvm-2.0.????????-x86_64-ebs` looks to *not* be working for this configuration."
+  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
   type        = map(list(string))
 
   default = {
-    name = ["amzn-ami-hvm-2018.03*-x86_64-ebs"]
+    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
   }
 }
 
@@ -493,6 +517,12 @@ variable "kms_deletion_window_in_days" {
 
 variable "enable_eip" {
   description = "Enable the assignment of an EIP to the gitlab runner instance"
+  default     = false
+  type        = bool
+}
+
+variable "enable_forced_updates" {
+  description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = false
   type        = bool
 }

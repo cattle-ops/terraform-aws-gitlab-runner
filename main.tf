@@ -112,6 +112,15 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   }
 }
 
+resource "null_resource" "remove_runner" {
+  depends_on = [aws_ssm_parameter.runner_registration_token]
+  provisioner "local-exec" {
+    when       = destroy
+    on_failure = continue
+    command    = "${path.module}/bin/remove-runner.sh ${var.aws_region} ${var.runners_gitlab_url} ${local.secure_parameter_store_runner_token_key}"
+  }
+}
+
 data "template_file" "user_data" {
   template = file("${path.module}/template/user-data.tpl")
 
@@ -195,17 +204,20 @@ data "template_file" "runners" {
     runners_ami                 = data.aws_ami.docker-machine.id
     runners_security_group_name = aws_security_group.docker_machine.name
     runners_monitoring          = var.runners_monitoring
+    runners_ebs_optimized       = var.runners_ebs_optimized
     runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
     runners_additional_volumes  = local.runners_additional_volumes
     docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
     runners_name                = var.runners_name
     runners_tags = var.overrides["name_docker_machine_runners"] == "" ? format(
-      "%s,Name,%s-docker-machine",
-      local.tags_string,
+      "Name,%s-docker-machine,%s,%s",
       var.environment,
-      ) : format(
-      "%s,Name,%s",
       local.tags_string,
+      local.runner_tags_string,
+      ) : format(
+      "%s,%s,Name,%s",
+      local.tags_string,
+      local.runner_tags_string,
       var.overrides["name_docker_machine_runners"],
     )
     runners_token                     = var.runners_token
@@ -256,9 +268,8 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                = "${var.environment}-as-group"
-  vpc_zone_identifier = var.subnet_ids_gitlab_runner
-
+  name                      = var.enable_forced_updates ? "${var.environment}-as-group" : "${aws_launch_configuration.gitlab_runner_instance.name}-asg"
+  vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -274,6 +285,11 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
         "propagate_at_launch" = true
       },
     ],
+    [for key in keys(var.agent_tags) : {
+      "key"                 = key,
+      "value"               = lookup(var.agent_tags, key),
+      "propagate_at_launch" = true
+    }]
   )
 
 }
@@ -320,11 +336,13 @@ locals {
 }
 
 resource "aws_launch_configuration" "gitlab_runner_instance" {
+  name_prefix          = var.runners_name
   security_groups      = [aws_security_group.runner.id]
   key_name             = local.key_pair_name
   image_id             = data.aws_ami.runner.id
   user_data            = data.template_file.user_data.rendered
   instance_type        = var.instance_type
+  ebs_optimized        = var.runner_instance_ebs_optimized
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
   dynamic "root_block_device" {
@@ -447,6 +465,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ################################################################################
 
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
+  count      = var.cache_bucket["create"] ? 1 : 0
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }
