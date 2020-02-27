@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.11.1 - 2020-02-27
+- Bugfix: #187 - fix double comma in tag list for docker machine
+
 ## 4.11.0 - 2020-02-25
 - Change: Update terraform-docs to support 0.8.x #185
 - Change: Support Amazon Linux #184 by @chludwig-haufe
@@ -276,9 +279,10 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.0...HEAD
-[4.10.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.9.0...4.10.0
-[4.11.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.10.0...4.11.0
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.1...HEAD
+[4.11.1]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.1...4.11.0
+[4.11.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.0...4.10.0
+[4.10.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.10.0...4.9.0
 [4.9.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.8.0...4.9.0
 [4.8.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.7.0...4.8.0
 [4.7.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.6.0...4.7.0
