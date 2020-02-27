@@ -209,7 +209,7 @@ data "template_file" "runners" {
     runners_additional_volumes  = local.runners_additional_volumes
     docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
     runners_name                = var.runners_name
-    runners_tags = var.overrides["name_docker_machine_runners"] == "" ? format(
+    runners_tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
       "Name,%s-docker-machine,%s,%s",
       var.environment,
       local.tags_string,
@@ -219,7 +219,7 @@ data "template_file" "runners" {
       local.tags_string,
       local.runner_tags_string,
       var.overrides["name_docker_machine_runners"],
-    )
+    ), ",,", ",")
     runners_token                     = var.runners_token
     runners_executor                  = var.runners_executor
     runners_limit                     = var.runners_limit
