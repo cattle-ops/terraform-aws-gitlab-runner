@@ -19,13 +19,20 @@ module "vpc" {
   }
 }
 
+module "key_pair" {
+  source = "../modules/key-pair"
+
+  environment = var.environment
+  name        = var.runner_name
+}
+
 module "runner" {
   source = "../../"
 
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key = local_file.public_ssh_key.content
+  ssh_key_pair = module.key_pair.key_pair.key_name
 
   runners_use_private_address = false
   enable_eip                  = true

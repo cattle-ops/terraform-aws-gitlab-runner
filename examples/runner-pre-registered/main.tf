@@ -23,13 +23,20 @@ module "vpc" {
   }
 }
 
+module "key_pair" {
+  source = "../modules/key-pair"
+
+  environment = var.environment
+  name        = var.runner_name
+}
+
 module "runner" {
   source = "../../"
 
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key = local_file.public_ssh_key.content
+  ssh_key_pair = module.key_pair.key_pair.key_name
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.private_subnets

@@ -1,11 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_key_pair" "key" {
-  count      = var.ssh_key_pair == "" && var.ssh_public_key != "" ? 1 : 0
-  key_name   = "${var.environment}-gitlab-runner"
-  public_key = var.ssh_public_key
-}
-
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = var.vpc_id
@@ -336,17 +330,10 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
-locals {
-  # Key magic, if public key is provided usthe public key, if key pair is proviced use key pair. Otherwise null
-  is_ssh_public_key = var.ssh_key_pair == "" && var.ssh_public_key != "" ? aws_key_pair.key[0].key_name : ""
-  is_key_pair_name  = local.is_ssh_public_key != "" ? local.is_ssh_public_key : var.ssh_key_pair
-  key_pair_name     = local.is_key_pair_name != "" ? local.is_key_pair_name : null
-}
-
 resource "aws_launch_configuration" "gitlab_runner_instance" {
   name_prefix          = var.runners_name
   security_groups      = [aws_security_group.runner.id]
-  key_name             = local.key_pair_name
+  key_name             = var.ssh_key_pair
   image_id             = data.aws_ami.runner.id
   user_data            = data.template_file.user_data.rendered
   instance_type        = var.instance_type

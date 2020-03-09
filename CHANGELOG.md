@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- Change: Variable `ssh_public_key` is not longer supported. 
+- Change: Bump gitlab runner version to 12.8.0
+- Fix: Defect in cancel spot instance script
+
 ## 4.11.1 - 2020-02-27
 - Bugfix: #187 - fix double comma in tag list for docker machine
 
