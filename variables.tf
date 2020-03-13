@@ -526,3 +526,9 @@ variable "enable_forced_updates" {
   default     = false
   type        = bool
 }
+
+variable "permissions_boundary" {
+  description = "Name of permissions boundary policy to attach to AWS IAM roles"
+  default     = ""
+  type        = string
+}
