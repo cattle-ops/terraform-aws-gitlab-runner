@@ -114,12 +114,20 @@ resource "aws_ssm_parameter" "runner_registration_token" {
 
 resource "null_resource" "remove_runner" {
   depends_on = [aws_ssm_parameter.runner_registration_token]
+  triggers = {
+    script                                  = "${path.module}/bin/remove-runner.sh"
+    aws_region                              = var.aws_region
+    runners_gitlab_url                      = var.runners_gitlab_url
+    secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
+  }
+
   provisioner "local-exec" {
     when       = destroy
     on_failure = continue
-    command    = "${path.module}/bin/remove-runner.sh ${var.aws_region} ${var.runners_gitlab_url} ${local.secure_parameter_store_runner_token_key}"
+    command    = "${self.triggers.script} ${self.triggers.aws_region} ${self.triggers.runners_gitlab_url} ${self.triggers.secure_parameter_store_runner_token_key}"
   }
 }
+
 
 data "template_file" "user_data" {
   template = file("${path.module}/template/user-data.tpl")
@@ -397,8 +405,9 @@ data "template_file" "instance_role_trust_policy" {
 }
 
 resource "aws_iam_role" "instance" {
-  name               = "${var.environment}-instance-role"
-  assume_role_policy = data.template_file.instance_role_trust_policy.rendered
+  name                 = "${var.environment}-instance-role"
+  assume_role_policy   = data.template_file.instance_role_trust_policy.rendered
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 ################################################################################
@@ -478,8 +487,9 @@ data "template_file" "dockermachine_role_trust_policy" {
 }
 
 resource "aws_iam_role" "docker_machine" {
-  name               = "${var.environment}-docker-machine-role"
-  assume_role_policy = data.template_file.dockermachine_role_trust_policy.rendered
+  name                 = "${var.environment}-docker-machine-role"
+  assume_role_policy   = data.template_file.dockermachine_role_trust_policy.rendered
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {

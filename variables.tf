@@ -300,7 +300,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.7.1"
+  default     = "12.8.0"
 }
 
 variable "enable_gitlab_runner_ssh_access" {
@@ -525,4 +525,10 @@ variable "enable_forced_updates" {
   description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = false
   type        = bool
+}
+
+variable "permissions_boundary" {
+  description = "Name of permissions boundary policy to attach to AWS IAM roles"
+  default     = ""
+  type        = string
 }

@@ -25,6 +25,8 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
+  ssh_public_key = local_file.public_ssh_key.content
+
   runners_use_private_address = false
   enable_eip                  = true
 
