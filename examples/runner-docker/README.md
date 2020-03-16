@@ -10,7 +10,6 @@ This examples shows:
   - Usages of runner of peak time mode configuration.
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor. ➜ tmp cat terraform-aws-gitlab-runner/examples/runner-docker/\_docs/README.md
-  - Usage of SSH keys
 
 # Example - Runner - Docker runner
 

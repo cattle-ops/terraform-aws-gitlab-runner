@@ -405,8 +405,9 @@ data "template_file" "instance_role_trust_policy" {
 }
 
 resource "aws_iam_role" "instance" {
-  name               = "${var.environment}-instance-role"
-  assume_role_policy = data.template_file.instance_role_trust_policy.rendered
+  name                 = "${var.environment}-instance-role"
+  assume_role_policy   = data.template_file.instance_role_trust_policy.rendered
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 ################################################################################
@@ -486,8 +487,9 @@ data "template_file" "dockermachine_role_trust_policy" {
 }
 
 resource "aws_iam_role" "docker_machine" {
-  name               = "${var.environment}-docker-machine-role"
-  assume_role_policy = data.template_file.dockermachine_role_trust_policy.rendered
+  name                 = "${var.environment}-docker-machine-role"
+  assume_role_policy   = data.template_file.dockermachine_role_trust_policy.rendered
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
