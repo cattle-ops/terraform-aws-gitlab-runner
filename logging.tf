@@ -1,9 +1,15 @@
-
-
-
 data "template_file" "instance_profile" {
   count    = var.enable_cloudwatch_logging ? 1 : 0
   template = file("${path.module}/policies/instance-logging-policy.json")
+
+}
+
+data "template_file" "logging" {
+  template = file("${path.module}/template/logging.tpl")
+
+  vars = {
+    log_group_name = var.log_group_name != null ? var.log_group_name : var.environment
+  }
 }
 
 resource "aws_iam_role_policy" "instance" {

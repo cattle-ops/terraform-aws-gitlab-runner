@@ -532,3 +532,9 @@ variable "permissions_boundary" {
   default     = ""
   type        = string
 }
+
+variable "log_group_name" {
+  description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
+  default     = null
+  type        = string
+}
