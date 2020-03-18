@@ -148,14 +148,6 @@ data "template_file" "eip" {
   }
 }
 
-data "template_file" "logging" {
-  template = file("${path.module}/template/logging.tpl")
-
-  vars = {
-    environment = var.environment
-  }
-}
-
 data "template_file" "gitlab_runner" {
   template = file("${path.module}/template/gitlab-runner.tpl")
 
