@@ -30,7 +30,6 @@ module "runner" {
 | Name | Version |
 |------|---------|
 | aws | n/a |
-| template | n/a |
 
 ## Inputs
 
