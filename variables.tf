@@ -485,17 +485,36 @@ variable "enable_runner_ssm_access" {
   default     = false
 }
 
+# variable "runners_volumes_tmpfs" {
+#   description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
+#   type        = list
+#   default     = null
+# }
+
 variable "runners_volumes_tmpfs" {
-  description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type        = list
-  default     = []
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = null
 }
 
+
+# variable "runners_services_volumes_tmpfs" {
+#   description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
+#   type        = list
+#   default     = []
+# }
+
+
 variable "runners_services_volumes_tmpfs" {
-  description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type        = list
-  default     = []
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = null
 }
+
 
 variable "kms_key_id" {
   description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
