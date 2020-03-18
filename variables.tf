@@ -490,7 +490,7 @@ variable "runners_volumes_tmpfs" {
     volume  = string
     options = string
   }))
-  default = null
+  default = []
 }
 
 variable "runners_services_volumes_tmpfs" {
@@ -498,7 +498,7 @@ variable "runners_services_volumes_tmpfs" {
     volume  = string
     options = string
   }))
-  default = null
+  default = []
 }
 
 variable "kms_key_id" {
