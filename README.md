@@ -187,7 +187,7 @@ module "runner" {
   runners_gitlab_url = "https://gitlab.com"
 
   gitlab_runner_registration_config = {
-    registration_token = "my-token
+    registration_token = "my-token"
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
@@ -332,15 +332,15 @@ terraform destroy
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| runner\_agent\_role\_arn | ARN of the role used for the ec2 instance for the GitLab runner agent. |
-| runner\_agent\_role\_name | Name of the role used for the ec2 instance for the GitLab runner agent. |
-| runner\_agent\_sg\_id | ID of the security group attached to the GitLab runner agent. |
-| runner\_as\_group\_name | Name of the autoscaling group for the gitlab-runner instance |
-| runner\_cache\_bucket\_arn | ARN of the S3 for the build cache. |
-| runner\_cache\_bucket\_name | Name of the S3 for the build cache. |
-| runner\_eip | EIP of the Gitlab Runner |
-| runner\_role\_arn | ARN of the role used for the docker machine runners. |
-| runner\_role\_name | Name of the role used for the docker machine runners. |
-| runner\_sg\_id | ID of the security group attached to the docker machine runners. |
+| Name                        | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------- |
+| runner\_agent\_role\_arn    | ARN of the role used for the ec2 instance for the GitLab runner agent.  |
+| runner\_agent\_role\_name   | Name of the role used for the ec2 instance for the GitLab runner agent. |
+| runner\_agent\_sg\_id       | ID of the security group attached to the GitLab runner agent.           |
+| runner\_as\_group\_name     | Name of the autoscaling group for the gitlab-runner instance            |
+| runner\_cache\_bucket\_arn  | ARN of the S3 for the build cache.                                      |
+| runner\_cache\_bucket\_name | Name of the S3 for the build cache.                                     |
+| runner\_eip                 | EIP of the Gitlab Runner                                                |
+| runner\_role\_arn           | ARN of the role used for the docker machine runners.                    |
+| runner\_role\_name          | Name of the role used for the docker machine runners.                   |
+| runner\_sg\_id              | ID of the security group attached to the docker machine runners.        |
