@@ -92,6 +92,7 @@ resource "aws_security_group_rule" "docker_machine_ssh_runner" {
 }
 
 resource "aws_security_group_rule" "docker_machine_ping_runner" {
+  count                    = var.enable_ping ? 1 : 0
   type                     = "ingress"
   from_port                = -1
   to_port                  = -1
@@ -112,6 +113,7 @@ resource "aws_security_group_rule" "docker_machine_ssh_self" {
 }
 
 resource "aws_security_group_rule" "docker_machine_ping_self" {
+  count     = var.enable_ping ? 1 : 0
   type      = "ingress"
   from_port = -1
   to_port   = -1
