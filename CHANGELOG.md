@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- Change: Types of `runners_volumes_tmpfs`, and  `runners_services_volumes_tmpfs` are changed, check README or default example for details.
+
 ## 4.12.0 - 2020-03-16
 - Add: Option for permissions boundary (#195) @mhulscher
 - Bugfix: Fix cancel spot instance script from destroy provisioners are deprecate

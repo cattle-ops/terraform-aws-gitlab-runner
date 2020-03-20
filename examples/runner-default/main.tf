@@ -61,12 +61,19 @@ module "runner" {
   runners_additional_volumes = ["/certs/client"]
 
   runners_volumes_tmpfs = [
-    { "/var/opt/cache" = "rw,noexec" },
+    {
+      volume  = "/var/opt/cache",
+      options = "rw,noexec"
+    }
   ]
 
   runners_services_volumes_tmpfs = [
-    { "/var/lib/mysql" = "rw,noexec" },
+    {
+      volume  = "/var/lib/mysql",
+      options = "rw,noexec"
+    }
   ]
+
   # working 9 to 5 :)
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }
