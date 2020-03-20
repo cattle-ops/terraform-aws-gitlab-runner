@@ -37,6 +37,18 @@ resource "aws_security_group_rule" "runner_ssh" {
   security_group_id = aws_security_group.runner.id
 }
 
+resource "aws_security_group_rule" "runner_ping" {
+  count = var.enable_ping ? 1 : 0
+
+  type        = "ingress"
+  from_port   = -1
+  to_port     = -1
+  protocol    = "icmp"
+  cidr_blocks = var.gitlab_runner_ssh_cidr_blocks
+
+  security_group_id = aws_security_group.runner.id
+}
+
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = var.vpc_id
@@ -79,11 +91,31 @@ resource "aws_security_group_rule" "docker_machine_ssh_runner" {
   security_group_id = aws_security_group.docker_machine.id
 }
 
+resource "aws_security_group_rule" "docker_machine_ping_runner" {
+  type                     = "ingress"
+  from_port                = -1
+  to_port                  = -1
+  protocol                 = "icmp"
+  source_security_group_id = aws_security_group.runner.id
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
 resource "aws_security_group_rule" "docker_machine_ssh_self" {
   type      = "ingress"
   from_port = 22
   to_port   = 22
   protocol  = "tcp"
+  self      = true
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ping_self" {
+  type      = "ingress"
+  from_port = -1
+  to_port   = -1
+  protocol  = "icmp"
   self      = true
 
   security_group_id = aws_security_group.docker_machine.id

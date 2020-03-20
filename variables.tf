@@ -303,6 +303,12 @@ variable "gitlab_runner_version" {
   default     = "12.8.0"
 }
 
+variable "enable_ping" {
+  description = "Allow ICMP Ping to the ec2 instances."
+  type        = bool
+  default     = false
+}
+
 variable "enable_gitlab_runner_ssh_access" {
   description = "Enables SSH Access to the gitlab runner instance."
   type        = bool
