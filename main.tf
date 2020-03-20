@@ -136,15 +136,11 @@ locals {
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
   })
-}
 
-locals {
   template_eip = templatefile("${path.module}/template/eip.tpl", {
     eip = join(",", aws_eip.gitlab_runner.*.public_ip)
   })
-}
 
-locals {
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
     {
       gitlab_runner_version                   = var.gitlab_runner_version
@@ -165,9 +161,7 @@ locals {
       gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level              = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
   })
-}
 
-locals {
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
       aws_region                  = var.aws_region
