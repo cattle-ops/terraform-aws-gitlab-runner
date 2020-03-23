@@ -30,9 +30,9 @@ resource "aws_s3_bucket" "build_cache" {
 
   lifecycle_rule {
     id      = "clear"
-    enabled = true
+    enabled = var.cache_lifecycle_clear
 
-    prefix = "runner/"
+    prefix = var.cache_lifecycle_prefix
 
     expiration {
       days = var.cache_expiration_days
