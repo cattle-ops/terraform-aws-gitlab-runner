@@ -9,6 +9,12 @@ variable "aws_zone" {
   default     = "a"
 }
 
+variable "arn_format" {
+  type        = string
+  default     = "arn:aws"
+  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}
+
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string

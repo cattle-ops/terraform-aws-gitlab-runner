@@ -38,3 +38,9 @@ variable "create_cache_bucket" {
   type        = bool
   default     = true
 }
+
+variable "arn_format" {
+  type        = string
+  default     = "arn:aws"
+  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}

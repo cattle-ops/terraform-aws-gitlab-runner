@@ -247,6 +247,7 @@ terraform destroy
 | allow\_iam\_service\_linked\_role\_creation | Boolean used to control attaching the policy to a runner instance to create service linked roles. | `bool` | `true` | no |
 | ami\_filter | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image. | `map(list(string))` | <pre>{<br>  "name": [<br>    "amzn2-ami-hvm-2.*-x86_64-ebs"<br>  ]<br>}</pre> | no |
 | ami\_owners | The list of owners used to select the AMI of Gitlab runner agent instances. | `list(string)` | <pre>[<br>  "amazon"<br>]</pre> | no |
+| arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions (e.g. `arn:aws-us-gov`/`arn:aws-cn`). | string | <pre>arn:aws</pre> | no |
 | aws\_region | AWS region. | `string` | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | `string` | `"a"` | no |
 | cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
