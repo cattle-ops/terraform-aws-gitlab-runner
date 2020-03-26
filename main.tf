@@ -400,7 +400,7 @@ resource "aws_iam_instance_profile" "instance" {
 resource "aws_iam_role" "instance" {
   name                 = "${var.environment}-instance-role"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 ################################################################################
@@ -443,7 +443,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
   count = var.enable_runner_ssm_access ? 1 : 0
 
   role       = aws_iam_role.instance.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 
@@ -462,7 +462,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 resource "aws_iam_role" "docker_machine" {
   name                 = "${var.environment}-docker-machine-role"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
@@ -480,7 +480,7 @@ resource "aws_iam_policy" "service_linked_role" {
   path        = "/"
   description = "Policy for creation of service linked roles."
 
-  policy = templatefile("${path.module}/policies/service-linked-role-create-policy.json", {})
+  policy = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
@@ -504,7 +504,7 @@ resource "aws_iam_policy" "ssm" {
   path        = "/"
   description = "Policy for runner token param access via SSM"
 
-  policy = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", {})
+  policy = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {

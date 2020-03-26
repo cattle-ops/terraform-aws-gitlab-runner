@@ -61,7 +61,7 @@ resource "aws_iam_policy" "docker_machine_cache" {
 
   policy = templatefile("${path.module}/policies/cache.json",
     {
-      s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "arn:aws:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
+      s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "${var.arn_format}:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
     }
   )
 }
