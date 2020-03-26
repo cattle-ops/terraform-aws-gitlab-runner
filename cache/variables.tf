@@ -39,6 +39,18 @@ variable "create_cache_bucket" {
   default     = true
 }
 
+variable "cache_lifecycle_clear" {
+  description = "Enable the rule to cleanup the cache for expired objects."
+  type        = bool
+  default     = true
+}
+
+variable "cache_lifecycle_prefix" {
+  description = "Object key prefix identifying one or more objects to which the clean up rule applies."
+  type        = string
+  default     = "runner/"
+}
+
 variable "arn_format" {
   type        = string
   default     = "arn:aws"
