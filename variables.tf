@@ -9,6 +9,12 @@ variable "aws_zone" {
   default     = "a"
 }
 
+variable "arn_format" {
+  type        = string
+  default     = "arn:aws"
+  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}
+
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string
@@ -303,6 +309,12 @@ variable "gitlab_runner_version" {
   default     = "12.8.0"
 }
 
+variable "enable_ping" {
+  description = "Allow ICMP Ping to the ec2 instances."
+  type        = bool
+  default     = false
+}
+
 variable "enable_gitlab_runner_ssh_access" {
   description = "Enables SSH Access to the gitlab runner instance."
   type        = bool
@@ -486,15 +498,19 @@ variable "enable_runner_ssm_access" {
 }
 
 variable "runners_volumes_tmpfs" {
-  description = "Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type        = list
-  default     = []
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = []
 }
 
 variable "runners_services_volumes_tmpfs" {
-  description = "Mount temporary file systems to service containers. Must consist of pairs of strings e.g. \"/var/lib/mysql\" = \"rw,noexec\", see example"
-  type        = list
-  default     = []
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = []
 }
 
 variable "kms_key_id" {
@@ -530,5 +546,11 @@ variable "enable_forced_updates" {
 variable "permissions_boundary" {
   description = "Name of permissions boundary policy to attach to AWS IAM roles"
   default     = ""
+  type        = string
+}
+
+variable "log_group_name" {
+  description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
+  default     = null
   type        = string
 }

@@ -3,7 +3,7 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> *NEW*: Terraform 0.12 is supported.
+> "Type changes": The types of variable `runners_volumes_tmpfs`, and  `runners_services_volumes_tmpfs` are changed to support the Terraform 12 `templatefile` function. Check the [default example](examples/runner-pre-registered/main.tf) for an usages example.
 
 ## Terraform versions
 

@@ -2,7 +2,7 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> *NEW*: Terraform 0.12 is supported.
+> "Type changes": The types of variable `runners_volumes_tmpfs`, and `runners_services_volumes_tmpfs` are changed to support the Terraform 12 `templatefile` function. Check the [default example](examples/runner-pre-registered/main.tf) for an usages example.
 
 ## Terraform versions
 
@@ -238,7 +238,6 @@ terraform destroy
 |------|---------|
 | aws | n/a |
 | null | n/a |
-| template | n/a |
 
 ## Inputs
 
@@ -248,6 +247,7 @@ terraform destroy
 | allow\_iam\_service\_linked\_role\_creation | Boolean used to control attaching the policy to a runner instance to create service linked roles. | `bool` | `true` | no |
 | ami\_filter | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image. | `map(list(string))` | <pre>{<br>  "name": [<br>    "amzn2-ami-hvm-2.*-x86_64-ebs"<br>  ]<br>}</pre> | no |
 | ami\_owners | The list of owners used to select the AMI of Gitlab runner agent instances. | `list(string)` | <pre>[<br>  "amazon"<br>]</pre> | no |
+| arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | aws\_region | AWS region. | `string` | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | `string` | `"a"` | no |
 | cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
@@ -268,6 +268,7 @@ terraform destroy
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | `bool` | `false` | no |
 | enable\_kms | Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key. | `bool` | `false` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `true` | no |
+| enable\_ping | Allow ICMP Ping to the ec2 instances. | `bool` | `false` | no |
 | enable\_runner\_ssm\_access | Add IAM policies to the runner agent instance to connect via the Session Manager. | `bool` | `false` | no |
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `false` | no |
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
@@ -279,6 +280,7 @@ terraform destroy
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
 | kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |
 | kms\_key\_id | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
+| log\_group\_name | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | n/a | yes |
 | overrides | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
 | permissions\_boundary | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"<br>  ]<br>}</pre> | no |
@@ -314,11 +316,11 @@ terraform destroy
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | `number` | `1` | no |
 | runners\_request\_spot\_instance | Whether or not to request spot instances via docker-machine | `bool` | `true` | no |
 | runners\_root\_size | Runner instance root size in GB. | `number` | `16` | no |
-| runners\_services\_volumes\_tmpfs | Mount temporary file systems to service containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | `list` | `[]` | no |
+| runners\_services\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | runners\_shm\_size | shm\_size for the runners, will be used in the runner config.toml | `number` | `0` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | `string` | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | `bool` | `true` | no |
-| runners\_volumes\_tmpfs | Mount temporary file systems to the main containers. Must consist of pairs of strings e.g. "/var/lib/mysql" = "rw,noexec", see example | `list` | `[]` | no |
+| runners\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | ssh\_key\_pair | Set this to use existing AWS key pair | `string` | `""` | no |

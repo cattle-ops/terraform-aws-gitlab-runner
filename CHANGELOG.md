@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.13.0 - 2020-03-26
+- Add: variables `cache_lifecycle_prefix` and `cache_lifecycle_clear` to increase flexibility of the cache usages.
+- Add: Parametrize the AWS ARN for policies (#203) @ericamador
+- Add: Allow ping to runners and agent from cidr range (#201 @fliphess
+- Change: Refactor templatefile (#199) 
+- Change: Types of `runners_volumes_tmpfs`, and  `runners_services_volumes_tmpfs` are changed, check README or default example for details.
+
 ## 4.12.0 - 2020-03-16
 - Add: Option for permissions boundary (#195) @mhulscher
 - Bugfix: Fix cancel spot instance script from destroy provisioners are deprecate

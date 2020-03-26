@@ -30,9 +30,9 @@ resource "aws_s3_bucket" "build_cache" {
 
   lifecycle_rule {
     id      = "clear"
-    enabled = true
+    enabled = var.cache_lifecycle_clear
 
-    prefix = "runner/"
+    prefix = var.cache_lifecycle_prefix
 
     expiration {
       days = var.cache_expiration_days
@@ -52,14 +52,6 @@ resource "aws_s3_bucket" "build_cache" {
   }
 }
 
-data "template_file" "docker_machine_cache_policy" {
-  template = file("${path.module}/policies/cache.json")
-
-  vars = {
-    s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "arn:aws:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
-  }
-}
-
 resource "aws_iam_policy" "docker_machine_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
@@ -67,5 +59,9 @@ resource "aws_iam_policy" "docker_machine_cache" {
   path        = "/"
   description = "Policy for docker machine instance to access cache"
 
-  policy = data.template_file.docker_machine_cache_policy.rendered
+  policy = templatefile("${path.module}/policies/cache.json",
+    {
+      s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "${var.arn_format}:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
+    }
+  )
 }

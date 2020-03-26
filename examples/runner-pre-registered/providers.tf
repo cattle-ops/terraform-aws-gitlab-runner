@@ -3,10 +3,6 @@ provider "aws" {
   version = "2.41"
 }
 
-provider "template" {
-  version = "2.1.2"
-}
-
 provider "local" {
   version = "1.4"
 }
