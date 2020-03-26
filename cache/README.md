@@ -35,6 +35,7 @@ module "runner" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
+| arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | `string` | `""` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | `string` | `"false"` | no |

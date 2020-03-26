@@ -9,6 +9,12 @@ variable "aws_zone" {
   default     = "a"
 }
 
+variable "arn_format" {
+  type        = string
+  default     = "arn:aws"
+  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}
+
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string
@@ -301,6 +307,12 @@ variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
   default     = "12.8.0"
+}
+
+variable "enable_ping" {
+  description = "Allow ICMP Ping to the ec2 instances."
+  type        = bool
+  default     = false
 }
 
 variable "enable_gitlab_runner_ssh_access" {

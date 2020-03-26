@@ -37,6 +37,18 @@ resource "aws_security_group_rule" "runner_ssh" {
   security_group_id = aws_security_group.runner.id
 }
 
+resource "aws_security_group_rule" "runner_ping" {
+  count = var.enable_ping ? 1 : 0
+
+  type        = "ingress"
+  from_port   = -1
+  to_port     = -1
+  protocol    = "icmp"
+  cidr_blocks = var.gitlab_runner_ssh_cidr_blocks
+
+  security_group_id = aws_security_group.runner.id
+}
+
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = var.vpc_id
@@ -79,11 +91,33 @@ resource "aws_security_group_rule" "docker_machine_ssh_runner" {
   security_group_id = aws_security_group.docker_machine.id
 }
 
+resource "aws_security_group_rule" "docker_machine_ping_runner" {
+  count                    = var.enable_ping ? 1 : 0
+  type                     = "ingress"
+  from_port                = -1
+  to_port                  = -1
+  protocol                 = "icmp"
+  source_security_group_id = aws_security_group.runner.id
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
 resource "aws_security_group_rule" "docker_machine_ssh_self" {
   type      = "ingress"
   from_port = 22
   to_port   = 22
   protocol  = "tcp"
+  self      = true
+
+  security_group_id = aws_security_group.docker_machine.id
+}
+
+resource "aws_security_group_rule" "docker_machine_ping_self" {
+  count     = var.enable_ping ? 1 : 0
+  type      = "ingress"
+  from_port = -1
+  to_port   = -1
+  protocol  = "icmp"
   self      = true
 
   security_group_id = aws_security_group.docker_machine.id
@@ -366,7 +400,7 @@ resource "aws_iam_instance_profile" "instance" {
 resource "aws_iam_role" "instance" {
   name                 = "${var.environment}-instance-role"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 ################################################################################
@@ -409,7 +443,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
   count = var.enable_runner_ssm_access ? 1 : 0
 
   role       = aws_iam_role.instance.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 
@@ -428,7 +462,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 resource "aws_iam_role" "docker_machine" {
   name                 = "${var.environment}-docker-machine-role"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
@@ -446,7 +480,7 @@ resource "aws_iam_policy" "service_linked_role" {
   path        = "/"
   description = "Policy for creation of service linked roles."
 
-  policy = templatefile("${path.module}/policies/service-linked-role-create-policy.json", {})
+  policy = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
@@ -470,7 +504,7 @@ resource "aws_iam_policy" "ssm" {
   path        = "/"
   description = "Policy for runner token param access via SSM"
 
-  policy = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", {})
+  policy = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {

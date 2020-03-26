@@ -50,3 +50,9 @@ variable "cache_lifecycle_prefix" {
   type        = string
   default     = "runner/"
 }
+
+variable "arn_format" {
+  type        = string
+  default     = "arn:aws"
+  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}
