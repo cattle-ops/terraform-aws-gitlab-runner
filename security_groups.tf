@@ -87,7 +87,7 @@ resource "aws_security_group_rule" "runner_ping" {
 
 # Allow SSH traffic from allowed security group IDs to gitlab-runner agent instances
 resource "aws_security_group_rule" "runner_ssh_group" {
-  count = length(var.gitlab_runner_security_group_ids) > 0 && var.enable_gitlab_runner_ssh_access ? length(var.gitlab_runner_security_group_ids) : 1
+  count = length(var.gitlab_runner_security_group_ids) > 0 && var.enable_gitlab_runner_ssh_access ? length(var.gitlab_runner_security_group_ids) : 0
 
   type      = "ingress"
   from_port = 22
@@ -180,12 +180,12 @@ resource "aws_security_group_rule" "docker_machine_ssh_runner" {
   to_port   = 22
   protocol  = "tcp"
 
-  source_security_group_id = element(var.gitlab_runner_security_group_ids, count.index)
+  source_security_group_id = element(local.security_groups_ssh, count.index)
   security_group_id        = aws_security_group.docker_machine.id
 
   description = format(
     "Allow SSH traffic from %s to docker-machine instances in group %s on port 22",
-    element(var.gitlab_runner_security_group_ids, count.index),
+    element(local.security_groups_ssh, count.index),
     aws_security_group.docker_machine.name
   )
 }
@@ -199,12 +199,12 @@ resource "aws_security_group_rule" "docker_machine_ping_runner" {
   to_port   = -1
   protocol  = "icmp"
 
-  source_security_group_id = element(var.gitlab_runner_security_group_ids, count.index)
+  source_security_group_id = element(local.security_groups_ping, count.index)
   security_group_id        = aws_security_group.docker_machine.id
 
   description = format(
     "Allow ICMP traffic from %s to docker-machine instances in group %s",
-    element(var.gitlab_runner_security_group_ids, count.index),
+    element(local.security_groups_ping, count.index),
     aws_security_group.docker_machine.name
   )
 }
