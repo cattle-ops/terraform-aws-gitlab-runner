@@ -47,8 +47,8 @@ module "runner" {
   enable_eip               = true
   enable_ping              = true
 
-  ssh_key_pair = aws_key_pair.runner.key_name
-  enable_gitlab_runner_ssh_access  = true
+  ssh_key_pair                    = aws_key_pair.runner.key_name
+  enable_gitlab_runner_ssh_access = true
 
   gitlab_runner_ssh_cidr_blocks    = module.vpc.private_subnets
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
