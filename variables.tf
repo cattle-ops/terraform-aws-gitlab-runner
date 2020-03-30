@@ -324,7 +324,7 @@ variable "enable_gitlab_runner_ssh_access" {
 variable "gitlab_runner_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 variable "gitlab_runner_security_group_ids" {

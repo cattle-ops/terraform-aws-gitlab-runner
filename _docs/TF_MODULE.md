@@ -40,8 +40,8 @@
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
-| gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
-| gitlab\_runner\_security\_group\_ids | List of security group IDs to allow Access to the gitlab runner instances. | `list(string)` | `[]` | no |
+| gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | <pre>[<br>]</pre> | no |
+| gitlab\_runner\_security\_group\_ids | List of security group IDs to allow Access to the gitlab runner instances. | `list(string)` | <pre>[<br>]</pre>` | no |
 | gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"12.8.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
