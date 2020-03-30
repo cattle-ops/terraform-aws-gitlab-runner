@@ -1,20 +1,4 @@
 ########################################
-## Validation                         ##
-########################################
-
-# prevent allow from world through cidr ranges while security_group_ids are used
-# This statement should fail during the plan phase, resulting in an error.
-# https://github.com/hashicorp/terraform/issues/15469#issuecomment-444876784
-resource "null_resource" "fail_if_security_group_ids_are_set_and_cidr_blocks_allow_all" {
-  count = length(var.gitlab_runner_security_group_ids) > 0 && var.gitlab_runner_ssh_cidr_blocks == ["0.0.0.0/0"] ? 1 : 0
-
-  provisioner "local-exec" {
-    command     = "false"
-    interpreter = ["bash", "-c"]
-  }
-}
-
-########################################
 ## Gitlab-runner agent security group ##
 ########################################
 
