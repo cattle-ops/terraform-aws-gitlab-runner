@@ -144,7 +144,7 @@ A few option are provide the runner instance
 2.  Provide a EC2 key pair to access the runner by setting \`\`.
 3.  Access via the Session Manager (SSM) by setting `enable_runner_ssm_access` to `true`. The policy to allow access via SSM is not very restrictive.
 4.  By setting non of the above no keys or extra policies will be attached to the instance. You can still configure you own policies by attaching them to `runner_agent_role_arn`.
-5.  Access through a bastion host or another security group in your vpc. An example implementation of this use case can be find in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-private) example.
+5.  Access through a bastion host or another security group in your vpc. An example implementation of this use case can be find in the [runner-private](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-private) example.
 
 ### GitLab runner cache
 
