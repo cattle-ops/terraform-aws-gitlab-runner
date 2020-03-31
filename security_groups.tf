@@ -151,7 +151,7 @@ resource "aws_security_group_rule" "docker_machine_docker_runner" {
 # Combine runner security group id and additional security group IDs
 locals {
   # Always include the runner security group id, add additional if ssh is enabled
-  security_groups_ssh  = var.enable_gitlab_runner_ssh_access && length(var.gitlab_runner_security_group_ids) > 0 ? concat(var.gitlab_runner_security_group_ids, [aws_security_group.runner.id]) : [aws_security_group.runner.id]
+  security_groups_ssh = var.enable_gitlab_runner_ssh_access && length(var.gitlab_runner_security_group_ids) > 0 ? concat(var.gitlab_runner_security_group_ids, [aws_security_group.runner.id]) : [aws_security_group.runner.id]
 
   # Only include runner security group id and addtional if ping is enabled
   security_groups_ping = var.enable_ping && length(var.gitlab_runner_security_group_ids) > 0 ? concat(var.gitlab_runner_security_group_ids, [aws_security_group.runner.id]) : []
