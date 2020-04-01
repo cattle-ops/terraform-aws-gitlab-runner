@@ -2,6 +2,10 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_security_group" "default" {
+  name = "default"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.21"
@@ -36,6 +40,8 @@ module "runner" {
   runners_gitlab_url       = var.gitlab_url
   enable_runner_ssm_access = true
   enable_eip               = true
+
+  gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
 
   docker_machine_spot_price_bid = "0.06"
 
