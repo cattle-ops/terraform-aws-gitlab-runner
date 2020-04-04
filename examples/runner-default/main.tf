@@ -2,6 +2,10 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_security_group" "default" {
+  name = "default"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.21"
@@ -37,6 +41,8 @@ module "runner" {
   enable_runner_ssm_access = true
   enable_eip               = true
 
+  gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
+
   docker_machine_spot_price_bid = "0.06"
 
   gitlab_runner_registration_config = {
@@ -61,12 +67,19 @@ module "runner" {
   runners_additional_volumes = ["/certs/client"]
 
   runners_volumes_tmpfs = [
-    { "/var/opt/cache" = "rw,noexec" },
+    {
+      volume  = "/var/opt/cache",
+      options = "rw,noexec"
+    }
   ]
 
   runners_services_volumes_tmpfs = [
-    { "/var/lib/mysql" = "rw,noexec" },
+    {
+      volume  = "/var/lib/mysql",
+      options = "rw,noexec"
+    }
   ]
+
   # working 9 to 5 :)
   runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
 }

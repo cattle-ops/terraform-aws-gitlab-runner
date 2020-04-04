@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-- Change: Variable `ssh_public_key` is not longer supported. 
-- Change: Bump gitlab runner version to 12.8.0
-- Fix: Defect in cancel spot instance script
+## 4.13.0 - 2020-03-26
+- Add: variables `cache_lifecycle_prefix` and `cache_lifecycle_clear` to increase flexibility of the cache usages.
+- Add: Parametrize the AWS ARN for policies (#203) @ericamador
+- Add: Allow ping to runners and agent from cidr range (#201 @fliphess
+- Change: Refactor templatefile (#199) 
+- Change: Types of `runners_volumes_tmpfs`, and  `runners_services_volumes_tmpfs` are changed, check README or default example for details.
+
+## 4.12.0 - 2020-03-16
+- Add: Option for permissions boundary (#195) @mhulscher
+- Bugfix: Fix cancel spot instance script from destroy provisioners are deprecate
+- Change: Update default GitLab runner version to 12.8.0
 
 ## 4.11.1 - 2020-02-27
 - Bugfix: #187 - fix double comma in tag list for docker machine
@@ -283,7 +291,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.1...HEAD
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.12.0...HEAD
+[4.12.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.12.0...4.11.1
 [4.11.1]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.1...4.11.0
 [4.11.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.0...4.10.0
 [4.10.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.10.0...4.9.0
