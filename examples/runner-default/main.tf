@@ -30,8 +30,9 @@ module "vpc" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
-  environment = var.environment
+  cache_bucket_prefix = "bladibla"
+  aws_region          = var.aws_region
+  environment         = var.environment
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.private_subnets
