@@ -3,12 +3,13 @@ data "aws_availability_zones" "available" {
 }
 
 data "aws_security_group" "default" {
-  name = "default"
+  name   = "default"
+  vpc_id = module.vpc.vpc_id
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.21"
+  version = "2.33"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"

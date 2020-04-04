@@ -20,14 +20,12 @@ module "vpc" {
 }
 
 module "cache" {
-  source      = "../../cache"
+  source      = "../../modules/cache"
   environment = "${var.environment}"
 }
 
-
-
 module "key_pair" {
-  source = "../modules/key-pair"
+  source = "../../modules/key-pair"
 
   environment = var.environment
   name        = var.runner_name

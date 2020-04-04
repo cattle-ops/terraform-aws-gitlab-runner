@@ -1,11 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_key_pair" "key" {
-  count      = var.ssh_key_pair == "" && var.ssh_public_key != "" ? 1 : 0
-  key_name   = "${var.environment}-gitlab-runner"
-  public_key = var.ssh_public_key
-}
-
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
@@ -243,7 +237,7 @@ locals {
 }
 
 module "cache" {
-  source = "./cache"
+  source = "./modules/cache"
 
   environment = var.environment
   tags        = local.tags

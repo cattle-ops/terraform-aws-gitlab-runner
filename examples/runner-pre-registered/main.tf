@@ -24,7 +24,7 @@ module "vpc" {
 }
 
 module "key_pair" {
-  source = "../modules/key-pair"
+  source = "../../modules/key-pair"
 
   environment = var.environment
   name        = var.runner_name
