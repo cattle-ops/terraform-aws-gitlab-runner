@@ -2,7 +2,7 @@
 
 | Name | Version |
 |------|---------|
-| aws | 2.52 |
+| aws | 2.56 |
 
 ## Inputs
 
