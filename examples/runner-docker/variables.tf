@@ -10,13 +10,13 @@ variable "environment" {
   type        = string
 }
 
-variable "public_ssh_key_filename" {
-  default = "generated/id_rsa.pub"
-}
+# variable "public_ssh_key_filename" {
+#   default = "generated/id_rsa.pub"
+# }
 
-variable "private_ssh_key_filename" {
-  default = "generated/id_rsa"
-}
+# variable "private_ssh_key_filename" {
+#   default = "generated/id_rsa"
+# }
 
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"

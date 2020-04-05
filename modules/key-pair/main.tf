@@ -1,5 +1,6 @@
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
+  rsa_bits  = var.rsa_bits
 }
 
 resource "local_file" "public_ssh_key" {
@@ -24,4 +25,23 @@ resource "null_resource" "file_permission" {
     interpreter = ["/bin/bash", "-c"]
   }
 }
+
+resource "aws_key_pair" "key" {
+  key_name   = var.name != null ? "${var.environment}-${var.name}" : "${var.environment}"
+  public_key = local_file.public_ssh_key.content
+  tags       = local.tags
+}
+
+locals {
+  tags = merge(
+    {
+      "Name" = format("%s", var.environment)
+    },
+    {
+      "Environment" = format("%s", var.environment)
+    },
+    var.tags,
+  )
+}
+
 
