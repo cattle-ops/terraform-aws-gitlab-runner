@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.21"
+  version = "2.33"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -20,8 +20,15 @@ module "vpc" {
 }
 
 module "cache" {
-  source      = "../../cache"
+  source      = "../../modules/cache"
   environment = "${var.environment}"
+}
+
+module "key_pair" {
+  source = "../../modules/key-pair"
+
+  environment = var.environment
+  name        = var.runner_name
 }
 
 module "runner" {
@@ -30,7 +37,7 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key              = local_file.public_ssh_key.content
+  ssh_key_pair                = module.key_pair.key_pair.key_name
   runners_use_private_address = false
 
   vpc_id                   = module.vpc.vpc_id
@@ -77,7 +84,7 @@ module "runner2" {
   aws_region  = var.aws_region
   environment = "${var.environment}-2"
 
-  ssh_public_key              = local_file.public_ssh_key.content
+  ssh_key_pair                = module.key_pair.key_pair.key_name
   runners_use_private_address = false
 
   vpc_id                   = module.vpc.vpc_id

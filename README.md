@@ -2,7 +2,7 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> "Type changes": The types of variable `runners_volumes_tmpfs`, and `runners_services_volumes_tmpfs` are changed to support the Terraform 12 `templatefile` function. Check the [default example](examples/runner-pre-registered/main.tf) for an usages example.
+> "Managed key support dropped": The module will not longer manage an SSH key pair. The module offers two way to access instances. First via the AWS session manager and second by providing an AWS key pair as parameter. "Type changes": The types of variable `runners_volumes_tmpfs`, and `runners_services_volumes_tmpfs` are changed to support the Terraform 12 `templatefile` function. Check the [default example](examples/runner-pre-registered/main.tf) for an usages example.
 
 ## Terraform versions
 
@@ -274,7 +274,8 @@ terraform destroy
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
-| gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| gitlab\_runner\_security\_group\_ids | A list of security group ids that are allowed to access the gitlab runner agent | `list(string)` | `[]` | no |
+| gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | `[]` | no |
 | gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"12.8.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
@@ -323,8 +324,7 @@ terraform destroy
 | runners\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
-| ssh\_key\_pair | Set this to use existing AWS key pair | `string` | `""` | no |
-| ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | `string` | `""` | no |
+| ssh\_key\_pair | Set this to use existing AWS key pair | `string` | n/a | yes |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | `string` | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | `list(string)` | n/a | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |

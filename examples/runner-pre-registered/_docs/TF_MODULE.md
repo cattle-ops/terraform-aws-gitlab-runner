@@ -2,10 +2,7 @@
 
 | Name | Version |
 |------|---------|
-| aws | 2.41 |
-| local | 1.4 |
-| null | 2.1.2 |
-| tls | 2.1.1 |
+| aws | 2.52 |
 
 ## Inputs
 
