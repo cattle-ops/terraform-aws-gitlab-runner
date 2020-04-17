@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-## 4.14.0 - 2020-04094
+
+## 4.15.0 - 2020-04-16
+
+- Added: support custom docker machine distribution (#216) …
+- Bugfix: disabled cache (#212) 
+- Bugfix: failing curl (#217) …
+- Change: Drop supported to manage ec2 keys (#192)
+
+
+## 4.14.0 - 2020-04-04
 - Add: Allow traffic from a list of security group IDs (#207) by @fliphess
 - Bugfix: Fix missing policy for existing cache (#208, #206)
-
 
 ## 4.13.0 - 2020-03-26
 - Add: variables `cache_lifecycle_prefix` and `cache_lifecycle_clear` to increase flexibility of the cache usages.
@@ -296,8 +304,9 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.14.0...HEAD
-[4.13.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.14.0...4.13.0
+[Unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.15.0...HEAD
+[4.15.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.15.0...4.14.0
+[4.14.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.14.0...4.13.0
 [4.13.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.13.0...4.12.0
 [4.12.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.12.0...4.11.1
 [4.11.1]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.11.1...4.11.0
