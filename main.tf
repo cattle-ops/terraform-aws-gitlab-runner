@@ -46,6 +46,7 @@ locals {
     {
       gitlab_runner_version                   = var.gitlab_runner_version
       docker_machine_version                  = var.docker_machine_version
+      docker_machine_download_url             = var.docker_machine_download_url
       runners_config                          = local.template_runner_config
       runners_executor                        = var.runners_executor
       pre_install                             = var.userdata_pre_install
