@@ -23,7 +23,7 @@ then
   fi
 fi
 
-curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
+curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
 yum install gitlab-runner-${gitlab_runner_version} -y
 
 if [[ `echo ${docker_machine_download_url}` == "" ]]
@@ -34,7 +34,7 @@ else
 fi
 
 chmod +x /tmp/docker-machine && \
-  cp /tmp/docker-machine /usr/local/bin/docker-machine && \
+  mv /tmp/docker-machine /usr/local/bin/docker-machine && \
   ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
 docker-machine --version
 
