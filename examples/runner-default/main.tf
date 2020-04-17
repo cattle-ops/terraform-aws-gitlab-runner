@@ -3,12 +3,13 @@ data "aws_availability_zones" "available" {
 }
 
 data "aws_security_group" "default" {
-  name = "default"
+  name   = "default"
+  vpc_id = module.vpc.vpc_id
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.21"
+  version = "2.33"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -43,6 +44,7 @@ module "runner" {
 
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
 
+  docker_machine_download_url   = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
   docker_machine_spot_price_bid = "0.06"
 
   gitlab_runner_registration_config = {

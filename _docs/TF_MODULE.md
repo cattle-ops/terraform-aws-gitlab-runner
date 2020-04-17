@@ -23,11 +23,12 @@
 | cache\_expiration\_days | Number of days before cache objects expires. | `number` | `1` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
 | cloudwatch\_logging\_retention\_in\_days | Retention for cloudwatch logs. Defaults to unlimited | `number` | `0` | no |
-| docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | `string` | `"m5a.large"` | no |
+| docker\_machine\_download\_url | Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine. | `string` | `""` | no |
+| docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | `string` | `"m5.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | `list(string)` | `[]` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | `string` | `"0.06"` | no |
-| docker\_machine\_version | Version of docker-machine. | `string` | `"0.16.2"` | no |
+| docker\_machine\_version | Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | `bool` | `true` | no |
 | enable\_eip | Enable the assignment of an EIP to the gitlab runner instance | `bool` | `false` | no |
 | enable\_forced\_updates | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `false` | no |
@@ -40,8 +41,8 @@
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
-| gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | <pre>[<br>]</pre> | no |
-| gitlab\_runner\_security\_group\_ids | List of security group IDs to allow Access to the gitlab runner instances. | `list(string)` | <pre>[<br>]</pre>` | no |
+| gitlab\_runner\_security\_group\_ids | A list of security group ids that are allowed to access the gitlab runner agent | `list(string)` | `[]` | no |
+| gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | `[]` | no |
 | gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"12.8.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
@@ -90,8 +91,7 @@
 | runners\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
-| ssh\_key\_pair | Set this to use existing AWS key pair | `string` | `""` | no |
-| ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | `string` | `""` | no |
+| ssh\_key\_pair | Set this to use existing AWS key pair | `string` | n/a | yes |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | `string` | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | `list(string)` | n/a | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |

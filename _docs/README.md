@@ -3,6 +3,10 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
+> "Added support to download docker machine from a different location, e.g. https://gitlab.com/gitlab-org/ci-cd/docker-machine"
+
+> "Managed ec2 key support dropped": The module will not longer manage an SSH key pair. The module offers two way to access instances. First via the AWS session manager and second by providing an AWS key pair as parameter. 
+
 > "Type changes": The types of variable `runners_volumes_tmpfs`, and  `runners_services_volumes_tmpfs` are changed to support the Terraform 12 `templatefile` function. Check the [default example](examples/runner-pre-registered/main.tf) for an usages example.
 
 ## Terraform versions

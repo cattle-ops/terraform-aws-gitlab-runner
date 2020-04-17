@@ -8,6 +8,7 @@ This examples shows:
   - No SSH keys, you can log into the instance via SSM (Session Manager).
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor.
+  - Addtional security groups that are allowed access to the runner agent
 
 ![runners-default](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-default.png)
 
@@ -19,7 +20,7 @@ The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv)
 
 | Name | Version |
 |------|---------|
-| aws | 2.41 |
+| aws | 2.56 |
 | null | 2.1.2 |
 
 ## Inputs

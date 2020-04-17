@@ -1,6 +1,6 @@
 echo 'installing additional software for assigning EIP'
 
-curl -O https://bootstrap.pypa.io/get-pip.py
+curl --fail --retry 6 -O https://bootstrap.pypa.io/get-pip.py
 python get-pip.py --user
 export PATH=~/.local/bin:$PATH
 

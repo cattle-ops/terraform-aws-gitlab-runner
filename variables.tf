@@ -56,19 +56,13 @@ variable "runner_instance_spot_price" {
 variable "ssh_key_pair" {
   description = "Set this to use existing AWS key pair"
   type        = string
-  default     = ""
-}
-
-variable "ssh_public_key" {
-  description = "Public SSH key used for the GitLab runner EC2 instance."
-  type        = string
-  default     = ""
+  default     = null
 }
 
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
   type        = string
-  default     = "m5a.large"
+  default     = "m5.large"
 }
 
 variable "docker_machine_spot_price_bid" {
@@ -77,8 +71,14 @@ variable "docker_machine_spot_price_bid" {
   default     = "0.06"
 }
 
+variable "docker_machine_download_url" {
+  description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
+  type        = string
+  default     = ""
+}
+
 variable "docker_machine_version" {
-  description = "Version of docker-machine."
+  description = "Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
   default     = "0.16.2"
 }
