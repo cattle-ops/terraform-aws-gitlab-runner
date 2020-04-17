@@ -23,11 +23,12 @@
 | cache\_expiration\_days | Number of days before cache objects expires. | `number` | `1` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
 | cloudwatch\_logging\_retention\_in\_days | Retention for cloudwatch logs. Defaults to unlimited | `number` | `0` | no |
-| docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | `string` | `"m5a.large"` | no |
+| docker\_machine\_download\_url | Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine. | `string` | `""` | no |
+| docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | `string` | `"m5.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | `list(string)` | `[]` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | `string` | `"0.06"` | no |
-| docker\_machine\_version | Version of docker-machine. | `string` | `"0.16.2"` | no |
+| docker\_machine\_version | Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `"0.16.2"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | `bool` | `true` | no |
 | enable\_eip | Enable the assignment of an EIP to the gitlab runner instance | `bool` | `false` | no |
 | enable\_forced\_updates | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `false` | no |

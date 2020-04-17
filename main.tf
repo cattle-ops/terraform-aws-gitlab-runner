@@ -46,6 +46,7 @@ locals {
     {
       gitlab_runner_version                   = var.gitlab_runner_version
       docker_machine_version                  = var.docker_machine_version
+      docker_machine_download_url             = var.docker_machine_download_url
       runners_config                          = local.template_runner_config
       runners_executor                        = var.runners_executor
       pre_install                             = var.userdata_pre_install
@@ -232,8 +233,8 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = var.cache_bucket["create"] ? module.cache.bucket : var.cache_bucket["bucket"]
-  bucket_policy = var.cache_bucket["create"] ? module.cache.policy_arn : var.cache_bucket["policy"]
+  bucket_name   = var.cache_bucket["create"] ? module.cache.bucket : lookup(var.cache_bucket, "bucket", "")
+  bucket_policy = var.cache_bucket["create"] ? module.cache.policy_arn : lookup(var.cache_bucket, "policy", "")
 }
 
 module "cache" {
@@ -311,7 +312,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
-  count      = var.cache_bucket["create"] || var.cache_bucket["policy"] != "" ? 1 : 0
+  count      = var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }
