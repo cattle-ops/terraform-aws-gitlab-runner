@@ -331,6 +331,13 @@ resource "aws_iam_instance_profile" "docker_machine" {
   role = aws_iam_role.docker_machine.name
 }
 
+resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
+  count = var.enable_docker_machine_ssm_access ? 1 : 0
+
+  role       = aws_iam_role.docker_machine.name
+  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 ################################################################################
 ### Service linked policy, optional
 ################################################################################

@@ -503,6 +503,12 @@ variable "enable_runner_ssm_access" {
   default     = false
 }
 
+variable "enable_docker_machine_ssm_access" {
+  description = "Add IAM policies to the docker-machine instances to connect via the Session Manager."
+  type        = bool
+  default     = false
+}
+
 variable "runners_volumes_tmpfs" {
   type = list(object({
     volume  = string
