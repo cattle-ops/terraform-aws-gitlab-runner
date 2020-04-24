@@ -275,6 +275,7 @@ terraform destroy
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `true` | no |
 | enable\_ping | Allow ICMP Ping to the ec2 instances. | `bool` | `false` | no |
 | enable\_runner\_ssm\_access | Add IAM policies to the runner agent instance to connect via the Session Manager. | `bool` | `false` | no |
+| enable\_docker\_machine\_ssm\_access | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `false` | no |
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
