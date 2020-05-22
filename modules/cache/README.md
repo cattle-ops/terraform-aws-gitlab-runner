@@ -24,6 +24,12 @@ module "runner" {
 
 }
 ```
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
 
 ## Providers
 
@@ -34,7 +40,7 @@ module "runner" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | `string` | `""` | no |
@@ -53,3 +59,5 @@ module "runner" {
 | arn | The ARN of the created bucket. |
 | bucket | Name of the created bucket. |
 | policy\_arn | Policy for users of the cache (bucket). |
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
