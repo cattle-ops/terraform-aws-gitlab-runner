@@ -306,7 +306,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.8.0"
+  default     = "13.0.0"
 }
 
 variable "enable_ping" {
@@ -549,10 +549,16 @@ variable "enable_eip" {
   type        = bool
 }
 
-variable "enable_forced_updates" {
+variable "enable_asg_recreation" {
   description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = false
+  default     = true
   type        = bool
+}
+
+variable "enable_forced_updates" {
+  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the oposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
+  default     = null
+  type        = string
 }
 
 variable "permissions_boundary" {

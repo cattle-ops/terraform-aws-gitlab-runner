@@ -274,22 +274,23 @@ terraform destroy
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | `string` | `"0.06"` | no |
 | docker\_machine\_version | Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `"0.16.2"` | no |
+| enable\_asg\_recreation | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `true` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | `bool` | `true` | no |
+| enable\_docker\_machine\_ssm\_access | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
 | enable\_eip | Enable the assignment of an EIP to the gitlab runner instance | `bool` | `false` | no |
-| enable\_forced\_updates | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `false` | no |
+| enable\_forced\_updates | DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the oposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change.` | `string` | `null` | no |
 | enable\_gitlab\_runner\_ssh\_access | Enables SSH Access to the gitlab runner instance. | `bool` | `false` | no |
 | enable\_kms | Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key. | `bool` | `false` | no |
 | enable\_manage\_gitlab\_token | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `true` | no |
 | enable\_ping | Allow ICMP Ping to the ec2 instances. | `bool` | `false` | no |
 | enable\_runner\_ssm\_access | Add IAM policies to the runner agent instance to connect via the Session Manager. | `bool` | `false` | no |
-| enable\_docker\_machine\_ssm\_access | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `false` | no |
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
 | gitlab\_runner\_security\_group\_ids | A list of security group ids that are allowed to access the gitlab runner agent | `list(string)` | `[]` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | `[]` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"12.8.0"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.0.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
 | kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |

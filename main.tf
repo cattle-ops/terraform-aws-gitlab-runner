@@ -30,6 +30,8 @@ resource "null_resource" "remove_runner" {
 }
 
 locals {
+  enable_asg_recreation = var.enable_forced_updates != null ? ! var.enable_forced_updates : var.enable_asg_recreation
+
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
@@ -141,7 +143,7 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                      = var.enable_forced_updates ? "${var.environment}-as-group" : "${aws_launch_configuration.gitlab_runner_instance.name}-asg"
+  name                      = local.enable_asg_recreation ? "${aws_launch_configuration.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
