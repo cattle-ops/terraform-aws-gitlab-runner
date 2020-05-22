@@ -50,7 +50,7 @@ variable "runner_instance_ebs_optimized" {
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "ssh_key_pair" {
@@ -306,7 +306,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "12.8.0"
+  default     = "13.0.0"
 }
 
 variable "enable_ping" {
@@ -503,6 +503,12 @@ variable "enable_runner_ssm_access" {
   default     = false
 }
 
+variable "enable_docker_machine_ssm_access" {
+  description = "Add IAM policies to the docker-machine instances to connect via the Session Manager."
+  type        = bool
+  default     = false
+}
+
 variable "runners_volumes_tmpfs" {
   type = list(object({
     volume  = string
@@ -543,10 +549,16 @@ variable "enable_eip" {
   type        = bool
 }
 
-variable "enable_forced_updates" {
+variable "enable_asg_recreation" {
   description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = false
+  default     = true
   type        = bool
+}
+
+variable "enable_forced_updates" {
+  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the oposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
+  default     = null
+  type        = string
 }
 
 variable "permissions_boundary" {
