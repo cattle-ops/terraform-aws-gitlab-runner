@@ -37,6 +37,7 @@ variable "subnet_ids_gitlab_runner" {
 
 variable "metrics_autoscaling" {
   description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
+  type        = list(string)
   default     = null
 }
 
