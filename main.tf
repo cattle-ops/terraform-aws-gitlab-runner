@@ -150,7 +150,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   desired_capacity          = "1"
   health_check_grace_period = 0
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
-
+  enabled_metrics           = var.metrics_autoscaling
   tags = concat(
     data.null_data_source.tags.*.outputs,
     [
