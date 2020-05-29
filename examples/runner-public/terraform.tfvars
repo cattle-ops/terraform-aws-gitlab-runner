@@ -1,5 +1,3 @@
-key_name = "gitlab-runner"
-
 environment = "runner-public"
 
 aws_region = "eu-west-1"

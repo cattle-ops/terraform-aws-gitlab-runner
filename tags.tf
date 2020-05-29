@@ -6,14 +6,16 @@ locals {
     {
       "Environment" = format("%s", var.environment)
     },
-    var.tags
+    var.tags,
   )
 
-  tags_string = replace(
-    replace(jsonencode(local.tags), "/[\\{\\}\"\\s]/", ""),
-    ":",
-    ","
-  )
+  tags_string = join(",", flatten([
+    for key in keys(local.tags) : [key, lookup(local.tags, key)]
+  ]))
+
+  runner_tags_string = join(",", flatten([
+    for key in keys(var.runner_tags) : [key, lookup(var.runner_tags, key)]
+  ]))
 }
 
 data "null_data_source" "tags" {
@@ -25,3 +27,4 @@ data "null_data_source" "tags" {
     propagate_at_launch = "true"
   }
 }
+

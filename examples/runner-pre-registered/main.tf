@@ -1,11 +1,15 @@
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "1.60.0"
+  version = "2.21"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
 
-  azs             = ["eu-west-1a"]
+  azs             = [data.aws_availability_zones.available.names[0]]
   private_subnets = ["10.0.1.0/24"]
   public_subnets  = ["10.0.101.0/24"]
 
@@ -15,27 +19,34 @@ module "vpc" {
   enable_s3_endpoint = true
 
   tags = {
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
+}
+
+module "key_pair" {
+  source = "../../modules/key-pair"
+
+  environment = var.environment
+  name        = var.runner_name
 }
 
 module "runner" {
   source = "../../"
 
-  aws_region  = "${var.aws_region}"
-  environment = "${var.environment}"
+  aws_region  = var.aws_region
+  environment = var.environment
 
-  ssh_public_key = "${local_file.public_ssh_key.content}"
+  ssh_key_pair = module.key_pair.key_pair.key_name
 
-  vpc_id                   = "${module.vpc.vpc_id}"
-  subnet_ids_gitlab_runner = "${module.vpc.private_subnets}"
-  subnet_id_runners        = "${element(module.vpc.private_subnets, 0)}"
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids_gitlab_runner = module.vpc.private_subnets
+  subnet_id_runners        = element(module.vpc.private_subnets, 0)
 
-  runners_name       = "${var.runner_name}"
-  runners_gitlab_url = "${var.gitlab_url}"
-  runners_token      = "${var.runner_token}"
+  runners_name       = var.runner_name
+  runners_gitlab_url = var.gitlab_url
+  runners_token      = var.runner_token
 
-  runners_off_peak_timezone   = "Europe/Amsterdam"
+  runners_off_peak_timezone   = var.timezone
   runners_off_peak_idle_count = 0
   runners_off_peak_idle_time  = 60
 

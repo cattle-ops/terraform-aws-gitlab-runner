@@ -2,10 +2,10 @@
 A few sentences describing the overall goals of the pull request's commits.
 
 ## Migrations required
-YES | NO - If yes please describe the mirgration.
+YES | NO - If yes please describe the migration.
 
 ## Verification
-Please mentioned the examples you have verified.
+Please mention the examples you have verified.
 
 ## Documentation
-Please ensure you pdate the README in `_docs/README.md`. The README.md in the root can be update by running the script `ci/bin/autodocs.sh`
+Please ensure you update the README in `_docs/README.md`. The README.md in the root can be updated by running the script `ci/bin/autodocs.sh`, requires `terraform-docs` version 0.8+

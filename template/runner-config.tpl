@@ -18,8 +18,13 @@ check_interval = 0
     image = "${runners_image}"
     privileged = ${runners_privileged}
     disable_cache = false
-    volumes = ["/cache"]
+    volumes = ["/cache"${runners_additional_volumes}]
     shm_size = ${runners_shm_size}
+    pull_policy = "${runners_pull_policy}"
+  [runners.docker.tmpfs]
+    ${runners_volumes_tmpfs}
+  [runners.docker.services_tmpfs]
+    ${runners_services_volumes_tmpfs}
   [runners.cache]
     Type = "s3"
     Shared = ${shared_cache}
@@ -31,6 +36,7 @@ check_interval = 0
   [runners.machine]
     IdleCount = ${runners_idle_count}
     IdleTime = ${runners_idle_time}
+    ${runners_max_builds}
     MachineDriver = "amazonec2"
     MachineName = "runner-%s"
     MachineOptions = [
@@ -39,14 +45,17 @@ check_interval = 0
       "amazonec2-zone=${runners_aws_zone}",
       "amazonec2-vpc-id=${runners_vpc_id}",
       "amazonec2-subnet-id=${runners_subnet_id}",
-      "amazonec2-private-address-only=${runners_use_private_address}",
-      "amazonec2-request-spot-instance=true",
+      "amazonec2-private-address-only=${runners_use_private_address_only}",
+      "amazonec2-use-private-address=${runners_use_private_address}",
+      "amazonec2-request-spot-instance=${runners_request_spot_instance}",
       "amazonec2-spot-price=${runners_spot_price_bid}",
       "amazonec2-security-group=${runners_security_group_name}",
       "amazonec2-tags=${runners_tags}",
+      "amazonec2-use-ebs-optimized-instance=${runners_ebs_optimized}",
       "amazonec2-monitoring=${runners_monitoring}",
-      "amazonec2-iam-instance-profile=${runners_instance_profile}",
-      "amazonec2-root-size=${runners_root_size}"
+      "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
+      "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]
     OffPeakTimezone = "${runners_off_peak_timezone}"
