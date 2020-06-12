@@ -282,7 +282,7 @@ variable "runners_use_private_address" {
 variable "runners_request_spot_instance" {
   description = "Whether or not to request spot instances via docker-machine"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "cache_bucket_prefix" {
