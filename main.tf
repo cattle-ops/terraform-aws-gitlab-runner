@@ -3,96 +3,6 @@ resource "aws_key_pair" "key" {
   public_key = var.ssh_public_key
 }
 
-locals {
-  // Convert list to a string separated and prepend by a comma
-  docker_machine_options_string = format(
-    ",%s",
-    join(",", formatlist("%q", var.docker_machine_options))
-  )
-
-  // Ensure off peak is optional
-  runners_off_peak_periods_string = var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)
-
-  // Define key for runner token for SSM
-  secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
-
-  // custom names for instances and security groups
-  name_runner_instance = var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]
-  name_sg              = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
-}
-
-resource "aws_security_group" "runner" {
-  name_prefix = "${var.environment}-security-group"
-  vpc_id      = var.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = format("%s", local.name_sg)
-    }
-  )
-}
-
-resource "aws_security_group_rule" "runner_ssh" {
-  count = var.enable_gitlab_runner_ssh_access ? 1 : 0
-
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = var.gitlab_runner_ssh_cidr_blocks
-
-  security_group_id = aws_security_group.runner.id
-}
-
-resource "aws_security_group" "docker_machine" {
-  name_prefix = "${var.environment}-docker-machine"
-  vpc_id      = var.vpc_id
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = format("%s", local.name_sg)
-    }
-  )
-}
-
-resource "aws_security_group_rule" "docker" {
-  type        = "ingress"
-  from_port   = 2376
-  to_port     = 2376
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = aws_security_group.docker_machine.id
-}
-
-resource "aws_security_group_rule" "ssh" {
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = aws_security_group.docker_machine.id
-}
-
-resource "aws_security_group_rule" "out_all" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 65535
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = aws_security_group.docker_machine.id
-}
 data "aws_caller_identity" "current" {}
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
@@ -105,97 +15,6 @@ resource "aws_ssm_parameter" "runner_registration_token" {
 
   lifecycle {
     ignore_changes = [value]
-  }
-}
-
-data "template_file" "user_data" {
-  template = file("${path.module}/template/user-data.tpl")
-
-  vars = {
-    logging       = var.enable_cloudwatch_logging ? data.template_file.logging.rendered : ""
-    gitlab_runner = data.template_file.gitlab_runner.rendered
-  }
-}
-
-data "template_file" "logging" {
-  template = file("${path.module}/template/logging.tpl")
-
-  vars = {
-    environment = var.environment
-  }
-}
-
-data "template_file" "gitlab_runner" {
-  template = file("${path.module}/template/gitlab-runner.tpl")
-
-  vars = {
-    gitlab_runner_version                   = var.gitlab_runner_version
-    docker_machine_version                  = var.docker_machine_version
-    runners_config                          = data.template_file.runners.rendered
-    runners_executor                        = var.runners_executor
-    pre_install                             = var.userdata_pre_install
-    post_install                            = var.userdata_post_install
-    runners_gitlab_url                      = var.runners_gitlab_url
-    runners_token                           = var.runners_token
-    secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
-    secure_parameter_store_region           = var.aws_region
-    gitlab_runner_registration_token        = var.gitlab_runner_registration_config["registration_token"]
-    giltab_runner_description               = var.gitlab_runner_registration_config["description"]
-    gitlab_runner_tag_list                  = var.gitlab_runner_registration_config["tag_list"]
-    gitlab_runner_locked_to_project         = var.gitlab_runner_registration_config["locked_to_project"]
-    gitlab_runner_run_untagged              = var.gitlab_runner_registration_config["run_untagged"]
-    gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
-  }
-}
-
-data "template_file" "runners" {
-  template = file("${path.module}/template/runner-config.tpl")
-
-  vars = {
-    aws_region                  = var.aws_region
-    gitlab_url                  = var.runners_gitlab_url
-    runners_vpc_id              = var.vpc_id
-    runners_subnet_id           = var.subnet_id_runners
-    runners_aws_zone            = var.aws_zone
-    runners_instance_type       = var.docker_machine_instance_type
-    runners_spot_price_bid      = var.docker_machine_spot_price_bid
-    runners_security_group_name = aws_security_group.docker_machine.name
-    runners_monitoring          = var.runners_monitoring
-    runners_instance_profile    = var.create_runners_iam_instance_profile ? aws_iam_instance_profile.docker_machine.name : var.runners_iam_instance_profile_name
-    docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
-    runners_name                = var.runners_name
-    runners_tags = var.overrides["name_docker_machine_runners"] == "" ? format(
-      "%s,Name,%s-docker-machine",
-      local.tags_string,
-      var.environment
-      ) : format(
-      "%s,Name,%s",
-      local.tags_string,
-      var.overrides["name_docker_machine_runners"]
-    )
-    runners_token                   = var.runners_token
-    runners_executor                = var.runners_executor
-    runners_limit                   = var.runners_limit
-    runners_concurrent              = var.runners_concurrent
-    runners_image                   = var.runners_image
-    runners_privileged              = var.runners_privileged
-    runners_shm_size                = var.runners_shm_size
-    runners_idle_count              = var.runners_idle_count
-    runners_idle_time               = var.runners_idle_time
-    runners_off_peak_timezone       = var.runners_off_peak_timezone
-    runners_off_peak_idle_count     = var.runners_off_peak_idle_count
-    runners_off_peak_idle_time      = var.runners_off_peak_idle_time
-    runners_off_peak_periods_string = local.runners_off_peak_periods_string
-    runners_root_size               = var.runners_root_size
-    runners_use_private_address     = var.runners_use_private_address
-    runners_environment_vars        = jsonencode(var.runners_environment_vars)
-    runners_pre_build_script        = var.runners_pre_build_script
-    runners_post_build_script       = var.runners_post_build_script
-    runners_pre_clone_script        = var.runners_pre_clone_script
-    runners_request_concurrency     = var.runners_request_concurrency
-    runners_output_limit            = var.runners_output_limit
-    bucket_name                     = aws_s3_bucket.build_cache.bucket
-    shared_cache                    = var.cache_shared
   }
 }
 
@@ -336,7 +155,35 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
+  # launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
+
+  mixed_instances_policy {
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.gitlab_runner_instance.id
+        version            = "$Latest"
+      }
+
+      override {
+        instance_type = "t3.micro"
+      }
+
+      override {
+        instance_type = "t3.small"
+      }
+
+       override {
+        instance_type = "t2.micro"
+      }
+
+    }
+
+    instances_distribution {
+      spot_instance_pools                      = 3
+      on_demand_base_capacity                  = 0
+      on_demand_percentage_above_base_capacity = 0
+    }
+  }
 
   enabled_metrics = var.metrics_autoscaling
   tags = concat(
@@ -391,28 +238,67 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
-resource "aws_launch_configuration" "gitlab_runner_instance" {
-  name_prefix          = var.runners_name
-  security_groups      = [aws_security_group.runner.id]
+# resource "aws_launch_configuration" "gitlab_runner_instance" {
+#   name_prefix          = var.runners_name
+#   security_groups      = [aws_security_group.runner.id]
+#   key_name             = var.ssh_key_pair
+#   image_id             = data.aws_ami.runner.id
+#   user_data            = local.template_user_data
+#   instance_type        = var.instance_type
+#   ebs_optimized        = var.runner_instance_ebs_optimized
+#   spot_price           = var.runner_instance_spot_price
+#   iam_instance_profile = aws_iam_instance_profile.instance.name
+
+#   dynamic "root_block_device" {
+#     for_each = [var.runner_root_block_device]
+#     content {
+#       delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
+#       volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
+#       volume_size           = lookup(root_block_device.value, "volume_size", 8)
+#       encrypted             = lookup(root_block_device.value, "encrypted", true)
+#       iops                  = lookup(root_block_device.value, "iops", null)
+#     }
+#   }
+
+#   associate_public_ip_address = false == var.runners_use_private_address
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
+
+resource "aws_launch_template" "gitlab_runner_instance" {
+  name_prefix   = "${var.runners_name}-"
+  image_id      = data.aws_ami.runner.id
+  instance_type = var.instance_type
   key_name             = var.ssh_key_pair
-  image_id             = data.aws_ami.runner.id
-  user_data            = local.template_user_data
-  instance_type        = var.instance_type
+
   ebs_optimized        = var.runner_instance_ebs_optimized
-  spot_price           = var.runner_instance_spot_price
-  iam_instance_profile = aws_iam_instance_profile.instance.name
-  dynamic "root_block_device" {
-    for_each = [var.runner_root_block_device]
-    content {
-      delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
-      volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
-      volume_size           = lookup(root_block_device.value, "volume_size", 8)
-      encrypted             = lookup(root_block_device.value, "encrypted", true)
-      iops                  = lookup(root_block_device.value, "iops", null)
-    }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.instance.name
   }
 
-  associate_public_ip_address = false == var.runners_use_private_address
+  user_data = base64encode(local.template_user_data)
+
+  # block_device_mappings {
+  #   dynamic "ebs" {
+  #     for_each = [var.runner_root_block_device]
+  #     content {
+  #       delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
+  #       volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
+  #       volume_size           = lookup(root_block_device.value, "volume_size", 8)
+  #       encrypted             = lookup(root_block_device.value, "encrypted", true)
+  #       iops                  = lookup(root_block_device.value, "iops", null)
+  #     }
+  #   }
+  # }
+
+  network_interfaces {
+    associate_public_ip_address = false == var.runners_use_private_address
+    security_groups = [aws_security_group.runner.id]
+  }
+
 
   lifecycle {
     create_before_destroy = true
