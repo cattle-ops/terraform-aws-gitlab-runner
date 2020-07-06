@@ -11,7 +11,7 @@ locals {
 
   agent_tags = merge(
     {
-      "Name" = format("%s", local.name_runner_instance)
+      "Name" = format("%s", local.name_runner_agent_instance)
     },
     {
       "Environment" = format("%s", var.environment)
@@ -19,7 +19,7 @@ locals {
     var.tags,
     var.agent_tags
   )
-  
+
   tags_string = join(",", flatten([
     for key in keys(local.tags) : [key, lookup(local.tags, key)]
   ]))
