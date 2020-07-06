@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_subnet" "runners" {
-  id = element(var.subnet_id_runners, 0)
+  id = var.subnet_id_runners
 }
 
 data "aws_availability_zone" "runners" {
