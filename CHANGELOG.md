@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
-
+- Changed: Variable aws_zone no longer needed (#232) by @kayma-hl
 
 ## 4.18.0 - 2020-06-01
 
