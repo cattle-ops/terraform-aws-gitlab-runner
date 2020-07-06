@@ -15,9 +15,9 @@ locals {
   secure_parameter_store_runner_token_key = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
 
   // custom names for instances and security groups
-  name_runner_agent_instance       = var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]
-  name_sg                          = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
-  runners_additional_volumes       = <<-EOT
+  name_runner_agent_instance = var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]
+  name_sg                    = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
+  runners_additional_volumes = <<-EOT
   %{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}
   EOT
 }
