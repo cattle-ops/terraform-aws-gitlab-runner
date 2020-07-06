@@ -1,10 +1,10 @@
 data "aws_caller_identity" "current" {}
 
-data aws_subnet runners {
+data "aws_subnet" "runners" {
   id = element(var.subnet_ids, 0)
 }
 
-data aws_availability_zone runners {
+data "aws_availability_zone" "runners" {
   name = data.aws_subnet.runners.availability_zone
 }
 
