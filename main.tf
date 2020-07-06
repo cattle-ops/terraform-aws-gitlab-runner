@@ -151,22 +151,22 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
-  tags = concat(
+  /*tags = concat(
     data.null_data_source.tags.*.outputs,
     [
       {
         "key"                 = "Name"
         "value"               = local.name_runner_instance
         "propagate_at_launch" = true
-      },
+      }
     ],
     [for key in keys(var.agent_tags) : {
       "key"                 = key,
       "value"               = lookup(var.agent_tags, key),
       "propagate_at_launch" = true
     }]
-  )
-
+  )*/
+  tags = data.null_data_source.agent_tags.*.outputs
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
