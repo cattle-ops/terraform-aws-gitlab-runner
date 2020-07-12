@@ -4,7 +4,7 @@ variable "aws_region" {
 }
 
 variable "aws_zone" {
-  description = "AWS availability zone (typically 'a', 'b', or 'c')."
+  description = "Deprecated. Will be removed in the next major release."
   type        = string
   default     = "a"
 }
@@ -312,7 +312,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.0.1"
+  default     = "13.1.1"
 }
 
 variable "enable_ping" {

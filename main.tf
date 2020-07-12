@@ -1,5 +1,13 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_subnet" "runners" {
+  id = var.subnet_id_runners
+}
+
+data "aws_availability_zone" "runners" {
+  name = data.aws_subnet.runners.availability_zone
+}
+
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
@@ -72,7 +80,7 @@ locals {
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
       runners_subnet_id           = var.subnet_id_runners
-      runners_aws_zone            = var.aws_zone
+      runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id
@@ -151,22 +159,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
-  tags = concat(
-    data.null_data_source.tags.*.outputs,
-    [
-      {
-        "key"                 = "Name"
-        "value"               = local.name_runner_instance
-        "propagate_at_launch" = true
-      },
-    ],
-    [for key in keys(var.agent_tags) : {
-      "key"                 = key,
-      "value"               = lookup(var.agent_tags, key),
-      "propagate_at_launch" = true
-    }]
-  )
-
+  tags                      = data.null_data_source.agent_tags.*.outputs
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
