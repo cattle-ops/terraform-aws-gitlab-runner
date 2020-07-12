@@ -35,6 +35,20 @@ The runners created by the module using by default spot instances for running th
   - Logs streamed to CloudWatch.
   - Runner agents registered automatically.
 
+The name of the runner agent and runner is set with the overrides variable. Adding an agent runner name tag does not work.
+
+``` hcl
+...
+overrides  = {
+  name_sg                     = ""
+  name_runner_agent_instance  = "Gitlab Runner Agent"
+  name_docker_machine_runners = "Gitlab Runner Terraform"
+}
+
+//this doesn't work
+agent_tags = merge(local.my_tags, map("Name", "Gitlab Runner Agent"))
+```
+
 The runner support 3 main scenario's:
 
 ### GitLab CI docker-machine runner - one runner agent

@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed: Update default runner version to 13.0.1
 
 
+- Bugfix: Remove duplicate tag names from the tags assigned to the runner agent instance to ensure the correct name (#233) @kayma-hl
+
+## 4.18.0 - 2020-06-01
+
+- Changed: Update default runner version to 13.0.1
+
+
 ## 4.17.0 - 2020-05-28
 
 - Added: Asg metrics (#228) @nlarzonNiklas
