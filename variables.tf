@@ -4,7 +4,7 @@ variable "aws_region" {
 }
 
 variable "aws_zone" {
-  description = "AWS availability zone (typically 'a', 'b', or 'c')."
+  description = "Deprecated. Will be removed in the next major release."
   type        = string
   default     = "a"
 }
