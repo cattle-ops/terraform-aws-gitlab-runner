@@ -58,7 +58,9 @@ check_interval = 0
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]
-    OffPeakTimezone = "${runners_off_peak_timezone}"
-    OffPeakIdleCount = ${runners_off_peak_idle_count}
-    OffPeakIdleTime = ${runners_off_peak_idle_time}
+
+    ${runners_off_peak_timezone}
+    ${runners_off_peak_idle_count}
+    ${runners_off_peak_idle_time}
     ${runners_off_peak_periods_string}
+  ${runners_machine_autoscaling}

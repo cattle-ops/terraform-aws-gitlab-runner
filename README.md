@@ -330,13 +330,14 @@ terraform destroy
 | runners\_idle\_time | Idle time of the runners, will be used in the runner config.toml. | `number` | `600` | no |
 | runners\_image | Image to run builds, will be used in the runner config.toml | `string` | `"docker:18.03.1-ce"` | no |
 | runners\_limit | Limit for the runners, will be used in the runner config.toml. | `number` | `0` | no |
+| runners\_machine\_autoscaling | Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section | <pre>list(object({<br>    periods    = list(string)<br>    idle_count = number<br>    idle_time  = number<br>    timezone   = string<br>  }))</pre> | `[]` | no |
 | runners\_max\_builds | Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration. | `number` | `0` | no |
 | runners\_monitoring | Enable detailed cloudwatch monitoring for spot instances. | `bool` | `false` | no |
 | runners\_name | Name of the runner, will be used in the runner config.toml. | `string` | n/a | yes |
-| runners\_off\_peak\_idle\_count | Off peak idle count of the runners, will be used in the runner config.toml. | `number` | `0` | no |
-| runners\_off\_peak\_idle\_time | Off peak idle time of the runners, will be used in the runner config.toml. | `number` | `0` | no |
-| runners\_off\_peak\_periods | Off peak periods of the runners, will be used in the runner config.toml. | `string` | `""` | no |
-| runners\_off\_peak\_timezone | Off peak idle time zone of the runners, will be used in the runner config.toml. | `string` | `""` | no |
+| runners\_off\_peak\_idle\_count | Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml. | `string` | `-1` | no |
+| runners\_off\_peak\_idle\_time | Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml. | `string` | `-1` | no |
+| runners\_off\_peak\_periods | Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml. | `string` | `null` | no |
+| runners\_off\_peak\_timezone | Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml. | `string` | `null` | no |
 | runners\_output\_limit | Sets the maximum build log size in kilobytes, by default set to 4096 (4MB) | `number` | `4096` | no |
 | runners\_post\_build\_script | Commands to be executed on the Runner just after executing the build, but before executing after\_script. | `string` | `""` | no |
 | runners\_pre\_build\_script | Script to execute in the pipeline just before the build, will be used in the runner config.toml | `string` | `""` | no |
