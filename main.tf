@@ -307,8 +307,8 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
   count      = length(var.runner_iam_policy_arns)
-  role       = aws_iam_role.instance_name
-  policy_arn = var.runner_iam_policy_arns[index]
+  role       = aws_iam_role.instance.name
+  policy_arn = var.runner_iam_policy_arns[count.index]
 }
 
 ################################################################################
