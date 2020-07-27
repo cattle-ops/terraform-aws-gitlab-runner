@@ -62,3 +62,8 @@ check_interval = 0
     OffPeakIdleCount = ${runners_off_peak_idle_count}
     OffPeakIdleTime = ${runners_off_peak_idle_time}
     ${runners_off_peak_periods_string}
+
+[session_server]
+  listen_address = "${session_server_listen_address"
+  advertise_address = "${session_server_external_url}"
+  session_timeout = ${session_server_session_timeout}
