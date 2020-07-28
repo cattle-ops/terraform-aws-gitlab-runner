@@ -579,6 +579,12 @@ variable "log_group_name" {
   type        = string
 }
 
+variable "runner_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the runners."
+  default     = []
+}
+
 variable "session_server_session_timeout" {
   description = "Time in seconds how long the session stays active after the job completes."
   default     = 1800
