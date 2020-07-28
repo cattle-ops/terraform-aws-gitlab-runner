@@ -13,7 +13,7 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
   type  = "SecureString"
   value = "null"
-
+  overwrite = true
   tags = local.tags
 
   lifecycle {
