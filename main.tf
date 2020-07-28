@@ -132,6 +132,7 @@ locals {
       runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
+      session_server_string             = length(var.session_server_listen_address) == 0 ? "" : local.session_server_string
     }
   )
 }

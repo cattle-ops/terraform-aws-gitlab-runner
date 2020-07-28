@@ -578,3 +578,21 @@ variable "log_group_name" {
   default     = null
   type        = string
 }
+
+variable "session_server_session_timeout" {
+  description = "Time in seconds how long the session stays active after the job completes."
+  default     = 1800
+  type        = number
+}
+
+variable "session_server_listen_address" {
+  description = "Listen address of the session server, e.g. [::]:8093. Don't forget to expose this port if you use the docker runner image."
+  default     = ""
+  type        = string
+}
+
+variable "session_server_advertise_address" {
+  description = "The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld:8093"
+  default     = ""
+  type        = string
+}

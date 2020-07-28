@@ -5,6 +5,12 @@ locals {
     join(",", formatlist("%q", var.docker_machine_options)),
   )
 
+  // convert the options for the session server
+  session_server_string = join("", formatlist("%s", ["[session_server]",
+                                            format("listen_address = %q", var.session_server_listen_address),
+                                            format("advertise_address = %q", var.session_server_advertise_address),
+                                            format("session_timeout = %s", var.session_server_session_timeout)]))
+
   // Ensure off peak is optional
   runners_off_peak_periods_string = var.runners_off_peak_periods == "" ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)
 
