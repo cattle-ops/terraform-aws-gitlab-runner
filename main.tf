@@ -303,6 +303,14 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
   policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+################################################################################
+### Add user defined policies
+################################################################################
+resource "aws_iam_role_policy_attachment" "user_defined_policies" {
+  count      = length(var.runner_iam_policy_arns)
+  role       = aws_iam_role.instance.name
+  policy_arn = var.runner_iam_policy_arns[count.index]
+}
 
 ################################################################################
 ### Policy for the docker machine instance to access cache

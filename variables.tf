@@ -589,3 +589,9 @@ variable "log_group_name" {
   default     = null
   type        = string
 }
+
+variable "runner_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the runners."
+  default     = []
+}
