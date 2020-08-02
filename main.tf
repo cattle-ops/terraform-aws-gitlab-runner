@@ -113,10 +113,11 @@ locals {
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_off_peak_timezone         = var.runners_off_peak_timezone
-      runners_off_peak_idle_count       = var.runners_off_peak_idle_count
-      runners_off_peak_idle_time        = var.runners_off_peak_idle_time
+      runners_off_peak_timezone         = local.runners_off_peak_timezone
+      runners_off_peak_idle_count       = local.runners_off_peak_idle_count
+      runners_off_peak_idle_time        = local.runners_off_peak_idle_time
       runners_off_peak_periods_string   = local.runners_off_peak_periods_string
+      runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
