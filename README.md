@@ -354,6 +354,9 @@ terraform destroy
 | runners\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
+| session\_server\_advertise\_address | The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld:8093 | `string` | `""` | no |
+| session\_server\_listen\_address | Listen address of the session server, e.g. [::]:8093. Don't forget to expose this port if you use the docker runner image. | `string` | `""` | no |
+| session\_server\_session\_timeout | Time in seconds how long the session stays active after the job completes. | `number` | `1800` | no |
 | ssh\_key\_pair | Set this to use existing AWS key pair | `string` | `null` | no |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | `string` | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | `list(string)` | n/a | yes |
