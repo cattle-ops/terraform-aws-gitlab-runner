@@ -184,27 +184,38 @@ variable "runners_ebs_optimized" {
 }
 
 variable "runners_off_peak_timezone" {
-  description = "Off peak idle time zone of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "runners_off_peak_idle_count" {
-  description = "Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
+  type        = string
+  default     = -1
 }
 
 variable "runners_off_peak_idle_time" {
-  description = "Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
+  type        = string
+  default     = -1
 }
 
 variable "runners_off_peak_periods" {
-  description = "Off peak periods of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
   type        = string
-  default     = ""
+  default     = null
+}
+
+variable "runners_machine_autoscaling" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
+  type = list(object({
+    periods    = list(string)
+    idle_count = number
+    idle_time  = number
+    timezone   = string
+  }))
+  default = []
 }
 
 variable "runners_root_size" {
