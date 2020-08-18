@@ -1,9 +1,10 @@
 name: Lint
+
 on: [push]
 
 jobs:
   tflint:
-    name: TFLint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -18,16 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - run: terraform fmt --recursive -check=true
-
-  docs:
-    name: Docs
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Install Deps
-        run: brew update && brew install pre-commit terraform-docs terraform
-      - name: Check Docs
-        run: pre-commit run --show-diff-on-failure --all-files terraform_docs
 
   validate:
     name: Validate
@@ -60,7 +51,7 @@ jobs:
     name: Minimum version check
     runs-on: ubuntu-latest
     container:
-      image: hashicorp/terraform:0.12.20
+      image: hashicorp/terraform:0.12.0
     steps:
       - uses: actions/checkout@master
       - name: Validate Code
