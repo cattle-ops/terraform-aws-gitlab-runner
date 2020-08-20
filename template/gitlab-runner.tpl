@@ -1,9 +1,5 @@
 mkdir -p /etc/gitlab-runner
-cat > /etc/gitlab-runner/config.toml <<- EOF
-
-${runners_config}
-
-EOF
+aws s3 cp "${runners_config_s3_uri}" "/etc/gitlab-runner/config.toml"
 
 ${pre_install}
 

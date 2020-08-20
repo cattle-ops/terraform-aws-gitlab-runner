@@ -675,3 +675,43 @@ variable "docker_machine_iam_policy_arns" {
   description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
   default     = []
 }
+
+variable "runners" {
+  description = "List of [[runners]] groups defined in GitLab runner configuration. Defaults from `local.runners_defaults` apply to all groups. To see what specific values can be set, see definition of `local.runners_defaults` and variables that can be set directly on this module, which make up a base configuration if you don't set any values here."
+  default     = [{}]
+  type        = list(any)
+}
+
+################################################################################
+### Variables passed directly to config module.
+################################################################################
+
+variable "config_bucket" {
+  type        = string
+  default     = ""
+  description = "If you already have exisiting S3 Bucket for storing configuration files, pass it's name here. Otherwise, leave this field empty and a new, private S3 bucket will be created by this module."
+}
+
+variable "config_key" {
+  type        = string
+  default     = ""
+  description = "Path to Gitlab runner configuration on configuration S3 bucket. If left empty, defaults to `config.toml`."
+}
+
+variable "cloudtrail_bucket" {
+  type        = string
+  default     = ""
+  description = "If you already have exisiting S3 Bucket for CloudTrail, pass it's name here. Otherwise, leave this field empty and a new CloudTrail S3 bucket will be created by this module."
+}
+
+variable "cloudtrail_prefix" {
+  type        = string
+  default     = ""
+  description = "Prefix on S3 bucket for storing CloudTrail logs."
+}
+
+variable "post_reload_config" {
+  description = "Custom script to be executed after config.toml file is reloaded. If you use `userdata_post_install` to further modify config.toml, you may need to do the same modifications here, to ensure that configuration is always modified in the same way."
+  default     = ""
+  type        = string
+}

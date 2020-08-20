@@ -47,3 +47,22 @@ output "runner_eip" {
   description = "EIP of the Gitlab Runner"
   value       = element(concat(aws_eip.gitlab_runner.*.public_ip, [""]), 0)
 }
+
+################################################################################
+### Outputs received from config module.
+################################################################################
+
+output "config_uri" {
+  value       = module.config.config_uri
+  description = "S3 URI to configuration file on configuration bucket. One can pass it to s3 cp command in order to pull it."
+}
+
+output "config_bucket" {
+  value       = module.config.config_bucket
+  description = "Name of Gitlab runner configuration bucket."
+}
+
+output "cloudtrail_bucket" {
+  value       = module.config.cloudtrail_bucket
+  description = "Name of CloudTrail bucket used by automatic config updates."
+}
