@@ -323,7 +323,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.1.1"
+  default     = "13.3.0"
 }
 
 variable "enable_ping" {
