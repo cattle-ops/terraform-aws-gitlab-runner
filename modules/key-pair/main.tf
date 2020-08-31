@@ -27,7 +27,7 @@ resource "null_resource" "file_permission" {
 }
 
 resource "aws_key_pair" "key" {
-  key_name   = var.name != null ? "${var.environment}-${var.name}" : "${var.environment}"
+  key_name   = var.name != null ? "${var.environment}-${var.name}" : var.environment
   public_key = local_file.public_ssh_key.content
   tags       = local.tags
 }
