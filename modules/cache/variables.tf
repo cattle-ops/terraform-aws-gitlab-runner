@@ -9,6 +9,12 @@ variable "cache_bucket_prefix" {
   default     = ""
 }
 
+variable "cache_bucket_set_suffix" {
+  description = "Random string suffix for s3 cache bucket"
+  type        = bool
+  default     = false
+}
+
 variable "cache_bucket_name_include_account_id" {
   description = "Boolean to add current account ID to cache bucket name."
   type        = bool
