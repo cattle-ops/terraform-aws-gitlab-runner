@@ -207,7 +207,7 @@ module "runner" {
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
-    run_untagged       = "false"
+     | `bool` | `false` | no |run_untagged       = "false"
     maximum_timeout    = "3600"
   }
 
@@ -276,6 +276,7 @@ terraform destroy
 | cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | `string` | `""` | no |
+| cache\_bucket\_set\_random\_suffix | Boolean used to append a random string to the bucket name | `bool` | `false` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | `bool` | `false` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | `number` | `1` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
