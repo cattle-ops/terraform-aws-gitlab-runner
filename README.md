@@ -207,7 +207,7 @@ module "runner" {
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
-     | `bool` | `false` | no |run_untagged       = "false"
+    run_untagged       = "false"
     maximum_timeout    = "3600"
   }
 
