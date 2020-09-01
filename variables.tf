@@ -308,6 +308,12 @@ variable "cache_bucket_name_include_account_id" {
   default     = true
 }
 
+variable "cache_bucket_set_random_suffix" {
+  description = "Append the cache bucket name with a random string suffix"
+	type = bool
+	default = false
+}
+
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = bool

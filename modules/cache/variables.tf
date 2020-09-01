@@ -9,7 +9,7 @@ variable "cache_bucket_prefix" {
   default     = ""
 }
 
-variable "cache_bucket_set_suffix" {
+variable "cache_bucket_set_random_suffix" {
   description = "Random string suffix for s3 cache bucket"
   type        = bool
   default     = false
