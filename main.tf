@@ -159,6 +159,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
+  target_group_arns         = [var.session_server_listener_arn > '' ? aws_alb_target_group.session_server.arn : '']
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = data.null_data_source.agent_tags.*.outputs
@@ -405,4 +406,33 @@ resource "aws_iam_role_policy_attachment" "eip" {
 
   role       = aws_iam_role.instance.name
   policy_arn = aws_iam_policy.eip[0].arn
+}
+
+################################################################################
+### Session server ALB support
+################################################################################
+resource "aws_alb_listener_rule" "session_server" {
+  count = var.session_server_listener_arn > "" ? 1 : 0
+
+  listener_arn = var.session_server_listener_arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.session_server.arn
+  }
+
+  condition {
+    host_header {
+      values = ["to be replaced"]
+    }
+  }
+}
+
+resource "aws_alb_target_group" "session_server" {
+  count = var.session_server_listener_arn > "" ? 1 : 0
+
+  name     = "${var.environment}-session-server"
+  port     = 9999
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
 }

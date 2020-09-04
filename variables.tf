@@ -613,3 +613,9 @@ variable "session_server_advertise_address" {
   default     = ""
   type        = string
 }
+
+variable "session_server_listener_arn" {
+  description = "ALB listener ARN to connect the session server to the outside. An EIP can be used instead (see enable_eip)."
+  default     = ""
+  type        = string
+}
