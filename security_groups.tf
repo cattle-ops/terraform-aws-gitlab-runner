@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "runner_ping" {
 
 # Allow incoming traffic for the session server to gitlab-runner agent instances
 resource "aws_security_group_rule" "runner_session_server" {
-  count = var.session_server_listen_address > '' && var.enable_eip > 0 ? 1 : 0
+  count = var.session_server_listen_address > "" && var.enable_eip > 0 ? 1 : 0
 
   type      = "ingress"
   from_port = var.session_server_port
@@ -101,8 +101,8 @@ resource "aws_security_group_rule" "runner_ssh_group" {
 }
 
 # Allow incoming traffic for the session server from allowed security groups to gitlab-runner agent instances
-resource "aws_security_group_rule" "runner_session_server" {
-  count = var.session_server_listen_address > '' && var.session_server_listener_arn > '' ? 1 : 0
+resource "aws_security_group_rule" "runner_session_server_group" {
+  count = var.session_server_listen_address > "" && var.session_server_listener_arn > "" ? 1 : 0
 
   type      = "ingress"
   from_port = var.session_server_port
