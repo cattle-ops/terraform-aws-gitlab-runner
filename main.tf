@@ -412,7 +412,7 @@ resource "aws_iam_role_policy_attachment" "eip" {
 ### Session server ALB support
 ################################################################################
 resource "aws_alb_listener_rule" "session_server" {
-  count = var.session_server_listener_arn > "" ? 1 : 0
+  count = var.session_server_listener_arn != "" ? 1 : 0
 
   listener_arn = var.session_server_listener_arn
 
@@ -429,7 +429,7 @@ resource "aws_alb_listener_rule" "session_server" {
 }
 
 resource "aws_alb_target_group" "session_server" {
-  count = var.session_server_listener_arn > "" ? 1 : 0
+  count = var.session_server_listener_arn != "" ? 1 : 0
 
   name     = "${var.environment}-session-server"
   port     = var.session_server_port
