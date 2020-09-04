@@ -110,7 +110,7 @@ resource "aws_security_group_rule" "runner_session_server_group" {
   protocol  = "tcp"
 
   source_security_group_id = var.session_server_alb_security_group_id
-  security_group_id = aws_security_group.runner.id
+  security_group_id        = aws_security_group.runner.id
 }
 
 # Allow ICMP traffic from allowed security group IDs to gitlab-runner agent instances
