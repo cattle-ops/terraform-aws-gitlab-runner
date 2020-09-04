@@ -423,7 +423,7 @@ resource "aws_alb_listener_rule" "session_server" {
 
   condition {
     host_header {
-      values = ["to be replaced"]
+      values = [var.session_server_advertise_address]
     }
   }
 }
@@ -432,7 +432,7 @@ resource "aws_alb_target_group" "session_server" {
   count = var.session_server_listener_arn > "" ? 1 : 0
 
   name     = "${var.environment}-session-server"
-  port     = 9999
+  port     = var.session_server_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 }

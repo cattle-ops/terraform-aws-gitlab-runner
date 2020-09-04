@@ -602,14 +602,19 @@ variable "session_server_session_timeout" {
   type        = number
 }
 
+variable "session_server_port" {
+  description = "Port which is used to connect to the session server. Don't forget to expose this port if you use the docker runner image."
+  default     = 8093
+  type        = number
+}
 variable "session_server_listen_address" {
-  description = "Listen address of the session server, e.g. [::]:8093. Don't forget to expose this port if you use the docker runner image."
+  description = "Listen address of the session server, e.g. [::] without a port. Session_server_port is used for the port."
   default     = ""
   type        = string
 }
 
 variable "session_server_advertise_address" {
-  description = "The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld:8093"
+  description = "The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld. session_server_port is used for the port."
   default     = ""
   type        = string
 }
@@ -618,4 +623,16 @@ variable "session_server_listener_arn" {
   description = "ALB listener ARN to connect the session server to the outside. An EIP can be used instead (see enable_eip)."
   default     = ""
   type        = string
+}
+
+variable "session_server_alb_security_group_id" {
+  description = "ID of the security group belonging to the ALB to restrict the traffic to the session_server."
+  default     = ""
+  type        = string
+}
+
+variable "gitlab_runner_session_server_cidr_blocks" {
+  description = "CIDR blocks which are allowed to connect to the session server."
+  default     = []
+  type        = list(string)
 }
