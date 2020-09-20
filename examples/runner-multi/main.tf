@@ -14,9 +14,9 @@ module "vpc" {
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
 
-  azs             = [data.aws_availability_zones.available.names[0]]
-  private_subnets = ["10.0.1.0/24"]
-  public_subnets  = ["10.0.101.0/24"]
+  azs             = [data.aws_availability_zones.available.names]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
 
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -34,6 +34,18 @@ locals {
 
 module "gitlab_runner" {
   source = "../../"
+
+  # CORE OF THIS EXAMPLE
+
+  runners = [
+    # Create a new runner for matrix of each subnet id and instance type
+    for element in setproduct(local.subnet_ids, local.instance_types) : {
+      subnet_id     = element[0]
+      instance_type = element[1]
+    }
+  ]
+
+  # BORING STUFF BELOW
 
   aws_region  = var.aws_region
   environment = var.environment
@@ -117,13 +129,5 @@ module "gitlab_runner" {
 
   docker_machine_options = [
     "engine-storage-driver=overlay2"
-  ]
-
-  runners = [
-    # Create a new runner for matrix of each subnet id and instance type
-    for element in setproduct(local.subnet_ids, local.instance_types) : {
-      subnet_id     = element[0]
-      instance_type = element[1]
-    }
   ]
 }
