@@ -17,3 +17,8 @@ output "cloudtrail_bucket" {
   value       = local.cloudtrail_bucket_name
   description = "Name of CloudTrail bucket"
 }
+
+output "extra_files_sync_command" {
+  value       = local.extra_files_sync_command
+  description = "Command which pulls extra files from S3 bucket to EC2 filesystem."
+}

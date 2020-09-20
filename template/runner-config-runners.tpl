@@ -34,9 +34,10 @@
     IdleCount = ${idle_count}
     IdleTime = ${idle_time}
     ${max_builds}
-    MachineDriver = "amazonec2"
-    MachineName = "runner-%s"
+    MachineDriver = "${machine_driver}"
+    MachineName = "${machine_name}"
     MachineOptions = [
+%{~ if machine_driver == "amazonec2" }
       "amazonec2-instance-type=${instance_type}",
       "amazonec2-region=${aws_region}",
       "amazonec2-zone=${aws_zone}",
@@ -52,8 +53,9 @@
       "amazonec2-monitoring=${monitoring}",
       "amazonec2-iam-instance-profile=%{ if iam_instance_profile_name != "" }${iam_instance_profile_name}%{ else }${instance_profile}%{ endif ~}",
       "amazonec2-root-size=${root_size}",
-      "amazonec2-ami=${ami}"
-      ${docker_machine_options}
+      "amazonec2-ami=${ami}"%{ if docker_machine_options != "" },%{ endif ~}
+%{ endif }
+${docker_machine_options}
     ]
     OffPeakTimezone = "${off_peak_timezone}"
     OffPeakIdleCount = ${off_peak_idle_count}

@@ -11,7 +11,10 @@ locals {
   config_bucket_name = length(var.cloudtrail_bucket) > 0 ? data.aws_s3_bucket.config[0].bucket : aws_s3_bucket.config[0].bucket
   config_bucket_arn  = "arn:aws:s3:::${local.config_bucket}"
 
-  config_uri = "s3://${aws_s3_bucket_object.config.bucket}/${aws_s3_bucket_object.config.key}"
+  extra_files_prefix = trim(var.extra_files_prefix == "" ? "/extra-files/" : var.extra_files_prefix, "/")
+
+  config_uri      = "s3://${aws_s3_bucket_object.config.bucket}/${aws_s3_bucket_object.config.key}"
+  extra_files_uri = "s3://${aws_s3_bucket_object.config.bucket}/${local.extra_files_prefix}"
 
   post_reload_script = length(var.post_reload_script) > 0 ? "echo \"Executing post_reload_config script...\"\n${var.post_reload_script}" : ""
 }
@@ -46,13 +49,24 @@ resource "aws_s3_bucket" "config" {
 
 data "aws_iam_policy_document" "config_bucket" {
   statement {
-    sid    = "AllowGitLabRunnerAccessConfig"
+    sid    = "AllowGitLabRunnerAccessData"
     effect = "Allow"
     actions = [
       "s3:GetObject",
       "s3:GetObjectAcl",
     ]
-    resources = ["${local.config_bucket_arn}/${local.config_key}"]
+    resources = [
+      "${local.config_bucket_arn}/${local.config_key}",
+      "${local.config_bucket_arn}/${local.extra_files_prefix}/*",
+    ]
+  }
+  statement {
+    sid    = "AllowGitLabRunnerListBucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [local.config_bucket_arn]
   }
 }
 
@@ -69,6 +83,20 @@ resource "aws_s3_bucket_object" "config" {
   content = var.config_content
   acl     = "private"
   tags    = var.tags
+}
+
+resource "aws_s3_bucket_object" "extra_files" {
+  for_each = var.extra_files
+
+  bucket  = local.config_bucket_name
+  key     = "${local.extra_files_prefix}/${each.key}"
+  content = each.value
+  acl     = "private"
+  tags    = var.tags
+}
+
+locals {
+  extra_files_sync_command = "mkdir -p /extra-files && aws s3 cp ${local.extra_files_uri} /extra-files --recursive"
 }
 
 ################################################################################
@@ -224,6 +252,9 @@ resource "aws_ssm_document" "reload_config" {
               echo "Replacing tokens in configuration with stored Gitlab token..."
               sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g "$${config_file}"
 
+              echo "Pulling extra files from S3 bucket (if any)..."
+              ${local.extra_files_sync_command}
+
               ${var.post_reload_script}
 
               echo "Restarting GitLab runner..."
@@ -247,7 +278,9 @@ resource "aws_cloudwatch_event_rule" "config_changes" {
       eventName   = ["PutObject", "CompleteMultipartUpload"]
       requestParameters = {
         bucketName = [aws_s3_bucket_object.config.bucket]
-        key        = [aws_s3_bucket_object.config.key]
+        key = concat([aws_s3_bucket_object.config.key], [
+          for file in aws_s3_bucket_object.extra_files : file.key
+        ])
       }
     }
   })

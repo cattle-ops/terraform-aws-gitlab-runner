@@ -19,4 +19,6 @@ done
 
 ${logging}
 
+${extra_files_sync_command}
+
 ${gitlab_runner}

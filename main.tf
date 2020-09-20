@@ -42,10 +42,11 @@ locals {
 
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
-      eip                 = var.enable_eip ? local.template_eip : ""
-      logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
-      gitlab_runner       = local.template_gitlab_runner
-      user_data_trace_log = var.enable_runner_user_data_trace_log
+      eip                      = var.enable_eip ? local.template_eip : ""
+      logging                  = var.enable_cloudwatch_logging ? local.logging_user_data : ""
+      gitlab_runner            = local.template_gitlab_runner
+      extra_files_sync_command = module.config.extra_files_sync_command
+      user_data_trace_log      = var.enable_runner_user_data_trace_log
   })
 
   template_eip = templatefile("${path.module}/template/eip.tpl", {
@@ -75,9 +76,11 @@ locals {
   })
 
   runners_defaults = {
-    aws_region = var.aws_region
-    gitlab_url = var.runners_gitlab_url
-    name       = var.runners_name
+    machine_driver = var.docker_machine_driver
+    machine_name   = var.docker_machine_name
+    aws_region     = var.aws_region
+    gitlab_url     = var.runners_gitlab_url
+    name           = var.runners_name
     tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
       runners_token                     = var.runners_token
       "Name,%s-docker-machine,%s,%s",
@@ -261,6 +264,8 @@ module "config" {
   config_key         = var.config_key
   cloudtrail_bucket  = var.cloudtrail_bucket
   cloudtrail_prefix  = var.cloudtrail_prefix
+  extra_files_prefix = var.extra_files_prefix
+  extra_files        = var.extra_files
 }
 
 resource "aws_iam_role_policy_attachment" "config_bucket" {

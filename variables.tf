@@ -89,6 +89,18 @@ variable "docker_machine_download_url" {
   default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.10/docker-machine-Linux-aarch64"
 }
 
+variable "docker_machine_driver" {
+  description = "Name of docker-machine driver. Set it to use a custom docker-machine driver."
+  type        = string
+  default     = "amazonec2"
+}
+
+variable "docker_machine_name" {
+  description = "MachineName parameter in [runners.machine] settings. Set it to use a custom name."
+  type        = string
+  default     = "runner-%s"
+}
+
 variable "docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
@@ -714,4 +726,16 @@ variable "post_reload_config" {
   description = "Custom script to be executed after config.toml file is reloaded. If you use `userdata_post_install` to further modify config.toml, you may need to do the same modifications here, to ensure that configuration is always modified in the same way."
   default     = ""
   type        = string
+}
+
+variable "extra_files_prefix" {
+  type        = string
+  default     = "/extra-files/"
+  description = "S3 Prefix used before keys of extra files on S3 bucket."
+}
+
+variable "extra_files" {
+  type        = map(string)
+  default     = {}
+  description = "Map of additional files to push to Gitlab Runner in { \"/path/from/root\": \"file contents\" } format. Files can be later found at /extra-files path and used in user-data script or in config reload script."
 }

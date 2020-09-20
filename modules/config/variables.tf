@@ -11,7 +11,7 @@ variable "tags" {
 variable "config_bucket" {
   type        = string
   default     = ""
-  description = "If you already have exisiting S3 Bucket for storing configuration files, pass it's name here. Otherwise, leave this field empty and a new, private S3 bucket will be created by this module."
+  description = "If you already have existing S3 Bucket for storing configuration files, pass it's name here. Otherwise, leave this field empty and a new, private S3 bucket will be created by this module."
 }
 
 variable "config_key" {
@@ -52,3 +52,14 @@ variable "gitlab_token_ssm_key" {
   description = "Key of Gitlab token stored as SSM Parameter."
 }
 
+variable "extra_files_prefix" {
+  type        = string
+  default     = "/extra-files/"
+  description = "S3 Prefix used before keys of extra files on S3 bucket."
+}
+
+variable "extra_files" {
+  type        = map(string)
+  default     = {}
+  description = "Map of additional files to push to Gitlab Runner in { \"/path/from/root\": \"file contents\" } format. Files can be later found at /extra-files path and used in user-data script or in config reload script."
+}
