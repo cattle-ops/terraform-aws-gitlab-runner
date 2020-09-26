@@ -190,6 +190,8 @@ data "aws_iam_policy_document" "config_update_ssm_command_trust" {
 }
 
 data "aws_iam_policy_document" "config_update_ssm_command" {
+  depends_on = [var.runner_autoscaling_group_name]
+
   statement {
     effect    = "Allow"
     actions   = ["ssm:SendCommand"]
@@ -287,6 +289,8 @@ resource "aws_cloudwatch_event_rule" "config_changes" {
 }
 
 resource "aws_cloudwatch_event_target" "reload_config" {
+  depends_on = [var.runner_autoscaling_group_name]
+
   target_id = "ReloadGitlabConfig"
   arn       = aws_ssm_document.reload_config.arn
   rule      = aws_cloudwatch_event_rule.config_changes.name

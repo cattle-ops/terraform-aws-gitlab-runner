@@ -42,6 +42,7 @@ locals {
 
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
+      aws_cli_version          = "2.0.30"
       eip                      = var.enable_eip ? local.template_eip : ""
       logging                  = var.enable_cloudwatch_logging ? local.logging_user_data : ""
       gitlab_runner            = local.template_gitlab_runner
