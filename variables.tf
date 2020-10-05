@@ -543,6 +543,12 @@ variable "enable_kms" {
   default     = false
 }
 
+variable "kms_alias_name" {
+  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
+  type        = string
+  default     = ""
+}
+
 variable "kms_deletion_window_in_days" {
   description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
   type        = number
