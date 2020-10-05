@@ -245,6 +245,32 @@ module "cache" {
   cache_expiration_days                = var.cache_expiration_days
 }
 
+resource "aws_s3_bucket_policy" "cache" {
+  bucket = module.cache.bucket
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "RunnerCacheBucketPolicy",
+  "Statement": [
+    {
+      "Sid": "AllowForRunnerInstanceRole",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS" : "${aws_iam_role.instance.arn}"
+      },
+      "Action": [
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:GetObject",
+        "s3:GetObjectAcl"
+      ],
+      "Resource": "${module.cache.arn}/*"
+    }
+  ]
+}
+POLICY
+}
+
 ################################################################################
 ### Trust policy
 ################################################################################
