@@ -205,6 +205,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   user_data            = local.template_user_data
   instance_type        = var.instance_type
   ebs_optimized        = var.runner_instance_ebs_optimized
+  enable_monitoring    = var.runner_instance_enable_monitoring
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
   dynamic "root_block_device" {
