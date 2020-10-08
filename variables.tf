@@ -53,6 +53,12 @@ variable "runner_instance_ebs_optimized" {
   default     = true
 }
 
+variable "runner_instance_enable_monitoring" {
+  description = "Enable the GitLab runner instance to have detailed monitoring."
+  type        = bool
+  default     = true
+}
+
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
