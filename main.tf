@@ -113,10 +113,11 @@ locals {
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_off_peak_timezone         = var.runners_off_peak_timezone
-      runners_off_peak_idle_count       = var.runners_off_peak_idle_count
-      runners_off_peak_idle_time        = var.runners_off_peak_idle_time
+      runners_off_peak_timezone         = local.runners_off_peak_timezone
+      runners_off_peak_idle_count       = local.runners_off_peak_idle_count
+      runners_off_peak_idle_time        = local.runners_off_peak_idle_time
       runners_off_peak_periods_string   = local.runners_off_peak_periods_string
+      runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
@@ -204,6 +205,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   user_data            = local.template_user_data
   instance_type        = var.instance_type
   ebs_optimized        = var.runner_instance_ebs_optimized
+  enable_monitoring    = var.runner_instance_enable_monitoring
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
   dynamic "root_block_device" {
@@ -302,6 +304,14 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
   policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+################################################################################
+### Add user defined policies
+################################################################################
+resource "aws_iam_role_policy_attachment" "user_defined_policies" {
+  count      = length(var.runner_iam_policy_arns)
+  role       = aws_iam_role.instance.name
+  policy_arn = var.runner_iam_policy_arns[count.index]
+}
 
 ################################################################################
 ### Policy for the docker machine instance to access cache

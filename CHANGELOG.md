@@ -7,24 +7,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.20.0 - 2020-10-08
+
+- Changed: upgrade default version for gitlab runner to 13.4.0 (#261)
+- Added: allow additional gitlab-runner egress rules (257) by @mhulscher
+- Added: Variable to disable EC2 detailed monitoring (#260) by @jessedobbelaere
+- Added: KMS alias to kms key (#255) by @Michenux
+- Changed: deprecated of peak settings (#242)
+- Fix: Bug fix on instance profile variable not passing correctly (#247) by @arthurbdiniz
+- Added: IAM policies for runner as variable, (#241) by @kayman-mk
+
 ## 4.19.0 - 2020-07-12
 
 - Changed: Variable aws_zone no longer needed (#232) by @kayma-hl
 - Changed: Update default GitLab runner version to 13.1.1 (#239)
 - Changed: Merge the tags for the runner agent to remove duplicate tags (#238) @kayma-hl
 
-
 ## 4.18.0 - 2020-06-01
 
 - Changed: Update default runner version to 13.0.1
-
 
 - Bugfix: Remove duplicate tag names from the tags assigned to the runner agent instance to ensure the correct name (#233) @kayma-hl
 
 ## 4.18.0 - 2020-06-01
 
 - Changed: Update default runner version to 13.0.1
-
 
 ## 4.17.0 - 2020-05-28
 
@@ -380,7 +387,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.19.0...HEAD
+[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.20.0...HEAD
+[4.20.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.20.0...4.19.0
 [4.19.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.19.0...4.18.0
 [4.18.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.18.0...4.17.0
 [4.17.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.17.0...4.16.0

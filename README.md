@@ -2,11 +2,9 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
+> "Added support for `runners.machine.autoscaling` parameters which replaces all depcreated off peak settings. In case you use any of the the variables `off_peak_*` please upgrade. The [default example](./examples/runner-default/main.tf) contains an example.
+
 > "Added support to download docker machine from a different location, e.g. <https://gitlab.com/gitlab-org/ci-cd/docker-machine>"
-
-> "Managed ec2 key support dropped": The module will not longer manage an SSH key pair. The module offers two way to access instances. First via the AWS session manager and second by providing an AWS key pair as parameter.
-
-> "Type changes": The types of variable `runners_volumes_tmpfs`, and `runners_services_volumes_tmpfs` are changed to support the Terraform 12 `templatefile` function. Check the [default example](examples/runner-pre-registered/main.tf) for an usages example.
 
 ## Terraform versions
 
@@ -16,10 +14,10 @@ Module is available as Terraform 0.12 module, pin to version 4.x. Please submit 
 
 Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migrate the runner, execute the following steps.
 
-  - Update to Terraform 0.12
-  - Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
-  - Update the module from 3.10.0 to 4.0.0, next run `terraform init`
-  - Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+- Update to Terraform 0.12
+- Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
+- Update the module from 3.10.0 to 4.0.0, next run `terraform init`
+- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
 
 ### Terraform 0.11
 
@@ -31,13 +29,13 @@ This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner]
 
 The runners created by the module using by default spot instances for running the builds using the `docker+machine` executor.
 
-  - Shared cache in S3 with life cycle management to clear objects after x days.
-  - Logs streamed to CloudWatch.
-  - Runner agents registered automatically.
+- Shared cache in S3 with life cycle management to clear objects after x days.
+- Logs streamed to CloudWatch.
+- Runner agents registered automatically.
 
 The name of the runner agent and runner is set with the overrides variable. Adding an agent runner name tag does not work.
 
-``` hcl
+```hcl
 ...
 overrides  = {
   name_sg                     = ""
@@ -65,7 +63,7 @@ In this scenario the multiple runner agents can be created with different config
 
 ### GitLab Ci docker runner
 
-In this scenario *not* docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the agent. No auto scaling is supported.
+In this scenario _not_ docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the agent. No auto scaling is supported.
 
 ![runners-docker](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-docker.png)
 
@@ -77,13 +75,13 @@ Ensure you have Terraform installed the modules is based on Terraform 0.11, see 
 
 On macOS it is simple to install `tfenv` using `brew`.
 
-``` sh
+```sh
 brew install tfenv
 ```
 
 Next install a Terraform version.
 
-``` sh
+```sh
 tfenv install <version>
 ```
 
@@ -97,7 +95,7 @@ In order to be able to destroy the module, you will need to run from a host with
 
 On macOS it is simple to install them using `brew`.
 
-``` sh
+```sh
 brew install jq awscli
 ```
 
@@ -105,12 +103,12 @@ brew install jq awscli
 
 The GitLab runner EC2 instance requires the following service linked roles:
 
-  - AWSServiceRoleForAutoScaling
-  - AWSServiceRoleForEC2Spot
+- AWSServiceRoleForAutoScaling
+- AWSServiceRoleForEC2Spot
 
 By default the EC2 instance is allowed to create the required roles, but this can be disabled by setting the option `allow_iam_service_linked_role_creation` to `false`. If disabled you must ensure the roles exist. You can create them manually or via Terraform.
 
-``` hcl
+```hcl
 resource "aws_iam_service_linked_role" "spot" {
   aws_service_name = "spot.amazonaws.com"
 }
@@ -126,7 +124,7 @@ By default the runner is registered on initial deployment. In previous versions 
 
 To register the runner automatically set the variable `gitlab_runner_registration_config["token"]`. This token value can be found in your GitLab project, group, or global settings. For a generic runner you can find the token in the admin section. By default the runner will be locked to the target project, not run untagged. Below is an example of the configuration map.
 
-``` hcl
+```hcl
 gitlab_runner_registration_config = {
   registration_token = "<registration token>"
   tag_list           = "<your tags, comma separated>"
@@ -140,7 +138,7 @@ gitlab_runner_registration_config = {
 
 For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
 
-``` sh
+```sh
 # set the following variables, look up the variables in your Terraform config.
 # see your Terraform variables to fill in the vars below.
 aws-region=<${var.aws_region}>
@@ -175,7 +173,7 @@ Creation of the bucket can be disabled and managed outside this module. A good u
 
 Update the variables in `terraform.tfvars` according to your needs and add the following variables. See the previous step for instructions on how to obtain the token.
 
-``` hcl
+```hcl
 runner_name  = "NAME_OF_YOUR_RUNNER"
 gitlab_url   = "GITLAB_URL"
 runner_token = "RUNNER_TOKEN"
@@ -187,7 +185,7 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 
 Below a basic examples of usages of the module. The dependencies such as a VPC, and SSH keys have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/examples/runner-default).
 
-``` hcl
+```hcl
 module "runner" {
   # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
   source  = "npalm/gitlab-runner/aws"
@@ -240,13 +238,13 @@ Run `terraform init` to initialize Terraform. Next you can run `terraform plan` 
 
 To create the runner run:
 
-``` sh
+```sh
 terraform apply
 ```
 
 To destroy runner:
 
-``` sh
+```sh
 terraform destroy
 ```
 
@@ -301,10 +299,11 @@ terraform destroy
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `false` | no |
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
+| gitlab\_runner\_egress\_rules | List of egress rules for the gitlab runner instance. | <pre>list(object({<br>    cidr_blocks      = list(string)<br>    ipv6_cidr_blocks = list(string)<br>    prefix_list_ids  = list(string)<br>    from_port        = number<br>    protocol         = string<br>    security_groups  = list(string)<br>    self             = bool<br>    to_port          = number<br>    description      = string<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "description": null,<br>    "from_port": 0,<br>    "ipv6_cidr_blocks": [<br>      "::/0"<br>    ],<br>    "prefix_list_ids": null,<br>    "protocol": "-1",<br>    "security_groups": null,<br>    "self": null,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
 | gitlab\_runner\_security\_group\_ids | A list of security group ids that are allowed to access the gitlab runner agent | `list(string)` | `[]` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | `[]` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.1.1"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.4.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
 | kms\_alias\_name | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
@@ -316,7 +315,9 @@ terraform destroy
 | permissions\_boundary | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"<br>  ]<br>}</pre> | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
+| runner\_iam\_policy\_arns | List of policy ARNs to be added to the instance profile of the runners. | `list(string)` | `[]` | no |
 | runner\_instance\_ebs\_optimized | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
+| runner\_instance\_enable\_monitoring | Enable the GitLab runner instance to have detailed monitoring. | `bool` | `true` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `null` | no |
 | runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops` | `map(string)` | `{}` | no |
 | runner\_tags | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
@@ -331,13 +332,14 @@ terraform destroy
 | runners\_idle\_time | Idle time of the runners, will be used in the runner config.toml. | `number` | `600` | no |
 | runners\_image | Image to run builds, will be used in the runner config.toml | `string` | `"docker:18.03.1-ce"` | no |
 | runners\_limit | Limit for the runners, will be used in the runner config.toml. | `number` | `0` | no |
+| runners\_machine\_autoscaling | Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section | <pre>list(object({<br>    periods    = list(string)<br>    idle_count = number<br>    idle_time  = number<br>    timezone   = string<br>  }))</pre> | `[]` | no |
 | runners\_max\_builds | Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration. | `number` | `0` | no |
 | runners\_monitoring | Enable detailed cloudwatch monitoring for spot instances. | `bool` | `false` | no |
 | runners\_name | Name of the runner, will be used in the runner config.toml. | `string` | n/a | yes |
-| runners\_off\_peak\_idle\_count | Off peak idle count of the runners, will be used in the runner config.toml. | `number` | `0` | no |
-| runners\_off\_peak\_idle\_time | Off peak idle time of the runners, will be used in the runner config.toml. | `number` | `0` | no |
-| runners\_off\_peak\_periods | Off peak periods of the runners, will be used in the runner config.toml. | `string` | `""` | no |
-| runners\_off\_peak\_timezone | Off peak idle time zone of the runners, will be used in the runner config.toml. | `string` | `""` | no |
+| runners\_off\_peak\_idle\_count | Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml. | `string` | `-1` | no |
+| runners\_off\_peak\_idle\_time | Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml. | `string` | `-1` | no |
+| runners\_off\_peak\_periods | Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml. | `string` | `null` | no |
+| runners\_off\_peak\_timezone | Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml. | `string` | `null` | no |
 | runners\_output\_limit | Sets the maximum build log size in kilobytes, by default set to 4096 (4MB) | `number` | `4096` | no |
 | runners\_post\_build\_script | Commands to be executed on the Runner just after executing the build, but before executing after\_script. | `string` | `""` | no |
 | runners\_pre\_build\_script | Script to execute in the pipeline just before the build, will be used in the runner config.toml | `string` | `""` | no |

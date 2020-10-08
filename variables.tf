@@ -53,6 +53,12 @@ variable "runner_instance_ebs_optimized" {
   default     = true
 }
 
+variable "runner_instance_enable_monitoring" {
+  description = "Enable the GitLab runner instance to have detailed monitoring."
+  type        = bool
+  default     = true
+}
+
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
@@ -184,27 +190,38 @@ variable "runners_ebs_optimized" {
 }
 
 variable "runners_off_peak_timezone" {
-  description = "Off peak idle time zone of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "runners_off_peak_idle_count" {
-  description = "Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
+  type        = string
+  default     = -1
 }
 
 variable "runners_off_peak_idle_time" {
-  description = "Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
+  type        = string
+  default     = -1
 }
 
 variable "runners_off_peak_periods" {
-  description = "Off peak periods of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
   type        = string
-  default     = ""
+  default     = null
+}
+
+variable "runners_machine_autoscaling" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
+  type = list(object({
+    periods    = list(string)
+    idle_count = number
+    idle_time  = number
+    timezone   = string
+  }))
+  default = []
 }
 
 variable "runners_root_size" {
@@ -312,7 +329,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.1.1"
+  default     = "13.4.0"
 }
 
 variable "enable_ping" {
@@ -331,6 +348,32 @@ variable "gitlab_runner_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
   type        = list(string)
   default     = []
+}
+
+variable "gitlab_runner_egress_rules" {
+  description = "List of egress rules for the gitlab runner instance."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [{
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    prefix_list_ids  = null
+    from_port        = 0
+    protocol         = "-1"
+    security_groups  = null
+    self             = null
+    to_port          = 0
+    description      = null
+  }]
 }
 
 variable "gitlab_runner_security_group_ids" {
@@ -583,4 +626,10 @@ variable "log_group_name" {
   description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
   default     = null
   type        = string
+}
+
+variable "runner_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the runners."
+  default     = []
 }
