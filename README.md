@@ -307,6 +307,7 @@ terraform destroy
 | gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.1.1"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
+| kms\_alias\_name | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
 | kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |
 | kms\_key\_id | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
 | log\_group\_name | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
