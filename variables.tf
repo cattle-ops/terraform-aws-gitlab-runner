@@ -581,6 +581,6 @@ variable "log_group_name" {
 
 variable "runner_iam_policy_arns" {
   type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the runners."
+  description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
   default     = []
 }
