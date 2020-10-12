@@ -17,7 +17,7 @@ locals {
 }
 
 resource "random_string" "s3_suffix" {
-  count   = var.cache_bucket_set_suffix ? 1 : 0
+  count   = var.cache_bucket_set_random_suffix ? 1 : 0
   length  = 8
   upper   = false
   special = false
