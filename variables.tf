@@ -53,6 +53,12 @@ variable "runner_instance_ebs_optimized" {
   default     = true
 }
 
+variable "runner_instance_enable_monitoring" {
+  description = "Enable the GitLab runner instance to have detailed monitoring."
+  type        = bool
+  default     = true
+}
+
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
@@ -323,7 +329,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.3.0"
+  default     = "13.4.0"
 }
 
 variable "enable_ping" {
@@ -342,6 +348,32 @@ variable "gitlab_runner_ssh_cidr_blocks" {
   description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
   type        = list(string)
   default     = []
+}
+
+variable "gitlab_runner_egress_rules" {
+  description = "List of egress rules for the gitlab runner instance."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [{
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    prefix_list_ids  = null
+    from_port        = 0
+    protocol         = "-1"
+    security_groups  = null
+    self             = null
+    to_port          = 0
+    description      = null
+  }]
 }
 
 variable "gitlab_runner_security_group_ids" {
@@ -554,6 +586,12 @@ variable "enable_kms" {
   default     = false
 }
 
+variable "kms_alias_name" {
+  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
+  type        = string
+  default     = ""
+}
+
 variable "kms_deletion_window_in_days" {
   description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
   type        = number
@@ -592,7 +630,7 @@ variable "log_group_name" {
 
 variable "runner_iam_policy_arns" {
   type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the runners."
+  description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
   default     = []
 }
 

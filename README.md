@@ -299,12 +299,14 @@ terraform destroy
 | enable\_runner\_user\_data\_trace\_log | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `false` | no |
 | enable\_schedule | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | environment | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
+| gitlab\_runner\_egress\_rules | List of egress rules for the gitlab runner instance. | <pre>list(object({<br>    cidr_blocks      = list(string)<br>    ipv6_cidr_blocks = list(string)<br>    prefix_list_ids  = list(string)<br>    from_port        = number<br>    protocol         = string<br>    security_groups  = list(string)<br>    self             = bool<br>    to_port          = number<br>    description      = string<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "description": null,<br>    "from_port": 0,<br>    "ipv6_cidr_blocks": [<br>      "::/0"<br>    ],<br>    "prefix_list_ids": null,<br>    "protocol": "-1",<br>    "security_groups": null,<br>    "self": null,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | gitlab\_runner\_registration\_config | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
 | gitlab\_runner\_security\_group\_ids | A list of security group ids that are allowed to access the gitlab runner agent | `list(string)` | `[]` | no |
 | gitlab\_runner\_ssh\_cidr\_blocks | List of CIDR blocks to allow SSH Access to the gitlab runner instance. | `list(string)` | `[]` | no |
-| gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.3.0"` | no |
+| gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.4.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
+| kms\_alias\_name | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
 | kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |
 | kms\_key\_id | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
 | log\_group\_name | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
@@ -315,6 +317,7 @@ terraform destroy
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
 | runner\_iam\_policy\_arns | List of policy ARNs to be added to the instance profile of the runners. | `list(string)` | `[]` | no |
 | runner\_instance\_ebs\_optimized | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
+| runner\_instance\_enable\_monitoring | Enable the GitLab runner instance to have detailed monitoring. | `bool` | `true` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `null` | no |
 | runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops` | `map(string)` | `{}` | no |
 | runner\_tags | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
