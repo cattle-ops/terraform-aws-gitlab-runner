@@ -633,3 +633,9 @@ variable "runner_iam_policy_arns" {
   description = "List of policy ARNs to be added to the instance profile of the runners."
   default     = []
 }
+
+variable "docker_machine_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
+  default     = []
+}
