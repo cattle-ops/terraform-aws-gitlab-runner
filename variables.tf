@@ -669,7 +669,7 @@ variable "session_server_alb_security_group_id" {
   type        = string
 }
 
-variable "gitlab_runner_session_server_cidr_blocks" {
+variable "session_server_gitlab_runner_cidr_blocks" {
   description = "CIDR blocks which are allowed to connect to the session server."
   default     = []
   type        = list(string)
