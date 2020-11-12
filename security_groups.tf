@@ -76,14 +76,14 @@ resource "aws_security_group_rule" "runner_ping" {
 
 # Allow incoming traffic for the session server to gitlab-runner agent instances
 resource "aws_security_group_rule" "runner_session_server" {
-  count = var.session_server_listen_address != "" && var.enable_eip ? 1 : 0
+  count = length(var.session_server) > 0 ? 1 : 0
 
   type      = "ingress"
-  from_port = var.session_server_port
-  to_port   = var.session_server_port
+  from_port = var.session_server["port"]
+  to_port   = var.session_server["port"]
   protocol  = "tcp"
 
-  cidr_blocks       = var.session_server_gitlab_runner_cidr_blocks
+  cidr_blocks       = var.session_server["incoming_cidr_blocks"]
   security_group_id = aws_security_group.runner.id
 }
 
@@ -112,14 +112,14 @@ resource "aws_security_group_rule" "runner_ssh_group" {
 
 # Allow incoming traffic for the session server from allowed security groups to gitlab-runner agent instances
 resource "aws_security_group_rule" "runner_session_server_group" {
-  count = var.session_server_listen_address != "" && var.session_server_listener_arn != "" ? 1 : 0
+  count = length(var.session_server) > 0 && var.session_server["listener_arn"] != "" ? 1 : 0
 
   type      = "ingress"
-  from_port = var.session_server_port
-  to_port   = var.session_server_port
+  from_port = var.session_server["port"]
+  to_port   = var.session_server["port"]
   protocol  = "tcp"
 
-  source_security_group_id = var.session_server_alb_security_group_id
+  source_security_group_id = var.session_server["alb_security_group_id"]
   security_group_id        = aws_security_group.runner.id
 }
 

@@ -133,7 +133,7 @@ locals {
       runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
-      session_server_string             = length(var.session_server_listen_address) == 0 ? "" : local.session_server_string
+      session_server_string             = length(var.session_server) == 0 ? "" : local.session_server_string
     }
   )
 }
@@ -159,7 +159,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  target_group_arns         = [var.session_server_listener_arn != "" ? aws_alb_target_group.session_server[0].arn : ""]
+  target_group_arns         = [var.session_server["listener_arn"] != "" ? aws_alb_target_group.session_server[0].arn : ""]
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = data.null_data_source.agent_tags.*.outputs
@@ -413,9 +413,9 @@ resource "aws_iam_role_policy_attachment" "eip" {
 ### Session server ALB support
 ################################################################################
 resource "aws_alb_listener_rule" "session_server" {
-  count = var.session_server_listener_arn != "" ? 1 : 0
+  count = length(var.session_server) > 0 && var.session_server["listener_arn"] != "" ? 1 : 0
 
-  listener_arn = var.session_server_listener_arn
+  listener_arn = var.session_server["listener_arn"]
 
   action {
     type             = "forward"
@@ -424,16 +424,16 @@ resource "aws_alb_listener_rule" "session_server" {
 
   condition {
     host_header {
-      values = [var.session_server_advertise_address]
+      values = [var.session_server["advertise_address"]]
     }
   }
 }
 
 resource "aws_alb_target_group" "session_server" {
-  count = var.session_server_listener_arn != "" ? 1 : 0
+  count = length(var.session_server) > 0 && var.session_server["listener_arn"] != "" ? 1 : 0
 
   name     = "${var.environment}-session-server"
-  port     = var.session_server_port
+  port     = var.session_server["port"]
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 }

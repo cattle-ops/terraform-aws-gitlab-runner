@@ -634,43 +634,16 @@ variable "runner_iam_policy_arns" {
   default     = []
 }
 
-variable "session_server_session_timeout" {
-  description = "Time in seconds how long the session stays active after the job completes."
-  default     = 1800
-  type        = number
-}
+variable "session_server" {
+  description = "Enables the session server support."
+  type        = map(object)
 
-variable "session_server_port" {
-  description = "Port which is used to connect to the session server. Don't forget to expose this port if you use the docker runner image."
-  default     = 8093
-  type        = number
-}
-variable "session_server_listen_address" {
-  description = "Listen address of the session server, e.g. [::] without a port. Session_server_port is used for the port."
-  default     = ""
-  type        = string
-}
-
-variable "session_server_advertise_address" {
-  description = "The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld. session_server_port is used for the port."
-  default     = ""
-  type        = string
-}
-
-variable "session_server_listener_arn" {
-  description = "ALB listener ARN to connect the session server to the outside. An EIP can be used instead (see enable_eip)."
-  default     = ""
-  type        = string
-}
-
-variable "session_server_alb_security_group_id" {
-  description = "ID of the security group belonging to the ALB to restrict the traffic to the session_server."
-  default     = ""
-  type        = string
-}
-
-variable "session_server_gitlab_runner_cidr_blocks" {
-  description = "CIDR blocks which are allowed to connect to the session server."
-  default     = []
-  type        = list(string)
+  default     = {}
+  # session_timeout       - Time in seconds how long the session stays active after the job completes. (1800)
+  # port                  - Port which is used to connect to the session server. Don't forget to expose this port if you use the docker runner image. (8093)
+  # listen_address        - Listen address of the session server, e.g. [::] without a port. Session_server_port is used for the port.
+  # advertise_address     - The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld. session_server_port is used for the port.
+  # listener_arn          - ALB listener ARN to connect the session server to the outside. An EIP can be used instead (see enable_eip).
+  # alb_security_group_id - ID of the security group belonging to the ALB to restrict the traffic to the session_server.
+  # incoming_cidr_blocks  - CIDR blocks which are allowed to connect to the session server.
 }
