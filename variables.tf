@@ -636,7 +636,7 @@ variable "runner_iam_policy_arns" {
 
 variable "session_server" {
   description = "Enables the session server support."
-  type        = map(object)
+  type        = map(string)
 
   default     = {}
   # session_timeout       - Time in seconds how long the session stays active after the job completes. (1800)
