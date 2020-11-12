@@ -638,7 +638,7 @@ variable "session_server" {
   description = "Enables the session server support."
   type        = map(string)
 
-  default     = {}
+  default = {}
   # session_timeout       - Time in seconds how long the session stays active after the job completes. (1800)
   # port                  - Port which is used to connect to the session server. Don't forget to expose this port if you use the docker runner image. (8093)
   # listen_address        - Listen address of the session server, e.g. [::] without a port. Session_server_port is used for the port.
