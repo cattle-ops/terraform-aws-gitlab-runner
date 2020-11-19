@@ -8,10 +8,10 @@ locals {
   // convert the options for the session server
   session_server_string = var.session_server == null ? "" : join("",
     formatlist("%s", [
-      "[session_server]",
-      format("listen_address = %q", var.session_server.listen_address),
-      format("advertise_address = %q", var.session_server.advertise_address),
-      format("session_timeout = %s", var.session_server.timeout)
+      "[session_server]\n",
+      format("listen_address = %q:%d\n", var.session_server.listen_address, var.session_server.port),
+      format("advertise_address = %q:%d\n", var.session_server.advertise_address, var.session_server.port),
+      format("session_timeout = %s\n", var.session_server.timeout)
       ]
     )
   )
