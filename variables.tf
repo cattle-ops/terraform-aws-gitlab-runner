@@ -636,9 +636,18 @@ variable "runner_iam_policy_arns" {
 
 variable "session_server" {
   description = "Enables the session server support."
-  type        = map(string)
+  type        = object({
+  timeout = number
+  port = number
+  listen_address = string
+  advertise_address = string
+  listener_arn = string
+  alb_security_group_id = string
+  incoming_cidr_blocks = list(string)
+  }
+  )
 
-  default = {}
+  default = null
   # session_timeout       - Time in seconds how long the session stays active after the job completes. (1800)
   # port                  - Port which is used to connect to the session server. Don't forget to expose this port if you use the docker runner image. (8093)
   # listen_address        - Listen address of the session server, e.g. [::] without a port. Session_server_port is used for the port.
