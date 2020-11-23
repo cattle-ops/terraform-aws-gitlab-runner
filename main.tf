@@ -337,6 +337,16 @@ resource "aws_iam_instance_profile" "docker_machine" {
   role = aws_iam_role.docker_machine.name
 }
 
+################################################################################
+### Add user defined policies
+################################################################################
+resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
+  count      = length(var.docker_machine_iam_policy_arns)
+  role       = aws_iam_role.docker_machine.name
+  policy_arn = var.docker_machine_iam_policy_arns[count.index]
+}
+
+################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
   count = var.enable_docker_machine_ssm_access ? 1 : 0
 

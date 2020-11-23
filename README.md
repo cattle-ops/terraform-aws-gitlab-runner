@@ -285,6 +285,7 @@ terraform destroy
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | `string` | `"m5.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | `list(string)` | `[]` | no |
 | docker\_machine\_role\_json | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
+| docker\_machine\_iam\_policy\_arns | List of policy ARNs to be added to the instance profile of the docker machine runners. | `list(string)` | `[]` | no |
 | docker\_machine\_spot\_price\_bid | Spot price bid. | `string` | `"0.06"` | no |
 | docker\_machine\_version | Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `"0.16.2"` | no |
 | enable\_asg\_recreation | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `true` | no |
