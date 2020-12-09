@@ -64,3 +64,4 @@ check_interval = 0
     ${runners_off_peak_idle_count}
     ${runners_off_peak_idle_time}
     ${runners_off_peak_periods_string}
+    ${runners_machine_autoscaling}
