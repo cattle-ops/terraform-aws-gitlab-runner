@@ -171,6 +171,12 @@ variable "runners_shm_size" {
   default     = 0
 }
 
+variable "runners_docker_runtime" {
+  description = "docker runtime for runners, will be used in the runner config.toml"
+  type        = string
+  default     = "containerd"
+}
+
 variable "runners_pull_policy" {
   description = "pull_policy for the runners, will be used in the runner config.toml"
   type        = string
