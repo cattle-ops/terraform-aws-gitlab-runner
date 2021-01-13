@@ -6,23 +6,6 @@
 
 > "Added support to download docker machine from a different location, e.g. <https://gitlab.com/gitlab-org/ci-cd/docker-machine>"
 
-## Terraform versions
-
-### Terraform 0.12
-
-Module is available as Terraform 0.12 module, pin to version 4.x. Please submit pull-requests to the `develop` branch.
-
-Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migrate the runner, execute the following steps.
-
-- Update to Terraform 0.12
-- Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
-- Update the module from 3.10.0 to 4.0.0, next run `terraform init`
-- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
-
-### Terraform 0.11
-
-Module is available as Terraform 0.11 module, pin module to version 3.x. Please submit pull-requests to the `terraform011` branch.
-
 ## The module
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).

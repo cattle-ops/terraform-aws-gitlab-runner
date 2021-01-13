@@ -1,6 +1,6 @@
 provider "aws" {
   region  = var.aws_region
-  version = "2.68"
+  version = "~> 3.23.0"
 }
 
 provider "local" {
@@ -8,9 +8,13 @@ provider "local" {
 }
 
 provider "null" {
-  version = "2.1.2"
+  version = "~> 3.0.0"
 }
 
 provider "tls" {
   version = "2.2.0"
+}
+
+provider "random" {
+  version = "~> 3.0.1"
 }
