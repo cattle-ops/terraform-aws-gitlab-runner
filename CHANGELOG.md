@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+
+## 4.21.0 - 2021-01-13
+- Changed: Updated default version of runner to 13.7
+- Changed: Updated default version of docker machine to GitLab v0.16.2-gitlab.2
+- Changed: Updated default runner ami to ubuntu 20.04
+- Added: Option to set docker runtime (#273) by @thomaskelm
+- Added: Option to attach additional policies to the runner (#269) by @bliles
+- Added: Random suffix to s3 bucket (#252) by @fliphess
+  
+
 ## 4.20.0 - 2020-10-08
 
 - Changed: upgrade default version for gitlab runner to 13.4.0 (#261)
@@ -387,7 +397,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.20.0...HEAD
+[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.21.0...HEAD
+[4.21.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.21.0...4.20.0
 [4.20.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.20.0...4.19.0
 [4.19.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.19.0...4.18.0
 [4.18.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.18.0...4.17.0
