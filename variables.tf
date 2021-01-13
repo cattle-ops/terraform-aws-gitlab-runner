@@ -86,13 +86,13 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_download_url" {
   description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
   type        = string
-  default     = ""
+  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.10/docker-machine-Linux-aarch64"
 }
 
 variable "docker_machine_version" {
-  description = "Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2"
+  default     = ""
 }
 
 variable "runners_name" {
@@ -169,6 +169,12 @@ variable "runners_shm_size" {
   description = "shm_size for the runners, will be used in the runner config.toml"
   type        = number
   default     = 0
+}
+
+variable "runners_docker_runtime" {
+  description = "docker runtime for runners, will be used in the runner config.toml"
+  type        = string
+  default     = ""
 }
 
 variable "runners_pull_policy" {
@@ -308,6 +314,12 @@ variable "cache_bucket_name_include_account_id" {
   default     = true
 }
 
+variable "cache_bucket_set_random_suffix" {
+  description = "Append the cache bucket name with a random string suffix"
+  type        = bool
+  default     = false
+}
+
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = bool
@@ -329,7 +341,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.4.0"
+  default     = "13.7.0"
 }
 
 variable "enable_ping" {
@@ -456,7 +468,7 @@ variable "runner_ami_filter" {
   type        = map(list(string))
 
   default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 }
 
@@ -631,5 +643,11 @@ variable "log_group_name" {
 variable "runner_iam_policy_arns" {
   type        = list(string)
   description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
+  default     = []
+}
+
+variable "docker_machine_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
   default     = []
 }

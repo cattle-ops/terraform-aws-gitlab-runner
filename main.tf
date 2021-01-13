@@ -108,6 +108,7 @@ locals {
       runners_concurrent                = var.runners_concurrent
       runners_image                     = var.runners_image
       runners_privileged                = var.runners_privileged
+      runners_docker_runtime            = var.runners_docker_runtime
       runners_shm_size                  = var.runners_shm_size
       runners_pull_policy               = var.runners_pull_policy
       runners_idle_count                = var.runners_idle_count
@@ -243,6 +244,7 @@ module "cache" {
   create_cache_bucket                  = var.cache_bucket["create"]
   cache_bucket_prefix                  = var.cache_bucket_prefix
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
+  cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
 }
@@ -336,6 +338,16 @@ resource "aws_iam_instance_profile" "docker_machine" {
   role = aws_iam_role.docker_machine.name
 }
 
+################################################################################
+### Add user defined policies
+################################################################################
+resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
+  count      = length(var.docker_machine_iam_policy_arns)
+  role       = aws_iam_role.docker_machine.name
+  policy_arn = var.docker_machine_iam_policy_arns[count.index]
+}
+
+################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
   count = var.enable_docker_machine_ssm_access ? 1 : 0
 

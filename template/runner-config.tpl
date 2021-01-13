@@ -21,6 +21,7 @@ check_interval = 0
     volumes = ["/cache"${runners_additional_volumes}]
     shm_size = ${runners_shm_size}
     pull_policy = "${runners_pull_policy}"
+    runtime = "${runners_docker_runtime}"
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
   [runners.docker.services_tmpfs]
@@ -63,4 +64,4 @@ check_interval = 0
     ${runners_off_peak_idle_count}
     ${runners_off_peak_idle_time}
     ${runners_off_peak_periods_string}
-  ${runners_machine_autoscaling}
+   ${runners_machine_autoscaling}
