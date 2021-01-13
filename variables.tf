@@ -86,13 +86,13 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_download_url" {
   description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
   type        = string
-  default     = ""
+  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.10/docker-machine-Linux-aarch64"
 }
 
 variable "docker_machine_version" {
-  description = "Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2"
+  default     = ""
 }
 
 variable "runners_name" {
@@ -341,7 +341,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.4.0"
+  default     = "13.7.0"
 }
 
 variable "enable_ping" {
@@ -468,7 +468,7 @@ variable "runner_ami_filter" {
   type        = map(list(string))
 
   default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 }
 

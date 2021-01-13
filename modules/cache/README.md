@@ -36,6 +36,7 @@ module "runner" {
 | Name | Version |
 |------|---------|
 | aws | n/a |
+| random | n/a |
 
 ## Inputs
 
@@ -44,7 +45,7 @@ module "runner" {
 | arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | `string` | `""` | no |
-| cache\_bucket\_set\_suffix | `bool` | `false` | no |
+| cache\_bucket\_set\_random\_suffix | Random string suffix for s3 cache bucket | `bool` | `false` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | `string` | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | `number` | `1` | no |
 | cache\_lifecycle\_clear | Enable the rule to cleanup the cache for expired objects. | `bool` | `true` | no |
