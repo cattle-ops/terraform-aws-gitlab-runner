@@ -308,6 +308,7 @@ terraform destroy
 | gitlab\_runner\_version | Version of the GitLab runner. | `string` | `"13.4.0"` | no |
 | instance\_role\_json | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | instance\_type | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
+| kms\_alias\_name | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
 | kms\_deletion\_window\_in\_days | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |
 | kms\_key\_id | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
 | log\_group\_name | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
@@ -316,7 +317,7 @@ terraform destroy
 | permissions\_boundary | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"<br>  ]<br>}</pre> | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
-| runner\_iam\_policy\_arns | List of policy ARNs to be added to the instance profile of the runners. | `list(string)` | `[]` | no |
+| runner\_iam\_policy\_arns | List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance. | `list(string)` | `[]` | no |
 | runner\_instance\_ebs\_optimized | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
 | runner\_instance\_enable\_monitoring | Enable the GitLab runner instance to have detailed monitoring. | `bool` | `true` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `null` | no |
@@ -324,6 +325,7 @@ terraform destroy
 | runner\_tags | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
 | runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list` | `[]` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | `number` | `10` | no |
+| runners\_docker\_runtime | docker runtime for runners, will be used in the runner config.toml | `string` | `""` | no |
 | runners\_ebs\_optimized | Enable runners to be EBS-optimized. | `bool` | `true` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | `list(string)` | `[]` | no |
 | runners\_executor | The executor to use. Currently supports `docker+machine` or `docker`. | `string` | `"docker+machine"` | no |

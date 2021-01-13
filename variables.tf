@@ -171,6 +171,12 @@ variable "runners_shm_size" {
   default     = 0
 }
 
+variable "runners_docker_runtime" {
+  description = "docker runtime for runners, will be used in the runner config.toml"
+  type        = string
+  default     = ""
+}
+
 variable "runners_pull_policy" {
   description = "pull_policy for the runners, will be used in the runner config.toml"
   type        = string
@@ -592,6 +598,12 @@ variable "enable_kms" {
   default     = false
 }
 
+variable "kms_alias_name" {
+  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
+  type        = string
+  default     = ""
+}
+
 variable "kms_deletion_window_in_days" {
   description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
   type        = number
@@ -630,7 +642,7 @@ variable "log_group_name" {
 
 variable "runner_iam_policy_arns" {
   type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the runners."
+  description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
   default     = []
 }
 
