@@ -31,6 +31,5 @@ variable "gitlab_url" {
 }
 
 variable "registration_token" {
-  default = "UkCzuTzyM8rBzs68Hpsu"
 }
 
