@@ -394,6 +394,12 @@ variable "gitlab_runner_security_group_ids" {
   default     = []
 }
 
+variable "gitlab_runner_security_group_description" {
+  description = "A description for the gitlab-runner security group"
+  type        = string
+  default     = "A security group containing gitlab-runner agent instances"
+}
+
 variable "enable_cloudwatch_logging" {
   description = "Boolean used to enable or disable the CloudWatch logging."
   type        = bool
@@ -446,6 +452,12 @@ variable "docker_machine_role_json" {
   description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = string
   default     = ""
+}
+
+variable "docker_machine_security_group_description" {
+  description = "A description for the docker-machine security group"
+  type        = string
+  default     = "A security group containing docker-machine instances"
 }
 
 variable "ami_filter" {
