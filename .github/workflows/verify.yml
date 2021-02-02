@@ -27,10 +27,16 @@ jobs:
     strategy:
       matrix:
         terraform: [0.13.6, 0.14.5, latest]
+        example: ["runner-default"]
+    defaults:
+      run:
+        working-directory: :${{ matrix.example }}
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:   
       - name: Validate Examples
-        run: |
-          ls -l
+      - uses: actions/checkout@v2
+      - run: terraform init -get -backend=false -input=false
+      - run: terraform fmt -recursive -check=true -write=false
+      - run: terraform validate
