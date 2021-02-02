@@ -161,7 +161,7 @@ variable "runners_privileged" {
 
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
@@ -532,7 +532,7 @@ variable "overrides" {
 
 variable "cache_bucket" {
   description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details."
-  type        = map
+  type        = map(any)
 
   default = {
     create = true
@@ -555,7 +555,7 @@ variable "enable_schedule" {
 
 variable "schedule_config" {
   description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
-  type        = map
+  type        = map(any)
   default = {
     scale_in_recurrence  = "0 18 * * 1-5"
     scale_in_count       = 0
