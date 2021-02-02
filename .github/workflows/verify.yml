@@ -34,11 +34,3 @@ jobs:
       - name: Validate Examples
         run: |
           ls -l
-          pwd
-          for example in $(find examples -maxdepth 1 -mindepth 1 -type d); do
-            cd $example
-            terraform init -get -backend=false -input=false
-            terraform fmt -recursive -check=true -write=false
-            terraform validate
-            cd -
-          done
