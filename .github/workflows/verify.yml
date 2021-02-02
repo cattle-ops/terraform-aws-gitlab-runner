@@ -30,7 +30,7 @@ jobs:
         example: ["runner-default"]
     defaults:
       run:
-        working-directory: ${{ matrix.example }}
+        working-directory: examples/${{ matrix.example }}
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
