@@ -35,7 +35,6 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:   
-      - name: Validate Examples
       - uses: actions/checkout@v2
       - run: terraform init -get -backend=false -input=false
       - run: terraform fmt -recursive -check=true -write=false
