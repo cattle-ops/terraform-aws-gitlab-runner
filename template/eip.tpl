@@ -1,7 +1,7 @@
 echo 'installing additional software for assigning EIP'
 
 yum install python3 -y
-curl --fail --retry 6 -O https://bootstrap.pypa.io/get-pip.py
+curl --fail --retry 6 -O https://bootstrap.pypa.io/2.7/get-pip.py
 python3 get-pip.py --user
 export PATH=~/.local/bin:$PATH
 
