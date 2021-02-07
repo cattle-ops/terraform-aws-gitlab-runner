@@ -8,7 +8,7 @@ on:
 
 jobs:
   updateContributors:
-    runs-on: [self-hosted, research]
+    runs-on: ubuntu-latest
     container: dl-innersource-docker.artifactory-ehv.ta.philips.com/forest-node-ci:12
     steps:
       - uses: actions/checkout@v2
