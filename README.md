@@ -2,9 +2,32 @@
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances
 
-> "Added support for `runners.machine.autoscaling` parameters which replaces all deprecated off peak settings. In case you use any of the variables `off_peak_*`, please upgrade. The [default example](./examples/runner-default/main.tf) contains an example.
-
-> "Added support to download docker machine from a different location, e.g. <https://gitlab.com/gitlab-org/ci-cd/docker-machine>"
+- [Terraform module for GitLab auto scaling runners on AWS spot instances](#terraform-module-for-gitlab-auto-scaling-runners-on-aws-spot-instances)
+  - [The module](#the-module)
+    - [GitLab CI docker-machine runner - one runner agent](#gitlab-ci-docker-machine-runner---one-runner-agent)
+    - [GitLab CI docker-machine runner - multiple runner agents](#gitlab-ci-docker-machine-runner---multiple-runner-agents)
+    - [GitLab Ci docker runner](#gitlab-ci-docker-runner)
+  - [Prerequisites](#prerequisites)
+    - [Terraform](#terraform)
+    - [AWS](#aws)
+    - [JQ & AWS CLI](#jq--aws-cli)
+    - [Service linked roles](#service-linked-roles)
+    - [GitLab runner token configuration](#gitlab-runner-token-configuration)
+    - [Access runner instance](#access-runner-instance)
+    - [GitLab runner cache](#gitlab-runner-cache)
+  - [Usage](#usage)
+    - [Configuration](#configuration)
+    - [Usage module](#usage-module)
+  - [Examples](#examples)
+    - [SSH keys](#ssh-keys)
+    - [Versions](#versions)
+    - [Configure](#configure)
+    - [Run](#run)
+  - [Requirements](#requirements)
+  - [Providers](#providers)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+  - [Contributors ✨](#contributors-)
 
 ## The module
 
