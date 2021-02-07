@@ -368,3 +368,7 @@ terraform destroy
 | runner\_sg\_id | ID of the security group attached to the docker machine runners. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Contributors ✨
+
+<img src="./CONTRIBUTORS.svg">
