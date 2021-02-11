@@ -102,6 +102,6 @@ resource "null_resource" "cancel_spot_requests" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "../../ci/bin/cancel-spot-instances.sh ${self.triggers.environment}"
+    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }
