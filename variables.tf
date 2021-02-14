@@ -177,6 +177,12 @@ variable "runners_docker_runtime" {
   default     = ""
 }
 
+variable "runners_helper_image" {
+  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
+  type        = string
+  default     = ""
+}
+
 variable "runners_pull_policy" {
   description = "pull_policy for the runners, will be used in the runner config.toml"
   type        = string
