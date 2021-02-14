@@ -161,7 +161,7 @@ variable "runners_privileged" {
 
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
@@ -173,6 +173,12 @@ variable "runners_shm_size" {
 
 variable "runners_docker_runtime" {
   description = "docker runtime for runners, will be used in the runner config.toml"
+  type        = string
+  default     = ""
+}
+
+variable "runners_helper_image" {
+  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
   type        = string
   default     = ""
 }
@@ -341,7 +347,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.7.0"
+  default     = "13.8.0"
 }
 
 variable "enable_ping" {
@@ -392,6 +398,12 @@ variable "gitlab_runner_security_group_ids" {
   description = "A list of security group ids that are allowed to access the gitlab runner agent"
   type        = list(string)
   default     = []
+}
+
+variable "gitlab_runner_security_group_description" {
+  description = "A description for the gitlab-runner security group"
+  type        = string
+  default     = "A security group containing gitlab-runner agent instances"
 }
 
 variable "enable_cloudwatch_logging" {
@@ -446,6 +458,12 @@ variable "docker_machine_role_json" {
   description = "Docker machine runner instance override policy, expected to be in JSON format."
   type        = string
   default     = ""
+}
+
+variable "docker_machine_security_group_description" {
+  description = "A description for the docker-machine security group"
+  type        = string
+  default     = "A security group containing docker-machine instances"
 }
 
 variable "ami_filter" {
@@ -520,7 +538,7 @@ variable "overrides" {
 
 variable "cache_bucket" {
   description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details."
-  type        = map
+  type        = map(any)
 
   default = {
     create = true
@@ -543,7 +561,7 @@ variable "enable_schedule" {
 
 variable "schedule_config" {
   description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
-  type        = map
+  type        = map(any)
   default = {
     scale_in_recurrence  = "0 18 * * 1-5"
     scale_in_count       = 0

@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.48"
+  version = "2.70"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -36,6 +36,9 @@ module "runner" {
 
   runners_use_private_address = false
   enable_eip                  = true
+
+  docker_machine_security_group_description = "Custom description for docker-machine"
+  gitlab_runner_security_group_description  = "Custom description for gitlab-runner"
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets

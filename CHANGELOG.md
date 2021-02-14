@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 4.22.0 - 2021-02-14
+
+- Changed: feat: Restrict public access and public objects for cache bucket (#295) @stefan-kolb
+- Changed: docs: Improve spelling and fix typos in README.md (#285) @NikolaiGulatz
+- Changed: ci: rewrite CI, examples verified for Terraform 13 and 14
+- Changed: fix: failing pip install for assigning eip #280
+- Added: feat: Add option to customize helper image (#293) @stefan-kolb
+- Added: chore: Contributors list (#291)  
+- Added: feat: Support Security Group custom description (#278) @pandarouxbsd
+
 
 ## 4.21.0 - 2021-01-13
+
 - Changed: Updated default version of runner to 13.7
 - Changed: Updated default version of docker machine to GitLab v0.16.2-gitlab.2
 - Changed: Updated default runner ami to ubuntu 20.04
@@ -397,7 +408,8 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.21.0...HEAD
+[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...HEAD
+[4.22.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...4.21.0
 [4.21.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.21.0...4.20.0
 [4.20.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.20.0...4.19.0
 [4.19.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.19.0...4.18.0

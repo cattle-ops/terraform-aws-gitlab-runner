@@ -9,7 +9,7 @@ data "aws_security_group" "default" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.48"
+  version = "2.70"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -102,6 +102,6 @@ resource "null_resource" "cancel_spot_requests" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "../../ci/bin/cancel-spot-instances.sh ${self.triggers.environment}"
+    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }

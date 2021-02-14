@@ -13,6 +13,8 @@
 | gitlab\_url | URL of the gitlab instance to connect to. | `string` | `"https://gitlab.com"` | no |
 | registration\_token | n/a | `any` | n/a | yes |
 | runner\_name | Name of the runner, will be used in the runner config.toml | `string` | `"docker"` | no |
+| docker_machine_security_group_description | Description for the docker machine security group. | `string` | `"A security group containing docker-machine instances"` | no |
+| gitlab_runner_security_group_description | Name of the timezone that the runner will be used in. | `string` | `"A security group containing gitlab-runner agent instances"` | no |
 
 ## Outputs
 

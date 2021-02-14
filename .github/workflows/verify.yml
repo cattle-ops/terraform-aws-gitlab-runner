@@ -1,28 +1,40 @@
 name: Verify
 on: 
-  push: 
+  push:
     branches:
       - master
       - develop
   pull_request:
+    
 
 jobs:
-  verify:
+  validate_module:
+    name: Verify module
+    strategy:
+      matrix:
+        terraform: [0.13.6]    
     runs-on: ubuntu-latest
-
+    container:
+      image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@v1
-      - name: verify
-        run: |
-          source ./ci/bin/install.sh
-          ./ci/bin/verify.sh
+      - uses: actions/checkout@v2
+      - run: terraform init -get -backend=false -input=false
+      - run: terraform fmt -recursive -check=true -write=false
 
-  verify-examples:
+  verify_examples:
+    name: Verify examples
+    strategy:
+      matrix:
+        terraform: [0.13.6, 0.14.5, latest]
+        example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
+    defaults:
+      run:
+        working-directory: examples/${{ matrix.example }}
     runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v1
-      - name: verify-examples
-        run: |
-          source ./ci/bin/install.sh
-          ./ci/bin/verify-examples.sh
+    container:
+      image: hashicorp/terraform:${{ matrix.terraform }}
+    steps:   
+      - uses: actions/checkout@v2
+      - run: terraform init -get -backend=false -input=false
+      - run: terraform fmt -recursive -check=true -write=false
+      - run: terraform validate
