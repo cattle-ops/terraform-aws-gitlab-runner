@@ -63,6 +63,7 @@ resource "aws_s3_bucket" "build_cache" {
 
 # block public access to S3 cache bucket
 resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
+  count  = var.create_cache_bucket ? 1 : 0
   bucket = local.cache_bucket_name
 
   block_public_acls       = true
