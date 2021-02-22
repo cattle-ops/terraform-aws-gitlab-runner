@@ -640,6 +640,12 @@ variable "enable_asg_recreation" {
   type        = bool
 }
 
+variable "asg_delete_timeout" {
+  description = "Timeout when trying to delete the Runner ASG."
+  default     = "10m"
+  type        = string
+}
+
 variable "enable_forced_updates" {
   description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the oposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = null

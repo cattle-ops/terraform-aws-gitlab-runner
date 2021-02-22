@@ -279,6 +279,7 @@ terraform destroy
 | docker\_machine\_spot\_price\_bid | Spot price bid. | `string` | `"0.06"` | no |
 | docker\_machine\_version | By default docker\_machine\_download\_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `""` | no |
 | enable\_asg\_recreation | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `true` | no |
+| asg\_delete\_timeout | Timeout when trying to delete the Runner ASG. | `string` | `"10m"` | no |
 | enable\_cloudwatch\_logging | Boolean used to enable or disable the CloudWatch logging. | `bool` | `true` | no |
 | enable\_docker\_machine\_ssm\_access | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
 | enable\_eip | Enable the assignment of an EIP to the gitlab runner instance | `bool` | `false` | no |

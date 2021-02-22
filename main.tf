@@ -163,6 +163,9 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = data.null_data_source.agent_tags.*.outputs
+  timeouts {
+    delete = var.asg_delete_timeout
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
