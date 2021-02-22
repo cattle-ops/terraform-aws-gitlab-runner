@@ -20,6 +20,9 @@ Pull requests are the best way to propose changes to the codebase (we use [Githu
 ## Coding Style
 We use the [Terraform Style conventions](https://www.terraform.io/docs/configuration/style.html). They are enforced with CI scripts.
 
+## Documentation
+We use [pre-commit](https://pre-commit.com/) to update the Terraform inputs and outputs in the documentation via [terraform-docs](https://github.com/terraform-docs/terraform-docs). Ensure you have installed those components.
+
 ## Testing
 No automated tests are available. The example directory takes care of a few scenario's.
 
