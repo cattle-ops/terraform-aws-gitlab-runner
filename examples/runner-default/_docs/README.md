@@ -8,6 +8,8 @@ This examples shows:
 - Registration via GitLab token.
 - Auto scaling using `docker+machine` executor.
 - Addtional security groups that are allowed access to the runner agent
+- A multiline pre build script
+- A single line post build script
 
 ![runners-default](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-default.png)
 

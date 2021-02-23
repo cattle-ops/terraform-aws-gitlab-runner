@@ -92,6 +92,15 @@ module "runner" {
       timezone   = var.timezone
     }
   ]
+
+  runners_pre_build_script = <<EOT
+  '''
+  echo 'multiline 1'
+  echo 'multiline 2'
+  '''
+  EOT
+
+  runners_post_build_script = "\"echo 'single line'\""
 }
 
 resource "null_resource" "cancel_spot_requests" {
