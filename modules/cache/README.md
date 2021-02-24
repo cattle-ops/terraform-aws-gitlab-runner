@@ -38,6 +38,20 @@ module "runner" {
 | aws | n/a |
 | random | n/a |
 
+## Modules
+
+No Modules.
+
+## Resources
+
+| Name |
+|------|
+| [aws_caller_identity](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) |
+| [aws_iam_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) |
+| [aws_s3_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) |
+| [random_string](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -61,5 +75,4 @@ module "runner" {
 | arn | The ARN of the created bucket. |
 | bucket | Name of the created bucket. |
 | policy\_arn | Policy for users of the cache (bucket). |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

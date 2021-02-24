@@ -209,13 +209,13 @@ variable "runners_off_peak_timezone" {
 
 variable "runners_off_peak_idle_count" {
   description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = string
+  type        = number
   default     = -1
 }
 
 variable "runners_off_peak_idle_time" {
   description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = string
+  type        = number
   default     = -1
 }
 
