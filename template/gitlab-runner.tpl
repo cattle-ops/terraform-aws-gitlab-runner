@@ -48,6 +48,9 @@ docker-machine rm -y dummy-machine
 unset HOME
 unset USER
 
+# Install amazon-ecr-credential-helper
+yum install amazon-ecr-credential-helper -y
+
 # Install jq if not exists
 if ! [ -x "$(command -v jq)" ]; then
   yum install jq -y
