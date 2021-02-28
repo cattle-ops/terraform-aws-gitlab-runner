@@ -7,9 +7,9 @@ check_interval = 0
   token = "${runners_token}"
   executor = "${runners_executor}"
   environment = ${runners_environment_vars}
-  pre_build_script = "${runners_pre_build_script}"
-  post_build_script = "${runners_post_build_script}"
-  pre_clone_script = "${runners_pre_clone_script}"
+  pre_build_script = ${runners_pre_build_script}
+  post_build_script = ${runners_post_build_script}
+  pre_clone_script = ${runners_pre_clone_script}
   request_concurrency = ${runners_request_concurrency}
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
@@ -65,4 +65,4 @@ check_interval = 0
     ${runners_off_peak_idle_count}
     ${runners_off_peak_idle_time}
     ${runners_off_peak_periods_string}
-   ${runners_machine_autoscaling}
+${runners_machine_autoscaling}

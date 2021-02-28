@@ -209,13 +209,13 @@ variable "runners_off_peak_timezone" {
 
 variable "runners_off_peak_idle_count" {
   description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = string
+  type        = number
   default     = -1
 }
 
 variable "runners_off_peak_idle_time" {
   description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = string
+  type        = number
   default     = -1
 }
 
@@ -257,19 +257,19 @@ variable "runners_environment_vars" {
 variable "runners_pre_build_script" {
   description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
   type        = string
-  default     = ""
+  default     = "\"\""
 }
 
 variable "runners_post_build_script" {
   description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
   type        = string
-  default     = ""
+  default     = "\"\""
 }
 
 variable "runners_pre_clone_script" {
   description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
   type        = string
-  default     = ""
+  default     = "\"\""
 }
 
 variable "runners_request_concurrency" {
@@ -638,6 +638,12 @@ variable "enable_asg_recreation" {
   description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = true
   type        = bool
+}
+
+variable "asg_delete_timeout" {
+  description = "Timeout when trying to delete the Runner ASG."
+  default     = "10m"
+  type        = string
 }
 
 variable "enable_forced_updates" {
