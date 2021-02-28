@@ -1,3 +1,19 @@
+# Changelog
+
+## [4.23.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...4.23.0) (2021-02-28)
+
+
+### Features
+
+* additional config parameter asg_delete_timeout to configure the timeout when trying to delete the ASG ([#305](https://github.com/npalm/terraform-aws-gitlab-runner/issues/305)) ([f60c9d5](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f60c9d54e65e071ee638b8c34d5277951c4e9835))
+* allow multilines build scripts ([#282](https://github.com/npalm/terraform-aws-gitlab-runner/issues/282)) ([7000c07](https://github.com/npalm/terraform-aws-gitlab-runner/commit/7000c0703cf03df75f3030f9d503cab0f593c429)), closes [#250](https://github.com/npalm/terraform-aws-gitlab-runner/issues/250)
+
+
+### Bug Fixes
+
+* autoscaling configuraton ([#301](https://github.com/npalm/terraform-aws-gitlab-runner/issues/301)) ([6b35a10](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6b35a10f4b15ee6df53ad57da1c4e5096c951645))
+* respect create_cache_bucket variable and avoid concurrent changes to cache bucket ([#296](https://github.com/npalm/terraform-aws-gitlab-runner/issues/296)) ([c3629f6](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c3629f6fae2aea9a88488964243867fe18fc7a3f))
+
 ## 4.22.0 - 2021-02-14
 
 - Changed: feat: Restrict public access and public objects for cache bucket (#295) @stefan-kolb
