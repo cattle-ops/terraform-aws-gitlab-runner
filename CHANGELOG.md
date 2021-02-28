@@ -1,12 +1,3 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](http://keepachangelog.com/)
-and this project adheres to [Semantic Versioning](http://semver.org/).
-
-## Unreleased
-
 ## 4.22.0 - 2021-02-14
 
 - Changed: feat: Restrict public access and public objects for cache bucket (#295) @stefan-kolb

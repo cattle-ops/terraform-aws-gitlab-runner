@@ -15,3 +15,11 @@ config-terraform.sh
 
 *.out
 *.secrets*.tfvars
+
+**/node_modules/
+package*.json
+yarn.lock
+
+# exceptions for semantic release
+!.release/package*
+!.release/*.lock
