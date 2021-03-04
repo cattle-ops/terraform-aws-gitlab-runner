@@ -18,6 +18,8 @@
     volumes = ["/cache"${additional_volumes}]
     shm_size = ${shm_size}
     pull_policy = "${pull_policy}"
+    runtime = "${docker_runtime}"
+    helper_image = "${helper_image}"
   [runners.docker.tmpfs]
     ${volumes_tmpfs}
   [runners.docker.services_tmpfs]
@@ -57,7 +59,9 @@
 %{ endif }
 ${docker_machine_options}
     ]
-    OffPeakTimezone = "${off_peak_timezone}"
-    OffPeakIdleCount = ${off_peak_idle_count}
-    OffPeakIdleTime = ${off_peak_idle_time}
+
+    ${off_peak_timezone}
+    ${off_peak_idle_count}
+    ${off_peak_idle_time}
     ${off_peak_periods_string}
+${runners_machine_autoscaling}

@@ -30,10 +30,10 @@ module "vpc" {
 }
 
 locals {
-  environment = "example-runners"
+  environment    = "example-runners"
   subnet_ids     = tolist(module.vpc.public_subnets)
   instance_types = ["c5a.xlarge", "c5.xlarge", "m5a.xlarge", "m5.xlarge"]
-  vpc_id = module.vpc.vpc_id
+  vpc_id         = module.vpc.vpc_id
 }
 
 module "gitlab_runner" {

@@ -83,7 +83,7 @@ locals {
     gitlab_url     = var.runners_gitlab_url
     name           = var.runners_name
     tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
-      runners_token                     = var.runners_token
+      var.runners_token,
       "Name,%s-docker-machine,%s,%s",
       var.environment,
       local.tags_string,
