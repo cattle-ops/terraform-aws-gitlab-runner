@@ -1,0 +1,37 @@
+{
+  "variables": {},
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "eu-central-1",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "docker-machine"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./docker-machine.sh",
+      "destination": "/tmp/docker-machine.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "whoami",
+        "cd /tmp",
+        "chmod +x docker-machine.sh",
+        "sudo ./docker-machine.sh"
+      ]
+    }
+  ]
+}

@@ -30,3 +30,8 @@ variable "timezone" {
   type        = string
   default     = "Europe/Amsterdam"
 }
+
+variable "image_id" {
+  description = "Run build.sh script to build a stable AMI for your instances with Packer."
+  type        = string
+}
