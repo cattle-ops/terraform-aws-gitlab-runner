@@ -106,6 +106,12 @@ variable "runners_executor" {
   default     = "docker+machine"
 }
 
+variable "runners_install_amazon_ecr_credential_helper" {
+  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
+  type        = bool
+  default     = false
+}
+
 variable "runners_gitlab_url" {
   description = "URL of the GitLab instance to connect to."
   type        = string
