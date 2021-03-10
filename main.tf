@@ -54,24 +54,25 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
     {
-      gitlab_runner_version                   = var.gitlab_runner_version
-      docker_machine_version                  = var.docker_machine_version
-      docker_machine_download_url             = var.docker_machine_download_url
-      runners_config                          = local.template_runner_config
-      runners_executor                        = var.runners_executor
-      pre_install                             = var.userdata_pre_install
-      post_install                            = var.userdata_post_install
-      runners_gitlab_url                      = var.runners_gitlab_url
-      runners_token                           = var.runners_token
-      secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
-      secure_parameter_store_region           = var.aws_region
-      gitlab_runner_registration_token        = var.gitlab_runner_registration_config["registration_token"]
-      giltab_runner_description               = var.gitlab_runner_registration_config["description"]
-      gitlab_runner_tag_list                  = var.gitlab_runner_registration_config["tag_list"]
-      gitlab_runner_locked_to_project         = var.gitlab_runner_registration_config["locked_to_project"]
-      gitlab_runner_run_untagged              = var.gitlab_runner_registration_config["run_untagged"]
-      gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
-      gitlab_runner_access_level              = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
+      gitlab_runner_version                        = var.gitlab_runner_version
+      docker_machine_version                       = var.docker_machine_version
+      docker_machine_download_url                  = var.docker_machine_download_url
+      runners_config                               = local.template_runner_config
+      runners_executor                             = var.runners_executor
+      runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
+      pre_install                                  = var.userdata_pre_install
+      post_install                                 = var.userdata_post_install
+      runners_gitlab_url                           = var.runners_gitlab_url
+      runners_token                                = var.runners_token
+      secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
+      secure_parameter_store_region                = var.aws_region
+      gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
+      giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
+      gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
+      gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
+      gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
+      gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
+      gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
