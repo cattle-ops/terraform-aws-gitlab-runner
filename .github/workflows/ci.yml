@@ -49,6 +49,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Get installation token
         uses: npalm/action-app-token@v1.0.0
