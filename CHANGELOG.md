@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.24.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.23.0...4.24.0) (2021-03-10)
+
+
+### Features
+
+* add amazon-ecr-credential-helper inside userdata_pre_install ([#311](https://github.com/npalm/terraform-aws-gitlab-runner/issues/311)) ([aa0c8b4](https://github.com/npalm/terraform-aws-gitlab-runner/commit/aa0c8b4ab07f646e8f93b87932022c6b8954f9c3))
+
 ## [4.23.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...4.23.0) (2021-02-28)
 
 
