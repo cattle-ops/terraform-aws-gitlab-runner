@@ -1,5 +1,12 @@
 # Changelog
 
+### [4.24.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.24.0...4.24.1) (2021-03-11)
+
+
+### Bug Fixes
+
+* updated docker machine default url ([064e0e2](https://github.com/npalm/terraform-aws-gitlab-runner/commit/064e0e2293764410dd7d9a92d9b81717db199acf)), closes [#308](https://github.com/npalm/terraform-aws-gitlab-runner/issues/308) [#299](https://github.com/npalm/terraform-aws-gitlab-runner/issues/299)
+
 ## [4.24.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.23.0...4.24.0) (2021-03-10)
 
 
