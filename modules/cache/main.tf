@@ -79,6 +79,7 @@ resource "aws_iam_policy" "docker_machine_cache" {
   name        = "${var.environment}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
+  tags        = local.tags
 
   policy = templatefile("${path.module}/policies/cache.json",
     {
