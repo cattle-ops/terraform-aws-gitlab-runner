@@ -245,12 +245,13 @@ terraform destroy
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
+| aws | >= 3.35.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
+| aws | >= 3.35.0 |
 | null | n/a |
 
 ## Modules
