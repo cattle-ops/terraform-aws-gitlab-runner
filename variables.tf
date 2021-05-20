@@ -232,8 +232,10 @@ variable "runners_off_peak_idle_time" {
 }
 
 variable "runners_off_peak_periods" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runne
-variable "runners_install_amazon_ecr_credential_helper" {
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
+  type        = string
+  default     = null
+}
 
 variable "runners_machine_autoscaling" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
