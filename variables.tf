@@ -165,6 +165,12 @@ variable "runners_privileged" {
   default     = true
 }
 
+variable "runners_disable_cache" {
+  description = "Runners will not use local cache, will be used in the runner config.toml"
+  type        = bool
+  default     = false
+}
+
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
   type        = list(any)
@@ -226,10 +232,8 @@ variable "runners_off_peak_idle_time" {
 }
 
 variable "runners_off_peak_periods" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
-}
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runne
+variable "runners_install_amazon_ecr_credential_helper" {
 
 variable "runners_machine_autoscaling" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
