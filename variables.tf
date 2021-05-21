@@ -165,6 +165,12 @@ variable "runners_privileged" {
   default     = true
 }
 
+variable "runners_disable_cache" {
+  description = "Runners will not use local cache, will be used in the runner config.toml"
+  type        = bool
+  default     = false
+}
+
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
   type        = list(any)
