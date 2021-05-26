@@ -91,6 +91,8 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
   block_public_policy     = true
   restrict_public_buckets = true
   ignore_public_acls      = true
+
+  depends_on = ["aws_s3_bucket.build_cache"]
 }
 
 resource "aws_iam_policy" "docker_machine_cache" {
@@ -106,4 +108,6 @@ resource "aws_iam_policy" "docker_machine_cache" {
       s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "${var.arn_format}:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
     }
   )
+
+  depends_on = ["aws_s3_bucket_public_access_block.build_cache_policy"]
 }
