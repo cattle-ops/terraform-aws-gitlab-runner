@@ -21,7 +21,7 @@ module "vpc" {
 
 module "cache" {
   source      = "../../modules/cache"
-  environment = "${var.environment}"
+  environment = var.environment
 }
 
 module "key_pair" {

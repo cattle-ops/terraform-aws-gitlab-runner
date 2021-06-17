@@ -35,7 +35,7 @@ resource "null_resource" "remove_runner" {
 }
 
 locals {
-  enable_asg_recreation = var.enable_forced_updates != null ? ! var.enable_forced_updates : var.enable_asg_recreation
+  enable_asg_recreation = var.enable_forced_updates != null ? !var.enable_forced_updates : var.enable_asg_recreation
 
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
@@ -117,7 +117,7 @@ locals {
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
-      runners_use_private_address       = ! var.runners_use_private_address
+      runners_use_private_address       = !var.runners_use_private_address
       runners_request_spot_instance     = var.runners_request_spot_instance
       runners_environment_vars          = jsonencode(var.runners_environment_vars)
       runners_pre_build_script          = var.runners_pre_build_script
@@ -172,7 +172,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
         instance_type = "t3.small"
       }
 
-       override {
+      override {
         instance_type = "t2.micro"
       }
 
@@ -271,9 +271,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix   = "${var.runners_name}-"
   image_id      = data.aws_ami.runner.id
   instance_type = var.instance_type
-  key_name             = var.ssh_key_pair
+  key_name      = var.ssh_key_pair
 
-  ebs_optimized        = var.runner_instance_ebs_optimized
+  ebs_optimized = var.runner_instance_ebs_optimized
 
   iam_instance_profile {
     name = aws_iam_instance_profile.instance.name
@@ -296,7 +296,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 
   network_interfaces {
     associate_public_ip_address = false == var.runners_use_private_address
-    security_groups = [aws_security_group.runner.id]
+    security_groups             = [aws_security_group.runner.id]
   }
 
 
