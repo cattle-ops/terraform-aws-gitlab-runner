@@ -23,6 +23,11 @@ then
   fi
 fi
 
+if [[ `echo ${runners_install_amazon_ecr_credential_helper}` == "true" ]]
+then
+  yum install amazon-ecr-credential-helper -y
+fi
+
 curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
 yum install gitlab-runner-${gitlab_runner_version} -y
 
@@ -70,7 +75,7 @@ fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
 
-# A small script to remove this runner from being registered with Gitlab. 
+# A small script to remove this runner from being registered with Gitlab.
 cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
 #!/bin/bash
 # chkconfig: 1356 99 03

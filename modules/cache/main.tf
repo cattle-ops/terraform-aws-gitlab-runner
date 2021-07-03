@@ -1,5 +1,6 @@
 data "aws_caller_identity" "current" {}
 
+
 locals {
   tags = merge(
     {
@@ -11,7 +12,15 @@ locals {
     var.tags,
   )
 
-  cache_bucket_name = var.cache_bucket_name_include_account_id ? "${var.cache_bucket_prefix}${data.aws_caller_identity.current.account_id}-gitlab-runner-cache" : "${var.cache_bucket_prefix}-gitlab-runner-cache"
+  cache_bucket_string = var.cache_bucket_name_include_account_id ? format("%s%s-gitlab-runner-cache", var.cache_bucket_prefix, data.aws_caller_identity.current.account_id) : format("%s-gitlab-runner-cache", var.cache_bucket_prefix)
+  cache_bucket_name   = var.cache_bucket_set_random_suffix ? format("%s-%s", local.cache_bucket_string, random_string.s3_suffix[0].result) : local.cache_bucket_string
+}
+
+resource "random_string" "s3_suffix" {
+  count   = var.cache_bucket_set_random_suffix ? 1 : 0
+  length  = 8
+  upper   = false
+  special = false
 }
 
 resource "aws_s3_bucket" "build_cache" {
@@ -52,12 +61,25 @@ resource "aws_s3_bucket" "build_cache" {
   }
 }
 
+# block public access to S3 cache bucket
+resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
+  count = var.create_cache_bucket ? 1 : 0
+
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+  ignore_public_acls      = true
+}
+
 resource "aws_iam_policy" "docker_machine_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
   name        = "${var.environment}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
+  tags        = local.tags
 
   policy = templatefile("${path.module}/policies/cache.json",
     {

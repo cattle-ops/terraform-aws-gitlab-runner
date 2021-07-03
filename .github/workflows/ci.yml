@@ -1,0 +1,69 @@
+name: CI
+on: 
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    
+
+jobs:
+  verify_module:
+    name: Verify module
+    strategy:
+      matrix:
+        terraform: [0.13.6]    
+    runs-on: ubuntu-latest
+    container:
+      image: hashicorp/terraform:${{ matrix.terraform }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: terraform init -get -backend=false -input=false
+      - run: terraform fmt -recursive -check=true -write=false
+
+  verify_examples:
+    name: Verify examples
+    strategy:
+      matrix:
+        terraform: [0.13.6, 0.14.5, latest]
+        example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
+    defaults:
+      run:
+        working-directory: examples/${{ matrix.example }}
+    runs-on: ubuntu-latest
+    container:
+      image: hashicorp/terraform:${{ matrix.terraform }}
+    steps:   
+      - uses: actions/checkout@v2
+      - run: terraform init -get -backend=false -input=false
+      - run: terraform fmt -recursive -check=true -write=false
+      - run: terraform validate
+
+
+  release:
+    if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)
+    name: Release
+    needs: [verify_module, verify_examples]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get installation token
+        uses: npalm/action-app-token@v1.0.0
+        id: app-token
+        with:
+          appId: ${{ secrets.APP_ID }}
+          appPrivateKeyBase64: ${{ secrets.APP_PRIVATE_KEY_BASE64 }}
+          appInstallationType: repo
+          appInstallationValue: ${{ github.repository }}
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          cp .release/* .
+          yarn 
+          yarn release --repositoryUrl https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git

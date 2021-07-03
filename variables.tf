@@ -53,6 +53,12 @@ variable "runner_instance_ebs_optimized" {
   default     = true
 }
 
+variable "runner_instance_enable_monitoring" {
+  description = "Enable the GitLab runner instance to have detailed monitoring."
+  type        = bool
+  default     = true
+}
+
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
   type        = string
@@ -80,13 +86,13 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_download_url" {
   description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
   type        = string
-  default     = ""
+  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
 }
 
 variable "docker_machine_version" {
-  description = "Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2"
+  default     = ""
 }
 
 variable "runners_name" {
@@ -98,6 +104,12 @@ variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
   default     = "docker+machine"
+}
+
+variable "runners_install_amazon_ecr_credential_helper" {
+  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
+  type        = bool
+  default     = false
 }
 
 variable "runners_gitlab_url" {
@@ -153,9 +165,15 @@ variable "runners_privileged" {
   default     = true
 }
 
+variable "runners_disable_cache" {
+  description = "Runners will not use local cache, will be used in the runner config.toml"
+  type        = bool
+  default     = false
+}
+
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
@@ -163,6 +181,18 @@ variable "runners_shm_size" {
   description = "shm_size for the runners, will be used in the runner config.toml"
   type        = number
   default     = 0
+}
+
+variable "runners_docker_runtime" {
+  description = "docker runtime for runners, will be used in the runner config.toml"
+  type        = string
+  default     = ""
+}
+
+variable "runners_helper_image" {
+  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
+  type        = string
+  default     = ""
 }
 
 variable "runners_pull_policy" {
@@ -184,27 +214,38 @@ variable "runners_ebs_optimized" {
 }
 
 variable "runners_off_peak_timezone" {
-  description = "Off peak idle time zone of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "runners_off_peak_idle_count" {
-  description = "Off peak idle count of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
   type        = number
-  default     = 0
+  default     = -1
 }
 
 variable "runners_off_peak_idle_time" {
-  description = "Off peak idle time of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
   type        = number
-  default     = 0
+  default     = -1
 }
 
 variable "runners_off_peak_periods" {
-  description = "Off peak periods of the runners, will be used in the runner config.toml."
+  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
   type        = string
-  default     = ""
+  default     = null
+}
+
+variable "runners_machine_autoscaling" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
+  type = list(object({
+    periods    = list(string)
+    idle_count = number
+    idle_time  = number
+    timezone   = string
+  }))
+  default = []
 }
 
 variable "runners_root_size" {
@@ -228,19 +269,19 @@ variable "runners_environment_vars" {
 variable "runners_pre_build_script" {
   description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
   type        = string
-  default     = ""
+  default     = "\"\""
 }
 
 variable "runners_post_build_script" {
   description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
   type        = string
-  default     = ""
+  default     = "\"\""
 }
 
 variable "runners_pre_clone_script" {
   description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
   type        = string
-  default     = ""
+  default     = "\"\""
 }
 
 variable "runners_request_concurrency" {
@@ -291,6 +332,12 @@ variable "cache_bucket_name_include_account_id" {
   default     = true
 }
 
+variable "cache_bucket_set_random_suffix" {
+  description = "Append the cache bucket name with a random string suffix"
+  type        = bool
+  default     = false
+}
+
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = bool
@@ -312,7 +359,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.1.1"
+  default     = "13.8.0"
 }
 
 variable "enable_ping" {
@@ -333,10 +380,42 @@ variable "gitlab_runner_ssh_cidr_blocks" {
   default     = []
 }
 
+variable "gitlab_runner_egress_rules" {
+  description = "List of egress rules for the gitlab runner instance."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [{
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    prefix_list_ids  = null
+    from_port        = 0
+    protocol         = "-1"
+    security_groups  = null
+    self             = null
+    to_port          = 0
+    description      = null
+  }]
+}
+
 variable "gitlab_runner_security_group_ids" {
   description = "A list of security group ids that are allowed to access the gitlab runner agent"
   type        = list(string)
   default     = []
+}
+
+variable "gitlab_runner_security_group_description" {
+  description = "A description for the gitlab-runner security group"
+  type        = string
+  default     = "A security group containing gitlab-runner agent instances"
 }
 
 variable "enable_cloudwatch_logging" {
@@ -393,6 +472,12 @@ variable "docker_machine_role_json" {
   default     = ""
 }
 
+variable "docker_machine_security_group_description" {
+  description = "A description for the docker-machine security group"
+  type        = string
+  default     = "A security group containing docker-machine instances"
+}
+
 variable "ami_filter" {
   description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
   type        = map(list(string))
@@ -413,7 +498,7 @@ variable "runner_ami_filter" {
   type        = map(list(string))
 
   default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 }
 
@@ -465,7 +550,7 @@ variable "overrides" {
 
 variable "cache_bucket" {
   description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details."
-  type        = map
+  type        = map(any)
 
   default = {
     create = true
@@ -488,7 +573,7 @@ variable "enable_schedule" {
 
 variable "schedule_config" {
   description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
-  type        = map
+  type        = map(any)
   default = {
     scale_in_recurrence  = "0 18 * * 1-5"
     scale_in_count       = 0
@@ -543,6 +628,12 @@ variable "enable_kms" {
   default     = false
 }
 
+variable "kms_alias_name" {
+  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
+  type        = string
+  default     = ""
+}
+
 variable "kms_deletion_window_in_days" {
   description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
   type        = number
@@ -561,6 +652,12 @@ variable "enable_asg_recreation" {
   type        = bool
 }
 
+variable "asg_delete_timeout" {
+  description = "Timeout when trying to delete the Runner ASG."
+  default     = "10m"
+  type        = string
+}
+
 variable "enable_forced_updates" {
   description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the oposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = null
@@ -577,4 +674,16 @@ variable "log_group_name" {
   description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
   default     = null
   type        = string
+}
+
+variable "runner_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
+  default     = []
+}
+
+variable "docker_machine_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
+  default     = []
 }

@@ -9,7 +9,7 @@ data "aws_security_group" "default" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.33"
+  version = "2.70"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -61,10 +61,6 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  runners_off_peak_timezone   = var.timezone
-  runners_off_peak_idle_count = 0
-  runners_off_peak_idle_time  = 60
-
   runners_privileged         = "true"
   runners_additional_volumes = ["/certs/client"]
 
@@ -83,7 +79,28 @@ module "runner" {
   ]
 
   # working 9 to 5 :)
-  runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
+  # Deprecated, replaced by runners_machine_autoscaling
+  # runners_off_peak_periods    = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
+  # runners_off_peak_timezone   = var.timezone
+  # runners_off_peak_idle_count = 0
+  # runners_off_peak_idle_time  = 60
+  runners_machine_autoscaling = [
+    {
+      periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
+      idle_count = 0
+      idle_time  = 60
+      timezone   = var.timezone
+    }
+  ]
+
+  runners_pre_build_script = <<EOT
+  '''
+  echo 'multiline 1'
+  echo 'multiline 2'
+  '''
+  EOT
+
+  runners_post_build_script = "\"echo 'single line'\""
 }
 
 resource "null_resource" "cancel_spot_requests" {
@@ -94,6 +111,6 @@ resource "null_resource" "cancel_spot_requests" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "../../ci/bin/cancel-spot-instances.sh ${self.triggers.environment}"
+    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }

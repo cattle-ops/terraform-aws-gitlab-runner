@@ -4,7 +4,7 @@ This sub module creates an S3 bucket for build caches. The cache will have by de
 
 ## Usages
 
-``` 
+```
 
 module "cache" {
   source      = "https://github.com/npalm/terraform-aws-gitlab-runner/tree/move-cache-to-moudle/cache"
@@ -36,6 +36,21 @@ module "runner" {
 | Name | Version |
 |------|---------|
 | aws | n/a |
+| random | n/a |
+
+## Modules
+
+No Modules.
+
+## Resources
+
+| Name |
+|------|
+| [aws_caller_identity](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) |
+| [aws_iam_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) |
+| [aws_s3_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) |
+| [random_string](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) |
 
 ## Inputs
 
@@ -44,6 +59,7 @@ module "runner" {
 | arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | `string` | `""` | no |
+| cache\_bucket\_set\_random\_suffix | Random string suffix for s3 cache bucket | `bool` | `false` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | `string` | `"false"` | no |
 | cache\_expiration\_days | Number of days before cache objects expires. | `number` | `1` | no |
 | cache\_lifecycle\_clear | Enable the rule to cleanup the cache for expired objects. | `bool` | `true` | no |
@@ -59,5 +75,4 @@ module "runner" {
 | arn | The ARN of the created bucket. |
 | bucket | Name of the created bucket. |
 | policy\_arn | Policy for users of the cache (bucket). |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

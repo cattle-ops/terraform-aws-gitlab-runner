@@ -1,11 +1,16 @@
 ## Description
+
 A few sentences describing the overall goals of the pull request's commits.
 
 ## Migrations required
+
 YES | NO - If yes please describe the migration.
 
 ## Verification
+
 Please mention the examples you have verified.
 
 ## Documentation
-Please ensure you update the README in `_docs/README.md`. The README.md in the root can be updated by running the script `ci/bin/autodocs.sh`, requires `terraform-docs` version 0.8+
+
+We use [pre-commit](https://pre-commit.com/) to update the Terraform inputs and outputs in the documentation via [terraform-docs](https://github.com/terraform-docs/terraform-docs). Ensure you have installed those components.
+

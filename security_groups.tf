@@ -5,13 +5,23 @@
 resource "aws_security_group" "runner" {
   name_prefix = "${var.environment}-security-group"
   vpc_id      = var.vpc_id
-  description = "A security group containing gitlab-runner agent instances"
+  description = var.gitlab_runner_security_group_description
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "egress" {
+    for_each = var.gitlab_runner_egress_rules
+    iterator = each
+
+    content {
+      cidr_blocks      = each.value.cidr_blocks
+      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
+      prefix_list_ids  = each.value.prefix_list_ids
+      from_port        = each.value.from_port
+      protocol         = each.value.protocol
+      security_groups  = each.value.security_groups
+      self             = each.value.self
+      to_port          = each.value.to_port
+      description      = each.value.description
+    }
   }
 
   tags = merge(
@@ -113,7 +123,7 @@ resource "aws_security_group_rule" "runner_ping_group" {
 resource "aws_security_group" "docker_machine" {
   name_prefix = "${var.environment}-docker-machine"
   vpc_id      = var.vpc_id
-  description = "A security group containing docker-machine instances"
+  description = var.docker_machine_security_group_description
 
   tags = merge(
     local.tags,

@@ -1,11 +1,63 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+### [4.24.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.24.0...4.24.1) (2021-03-11)
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/)
-and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+### Bug Fixes
+
+* updated docker machine default url ([064e0e2](https://github.com/npalm/terraform-aws-gitlab-runner/commit/064e0e2293764410dd7d9a92d9b81717db199acf)), closes [#308](https://github.com/npalm/terraform-aws-gitlab-runner/issues/308) [#299](https://github.com/npalm/terraform-aws-gitlab-runner/issues/299)
+
+## [4.24.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.23.0...4.24.0) (2021-03-10)
+
+
+### Features
+
+* add amazon-ecr-credential-helper inside userdata_pre_install ([#311](https://github.com/npalm/terraform-aws-gitlab-runner/issues/311)) ([aa0c8b4](https://github.com/npalm/terraform-aws-gitlab-runner/commit/aa0c8b4ab07f646e8f93b87932022c6b8954f9c3))
+
+## [4.23.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...4.23.0) (2021-02-28)
+
+
+### Features
+
+* additional config parameter asg_delete_timeout to configure the timeout when trying to delete the ASG ([#305](https://github.com/npalm/terraform-aws-gitlab-runner/issues/305)) ([f60c9d5](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f60c9d54e65e071ee638b8c34d5277951c4e9835))
+* allow multilines build scripts ([#282](https://github.com/npalm/terraform-aws-gitlab-runner/issues/282)) ([7000c07](https://github.com/npalm/terraform-aws-gitlab-runner/commit/7000c0703cf03df75f3030f9d503cab0f593c429)), closes [#250](https://github.com/npalm/terraform-aws-gitlab-runner/issues/250)
+
+
+### Bug Fixes
+
+* autoscaling configuraton ([#301](https://github.com/npalm/terraform-aws-gitlab-runner/issues/301)) ([6b35a10](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6b35a10f4b15ee6df53ad57da1c4e5096c951645))
+* respect create_cache_bucket variable and avoid concurrent changes to cache bucket ([#296](https://github.com/npalm/terraform-aws-gitlab-runner/issues/296)) ([c3629f6](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c3629f6fae2aea9a88488964243867fe18fc7a3f))
+
+## 4.22.0 - 2021-02-14
+
+- Changed: feat: Restrict public access and public objects for cache bucket (#295) @stefan-kolb
+- Changed: docs: Improve spelling and fix typos in README.md (#285) @NikolaiGulatz
+- Changed: ci: rewrite CI, examples verified for Terraform 13 and 14
+- Changed: fix: failing pip install for assigning eip #280
+- Added: feat: Add option to customize helper image (#293) @stefan-kolb
+- Added: chore: Contributors list (#291)  
+- Added: feat: Support Security Group custom description (#278) @pandarouxbsd
+
+
+## 4.21.0 - 2021-01-13
+
+- Changed: Updated default version of runner to 13.7
+- Changed: Updated default version of docker machine to GitLab v0.16.2-gitlab.2
+- Changed: Updated default runner ami to ubuntu 20.04
+- Added: Option to set docker runtime (#273) by @thomaskelm
+- Added: Option to attach additional policies to the runner (#269) by @bliles
+- Added: Random suffix to s3 bucket (#252) by @fliphess
+  
+
+## 4.20.0 - 2020-10-08
+
+- Changed: upgrade default version for gitlab runner to 13.4.0 (#261)
+- Added: allow additional gitlab-runner egress rules (257) by @mhulscher
+- Added: Variable to disable EC2 detailed monitoring (#260) by @jessedobbelaere
+- Added: KMS alias to kms key (#255) by @Michenux
+- Changed: deprecated of peak settings (#242)
+- Fix: Bug fix on instance profile variable not passing correctly (#247) by @arthurbdiniz
+- Added: IAM policies for runner as variable, (#241) by @kayman-mk
 
 ## 4.19.0 - 2020-07-12
 
@@ -13,18 +65,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed: Update default GitLab runner version to 13.1.1 (#239)
 - Changed: Merge the tags for the runner agent to remove duplicate tags (#238) @kayma-hl
 
-
 ## 4.18.0 - 2020-06-01
 
 - Changed: Update default runner version to 13.0.1
-
 
 - Bugfix: Remove duplicate tag names from the tags assigned to the runner agent instance to ensure the correct name (#233) @kayma-hl
 
 ## 4.18.0 - 2020-06-01
 
 - Changed: Update default runner version to 13.0.1
-
 
 ## 4.17.0 - 2020-05-28
 
@@ -380,7 +429,10 @@ Module is available as Terraform 0.11 module, pin module to version 3.x. Please 
 - Update default AMI's to The latest Amazon Linux AMI 2017.09.1 - released on 2018-01-17.
 - Minor updates in the example
 
-[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.19.0...HEAD
+[unreleased]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...HEAD
+[4.22.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.22.0...4.21.0
+[4.21.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.21.0...4.20.0
+[4.20.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.20.0...4.19.0
 [4.19.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.19.0...4.18.0
 [4.18.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.18.0...4.17.0
 [4.17.0]: https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.17.0...4.16.0

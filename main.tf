@@ -54,24 +54,25 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
     {
-      gitlab_runner_version                   = var.gitlab_runner_version
-      docker_machine_version                  = var.docker_machine_version
-      docker_machine_download_url             = var.docker_machine_download_url
-      runners_config                          = local.template_runner_config
-      runners_executor                        = var.runners_executor
-      pre_install                             = var.userdata_pre_install
-      post_install                            = var.userdata_post_install
-      runners_gitlab_url                      = var.runners_gitlab_url
-      runners_token                           = var.runners_token
-      secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
-      secure_parameter_store_region           = var.aws_region
-      gitlab_runner_registration_token        = var.gitlab_runner_registration_config["registration_token"]
-      giltab_runner_description               = var.gitlab_runner_registration_config["description"]
-      gitlab_runner_tag_list                  = var.gitlab_runner_registration_config["tag_list"]
-      gitlab_runner_locked_to_project         = var.gitlab_runner_registration_config["locked_to_project"]
-      gitlab_runner_run_untagged              = var.gitlab_runner_registration_config["run_untagged"]
-      gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
-      gitlab_runner_access_level              = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
+      gitlab_runner_version                        = var.gitlab_runner_version
+      docker_machine_version                       = var.docker_machine_version
+      docker_machine_download_url                  = var.docker_machine_download_url
+      runners_config                               = local.template_runner_config
+      runners_executor                             = var.runners_executor
+      runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
+      pre_install                                  = var.userdata_pre_install
+      post_install                                 = var.userdata_post_install
+      runners_gitlab_url                           = var.runners_gitlab_url
+      runners_token                                = var.runners_token
+      secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
+      secure_parameter_store_region                = var.aws_region
+      gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
+      giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
+      gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
+      gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
+      gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
+      gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
+      gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
@@ -108,15 +109,19 @@ locals {
       runners_concurrent                = var.runners_concurrent
       runners_image                     = var.runners_image
       runners_privileged                = var.runners_privileged
+      runners_disable_cache             = var.runners_disable_cache
+      runners_docker_runtime            = var.runners_docker_runtime
+      runners_helper_image              = var.runners_helper_image
       runners_shm_size                  = var.runners_shm_size
       runners_pull_policy               = var.runners_pull_policy
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_off_peak_timezone         = var.runners_off_peak_timezone
-      runners_off_peak_idle_count       = var.runners_off_peak_idle_count
-      runners_off_peak_idle_time        = var.runners_off_peak_idle_time
+      runners_off_peak_timezone         = local.runners_off_peak_timezone
+      runners_off_peak_idle_count       = local.runners_off_peak_idle_count
+      runners_off_peak_idle_time        = local.runners_off_peak_idle_time
       runners_off_peak_periods_string   = local.runners_off_peak_periods_string
+      runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
@@ -160,6 +165,10 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = [for key, value in local.agent_tags : tomap({ "key" : key, "value" : value, "propagate_at_launch" : true })]
+
+  timeouts {
+    delete = var.asg_delete_timeout
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
@@ -204,6 +213,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
   user_data            = local.template_user_data
   instance_type        = var.instance_type
   ebs_optimized        = var.runner_instance_ebs_optimized
+  enable_monitoring    = var.runner_instance_enable_monitoring
   spot_price           = var.runner_instance_spot_price
   iam_instance_profile = aws_iam_instance_profile.instance.name
   dynamic "root_block_device" {
@@ -241,6 +251,7 @@ module "cache" {
   create_cache_bucket                  = var.cache_bucket["create"]
   cache_bucket_prefix                  = var.cache_bucket_prefix
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
+  cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
 }
@@ -257,6 +268,7 @@ resource "aws_iam_role" "instance" {
   name                 = "${var.environment}-instance-role"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  tags                 = local.tags
 }
 
 ################################################################################
@@ -266,8 +278,8 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
   name        = "${var.environment}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
-
-  policy = templatefile("${path.module}/policies/instance-docker-machine-policy.json", {})
+  policy      = templatefile("${path.module}/policies/instance-docker-machine-policy.json", {})
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
@@ -284,8 +296,8 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
   name        = "${var.environment}-session-manager"
   path        = "/"
   description = "Policy session manager."
-
-  policy = templatefile("${path.module}/policies/instance-session-manager-policy.json", {})
+  policy      = templatefile("${path.module}/policies/instance-session-manager-policy.json", {})
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
@@ -302,6 +314,14 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
   policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+################################################################################
+### Add user defined policies
+################################################################################
+resource "aws_iam_role_policy_attachment" "user_defined_policies" {
+  count      = length(var.runner_iam_policy_arns)
+  role       = aws_iam_role.instance.name
+  policy_arn = var.runner_iam_policy_arns[count.index]
+}
 
 ################################################################################
 ### Policy for the docker machine instance to access cache
@@ -319,13 +339,25 @@ resource "aws_iam_role" "docker_machine" {
   name                 = "${var.environment}-docker-machine-role"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  tags                 = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
   name = "${var.environment}-docker-machine-profile"
   role = aws_iam_role.docker_machine.name
+  tags = local.tags
 }
 
+################################################################################
+### Add user defined policies
+################################################################################
+resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
+  count      = length(var.docker_machine_iam_policy_arns)
+  role       = aws_iam_role.docker_machine.name
+  policy_arn = var.docker_machine_iam_policy_arns[count.index]
+}
+
+################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
   count = var.enable_docker_machine_ssm_access ? 1 : 0
 
@@ -342,8 +374,8 @@ resource "aws_iam_policy" "service_linked_role" {
   name        = "${var.environment}-service_linked_role"
   path        = "/"
   description = "Policy for creation of service linked roles."
-
-  policy = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
+  policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
@@ -366,8 +398,8 @@ resource "aws_iam_policy" "ssm" {
   name        = "${var.environment}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
-
-  policy = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
+  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
@@ -386,8 +418,8 @@ resource "aws_iam_policy" "eip" {
   name        = "${var.environment}-eip"
   path        = "/"
   description = "Policy for runner to assign EIP"
-
-  policy = templatefile("${path.module}/policies/instance-eip.json", {})
+  policy      = templatefile("${path.module}/policies/instance-eip.json", {})
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "eip" {
