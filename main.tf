@@ -156,13 +156,13 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                      = local.enable_asg_recreation ? "${aws_launch_configuration.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+  name                      = local.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
+  launch_configuration      = aws_launch_template.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = local.agent_tags_propagated
 
@@ -205,22 +205,33 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
-resource "aws_launch_configuration" "gitlab_runner_instance" {
-  name_prefix          = var.runners_name
-  security_groups      = [aws_security_group.runner.id]
-  key_name             = var.ssh_key_pair
-  image_id             = data.aws_ami.runner.id
-  user_data            = local.template_user_data
-  instance_type        = var.instance_type
-  ebs_optimized        = var.runner_instance_ebs_optimized
-  enable_monitoring    = var.runner_instance_enable_monitoring
-  spot_price           = var.runner_instance_spot_price
-  iam_instance_profile = aws_iam_instance_profile.instance.name
-  dynamic "root_block_device" {
+resource "aws_launch_template" "gitlab_runner_instance" {
+  name_prefix   = var.runners_name
+  key_name      = var.ssh_key_pair
+  image_id      = data.aws_ami.runner.id
+  user_data     = local.template_user_data
+  instance_type = var.instance_type
+  ebs_optimized = var.runner_instance_ebs_optimized
+  monitoring {
+    enabled = var.runner_instance_enable_monitoring
+  }
+  dynamic instance_market_options {
+    for_each = length(var.runner_instance_spot_price) == 0 ? [] : ["spot"]
+    content {
+      market_type = instance_market_options.value
+      spot_options {
+        max_price = var.runner_instance_spot_price
+      }
+    }
+  }
+  iam_instance_profile {
+    name = aws_iam_instance_profile.instance.name
+  }
+  dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
     content {
       delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
-      volume_type           = lookup(root_block_device.value, "volume_type", "gp3")
+      volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
       volume_size           = lookup(root_block_device.value, "volume_size", 8)
       encrypted             = lookup(root_block_device.value, "encrypted", true)
       iops                  = lookup(root_block_device.value, "iops", null)
