@@ -165,6 +165,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = local.agent_tags_propagated
+
   timeouts {
     delete = var.asg_delete_timeout
   }
@@ -261,13 +262,14 @@ module "cache" {
 resource "aws_iam_instance_profile" "instance" {
   name = "${var.environment}-instance-profile"
   role = aws_iam_role.instance.name
+  tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
   name                 = "${var.environment}-instance-role"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  tags                 = local.tags
+  tags                 = merge(local.tags, var.role_tags)
 }
 
 ################################################################################
