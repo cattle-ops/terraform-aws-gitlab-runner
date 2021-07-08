@@ -165,6 +165,12 @@ variable "runners_privileged" {
   default     = true
 }
 
+variable "runners_disable_cache" {
+  description = "Runners will not use local cache, will be used in the runner config.toml"
+  type        = bool
+  default     = false
+}
+
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
   type        = list(any)
@@ -353,7 +359,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the GitLab runner."
   type        = string
-  default     = "13.8.0"
+  default     = "14.0.1"
 }
 
 variable "enable_ping" {
@@ -438,6 +444,12 @@ variable "agent_tags" {
 
 variable "runner_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
+  type        = map(string)
+  default     = {}
+}
+
+variable "role_tags" {
+  description = "Map of tags that will be added to the role created. Useful for tag based authorization."
   type        = map(string)
   default     = {}
 }

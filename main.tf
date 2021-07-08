@@ -38,7 +38,7 @@ resource "null_resource" "remove_runner" {
 }
 
 locals {
-  enable_asg_recreation = var.enable_forced_updates != null ? ! var.enable_forced_updates : var.enable_asg_recreation
+  enable_asg_recreation = var.enable_forced_updates != null ? !var.enable_forced_updates : var.enable_asg_recreation
 
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
@@ -109,6 +109,7 @@ locals {
       runners_concurrent                = var.runners_concurrent
       runners_image                     = var.runners_image
       runners_privileged                = var.runners_privileged
+      runners_disable_cache             = var.runners_disable_cache
       runners_docker_runtime            = var.runners_docker_runtime
       runners_helper_image              = var.runners_helper_image
       runners_shm_size                  = var.runners_shm_size
@@ -124,7 +125,7 @@ locals {
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
-      runners_use_private_address       = ! var.runners_use_private_address
+      runners_use_private_address       = !var.runners_use_private_address
       runners_request_spot_instance     = var.runners_request_spot_instance
       runners_environment_vars          = jsonencode(var.runners_environment_vars)
       runners_pre_build_script          = var.runners_pre_build_script
@@ -163,7 +164,8 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
-  tags                      = data.null_data_source.agent_tags.*.outputs
+  tags                      = local.agent_tags_propagated
+
   timeouts {
     delete = var.asg_delete_timeout
   }
@@ -218,7 +220,7 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
     for_each = [var.runner_root_block_device]
     content {
       delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
-      volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
+      volume_type           = lookup(root_block_device.value, "volume_type", "gp3")
       volume_size           = lookup(root_block_device.value, "volume_size", 8)
       encrypted             = lookup(root_block_device.value, "encrypted", true)
       iops                  = lookup(root_block_device.value, "iops", null)
@@ -260,13 +262,14 @@ module "cache" {
 resource "aws_iam_instance_profile" "instance" {
   name = "${var.environment}-instance-profile"
   role = aws_iam_role.instance.name
+  tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
   name                 = "${var.environment}-instance-role"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  tags                 = local.tags
+  tags                 = merge(local.tags, var.role_tags)
 }
 
 ################################################################################
