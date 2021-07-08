@@ -18,7 +18,7 @@ check_interval = 0
     image = "${runners_image}"
     privileged = ${runners_privileged}
     disable_cache = false
-    volumes = ["/cache"${runners_additional_volumes}]
+    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache", "/builds:/builds"${runners_additional_volumes}]
     shm_size = ${runners_shm_size}
     pull_policy = "${runners_pull_policy}"
   [runners.docker.tmpfs]
