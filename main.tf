@@ -164,7 +164,8 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
-  tags                      = data.null_data_source.agent_tags.*.outputs
+  tags                      = [for key, value in local.agent_tags : tomap({ "key" : key, "value" : value, "propagate_at_launch" : true })]
+
   timeouts {
     delete = var.asg_delete_timeout
   }
