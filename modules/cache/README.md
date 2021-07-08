@@ -29,7 +29,7 @@ module "runner" {
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.13 |
+| terraform | >= 0.12 |
 
 ## Providers
 
