@@ -261,6 +261,7 @@ module "cache" {
 resource "aws_iam_instance_profile" "instance" {
   name = "${var.environment}-instance-profile"
   role = aws_iam_role.instance.name
+  tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
