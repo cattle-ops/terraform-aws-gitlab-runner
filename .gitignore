@@ -3,6 +3,7 @@
 
 # Module directory
 .terraform/
+.terraform.lock.hcl
 
 # keys
 *id_rsa*
