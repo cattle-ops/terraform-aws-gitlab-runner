@@ -24,6 +24,7 @@ jobs:
   verify_examples:
     name: Verify examples
     strategy:
+      fail-fast: false
       matrix:
         terraform: [0.13.6, 0.14.5, 0.15.5, 1.0.2]
         example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
