@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.25.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.24.1...4.25.0) (2021-05-11)
+
+
+### Features
+
+* Add tags to aws_iam_policy ([#318](https://github.com/npalm/terraform-aws-gitlab-runner/issues/318)) ([3450b4d](https://github.com/npalm/terraform-aws-gitlab-runner/commit/3450b4db509e050bbfbe261a675d3e01d4befe80))
+
 ### [4.24.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.24.0...4.24.1) (2021-03-11)
 
 
