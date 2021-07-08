@@ -269,7 +269,7 @@ resource "aws_iam_role" "instance" {
   name                 = "${var.environment}-instance-role"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  tags                 = local.tags
+  tags                 = merge(local.tags, var.role_tags)
 }
 
 ################################################################################

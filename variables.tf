@@ -448,6 +448,12 @@ variable "runner_tags" {
   default     = {}
 }
 
+variable "role_tags" {
+  description = "Map of tags that will be added to the role created. Useful for tag based authorization."
+  type        = map(string)
+  default     = {}
+}
+
 variable "allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
   type        = bool
