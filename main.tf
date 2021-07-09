@@ -274,7 +274,8 @@ resource "aws_launch_template" "gitlab_runner_instance" {
       tags = local.tags
     }
   }
-  tags = local.tags  lifecycle {
+  tags = local.tags
+  lifecycle {
     create_before_destroy = true
   }
 }
