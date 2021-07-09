@@ -247,7 +247,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
       device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
       ebs {
         delete_on_termination = lookup(block_device_mappings.value, "delete_on_termination", true)
-        volume_type           = lookup(block_device_mappings.value, "volume_type", "gp2")
+        volume_type           = lookup(block_device_mappings.value, "volume_type", "gp3")
         volume_size           = lookup(block_device_mappings.value, "volume_size", 8)
         encrypted             = lookup(block_device_mappings.value, "encrypted", true)
         iops                  = lookup(block_device_mappings.value, "iops", null)
