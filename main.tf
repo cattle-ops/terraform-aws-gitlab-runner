@@ -38,7 +38,7 @@ resource "null_resource" "remove_runner" {
 }
 
 locals {
-  enable_asg_recreation = var.enable_forced_updates != null ? ! var.enable_forced_updates : var.enable_asg_recreation
+  enable_asg_recreation = var.enable_forced_updates != null ? !var.enable_forced_updates : var.enable_asg_recreation
 
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
@@ -125,7 +125,7 @@ locals {
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
-      runners_use_private_address       = ! var.runners_use_private_address
+      runners_use_private_address       = !var.runners_use_private_address
       runners_request_spot_instance     = var.runners_request_spot_instance
       runners_environment_vars          = jsonencode(var.runners_environment_vars)
       runners_pre_build_script          = var.runners_pre_build_script
@@ -219,17 +219,17 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
-  name_prefix   = var.runners_name
-  key_name      = var.ssh_key_pair
-  image_id      = data.aws_ami.runner.id
-  user_data     = local.template_user_data
-  instance_type = var.instance_type
+  name_prefix            = var.runners_name
+  key_name               = var.ssh_key_pair
+  image_id               = data.aws_ami.runner.id
+  user_data              = local.template_user_data
+  instance_type          = var.instance_type
   update_default_version = true
-  ebs_optimized = var.runner_instance_ebs_optimized
+  ebs_optimized          = var.runner_instance_ebs_optimized
   monitoring {
     enabled = var.runner_instance_enable_monitoring
   }
-  dynamic instance_market_options {
+  dynamic "instance_market_options" {
     for_each = var.runner_instance_spot_price != null && length(var.runner_instance_spot_price) == 0 ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
@@ -268,10 +268,10 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     tags          = local.tags
   }
   dynamic "tag_specifications" {
-    for_each = var.runner_instance_spot_price != null && length(var.runner_instance_spot_price) == 0 ? []: ["spot"]
+    for_each = var.runner_instance_spot_price != null && length(var.runner_instance_spot_price) == 0 ? [] : ["spot"]
     content {
       resource_type = "spot-instances-request"
-      tags = local.tags
+      tags          = local.tags
     }
   }
   tags = local.tags
