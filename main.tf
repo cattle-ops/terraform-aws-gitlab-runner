@@ -162,9 +162,22 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  launch_configuration      = aws_launch_template.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = local.agent_tags_propagated
+
+
+  launch_template {
+    id      = aws_launch_template.gitlab_runner_instance.id
+    version = aws_launch_template.gitlab_runner_instance.latest_version
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 0
+    }
+    triggers = ["tag"]
+  }
 
   timeouts {
     delete = var.asg_delete_timeout
@@ -211,12 +224,13 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   image_id      = data.aws_ami.runner.id
   user_data     = local.template_user_data
   instance_type = var.instance_type
+  update_default_version = true
   ebs_optimized = var.runner_instance_ebs_optimized
   monitoring {
     enabled = var.runner_instance_enable_monitoring
   }
   dynamic instance_market_options {
-    for_each = length(var.runner_instance_spot_price) == 0 ? [] : ["spot"]
+    for_each = var.runner_instance_spot_price != null && length(var.runner_instance_spot_price) == 0 ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
       spot_options {
@@ -230,17 +244,37 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
     content {
-      delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
-      volume_type           = lookup(root_block_device.value, "volume_type", "gp2")
-      volume_size           = lookup(root_block_device.value, "volume_size", 8)
-      encrypted             = lookup(root_block_device.value, "encrypted", true)
-      iops                  = lookup(root_block_device.value, "iops", null)
+      device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
+      ebs {
+        delete_on_termination = lookup(block_device_mappings.value, "delete_on_termination", true)
+        volume_type           = lookup(block_device_mappings.value, "volume_type", "gp2")
+        volume_size           = lookup(block_device_mappings.value, "volume_size", 8)
+        encrypted             = lookup(block_device_mappings.value, "encrypted", true)
+        iops                  = lookup(block_device_mappings.value, "iops", null)
+        kms_key_id            = lookup(block_device_mappings.value, "`kms_key_id`", null)
+      }
     }
   }
-
-  associate_public_ip_address = false == var.runners_use_private_address
-
-  lifecycle {
+  network_interfaces {
+    security_groups             = [aws_security_group.runner.id]
+    associate_public_ip_address = false == var.runners_use_private_address
+  }
+  tag_specifications {
+    resource_type = "instance"
+    tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "volume"
+    tags          = local.tags
+  }
+  dynamic "tag_specifications" {
+    for_each = var.runner_instance_spot_price != null && length(var.runner_instance_spot_price) == 0 ? []: ["spot"]
+    content {
+      resource_type = "spot-instances-request"
+      tags = local.tags
+    }
+  }
+  tags = local.tags  lifecycle {
     create_before_destroy = true
   }
 }
