@@ -227,8 +227,8 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
     }
   }
   metadata_options {
-    http_endpoint               = var.runner_instance_metadata_options_http_endpoint
-    http_tokens                 = var.runner_instance_metadata_options_http_tokens
+    http_endpoint = var.runner_instance_metadata_options_http_endpoint
+    http_tokens   = var.runner_instance_metadata_options_http_tokens
   }
 
   associate_public_ip_address = false == var.runners_use_private_address
