@@ -65,6 +65,18 @@ variable "runner_instance_spot_price" {
   default     = null
 }
 
+variable "runner_instance_metadata_options_http_endpoint" {
+  description = "Enable the Gitlab runner instance metadata service. The allowed values are enabled, disabled."
+  type        = string
+  default     = "enabled"
+}
+
+variable "runner_instance_metadata_options_http_tokens" {
+  description = "Set if Gitlab runner instance metadata service session tokens are required. The allowed values are optional, required."
+  type        = string
+  default     = "optional"
+}
+
 variable "ssh_key_pair" {
   description = "Set this to use existing AWS key pair"
   type        = string
