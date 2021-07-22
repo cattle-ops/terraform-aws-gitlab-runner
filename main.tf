@@ -268,7 +268,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     tags          = local.tags
   }
   dynamic "tag_specifications" {
-    for_each = var.runner_instance_spot_price != null && length(var.runner_instance_spot_price) == 0 ? [] : ["spot"]
+    for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? ["spot"] : []
     content {
       resource_type = "spot-instances-request"
       tags          = local.tags
