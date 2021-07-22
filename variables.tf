@@ -66,7 +66,7 @@ variable "runner_instance_spot_price" {
 }
 
 variable "runner_instance_metadata_options_http_endpoint" {
-  description = "Enable the Gitlab runner instance metadata service. The allowed values are enabled, disabled."
+  description = "Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled."
   type        = string
   default     = "enabled"
 }
