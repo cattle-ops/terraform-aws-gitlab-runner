@@ -222,7 +222,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = var.runners_name
   key_name               = var.ssh_key_pair
   image_id               = data.aws_ami.runner.id
-  user_data              = local.template_user_data
+  user_data              = base64encode(local.template_user_data)
   instance_type          = var.instance_type
   update_default_version = true
   ebs_optimized          = var.runner_instance_ebs_optimized
