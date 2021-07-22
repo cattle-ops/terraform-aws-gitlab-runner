@@ -226,6 +226,10 @@ resource "aws_launch_configuration" "gitlab_runner_instance" {
       iops                  = lookup(root_block_device.value, "iops", null)
     }
   }
+  metadata_options {
+    http_endpoint = var.runner_instance_metadata_options_http_endpoint
+    http_tokens   = var.runner_instance_metadata_options_http_tokens
+  }
 
   associate_public_ip_address = false == var.runners_use_private_address
 
