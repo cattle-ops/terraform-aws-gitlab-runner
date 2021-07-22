@@ -281,8 +281,6 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     http_tokens   = var.runner_instance_metadata_options_http_tokens
   }
 
-  associate_public_ip_address = false == var.runners_use_private_address
-
   lifecycle {
     create_before_destroy = true
   }
