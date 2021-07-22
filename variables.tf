@@ -72,7 +72,7 @@ variable "runner_instance_metadata_options_http_endpoint" {
 }
 
 variable "runner_instance_metadata_options_http_tokens" {
-  description = "Set if Gitlab runner instance metadata service session tokens are required. The allowed values are optional, required."
+  description = "Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required."
   type        = string
   default     = "optional"
 }
