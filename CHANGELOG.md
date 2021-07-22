@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.27.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.26.0...4.27.0) (2021-07-22)
+
+
+### Features
+
+* Parametrize runner instance launch configuration metadata options ([#348](https://github.com/npalm/terraform-aws-gitlab-runner/issues/348)) ([92204ee](https://github.com/npalm/terraform-aws-gitlab-runner/commit/92204eef84f09482c8b10d5c85fed54b68ca66be))
+
 ## [4.26.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.25.0...4.26.0) (2021-07-08)
 
 
