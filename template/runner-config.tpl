@@ -1,5 +1,6 @@
 concurrent = ${runners_concurrent}
 check_interval = 0
+sentry_dsn = "${sentry_dsn}"
 
 [[runners]]
   name = "${runners_name}"

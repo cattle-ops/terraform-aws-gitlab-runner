@@ -75,6 +75,16 @@ fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
 
+ssm_sentry_dsn=$(aws ssm get-parameters --names "${secure_parameter_store_runner_sentry_dsn}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+if [[ `echo ${sentry_dsn}` == "__SENTRY_DSN_REPLACED_BY_USER_DATA__" && `echo $ssm_sentry_dsn` == "null" ]]
+then
+  ssm_sentry_dsn=""
+fi
+
+# For those of you wondering why commas are used in the sed below instead of forward slashes, see https://stackoverflow.com/a/16778711/13169919
+# It is because the Sentry DSN contains forward slashes as it is an URL so it would break out of the sed command with forward slashes as delimiters :)
+sed -i.bak s,__SENTRY_DSN_REPLACED_BY_USER_DATA__,`echo $ssm_sentry_dsn`,g /etc/gitlab-runner/config.toml
+
 # A small script to remove this runner from being registered with Gitlab.
 cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
 #!/bin/bash
