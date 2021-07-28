@@ -705,3 +705,29 @@ variable "docker_machine_iam_policy_arns" {
   description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
   default     = []
 }
+
+variable "docker_machine_egress_rules" {
+  description = "List of egress rules for the docker-machine instance(s)."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [{
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    prefix_list_ids  = null
+    from_port        = 0
+    protocol         = "-1"
+    security_groups  = null
+    self             = null
+    to_port          = 0
+    description      = null
+  }]
+}
