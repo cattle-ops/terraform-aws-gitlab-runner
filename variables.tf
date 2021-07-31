@@ -728,6 +728,6 @@ variable "docker_machine_egress_rules" {
     security_groups  = null
     self             = null
     to_port          = 0
-    description      = null
+    description      = "Allow all egress traffic for docker machine build runners"
   }]
 }
