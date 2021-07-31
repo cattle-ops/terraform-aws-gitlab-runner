@@ -125,6 +125,23 @@ resource "aws_security_group" "docker_machine" {
   vpc_id      = var.vpc_id
   description = var.docker_machine_security_group_description
 
+  dynamic "egress" {
+    for_each = var.docker_machine_egress_rules
+    iterator = each
+
+    content {
+      cidr_blocks      = each.value.cidr_blocks
+      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
+      prefix_list_ids  = each.value.prefix_list_ids
+      from_port        = each.value.from_port
+      protocol         = each.value.protocol
+      security_groups  = each.value.security_groups
+      self             = each.value.self
+      to_port          = each.value.to_port
+      description      = each.value.description
+    }
+  }
+
   tags = merge(
     local.tags,
     {
@@ -254,26 +271,6 @@ resource "aws_security_group_rule" "docker_machine_ping_self" {
 
   description = format(
     "Allow ICMP traffic within group %s",
-    aws_security_group.docker_machine.name,
-  )
-}
-
-########################################
-## Egress Security rules              ##
-########################################
-
-# Allow egress traffic from docker-machine instances
-resource "aws_security_group_rule" "out_all" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 65535
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = aws_security_group.docker_machine.id
-
-  description = format(
-    "Allow egress traffic for group %s",
     aws_security_group.docker_machine.name,
   )
 }
