@@ -37,6 +37,18 @@ resource "null_resource" "remove_runner" {
   }
 }
 
+resource "aws_ssm_parameter" "runner_sentry_dsn" {
+  name  = local.secure_parameter_store_runner_sentry_dsn
+  type  = "SecureString"
+  value = "null"
+
+  tags = local.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 locals {
   enable_asg_recreation = var.enable_forced_updates != null ? ! var.enable_forced_updates : var.enable_asg_recreation
 
@@ -65,6 +77,7 @@ locals {
       runners_gitlab_url                           = var.runners_gitlab_url
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
+      secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
       giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
@@ -73,6 +86,7 @@ locals {
       gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
+      sentry_dsn                                   = var.sentry_dsn
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
@@ -137,6 +151,7 @@ locals {
       runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
+      sentry_dsn                        = var.sentry_dsn
     }
   )
 }
