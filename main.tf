@@ -69,6 +69,7 @@ locals {
       gitlab_runner_run_untagged              = var.gitlab_runner_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout           = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level              = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
+      runners_security_group_id               = aws_security_group.docker_machine.id
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
@@ -179,9 +180,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
     }
 
     instances_distribution {
-      spot_instance_pools                      = 3
-      on_demand_base_capacity                  = 0
-      on_demand_percentage_above_base_capacity = 0
+      on_demand_percentage_above_base_capacity = 100
     }
   }
 

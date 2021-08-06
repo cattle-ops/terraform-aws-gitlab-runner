@@ -56,7 +56,9 @@ fi
 token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
 if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]]
 then
-  token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+  if [[ `echo ${gitlab_runner_registration_token}` != "" ]]
+  then
+    token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
     --form "tag_list=${gitlab_runner_tag_list}" \
     --form "description=${giltab_runner_description}" \
@@ -65,7 +67,17 @@ then
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     --form "access_level=${gitlab_runner_access_level}" \
     | jq -r .token)
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
+    aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
+  else
+    echo "ERROR: Can't register the runner. The gitlab_runner_registration_token is required on initial deployment to do the agent registration."
+  fi
+else
+  echo "WARNING: Runner already registered. Looking for orphan runners in the runners_security_group_id to destroy it"
+  terminate=$(aws ec2 describe-instances --region "${secure_parameter_store_region}" --filter "Name=instance.group-id,Values=${runners_security_group_id}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+  if [[ `echo $terminate` != "" ]]
+  then
+    aws ec2 terminate-instances --instance-ids $terminate --region "${secure_parameter_store_region}"
+  fi
 fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
