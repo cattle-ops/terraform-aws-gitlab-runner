@@ -3,7 +3,7 @@
 ########################################
 
 resource "aws_security_group" "runner" {
-  name_prefix = "${var.environment}-security-group"
+  name_prefix = local.name_sg
   vpc_id      = var.vpc_id
   description = var.gitlab_runner_security_group_description
 
@@ -121,7 +121,7 @@ resource "aws_security_group_rule" "runner_ping_group" {
 ########################################
 
 resource "aws_security_group" "docker_machine" {
-  name_prefix = "${var.environment}-docker-machine"
+  name_prefix = "${local.name_sg}-docker-machine"
   vpc_id      = var.vpc_id
   description = var.docker_machine_security_group_description
 

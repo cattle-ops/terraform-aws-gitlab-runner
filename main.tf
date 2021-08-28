@@ -171,15 +171,28 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                      = local.enable_asg_recreation ? "${aws_launch_configuration.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+  name                      = local.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  launch_configuration      = aws_launch_configuration.gitlab_runner_instance.name
   enabled_metrics           = var.metrics_autoscaling
   tags                      = local.agent_tags_propagated
+
+
+  launch_template {
+    id      = aws_launch_template.gitlab_runner_instance.id
+    version = aws_launch_template.gitlab_runner_instance.latest_version
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 0
+    }
+    triggers = ["tag"]
+  }
 
   timeouts {
     delete = var.asg_delete_timeout
@@ -220,33 +233,69 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
-resource "aws_launch_configuration" "gitlab_runner_instance" {
-  name_prefix          = var.runners_name
-  security_groups      = [aws_security_group.runner.id]
-  key_name             = var.ssh_key_pair
-  image_id             = data.aws_ami.runner.id
-  user_data            = local.template_user_data
-  instance_type        = var.instance_type
-  ebs_optimized        = var.runner_instance_ebs_optimized
-  enable_monitoring    = var.runner_instance_enable_monitoring
-  spot_price           = var.runner_instance_spot_price
-  iam_instance_profile = aws_iam_instance_profile.instance.name
-  dynamic "root_block_device" {
-    for_each = [var.runner_root_block_device]
+resource "aws_launch_template" "gitlab_runner_instance" {
+  name_prefix            = local.name_runner_agent_instance
+  key_name               = var.ssh_key_pair
+  image_id               = data.aws_ami.runner.id
+  user_data              = base64encode(local.template_user_data)
+  instance_type          = var.instance_type
+  update_default_version = true
+  ebs_optimized          = var.runner_instance_ebs_optimized
+  monitoring {
+    enabled = var.runner_instance_enable_monitoring
+  }
+  dynamic "instance_market_options" {
+    for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
     content {
-      delete_on_termination = lookup(root_block_device.value, "delete_on_termination", true)
-      volume_type           = lookup(root_block_device.value, "volume_type", "gp3")
-      volume_size           = lookup(root_block_device.value, "volume_size", 8)
-      encrypted             = lookup(root_block_device.value, "encrypted", true)
-      iops                  = lookup(root_block_device.value, "iops", null)
+      market_type = instance_market_options.value
+      spot_options {
+        max_price = var.runner_instance_spot_price
+      }
     }
   }
+  iam_instance_profile {
+    name = aws_iam_instance_profile.instance.name
+  }
+  dynamic "block_device_mappings" {
+    for_each = [var.runner_root_block_device]
+    content {
+      device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
+      ebs {
+        delete_on_termination = lookup(block_device_mappings.value, "delete_on_termination", true)
+        volume_type           = lookup(block_device_mappings.value, "volume_type", "gp3")
+        volume_size           = lookup(block_device_mappings.value, "volume_size", 8)
+        encrypted             = lookup(block_device_mappings.value, "encrypted", true)
+        iops                  = lookup(block_device_mappings.value, "iops", null)
+        kms_key_id            = lookup(block_device_mappings.value, "`kms_key_id`", null)
+      }
+    }
+  }
+  network_interfaces {
+    security_groups             = [aws_security_group.runner.id]
+    associate_public_ip_address = false == var.runners_use_private_address
+  }
+  tag_specifications {
+    resource_type = "instance"
+    tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "volume"
+    tags          = local.tags
+  }
+  dynamic "tag_specifications" {
+    for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
+    content {
+      resource_type = "spot-instances-request"
+      tags          = local.tags
+    }
+  }
+
+  tags = local.tags
+
   metadata_options {
     http_endpoint = var.runner_instance_metadata_options_http_endpoint
     http_tokens   = var.runner_instance_metadata_options_http_tokens
   }
-
-  associate_public_ip_address = false == var.runners_use_private_address
 
   lifecycle {
     create_before_destroy = true
