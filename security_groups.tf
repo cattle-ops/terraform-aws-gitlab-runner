@@ -3,7 +3,7 @@
 ########################################
 
 resource "aws_security_group" "runner" {
-  name_prefix = "${local.name_sg}"
+  name_prefix = local.name_sg
   vpc_id      = var.vpc_id
   description = var.gitlab_runner_security_group_description
 
