@@ -289,8 +289,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
       tags          = local.tags
     }
   }
-  tags = local.tags
 
+  tags = local.tags
+  
   metadata_options {
     http_endpoint = var.runner_instance_metadata_options_http_endpoint
     http_tokens   = var.runner_instance_metadata_options_http_tokens

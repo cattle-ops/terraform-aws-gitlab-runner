@@ -1,5 +1,38 @@
 # Changelog
 
+## [4.28.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.27.0...4.28.0) (2021-07-31)
+
+
+### Features
+
+* Allow configuring docker machine egress rules, see PR [#351](https://github.com/npalm/terraform-aws-gitlab-runner/issues/351) for upgrade instructions ([f41ce19](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f41ce1915cbf495a65b75c59b5dfd525f9372bea))
+* support for settings Sentry DSN ([#352](https://github.com/npalm/terraform-aws-gitlab-runner/issues/352)) ([5dbe1f7](https://github.com/npalm/terraform-aws-gitlab-runner/commit/5dbe1f726aaaaec0771d0198055b2bb426dbca17))
+
+## [4.27.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.26.0...4.27.0) (2021-07-22)
+
+
+### Features
+
+* Parametrize runner instance launch configuration metadata options ([#348](https://github.com/npalm/terraform-aws-gitlab-runner/issues/348)) ([92204ee](https://github.com/npalm/terraform-aws-gitlab-runner/commit/92204eef84f09482c8b10d5c85fed54b68ca66be))
+
+## [4.26.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.25.0...4.26.0) (2021-07-08)
+
+
+### Features
+
+* Add `role_tags` to support tag based authorization ([#333](https://github.com/npalm/terraform-aws-gitlab-runner/issues/333)) ([#335](https://github.com/npalm/terraform-aws-gitlab-runner/issues/335)) ([c81f221](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c81f221634dc5d9f22fe8653ae53b5e1f786fafe))
+* Make disable_cache configurable ([#324](https://github.com/npalm/terraform-aws-gitlab-runner/issues/324)) ([d726cf4](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d726cf4b6bdd5ea607574e56023760195d81fc10))
+* replace default volume type gp2 by gp3  ([#338](https://github.com/npalm/terraform-aws-gitlab-runner/issues/338)) ([1bfaf2b](https://github.com/npalm/terraform-aws-gitlab-runner/commit/1bfaf2bb0b4a993c2c6c6e1107f855cea78223c6)), closes [#318](https://github.com/npalm/terraform-aws-gitlab-runner/issues/318)
+* upgrade default runner version to 14.0.1 ([#341](https://github.com/npalm/terraform-aws-gitlab-runner/issues/341)) ([18b4103](https://github.com/npalm/terraform-aws-gitlab-runner/commit/18b41033761d9ac5f7b3b1b9ac948e75e5c7eeef))
+
+
+### Bug Fixes
+
+* add tags for instance profile ([#331](https://github.com/npalm/terraform-aws-gitlab-runner/issues/331)) ([b42712f](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b42712f397bef307f7234f59408866d3fb348eff))
+* Remove deprecarted null_data_source ([#332](https://github.com/npalm/terraform-aws-gitlab-runner/issues/332)) ([#334](https://github.com/npalm/terraform-aws-gitlab-runner/issues/334)) ([b3ab3f6](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b3ab3f6fc9695f2ebed688b73b8f7846635015b1))
+* replace deprecated null_data_source with locals ([#336](https://github.com/npalm/terraform-aws-gitlab-runner/issues/336)) ([6a240c9](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6a240c9078a55ea528142f6c8987710ac207c61f))
+* support terraform 1.x ([800c264](https://github.com/npalm/terraform-aws-gitlab-runner/commit/800c2643d90cfd7e69a8eeec352a38683e73a2ac)), closes [#330](https://github.com/npalm/terraform-aws-gitlab-runner/issues/330)
+
 ## [4.25.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.24.1...4.25.0) (2021-05-11)
 
 
