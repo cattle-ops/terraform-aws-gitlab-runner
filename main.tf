@@ -328,13 +328,13 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  name = "${var.environment}-instance-profile"
+  name = "${local.name_iam_objects}-instance"
   role = aws_iam_role.instance.name
   tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
-  name                 = "${var.environment}-instance-role"
+  name                 = "${local.name_iam_objects}-instance"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = merge(local.tags, var.role_tags)
@@ -344,7 +344,7 @@ resource "aws_iam_role" "instance" {
 ### Policies for runner agent instance to create docker machines via spot req.
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  name        = "${var.environment}-docker-machine"
+  name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
   policy      = templatefile("${path.module}/policies/instance-docker-machine-policy.json", {})
@@ -362,7 +362,7 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 resource "aws_iam_policy" "instance_session_manager_policy" {
   count = var.enable_runner_ssm_access ? 1 : 0
 
-  name        = "${var.environment}-session-manager"
+  name        = "${local.name_iam_objects}-session-manager"
   path        = "/"
   description = "Policy session manager."
   policy      = templatefile("${path.module}/policies/instance-session-manager-policy.json", {})
@@ -405,14 +405,14 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
-  name                 = "${var.environment}-docker-machine-role"
+  name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  name = "${var.environment}-docker-machine-profile"
+  name = "${local.name_iam_objects}-docker-machine"
   role = aws_iam_role.docker_machine.name
   tags = local.tags
 }
@@ -440,7 +440,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
 resource "aws_iam_policy" "service_linked_role" {
   count = var.allow_iam_service_linked_role_creation ? 1 : 0
 
-  name        = "${var.environment}-service_linked_role"
+  name        = "${local.name_iam_objects}-service_linked_role"
   path        = "/"
   description = "Policy for creation of service linked roles."
   policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
@@ -464,7 +464,7 @@ resource "aws_eip" "gitlab_runner" {
 resource "aws_iam_policy" "ssm" {
   count = var.enable_manage_gitlab_token ? 1 : 0
 
-  name        = "${var.environment}-ssm"
+  name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
   policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
