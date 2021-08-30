@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.30.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.29.0...4.30.0) (2021-08-30)
+
+
+### Features
+
+* Add option to override IAM objects names ([#358](https://github.com/npalm/terraform-aws-gitlab-runner/issues/358)) ([c96051d](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c96051d382cfe4365bc014eae9645d3fbc36e3e2))
+
 ## [4.29.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.28.0...4.29.0) (2021-08-28)
 
 
