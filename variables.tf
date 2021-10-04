@@ -608,7 +608,7 @@ variable "schedule_config" {
 }
 
 variable "runner_root_block_device" {
-  description = "The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `kms_key_id`"
+  description = "The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
   type        = map(string)
   default     = {}
 }
