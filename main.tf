@@ -342,6 +342,8 @@ resource "aws_iam_role" "instance" {
 
 ################################################################################
 ### Policies for runner agent instance to create docker machines via spot req.
+###
+### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
   name        = "${local.name_iam_objects}-docker-machine"
