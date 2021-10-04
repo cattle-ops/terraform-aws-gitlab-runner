@@ -351,7 +351,7 @@ terraform destroy
 | runner\_instance\_metadata\_options\_http\_endpoint | Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled. | `string` | `"enabled"` | no |
 | runner\_instance\_metadata\_options\_http\_tokens | Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required. | `string` | `"optional"` | no |
 | runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `null` | no |
-| runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `kms_key_id` | `map(string)` | `{}` | no |
+| runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id` | `map(string)` | `{}` | no |
 | runner\_tags | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
 | runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list(any)` | `[]` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | `number` | `10` | no |
