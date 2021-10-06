@@ -50,7 +50,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  enable_asg_recreation = var.enable_forced_updates != null ? ! var.enable_forced_updates : var.enable_asg_recreation
+  enable_asg_recreation = var.enable_forced_updates != null ? !var.enable_forced_updates : var.enable_asg_recreation
 
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
@@ -139,7 +139,7 @@ locals {
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
-      runners_use_private_address       = ! var.runners_use_private_address
+      runners_use_private_address       = !var.runners_use_private_address
       runners_request_spot_instance     = var.runners_request_spot_instance
       runners_environment_vars          = jsonencode(var.runners_environment_vars)
       runners_pre_build_script          = var.runners_pre_build_script
@@ -350,11 +350,11 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
-  policy      = templatefile("${path.module}/policies/instance-docker-machine-policy.json",
+  policy = templatefile("${path.module}/policies/instance-docker-machine-policy.json",
     {
       docker_machine_role_arn = aws_iam_role.docker_machine.arn
   })
-  tags        = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
