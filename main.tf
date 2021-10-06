@@ -350,7 +350,9 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
-  policy      = templatefile("${path.module}/policies/instance-docker-machine-policy.json", {})
+  policy      = templatefile("${path.module}/policies/instance-docker-machine-policy.json", {
+    docker_machine_role_arn = aws_iam_role.docker_machine.arn
+    })
   tags        = local.tags
 }
 
