@@ -35,6 +35,12 @@ variable "subnet_ids_gitlab_runner" {
   type        = list(string)
 }
 
+variable "extra_security_group_ids_runner_agent" {
+  description = "Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default."
+  type        = list(string)
+  default     = []
+}
+
 variable "metrics_autoscaling" {
   description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
   type        = list(string)
