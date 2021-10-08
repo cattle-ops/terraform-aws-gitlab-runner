@@ -332,6 +332,12 @@ variable "runners_use_private_address" {
   default     = true
 }
 
+variable "runner_agent_uses_private_address" {
+  description = "Restrict runners to the use of a private IP address"
+  type        = bool
+  default     = true
+}
+
 variable "runners_request_spot_instance" {
   description = "Whether or not to request spot instances via docker-machine"
   type        = bool
