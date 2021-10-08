@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.32.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.31.1...4.32.0) (2021-10-08)
+
+
+### Features
+
+* Add ability to specify extra security group IDs for the runner agent ([#378](https://github.com/npalm/terraform-aws-gitlab-runner/issues/378)) ([e0370dd](https://github.com/npalm/terraform-aws-gitlab-runner/commit/e0370ddd516bcb56c00ebe063e03f375df2ac9ac))
+
+
+### Bug Fixes
+
+* upgrade dependencies ([#379](https://github.com/npalm/terraform-aws-gitlab-runner/issues/379)) ([daf5ee0](https://github.com/npalm/terraform-aws-gitlab-runner/commit/daf5ee09987a9fc7db2e3c78af8134e7231b406c))
+
 ### [4.31.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.31.0...4.31.1) (2021-10-06)
 
 
