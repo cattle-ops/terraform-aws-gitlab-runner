@@ -273,7 +273,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   }
   network_interfaces {
     security_groups             = concat([aws_security_group.runner.id], var.extra_security_group_ids_runner_agent)
-    associate_public_ip_address = false == var.runners_use_private_address
+    associate_public_ip_address = false == (var.runner_agent_uses_private_address == false ? var.runner_agent_uses_private_address : var.runners_use_private_address)
   }
   tag_specifications {
     resource_type = "instance"
