@@ -333,7 +333,7 @@ variable "runners_use_private_address" {
 }
 
 variable "runner_agent_uses_private_address" {
-  description = "Restrict runners to the use of a private IP address"
+  description = "Restrict the runner agent to the use of a private IP address"
   type        = bool
   default     = true
 }
