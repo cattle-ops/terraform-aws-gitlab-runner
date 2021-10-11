@@ -327,13 +327,13 @@ variable "userdata_post_install" {
 }
 
 variable "runners_use_private_address" {
-  description = "Restrict runners to the use of a private IP address"
+  description = "Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent."
   type        = bool
   default     = true
 }
 
 variable "runner_agent_uses_private_address" {
-  description = "Restrict the runner agent to the use of a private IP address"
+  description = "Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent."
   type        = bool
   default     = true
 }
@@ -696,7 +696,7 @@ variable "asg_delete_timeout" {
 }
 
 variable "enable_forced_updates" {
-  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the oposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
+  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the opposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = null
   type        = string
 }
