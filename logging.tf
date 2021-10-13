@@ -16,7 +16,7 @@ locals {
 
 resource "aws_cloudwatch_log_group" "environment" {
   count             = var.enable_cloudwatch_logging ? 1 : 0
-  name              = var.environment
+  name              = var.log_group_name != null ? var.log_group_name : var.environment
   retention_in_days = var.cloudwatch_logging_retention_in_days
   tags              = local.tags
   kms_key_id        = local.kms_key
