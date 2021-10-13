@@ -177,9 +177,9 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
+  max_instance_lifetime     = var.asg_max_instance_lifetime
   enabled_metrics           = var.metrics_autoscaling
   tags                      = local.agent_tags_propagated
-
 
   launch_template {
     id      = aws_launch_template.gitlab_runner_instance.id
