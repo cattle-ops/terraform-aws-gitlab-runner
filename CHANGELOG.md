@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.34.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.33.0...4.34.0) (2021-10-13)
+
+
+### Features
+
+* Add support ASG maximum instance lifetime ([#385](https://github.com/npalm/terraform-aws-gitlab-runner/issues/385)) ([8515137](https://github.com/npalm/terraform-aws-gitlab-runner/commit/8515137469ce68e9c88664a861ca089a7705c6fe))
+
+
+### Bug Fixes
+
+* aws_cloudwatch_log_group name to match the custom one provide by variable log_group_name ([#384](https://github.com/npalm/terraform-aws-gitlab-runner/issues/384)) ([f80accd](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f80accdbfdb540347828b11f89ea24249a66cab1))
+
 ## [4.33.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.32.0...4.33.0) (2021-10-08)
 
 
