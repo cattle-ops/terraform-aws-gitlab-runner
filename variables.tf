@@ -695,6 +695,12 @@ variable "asg_delete_timeout" {
   type        = string
 }
 
+variable "asg_max_instance_lifetime" {
+  description = "The seconds before an instance is refreshed in the ASG."
+  default     = null
+  type        = number
+}
+
 variable "enable_forced_updates" {
   description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the opposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = null
