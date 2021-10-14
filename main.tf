@@ -1,5 +1,7 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 data "aws_subnet" "runners" {
   id = var.subnet_id_runners
 }
@@ -97,7 +99,7 @@ locals {
       runners_subnet_id           = var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
-      runners_spot_price_bid      = var.docker_machine_spot_price_bid
+      runners_spot_price_bid      = local.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id
       runners_security_group_name = aws_security_group.docker_machine.name
       runners_monitoring          = var.runners_monitoring
@@ -323,6 +325,50 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+}
+
+################################################################################
+### Spot price
+################################################################################
+data "aws_pricing_product" "on_demand_job_instance" {
+  service_code = "AmazonEC2"
+
+  filters {
+    field = "location"
+    value = replace(data.aws_region.current.description, "Europe", "EU") # need EU instead of Europe
+  }
+
+  filters {
+    field = "operatingSystem"
+    value = "Linux"
+  }
+
+  filters {
+    field = "instanceType"
+    value = var.docker_machine_instance_type
+  }
+
+  filters {
+    field = "capacitystatus"
+    value = "Used"
+  }
+
+  filters {
+    field = "tenancy"
+    value = "Shared"
+  }
+
+  filters {
+    field = "preInstalledSw"
+    value = "NA"
+  }
+
+  filters {
+    field = "licenseModel"
+    value = "No License required"
+  }
+
+  provider = aws.pricing # pricing API is available in special regions only
 }
 
 ################################################################################

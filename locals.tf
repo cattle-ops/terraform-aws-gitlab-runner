@@ -25,6 +25,8 @@ locals {
     }
   )
 
+  docker_machine_spot_price_bid = var.docker_machine_spot_price_bid == "up-to-on-demand" ? tonumber(values(values(jsondecode(data.aws_pricing_product.ec2_docker_machine.result).terms.OnDemand)[0].priceDimensions)[0].pricePerUnit.USD) : var.docker_machine_spot_price_bid
+
   // Depcrecated off peak, ensure not set if not explicit set.
   runners_off_peak_periods_string = var.runners_off_peak_periods == null ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)
   runners_off_peak_timezone       = var.runners_off_peak_timezone == null ? "" : "OffPeakTimezone = \"${var.runners_off_peak_timezone}\""
