@@ -330,7 +330,7 @@ module "cache" {
 ################################################################################
 ### Spot price
 ################################################################################
-data "aws_pricing_product" "on_demand_job_instance" {
+data "aws_pricing_product" "ec2_docker_machine" {
   service_code = "AmazonEC2"
 
   filters {
