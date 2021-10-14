@@ -46,10 +46,13 @@ module "runner" {
   runners_gitlab_url = var.gitlab_url
   runners_token      = var.runner_token
 
-  runners_off_peak_timezone   = var.timezone
-  runners_off_peak_idle_count = 0
-  runners_off_peak_idle_time  = 60
-
   # working 9 to 5 :)
-  runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
+  runners_machine_autoscaling = [
+    {
+      periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
+      idle_count = 0
+      idle_time  = 60
+      timezone   = var.timezone
+    }
+  ]
 }

@@ -225,30 +225,6 @@ variable "runners_ebs_optimized" {
   default     = true
 }
 
-variable "runners_off_peak_timezone" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
-}
-
-variable "runners_off_peak_idle_count" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = -1
-}
-
-variable "runners_off_peak_idle_time" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = -1
-}
-
-variable "runners_off_peak_periods" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
-}
-
 variable "runners_machine_autoscaling" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
