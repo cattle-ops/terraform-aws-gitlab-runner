@@ -33,29 +33,6 @@ resource "aws_security_group" "runner" {
 }
 
 ########################################
-## CIDR ranges to runner agent        ##
-########################################
-
-# Allow ICMP traffic from allowed cidr blocks to gitlab-runner agent instances
-resource "aws_security_group_rule" "runner_ping" {
-  count = length(var.gitlab_runner_ssh_cidr_blocks) > 0 && var.enable_ping ? length(var.gitlab_runner_ssh_cidr_blocks) : 0
-
-  type      = "ingress"
-  from_port = -1
-  to_port   = -1
-  protocol  = "icmp"
-
-  cidr_blocks       = [element(var.gitlab_runner_ssh_cidr_blocks, count.index)]
-  security_group_id = aws_security_group.runner.id
-
-  description = format(
-    "Allow ICMP traffic from %s to gitlab-runner agent instances in group %s",
-    element(var.gitlab_runner_ssh_cidr_blocks, count.index),
-    aws_security_group.runner.name
-  )
-}
-
-########################################
 ## Security group IDs to runner agent ##
 ########################################
 
