@@ -1,5 +1,5 @@
 name: CI
-on: 
+on:
   push:
     branches:
       - master
@@ -11,7 +11,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.0.8]    
+        terraform: [1.0.8]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -26,14 +26,14 @@ jobs:
       fail-fast: false
       matrix:
         terraform: [0.13.0, 0.14.0, 0.15.0, 1.0.8]
-        example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
+        example: ["runner-default", "runner-docker", "runner-public"]
     defaults:
       run:
         working-directory: examples/${{ matrix.example }}
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
-    steps:   
+    steps:
       - uses: actions/checkout@v2
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.0.')
@@ -66,5 +66,5 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           cp .release/* .
-          yarn 
+          yarn
           yarn release --repositoryUrl https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
