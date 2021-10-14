@@ -513,12 +513,6 @@ variable "gitlab_runner_registration_config" {
   }
 }
 
-variable "secure_parameter_store_runner_token_key" {
-  description = "The key name used store the Gitlab runner token in Secure Parameter Store"
-  type        = string
-  default     = "runner-token"
-}
-
 variable "secure_parameter_store_runner_sentry_dsn" {
   description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
   type        = string
