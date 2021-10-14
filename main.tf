@@ -235,6 +235,50 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
+################################################################################
+### Spot price
+################################################################################
+data "aws_pricing_product" "gitlab_runner_instance" {
+  service_code = "AmazonEC2"
+
+  filters {
+    field = "location"
+    value = replace(data.aws_region.current.description, "Europe", "EU") # need EU instead of Europe
+  }
+
+  filters {
+    field = "operatingSystem"
+    value = "Linux"
+  }
+
+  filters {
+    field = "instanceType"
+    value = var.instance_type
+  }
+
+  filters {
+    field = "capacitystatus"
+    value = "Used"
+  }
+
+  filters {
+    field = "tenancy"
+    value = "Shared"
+  }
+
+  filters {
+    field = "preInstalledSw"
+    value = "NA"
+  }
+
+  filters {
+    field = "licenseModel"
+    value = "No License required"
+  }
+
+  provider = aws.pricing # pricing API is available in special regions only
+}
+
 resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = local.name_runner_agent_instance
   key_name               = var.ssh_key_pair
@@ -251,7 +295,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     content {
       market_type = instance_market_options.value
       spot_options {
-        max_price = var.runner_instance_spot_price
+        max_price = var.runner_instance_spot_price == "up-to-on-demand" ? local.gitlab_runner_instance_spot_price : var.runner_instance_spot_price
       }
     }
   }

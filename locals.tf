@@ -25,6 +25,7 @@ locals {
     }
   )
 
+  gitlab_runner_instance_spot_price = tonumber(values(values(jsondecode(data.aws_pricing_product.ec2_docker_machine.result).terms.OnDemand)[0].priceDimensions)[0].pricePerUnit.USD)
   docker_machine_spot_price_bid = var.docker_machine_spot_price_bid == "up-to-on-demand" ? tonumber(values(values(jsondecode(data.aws_pricing_product.ec2_docker_machine.result).terms.OnDemand)[0].priceDimensions)[0].pricePerUnit.USD) : var.docker_machine_spot_price_bid
 
   // Depcrecated off peak, ensure not set if not explicit set.
