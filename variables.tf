@@ -671,12 +671,6 @@ variable "asg_max_instance_lifetime" {
   type        = number
 }
 
-variable "enable_forced_updates" {
-  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the opposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = null
-  type        = string
-}
-
 variable "permissions_boundary" {
   description = "Name of permissions boundary policy to attach to AWS IAM roles"
   default     = ""
