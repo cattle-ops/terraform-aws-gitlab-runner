@@ -116,16 +116,35 @@ By default the runner is registered on initial deployment. In previous versions 
 To register the runner automatically set the variable `gitlab_runner_registration_config["registration_token"]`. This token value can be found in your GitLab project, group, or global settings. For a generic runner you can find the token in the admin section. By default the runner will be locked to the target project, not run untagged. Below is an example of the configuration map.
 
 ```hcl
-gitlab_runner_registration_config = {
-  registration_token = "<registration token>"
-  tag_list           = "<your tags, comma separated>"
-  description        = "<some description>"
-  locked_to_project  = "true"
-  run_untagged       = "false"
-  maximum_timeout    = "3600"
-  access_level       = "<not_protected OR ref_protected, ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected>"
+module "gitlab_runner" {
+  ...
+
+  gitlab_runner_registration_config = {
+    registration_token = aws_ssm_parameter.gitlab_runner_registration_token.value
+    tag_list           = "<your tags, comma separated>"
+    description        = "<some description>"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+    access_level       = "<not_protected OR ref_protected, ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected>"
+  }
 }
-```
+
+# obtain this token from your Gitlab instance and store it manually in the SSM parameter
+
+resource "aws_ssm_parameter" "gitlab_runner_registration_token" {
+  name        = "gitlab-registration-token"
+  type        = "SecureString"
+  value       = "Please fill manually."
+  description = "Gitlab registration token for a new runner."
+
+  lifecycle {
+    # the secret is set manually
+    ignore_changes = [value]
+  }
+}```
+
+After deploying this infrastructure, fill in the token manually and kill the agents. After the automatic restart, all runners register automatically.
 
 ### Access runner instance
 
