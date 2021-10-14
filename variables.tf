@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "aws_zone" {
-  description = "Deprecated. Will be removed in the next major release."
-  type        = string
-  default     = "a"
-}
-
 variable "arn_format" {
   type        = string
   default     = "arn:aws"
