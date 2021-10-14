@@ -111,7 +111,7 @@ locals {
       runners_additional_volumes  = local.runners_additional_volumes
       docker_machine_options      = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_name                = var.runners_name
-      runners_tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
+      runners_tags = replace(replace(var.overrides["name_docker_machine_runners"] == "" ? format(
         "Name,%s-docker-machine,%s,%s",
         var.environment,
         local.tags_string,
@@ -121,7 +121,7 @@ locals {
         local.tags_string,
         local.runner_tags_string,
         var.overrides["name_docker_machine_runners"],
-      ), ",,", ",")
+      ), ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
@@ -503,4 +503,25 @@ resource "aws_iam_role_policy_attachment" "eip" {
 
   role       = aws_iam_role.instance.name
   policy_arn = aws_iam_policy.eip[0].arn
+}
+
+################################################################################
+### Lambda function for ASG instance termination lifecycle hook
+################################################################################
+module "terminate_instances_lifecycle_function" {
+  source = "./modules/terminate-instances"
+
+  count = var.asg_terminate_lifecycle_hook_create ? 1 : 0
+
+  name                                 = var.asg_terminate_lifecycle_hook_name == null ? "terminate-instances" : var.asg_terminate_lifecycle_hook_name
+  environment                          = var.environment
+  asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
+  asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
+  cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
+  lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
+  lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
+  name_iam_objects                     = local.name_iam_objects
+  role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
+  tags                                 = local.tags
 }

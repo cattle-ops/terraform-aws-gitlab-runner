@@ -734,3 +734,33 @@ variable "subnet_ids_gitlab_runner" {
   type        = list(string)
   default     = []
 }
+
+variable "asg_terminate_lifecycle_hook_name" {
+  description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
+  type        = string
+  default     = null
+}
+
+variable "asg_terminate_lifecycle_hook_create" {
+  description = "Boolean toggling the creation of the ASG instance terminate lifecycle hook."
+  type        = bool
+  default     = true
+}
+
+variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
+  description = "The amount of time, in seconds, for the instances to remain in wait state."
+  type        = number
+  default     = 90
+}
+
+variable "asg_terminate_lifecycle_lambda_memory_size" {
+  description = "The memory size in MB to allocate to the terminate-instances Lambda function."
+  type        = number
+  default     = 128
+}
+
+variable "asg_terminate_lifecycle_lambda_timeout" {
+  description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
+  default     = 30
+  type        = number
+}

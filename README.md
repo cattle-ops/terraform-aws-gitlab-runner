@@ -143,6 +143,19 @@ Once you have created the parameter, you must remove the variable `runners_token
 
 Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be removed in future releases.
 
+### Auto Scaling Group Instance Termination
+
+The Auto Scaling Group may be configured with a
+[lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
+that executes a provided Lambda function when the runner is terminated to
+terminate additional instances that were spawned.
+
+The use of the termination lifecycle can be toggled using the
+`asg_termination_lifecycle_hook_create` variable.
+
+When using this feature, a `builds/` directory relative to the root module will
+persist that contains the packaged Lambda function.
+
 ### Access runner instance
 
 A few option are provided to access the runner instance:
@@ -259,25 +272,33 @@ terraform destroy
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_cache"></a> [cache](#module\_cache) | ./modules/cache | n/a |
+| <a name="module_terminate_instances_lifecycle_function"></a> [terminate\_instances\_lifecycle\_function](#module\_terminate\_instances\_lifecycle\_function) | ./modules/terminate-instances | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
+| [archive_file.terminate_runner_instances_lambda](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
 | [aws_autoscaling_group.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
+| [aws_autoscaling_lifecycle_hook.terminate_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_lifecycle_hook) | resource |
 | [aws_autoscaling_schedule.scale_in](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_schedule) | resource |
 | [aws_autoscaling_schedule.scale_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_schedule) | resource |
+| [aws_cloudwatch_event_rule.terminate_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.terminate_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_log_group.environment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_group.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_eip.gitlab_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_iam_instance_profile.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_instance_profile.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_policy.eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.instance_docker_machine_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.instance_session_manager_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy_attachment.docker_machine_cache_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.docker_machine_session_manager_aws_managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
@@ -286,11 +307,17 @@ terraform destroy
 | [aws_iam_role_policy_attachment.instance_docker_machine_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.instance_session_manager_aws_managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.instance_session_manager_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.user_defined_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_policy_document.assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_kms_alias.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_lambda_function.terminate_runner_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
+| [aws_lambda_permission.current_version_triggers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
+| [aws_lambda_permission.unqualified_alias_triggers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
 | [aws_launch_template.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
 | [aws_security_group.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
@@ -322,6 +349,11 @@ terraform destroy
 | <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | <a name="input_asg_delete_timeout"></a> [asg\_delete\_timeout](#input\_asg\_delete\_timeout) | Timeout when trying to delete the Runner ASG. | `string` | `"10m"` | no |
 | <a name="input_asg_max_instance_lifetime"></a> [asg\_max\_instance\_lifetime](#input\_asg\_max\_instance\_lifetime) | The seconds before an instance is refreshed in the ASG. | `number` | `null` | no |
+| <a name="input_asg_terminate_lifecycle_hook_create"></a> [asg\_terminate\_lifecycle\_hook\_create](#input\_asg\_terminate\_lifecycle\_hook\_create) | Boolean toggling the creation of the ASG instance terminate lifecycle hook. | `bool` | `true` | no |
+| <a name="input_asg_terminate_lifecycle_hook_heartbeat_timeout"></a> [asg\_terminate\_lifecycle\_hook\_heartbeat\_timeout](#input\_asg\_terminate\_lifecycle\_hook\_heartbeat\_timeout) | The amount of time, in seconds, for the instances to remain in wait state. | `number` | `90` | no |
+| <a name="input_asg_terminate_lifecycle_hook_name"></a> [asg\_terminate\_lifecycle\_hook\_name](#input\_asg\_terminate\_lifecycle\_hook\_name) | Specifies a custom name for the ASG terminate lifecycle hook and related resources. | `string` | `null` | no |
+| <a name="input_asg_terminate_lifecycle_lambda_memory_size"></a> [asg\_terminate\_lifecycle\_lambda\_memory\_size](#input\_asg\_terminate\_lifecycle\_lambda\_memory\_size) | The memory size in MB to allocate to the terminate-instances Lambda function. | `number` | `128` | no |
+| <a name="input_asg_terminate_lifecycle_lambda_timeout"></a> [asg\_terminate\_lifecycle\_lambda\_timeout](#input\_asg\_terminate\_lifecycle\_lambda\_timeout) | Amount of time the terminate-instances Lambda Function has to run in seconds. | `number` | `30` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region. | `string` | n/a | yes |
 | <a name="input_cache_bucket"></a> [cache\_bucket](#input\_cache\_bucket) | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map(any)` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
 | <a name="input_cache_bucket_name_include_account_id"></a> [cache\_bucket\_name\_include\_account\_id](#input\_cache\_bucket\_name\_include\_account\_id) | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
