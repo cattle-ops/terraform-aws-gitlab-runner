@@ -23,4 +23,6 @@ variable "gitlab_url" {
 }
 
 variable "registration_token" {
+  description = "The registration token obtained from your Gitlab instance."
+  type        = string
 }
