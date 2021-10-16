@@ -66,7 +66,7 @@ variable "runner_instance_enable_monitoring" {
 }
 
 variable "runner_instance_spot_price" {
-  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS."
+  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
   type        = string
   default     = null
 }
@@ -96,7 +96,7 @@ variable "docker_machine_instance_type" {
 }
 
 variable "docker_machine_spot_price_bid" {
-  description = "Spot price bid. The maximum price willing to pay."
+  description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
   type        = string
   default     = "on-demand-price"
 }
