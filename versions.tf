@@ -10,8 +10,3 @@ terraform {
     }
   }
 }
-
-provider "aws" {
-  alias  = "pricing"
-  region = "us-east-1"
-}

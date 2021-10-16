@@ -97,7 +97,7 @@ locals {
       runners_subnet_id           = var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
-      runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand" ? "" : var.docker_machine_spot_price_bid
+      runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id
       runners_security_group_name = aws_security_group.docker_machine.name
       runners_monitoring          = var.runners_monitoring
@@ -249,7 +249,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     content {
       market_type = instance_market_options.value
       spot_options {
-        max_price = var.runner_instance_spot_price == "on-demand" ? "" : var.runner_instance_spot_price
+        max_price = var.runner_instance_spot_price == "on-demand-price" ? "" : var.runner_instance_spot_price
       }
     }
   }

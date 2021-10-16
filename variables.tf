@@ -96,9 +96,9 @@ variable "docker_machine_instance_type" {
 }
 
 variable "docker_machine_spot_price_bid" {
-  description = "Spot price bid."
+  description = "Spot price bid. The maximum price willing to pay."
   type        = string
-  default     = "up-to-on-demand"
+  default     = "on-demand-price"
 }
 
 variable "docker_machine_download_url" {
