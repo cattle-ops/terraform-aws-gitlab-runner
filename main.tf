@@ -1,7 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_region" "current" {}
-
 data "aws_subnet" "runners" {
   id = var.subnet_id_runners
 }
@@ -99,7 +97,7 @@ locals {
       runners_subnet_id           = var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
-      runners_spot_price_bid      = local.docker_machine_spot_price_bid
+      runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand" ? "" : var.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id
       runners_security_group_name = aws_security_group.docker_machine.name
       runners_monitoring          = var.runners_monitoring
@@ -235,50 +233,6 @@ data "aws_ami" "runner" {
   owners = var.ami_owners
 }
 
-################################################################################
-### Spot price
-################################################################################
-data "aws_pricing_product" "gitlab_runner_instance" {
-  service_code = "AmazonEC2"
-
-  filters {
-    field = "location"
-    value = replace(data.aws_region.current.description, "Europe", "EU") # need EU instead of Europe
-  }
-
-  filters {
-    field = "operatingSystem"
-    value = "Linux"
-  }
-
-  filters {
-    field = "instanceType"
-    value = var.instance_type
-  }
-
-  filters {
-    field = "capacitystatus"
-    value = "Used"
-  }
-
-  filters {
-    field = "tenancy"
-    value = "Shared"
-  }
-
-  filters {
-    field = "preInstalledSw"
-    value = "NA"
-  }
-
-  filters {
-    field = "licenseModel"
-    value = "No License required"
-  }
-
-  provider = aws.pricing # pricing API is available in special regions only
-}
-
 resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = local.name_runner_agent_instance
   key_name               = var.ssh_key_pair
@@ -295,7 +249,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     content {
       market_type = instance_market_options.value
       spot_options {
-        max_price = var.runner_instance_spot_price == "up-to-on-demand" ? local.gitlab_runner_instance_spot_price : var.runner_instance_spot_price
+        max_price = var.runner_instance_spot_price == "on-demand" ? "" : var.runner_instance_spot_price
       }
     }
   }
@@ -369,50 +323,6 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
-}
-
-################################################################################
-### Spot price
-################################################################################
-data "aws_pricing_product" "ec2_docker_machine" {
-  service_code = "AmazonEC2"
-
-  filters {
-    field = "location"
-    value = replace(data.aws_region.current.description, "Europe", "EU") # need EU instead of Europe
-  }
-
-  filters {
-    field = "operatingSystem"
-    value = "Linux"
-  }
-
-  filters {
-    field = "instanceType"
-    value = var.docker_machine_instance_type
-  }
-
-  filters {
-    field = "capacitystatus"
-    value = "Used"
-  }
-
-  filters {
-    field = "tenancy"
-    value = "Shared"
-  }
-
-  filters {
-    field = "preInstalledSw"
-    value = "NA"
-  }
-
-  filters {
-    field = "licenseModel"
-    value = "No License required"
-  }
-
-  provider = aws.pricing # pricing API is available in special regions only
 }
 
 ################################################################################
