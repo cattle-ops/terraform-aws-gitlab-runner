@@ -158,6 +158,18 @@ By default the module creates a a cache for the runner in S3. Old objects are au
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/cache). An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
 
+## Cost Estimation
+
+### Hapag-Lloyd AG
+We set up a build pipeline for 13 developers (plus one technical user running Renovate to update all
+dependencies) in 3 availability zones. Running 2 different type of machines. One for cloud deployment,
+aka `terraform apply` (t3.medium, on demand, 3 idles, 15 max, 45 minutes idle time). The other one
+for all other jobs (c5.xlarge, spot, 9 idles, 60 max, 45 minutes idle time). All machines are
+using a shared S3 cache. The pipeline is running from 7am till 7pm. In the non peak hours all
+docker+machine instances are killed.
+
+Per day costs: $20. We are quite satisfied with this pipeline.
+
 ## Usage
 
 ### Configuration
