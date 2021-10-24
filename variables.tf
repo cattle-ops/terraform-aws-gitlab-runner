@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "aws_zone" {
-  description = "Deprecated. Will be removed in the next major release."
-  type        = string
-  default     = "a"
-}
-
 variable "arn_format" {
   type        = string
   default     = "arn:aws"
@@ -229,30 +223,6 @@ variable "runners_ebs_optimized" {
   description = "Enable runners to be EBS-optimized."
   type        = bool
   default     = true
-}
-
-variable "runners_off_peak_timezone" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
-}
-
-variable "runners_off_peak_idle_count" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = -1
-}
-
-variable "runners_off_peak_idle_time" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = -1
-}
-
-variable "runners_off_peak_periods" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
 }
 
 variable "runners_machine_autoscaling" {
@@ -699,12 +669,6 @@ variable "asg_max_instance_lifetime" {
   description = "The seconds before an instance is refreshed in the ASG."
   default     = null
   type        = number
-}
-
-variable "enable_forced_updates" {
-  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the opposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = null
-  type        = string
 }
 
 variable "permissions_boundary" {

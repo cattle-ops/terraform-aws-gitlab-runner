@@ -50,8 +50,6 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  enable_asg_recreation = var.enable_forced_updates != null ? !var.enable_forced_updates : var.enable_asg_recreation
-
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
@@ -131,10 +129,6 @@ locals {
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_off_peak_timezone         = local.runners_off_peak_timezone
-      runners_off_peak_idle_count       = local.runners_off_peak_idle_count
-      runners_off_peak_idle_time        = local.runners_off_peak_idle_time
-      runners_off_peak_periods_string   = local.runners_off_peak_periods_string
       runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
@@ -171,7 +165,7 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                      = local.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+  name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"

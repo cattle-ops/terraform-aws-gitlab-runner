@@ -24,11 +24,4 @@ locals {
     runners_machine_autoscaling = var.runners_machine_autoscaling
     }
   )
-
-  // Depcrecated off peak, ensure not set if not explicit set.
-  runners_off_peak_periods_string = var.runners_off_peak_periods == null ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)
-  runners_off_peak_timezone       = var.runners_off_peak_timezone == null ? "" : "OffPeakTimezone = \"${var.runners_off_peak_timezone}\""
-  runners_off_peak_idle_count     = var.runners_off_peak_idle_count == -1 ? "" : format("OffPeakIdleCount = %d", var.runners_off_peak_idle_count)
-  runners_off_peak_idle_time      = var.runners_off_peak_idle_time == -1 ? "" : format("OffPeakIdleTime = %d", var.runners_off_peak_idle_time)
-
 }
