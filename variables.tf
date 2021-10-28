@@ -191,8 +191,8 @@ variable "runners_disable_cache" {
 
 variable "runners_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "runners_additional_volumes" {
