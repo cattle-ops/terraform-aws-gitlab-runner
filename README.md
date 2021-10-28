@@ -240,12 +240,13 @@ To destroy runner:
 terraform destroy
 ```
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!--- BEGIN_TF_DOCS --->
+
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12 |
+| terraform | >= 0.12.20 |
 
 ## Providers
 
@@ -265,7 +266,7 @@ terraform destroy
 | arn\_format | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | aws\_region | AWS region. | `string` | n/a | yes |
 | aws\_zone | AWS availability zone (typically 'a', 'b', or 'c'). | `string` | `"a"` | no |
-| cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
+| cache\_bucket | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map(any)` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
 | cache\_bucket\_name\_include\_account\_id | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | cache\_bucket\_prefix | Prefix for s3 cache bucket name. | `string` | `""` | no |
 | cache\_bucket\_versioning | Boolean used to enable versioning on the cache bucket, false by default. | `bool` | `false` | no |
@@ -306,10 +307,10 @@ terraform destroy
 | runner\_ami\_filter | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"<br>  ]<br>}</pre> | no |
 | runner\_ami\_owners | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
 | runner\_instance\_ebs\_optimized | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
-| runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `null` | no |
+| runner\_instance\_spot\_price | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `""` | no |
 | runner\_root\_block\_device | The EC2 instance root block device configuration. Takes the following keys: `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops` | `map(string)` | `{}` | no |
 | runner\_tags | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
-| runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list` | `[]` | no |
+| runners\_additional\_volumes | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list(any)` | `[]` | no |
 | runners\_concurrent | Concurrent value for the runners, will be used in the runner config.toml. | `number` | `10` | no |
 | runners\_ebs\_optimized | Enable runners to be EBS-optimized. | `bool` | `true` | no |
 | runners\_environment\_vars | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | `list(string)` | `[]` | no |
@@ -334,16 +335,17 @@ terraform destroy
 | runners\_privileged | Runners will run in privileged mode, will be used in the runner config.toml | `bool` | `true` | no |
 | runners\_pull\_policy | pull\_policy for the runners, will be used in the runner config.toml | `string` | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | `number` | `1` | no |
-| runners\_request\_spot\_instance | Whether or not to request spot instances via docker-machine | `bool` | `true` | no |
+| runners\_request\_spot\_instance | Whether or not to request spot instances via docker-machine | `bool` | `false` | no |
 | runners\_root\_size | Runner instance root size in GB. | `number` | `16` | no |
 | runners\_services\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | runners\_shm\_size | shm\_size for the runners, will be used in the runner config.toml | `number` | `0` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | `string` | `"__REPLACED_BY_USER_DATA__"` | no |
 | runners\_use\_private\_address | Restrict runners to the use of a private IP address | `bool` | `true` | no |
 | runners\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
-| schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
+| schedule\_config | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | secure\_parameter\_store\_runner\_token\_key | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | ssh\_key\_pair | Set this to use existing AWS key pair | `string` | `null` | no |
+| ssh\_public\_key | Public SSH key used for the GitLab runner EC2 instance. | `string` | `null` | no |
 | subnet\_id\_runners | List of subnets used for hosting the gitlab-runners. | `string` | n/a | yes |
 | subnet\_ids\_gitlab\_runner | Subnet used for hosting the GitLab runner. | `list(string)` | n/a | yes |
 | tags | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |
@@ -366,4 +368,4 @@ terraform destroy
 | runner\_role\_name | Name of the role used for the docker machine runners. |
 | runner\_sg\_id | ID of the security group attached to the docker machine runners. |
 
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!--- END_TF_DOCS --->
