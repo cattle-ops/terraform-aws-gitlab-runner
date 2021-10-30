@@ -159,6 +159,18 @@ By default the module creates a a cache for the runner in S3. Old objects are au
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/cache). An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
 
+## Cost Estimation
+
+### Hapag-Lloyd AG
+We set up a build pipeline for 13 developers (plus one technical user running Renovate to update all
+dependencies) in 3 availability zones. Running 2 different type of machines. One for cloud deployment,
+aka `terraform apply` (t3.medium, on demand, 3 idles, 15 max, 45 minutes idle time). The other one
+for all other jobs (c5.xlarge, spot, 9 idles, 60 max, 45 minutes idle time). All machines are
+using a shared S3 cache. The pipeline is running from 7am till 7pm. In the non peak hours all
+docker+machine instances are killed.
+
+Per day costs: $20. We are quite satisfied with this pipeline.
+
 ## Usage
 
 ### Configuration
@@ -324,8 +336,8 @@ terraform destroy
 | <a name="input_ami_owners"></a> [ami\_owners](#input\_ami\_owners) | The list of owners used to select the AMI of Gitlab runner agent instances. | `list(string)` | <pre>[<br>  "amazon"<br>]</pre> | no |
 | <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | <a name="input_asg_delete_timeout"></a> [asg\_delete\_timeout](#input\_asg\_delete\_timeout) | Timeout when trying to delete the Runner ASG. | `string` | `"10m"` | no |
+| <a name="input_asg_max_instance_lifetime"></a> [asg\_max\_instance\_lifetime](#input\_asg\_max\_instance\_lifetime) | The seconds before an instance is refreshed in the ASG. | `number` | `null` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region. | `string` | n/a | yes |
-| <a name="input_aws_zone"></a> [aws\_zone](#input\_aws\_zone) | Deprecated. Will be removed in the next major release. | `string` | `"a"` | no |
 | <a name="input_cache_bucket"></a> [cache\_bucket](#input\_cache\_bucket) | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map(any)` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
 | <a name="input_cache_bucket_name_include_account_id"></a> [cache\_bucket\_name\_include\_account\_id](#input\_cache\_bucket\_name\_include\_account\_id) | Boolean to add current account ID to cache bucket name. | `bool` | `true` | no |
 | <a name="input_cache_bucket_prefix"></a> [cache\_bucket\_prefix](#input\_cache\_bucket\_prefix) | Prefix for s3 cache bucket name. | `string` | `""` | no |
@@ -341,14 +353,12 @@ terraform destroy
 | <a name="input_docker_machine_options"></a> [docker\_machine\_options](#input\_docker\_machine\_options) | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | `list(string)` | `[]` | no |
 | <a name="input_docker_machine_role_json"></a> [docker\_machine\_role\_json](#input\_docker\_machine\_role\_json) | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | <a name="input_docker_machine_security_group_description"></a> [docker\_machine\_security\_group\_description](#input\_docker\_machine\_security\_group\_description) | A description for the docker-machine security group | `string` | `"A security group containing docker-machine instances"` | no |
-| <a name="input_docker_machine_spot_price_bid"></a> [docker\_machine\_spot\_price\_bid](#input\_docker\_machine\_spot\_price\_bid) | Spot price bid. | `string` | `"0.06"` | no |
+| <a name="input_docker_machine_spot_price_bid"></a> [docker\_machine\_spot\_price\_bid](#input\_docker\_machine\_spot\_price\_bid) | Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen. | `string` | `"on-demand-price"` | no |
 | <a name="input_docker_machine_version"></a> [docker\_machine\_version](#input\_docker\_machine\_version) | By default docker\_machine\_download\_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `""` | no |
 | <a name="input_enable_asg_recreation"></a> [enable\_asg\_recreation](#input\_enable\_asg\_recreation) | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `true` | no |
-| <a name="input_asg_max_instance_lifetime"></a> [asg\_max\_instance\_lifetime](#input\_asg\_max\_instance\_lifetime) | The seconds before an instance is refreshed in the ASG. | `number` | `null` | no |
 | <a name="input_enable_cloudwatch_logging"></a> [enable\_cloudwatch\_logging](#input\_enable\_cloudwatch\_logging) | Boolean used to enable or disable the CloudWatch logging. | `bool` | `true` | no |
 | <a name="input_enable_docker_machine_ssm_access"></a> [enable\_docker\_machine\_ssm\_access](#input\_enable\_docker\_machine\_ssm\_access) | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
 | <a name="input_enable_eip"></a> [enable\_eip](#input\_enable\_eip) | Enable the assignment of an EIP to the gitlab runner instance | `bool` | `false` | no |
-| <a name="input_enable_forced_updates"></a> [enable\_forced\_updates](#input\_enable\_forced\_updates) | DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the opposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change.` | `string` | `null` | no |
 | <a name="input_enable_gitlab_runner_ssh_access"></a> [enable\_gitlab\_runner\_ssh\_access](#input\_enable\_gitlab\_runner\_ssh\_access) | Enables SSH Access to the gitlab runner instance. | `bool` | `false` | no |
 | <a name="input_enable_kms"></a> [enable\_kms](#input\_enable\_kms) | Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key. | `bool` | `false` | no |
 | <a name="input_enable_manage_gitlab_token"></a> [enable\_manage\_gitlab\_token](#input\_enable\_manage\_gitlab\_token) | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `true` | no |
@@ -382,7 +392,7 @@ terraform destroy
 | <a name="input_runner_instance_enable_monitoring"></a> [runner\_instance\_enable\_monitoring](#input\_runner\_instance\_enable\_monitoring) | Enable the GitLab runner instance to have detailed monitoring. | `bool` | `true` | no |
 | <a name="input_runner_instance_metadata_options_http_endpoint"></a> [runner\_instance\_metadata\_options\_http\_endpoint](#input\_runner\_instance\_metadata\_options\_http\_endpoint) | Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled. | `string` | `"enabled"` | no |
 | <a name="input_runner_instance_metadata_options_http_tokens"></a> [runner\_instance\_metadata\_options\_http\_tokens](#input\_runner\_instance\_metadata\_options\_http\_tokens) | Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required. | `string` | `"optional"` | no |
-| <a name="input_runner_instance_spot_price"></a> [runner\_instance\_spot\_price](#input\_runner\_instance\_spot\_price) | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. | `string` | `null` | no |
+| <a name="input_runner_instance_spot_price"></a> [runner\_instance\_spot\_price](#input\_runner\_instance\_spot\_price) | By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose "on-demand-price" to pay up to the current on demand price for the instance type chosen. | `string` | `null` | no |
 | <a name="input_runner_root_block_device"></a> [runner\_root\_block\_device](#input\_runner\_root\_block\_device) | The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id` | `map(string)` | `{}` | no |
 | <a name="input_runner_tags"></a> [runner\_tags](#input\_runner\_tags) | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
 | <a name="input_runners_additional_volumes"></a> [runners\_additional\_volumes](#input\_runners\_additional\_volumes) | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list(any)` | `[]` | no |
@@ -404,10 +414,6 @@ terraform destroy
 | <a name="input_runners_max_builds"></a> [runners\_max\_builds](#input\_runners\_max\_builds) | Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration. | `number` | `0` | no |
 | <a name="input_runners_monitoring"></a> [runners\_monitoring](#input\_runners\_monitoring) | Enable detailed cloudwatch monitoring for spot instances. | `bool` | `false` | no |
 | <a name="input_runners_name"></a> [runners\_name](#input\_runners\_name) | Name of the runner, will be used in the runner config.toml. | `string` | n/a | yes |
-| <a name="input_runners_off_peak_idle_count"></a> [runners\_off\_peak\_idle\_count](#input\_runners\_off\_peak\_idle\_count) | Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml. | `number` | `-1` | no |
-| <a name="input_runners_off_peak_idle_time"></a> [runners\_off\_peak\_idle\_time](#input\_runners\_off\_peak\_idle\_time) | Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml. | `number` | `-1` | no |
-| <a name="input_runners_off_peak_periods"></a> [runners\_off\_peak\_periods](#input\_runners\_off\_peak\_periods) | Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml. | `string` | `null` | no |
-| <a name="input_runners_off_peak_timezone"></a> [runners\_off\_peak\_timezone](#input\_runners\_off\_peak\_timezone) | Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml. | `string` | `null` | no |
 | <a name="input_runners_output_limit"></a> [runners\_output\_limit](#input\_runners\_output\_limit) | Sets the maximum build log size in kilobytes, by default set to 4096 (4MB) | `number` | `4096` | no |
 | <a name="input_runners_post_build_script"></a> [runners\_post\_build\_script](#input\_runners\_post\_build\_script) | Commands to be executed on the Runner just after executing the build, but before executing after\_script. | `string` | `"\"\""` | no |
 | <a name="input_runners_pre_build_script"></a> [runners\_pre\_build\_script](#input\_runners\_pre\_build\_script) | Script to execute in the pipeline just before the build, will be used in the runner config.toml | `string` | `"\"\""` | no |
