@@ -15,7 +15,7 @@ locals {
   // custom names for instances and security groups
   name_runner_agent_instance = var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]
   name_sg                    = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
-  name_iam_objects           = var.overrides["name_iam_objects"] == "" ? local.tags["Name"] : var.overrides["name_iam_objects"]
+  name_iam_objects           = lookup(var.overrides, "name_iam_objects", "") == "" ? local.tags["Name"] : var.overrides["name_iam_objects"]
   runners_additional_volumes = <<-EOT
   %{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}
   EOT
@@ -24,11 +24,4 @@ locals {
     runners_machine_autoscaling = var.runners_machine_autoscaling
     }
   )
-
-  // Depcrecated off peak, ensure not set if not explicit set.
-  runners_off_peak_periods_string = var.runners_off_peak_periods == null ? "" : format("OffPeakPeriods = %s", var.runners_off_peak_periods)
-  runners_off_peak_timezone       = var.runners_off_peak_timezone == null ? "" : "OffPeakTimezone = \"${var.runners_off_peak_timezone}\""
-  runners_off_peak_idle_count     = var.runners_off_peak_idle_count == -1 ? "" : format("OffPeakIdleCount = %d", var.runners_off_peak_idle_count)
-  runners_off_peak_idle_time      = var.runners_off_peak_idle_time == -1 ? "" : format("OffPeakIdleTime = %d", var.runners_off_peak_idle_time)
-
 }

@@ -45,7 +45,7 @@ module "runner" {
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
 
   docker_machine_download_url   = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
-  docker_machine_spot_price_bid = "0.06"
+  docker_machine_spot_price_bid = "on-demand-price"
 
   gitlab_runner_registration_config = {
     registration_token = var.registration_token
@@ -79,11 +79,6 @@ module "runner" {
   ]
 
   # working 9 to 5 :)
-  # Deprecated, replaced by runners_machine_autoscaling
-  # runners_off_peak_periods    = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
-  # runners_off_peak_timezone   = var.timezone
-  # runners_off_peak_idle_count = 0
-  # runners_off_peak_idle_time  = 60
   runners_machine_autoscaling = [
     {
       periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
