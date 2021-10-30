@@ -394,6 +394,7 @@ terraform destroy
 | <a name="input_runners_gitlab_url"></a> [runners\_gitlab\_url](#input\_runners\_gitlab\_url) | URL of the GitLab instance to connect to. | `string` | n/a | yes |
 | <a name="input_runners_helper_image"></a> [runners\_helper\_image](#input\_runners\_helper\_image) | Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml | `string` | `""` | no |
 | <a name="input_runners_iam_instance_profile_name"></a> [runners\_iam\_instance\_profile\_name](#input\_runners\_iam\_instance\_profile\_name) | IAM instance profile name of the runners, will be used in the runner config.toml | `string` | `""` | no |
+| <a name="input_runners_docker_registry_mirror"></a> [runners\_docker\_registry\_mirror](#input\_runners\_docker\_registry\_mirror) | The docker registry mirror to use to avoid rate limiting by hub.docker.com | `string` | `""` | no |
 | <a name="input_runners_idle_count"></a> [runners\_idle\_count](#input\_runners\_idle\_count) | Idle count of the runners, will be used in the runner config.toml. | `number` | `0` | no |
 | <a name="input_runners_idle_time"></a> [runners\_idle\_time](#input\_runners\_idle\_time) | Idle time of the runners, will be used in the runner config.toml. | `number` | `600` | no |
 | <a name="input_runners_image"></a> [runners\_image](#input\_runners\_image) | Image to run builds, will be used in the runner config.toml | `string` | `"docker:18.03.1-ce"` | no |
