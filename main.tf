@@ -23,8 +23,8 @@ resource "aws_ssm_parameter" "runner_registration_token" {
 
 resource "null_resource" "remove_runner" {
   depends_on = [aws_ssm_parameter.runner_registration_token]
+
   triggers = {
-    script                                  = "${path.module}/bin/remove-runner.sh"
     aws_region                              = var.aws_region
     runners_gitlab_url                      = var.runners_gitlab_url
     secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
@@ -33,7 +33,7 @@ resource "null_resource" "remove_runner" {
   provisioner "local-exec" {
     when       = destroy
     on_failure = continue
-    command    = "${self.triggers.script} ${self.triggers.aws_region} ${self.triggers.runners_gitlab_url} ${self.triggers.secure_parameter_store_runner_token_key}"
+    command    = "curl -sS --request DELETE \"${var.runners_gitlab_url}/api/v4/runners\" --form \"token=${aws_ssm_parameter.runner_registration_token.value}\""
   }
 }
 
