@@ -25,9 +25,9 @@ resource "null_resource" "remove_runner" {
   depends_on = [aws_ssm_parameter.runner_registration_token]
 
   triggers = {
-    aws_region                              = var.aws_region
-    runners_gitlab_url                      = var.runners_gitlab_url
-    runner_registration_token               = aws_ssm_parameter.runner_registration_token.value
+    aws_region                = var.aws_region
+    runners_gitlab_url        = var.runners_gitlab_url
+    runner_registration_token = aws_ssm_parameter.runner_registration_token.value
   }
 
   provisioner "local-exec" {
