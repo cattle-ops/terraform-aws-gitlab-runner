@@ -133,7 +133,7 @@ locals {
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
-      runners_use_private_address       = !var.runners_use_private_address
+      runners_use_private_address       = ! var.runners_use_private_address
       runners_request_spot_instance     = var.runners_request_spot_instance
       runners_environment_vars          = jsonencode(var.runners_environment_vars)
       runners_pre_build_script          = var.runners_pre_build_script
@@ -141,6 +141,7 @@ locals {
       runners_pre_clone_script          = var.runners_pre_clone_script
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
+      runners_check_interval            = var.runners_check_interval
       runners_volumes_tmpfs             = join(",", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
