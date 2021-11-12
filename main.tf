@@ -104,7 +104,7 @@ locals {
       runners_ebs_optimized       = var.runners_ebs_optimized
       runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
       runners_additional_volumes  = local.runners_additional_volumes
-      docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
+      docker_machine_options      = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_name                = var.runners_name
       runners_tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
         "Name,%s-docker-machine,%s,%s",
