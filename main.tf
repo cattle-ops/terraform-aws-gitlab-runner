@@ -1,11 +1,11 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_subnet" "runners" {
-  id = var.subnet_id_runners
+data "aws_subnet" "executors" {
+  id = var.subnet_id_executors
 }
 
-data "aws_availability_zone" "runners" {
-  name = data.aws_subnet.runners.availability_zone
+data "aws_availability_zone" "executors" {
+  name = data.aws_subnet.executors.availability_zone
 }
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
@@ -99,8 +99,8 @@ locals {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
-      runners_subnet_id           = var.subnet_id_runners
-      runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
+      runners_subnet_id           = var.subnet_id_executors
+      runners_aws_zone            = data.aws_availability_zone.executors.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id

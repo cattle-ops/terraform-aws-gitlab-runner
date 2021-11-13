@@ -19,8 +19,8 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "subnet_id_runners" {
-  description = "List of subnets used for hosting the gitlab-runners."
+variable "subnet_id_executors" {
+  description = "Subnet id used to host the executors."
   type        = string
 }
 
@@ -29,8 +29,8 @@ variable "subnet_ids_gitlab_runner" {
   type        = list(string)
 }
 
-variable "extra_security_group_ids_runner_agent" {
-  description = "Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default."
+variable "extra_security_group_ids_runner" {
+  description = "Optional IDs of extra security groups to apply to the runner. This will not apply to the runner instances spun up when using the docker+machine executor, which is the default."
   type        = list(string)
   default     = []
 }

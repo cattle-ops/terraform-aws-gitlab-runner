@@ -34,7 +34,7 @@ module "runner" {
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  subnet_id_executors      = element(module.vpc.public_subnets, 0)
 
   docker_machine_spot_price_bid = "on-demand-price"
 
@@ -80,7 +80,7 @@ module "runner2" {
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  subnet_id_executors      = element(module.vpc.public_subnets, 0)
 
   docker_machine_spot_price_bid = "on-demand-price"
 
