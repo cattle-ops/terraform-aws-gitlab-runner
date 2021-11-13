@@ -236,7 +236,6 @@ data "aws_ami" "runner" {
 
 resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = local.name_runner_agent_instance
-  key_name               = var.ssh_key_pair
   image_id               = data.aws_ami.runner.id
   user_data              = base64encode(local.template_user_data)
   instance_type          = var.instance_type

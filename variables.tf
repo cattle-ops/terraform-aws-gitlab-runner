@@ -77,12 +77,6 @@ variable "runner_instance_metadata_options_http_tokens" {
   default     = "optional"
 }
 
-variable "ssh_key_pair" {
-  description = "Set this to use existing AWS key pair"
-  type        = string
-  default     = null
-}
-
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
   type        = string
@@ -366,18 +360,6 @@ variable "enable_ping" {
   description = "Allow ICMP Ping to the ec2 instances."
   type        = bool
   default     = false
-}
-
-variable "enable_gitlab_runner_ssh_access" {
-  description = "Enables SSH Access to the gitlab runner instance."
-  type        = bool
-  default     = false
-}
-
-variable "gitlab_runner_ssh_cidr_blocks" {
-  description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
-  type        = list(string)
-  default     = []
 }
 
 variable "gitlab_runner_egress_rules" {
