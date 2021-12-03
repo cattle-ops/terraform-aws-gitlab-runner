@@ -317,7 +317,7 @@ variable "runners_request_spot_instance" {
 variable "runners_check_interval" {
   description = "defines the interval length, in seconds, between new jobs check."
   type        = number
-  default     = 0
+  default     = 3
 }
 
 variable "cache_bucket_prefix" {
