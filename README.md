@@ -387,6 +387,7 @@ terraform destroy
 | <a name="input_runner_root_block_device"></a> [runner\_root\_block\_device](#input\_runner\_root\_block\_device) | The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id` | `map(string)` | `{}` | no |
 | <a name="input_runner_tags"></a> [runner\_tags](#input\_runner\_tags) | Map of tags that will be added to runner EC2 instances. | `map(string)` | `{}` | no |
 | <a name="input_runners_additional_volumes"></a> [runners\_additional\_volumes](#input\_runners\_additional\_volumes) | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list(any)` | `[]` | no |
+| <a name="input_runners_check_interval"></a> [runners\_check\_interval](#input\_runners\_check\_interval) | defines the interval length, in seconds, between new jobs check. | `number` | `0` | no |
 | <a name="input_runners_concurrent"></a> [runners\_concurrent](#input\_runners\_concurrent) | Concurrent value for the runners, will be used in the runner config.toml. | `number` | `10` | no |
 | <a name="input_runners_disable_cache"></a> [runners\_disable\_cache](#input\_runners\_disable\_cache) | Runners will not use local cache, will be used in the runner config.toml | `bool` | `false` | no |
 | <a name="input_runners_add_dind_volumes"></a> [runners\_add\_dind\_volumes](#input\_runners\_add\_dind\_volumes) | Add certificates and docker.sock to the volumes to support docker-in-docker (dind) | `bool` | `false` | no |

@@ -1,5 +1,5 @@
 concurrent = ${runners_concurrent}
-check_interval = 0
+check_interval = ${runners_check_interval}
 sentry_dsn = "${sentry_dsn}"
 
 [[runners]]

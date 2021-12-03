@@ -314,6 +314,12 @@ variable "runners_request_spot_instance" {
   default     = true
 }
 
+variable "runners_check_interval" {
+  description = "defines the interval length, in seconds, between new jobs check."
+  type        = number
+  default     = 3
+}
+
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
