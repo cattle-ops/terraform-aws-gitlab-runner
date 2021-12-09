@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "aws_zone" {
-  description = "Deprecated. Will be removed in the next major release."
-  type        = string
-  default     = "a"
-}
-
 variable "arn_format" {
   type        = string
   default     = "arn:aws"
@@ -81,12 +75,6 @@ variable "runner_instance_metadata_options_http_tokens" {
   description = "Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required."
   type        = string
   default     = "optional"
-}
-
-variable "ssh_key_pair" {
-  description = "Set this to use existing AWS key pair"
-  type        = string
-  default     = null
 }
 
 variable "docker_machine_instance_type" {
@@ -189,6 +177,12 @@ variable "runners_disable_cache" {
   default     = false
 }
 
+variable "runners_add_dind_volumes" {
+  description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
+  type        = bool
+  default     = false
+}
+
 variable "runners_additional_volumes" {
   description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
   type        = list(any)
@@ -231,30 +225,6 @@ variable "runners_ebs_optimized" {
   default     = true
 }
 
-variable "runners_off_peak_timezone" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time zone of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
-}
-
-variable "runners_off_peak_idle_count" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = -1
-}
-
-variable "runners_off_peak_idle_time" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = -1
-}
-
-variable "runners_off_peak_periods" {
-  description = "Deprecated, please use `runners_machine_autoscaling`. Off peak periods of the runners, will be used in the runner config.toml."
-  type        = string
-  default     = null
-}
-
 variable "runners_machine_autoscaling" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
@@ -274,6 +244,12 @@ variable "runners_root_size" {
 
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
+  type        = string
+  default     = ""
+}
+
+variable "runners_docker_registry_mirror" {
+  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
   type        = string
   default     = ""
 }
@@ -344,6 +320,12 @@ variable "runners_request_spot_instance" {
   default     = true
 }
 
+variable "runners_check_interval" {
+  description = "defines the interval length, in seconds, between new jobs check."
+  type        = number
+  default     = 3
+}
+
 variable "cache_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
@@ -390,18 +372,6 @@ variable "enable_ping" {
   description = "Allow ICMP Ping to the ec2 instances."
   type        = bool
   default     = false
-}
-
-variable "enable_gitlab_runner_ssh_access" {
-  description = "Enables SSH Access to the gitlab runner instance."
-  type        = bool
-  default     = false
-}
-
-variable "gitlab_runner_ssh_cidr_blocks" {
-  description = "List of CIDR blocks to allow SSH Access to the gitlab runner instance."
-  type        = list(string)
-  default     = []
 }
 
 variable "gitlab_runner_egress_rules" {
@@ -699,12 +669,6 @@ variable "asg_max_instance_lifetime" {
   description = "The seconds before an instance is refreshed in the ASG."
   default     = null
   type        = number
-}
-
-variable "enable_forced_updates" {
-  description = "DEPRECATED! and is replaced by `enable_asg_recreation. Setting this variable to true will do the opposite as expected. For backward compatibility the variable will remain some releases. Old desription: Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = null
-  type        = string
 }
 
 variable "permissions_boundary" {

@@ -21,19 +21,26 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   }
 }
 
+# to read the current token for the null_resource. aws_ssm_parameter.runner_registration_token.value is never updated!
+data "aws_ssm_parameter" "current_runner_registration_token" {
+  depends_on = [aws_ssm_parameter.runner_registration_token]
+
+  name = local.secure_parameter_store_runner_token_key
+}
+
 resource "null_resource" "remove_runner" {
   depends_on = [aws_ssm_parameter.runner_registration_token]
+
   triggers = {
-    script                                  = "${path.module}/bin/remove-runner.sh"
-    aws_region                              = var.aws_region
-    runners_gitlab_url                      = var.runners_gitlab_url
-    secure_parameter_store_runner_token_key = local.secure_parameter_store_runner_token_key
+    aws_region                = var.aws_region
+    runners_gitlab_url        = var.runners_gitlab_url
+    runner_registration_token = data.aws_ssm_parameter.current_runner_registration_token.value
   }
 
   provisioner "local-exec" {
     when       = destroy
     on_failure = continue
-    command    = "${self.triggers.script} ${self.triggers.aws_region} ${self.triggers.runners_gitlab_url} ${self.triggers.secure_parameter_store_runner_token_key}"
+    command    = "curl -sS --request DELETE \"${self.triggers.runners_gitlab_url}/api/v4/runners\" --form \"token=${self.triggers.runner_registration_token}\""
   }
 }
 
@@ -50,8 +57,6 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  enable_asg_recreation = var.enable_forced_updates != null ? !var.enable_forced_updates : var.enable_asg_recreation
-
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
@@ -104,7 +109,7 @@ locals {
       runners_ebs_optimized       = var.runners_ebs_optimized
       runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
       runners_additional_volumes  = local.runners_additional_volumes
-      docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
+      docker_machine_options      = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_name                = var.runners_name
       runners_tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
         "Name,%s-docker-machine,%s,%s",
@@ -131,10 +136,6 @@ locals {
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_off_peak_timezone         = local.runners_off_peak_timezone
-      runners_off_peak_idle_count       = local.runners_off_peak_idle_count
-      runners_off_peak_idle_time        = local.runners_off_peak_idle_time
-      runners_off_peak_periods_string   = local.runners_off_peak_periods_string
       runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
@@ -147,6 +148,7 @@ locals {
       runners_pre_clone_script          = var.runners_pre_clone_script
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
+      runners_check_interval            = var.runners_check_interval
       runners_volumes_tmpfs             = join(",", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
@@ -171,7 +173,7 @@ data "aws_ami" "docker-machine" {
 }
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  name                      = local.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+  name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
@@ -235,7 +237,6 @@ data "aws_ami" "runner" {
 
 resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = local.name_runner_agent_instance
-  key_name               = var.ssh_key_pair
   image_id               = data.aws_ami.runner.id
   user_data              = base64encode(local.template_user_data)
   instance_type          = var.instance_type
