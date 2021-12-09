@@ -2,8 +2,10 @@ locals {
   // Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
     ",%s",
-    join(",", formatlist("%q", var.docker_machine_options)),
+    join(",", formatlist("%q", concat(var.docker_machine_options, local.runners_docker_registry_mirror_option))),
   )
+
+  runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
   // Ensure max builds is optional
   runners_max_builds_string = var.runners_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runners_max_builds)

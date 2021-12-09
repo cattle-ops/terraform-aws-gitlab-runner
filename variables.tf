@@ -248,6 +248,12 @@ variable "runners_iam_instance_profile_name" {
   default     = ""
 }
 
+variable "runners_docker_registry_mirror" {
+  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
+  type        = string
+  default     = ""
+}
+
 variable "runners_environment_vars" {
   description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml"
   type        = list(string)
