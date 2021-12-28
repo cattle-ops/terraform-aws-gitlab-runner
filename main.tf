@@ -174,7 +174,7 @@ data "aws_ami" "docker-machine" {
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = var.subnet_id ? var.subnet_id : var.subnet_ids_gitlab_runner
+  vpc_zone_identifier       = var.subnet_id ? [var.subnet_id] : var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
