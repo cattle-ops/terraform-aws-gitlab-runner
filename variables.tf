@@ -19,13 +19,18 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "subnet_id" {
+  description = "Subnet used for the runner and executors."
+  type        = string
+}
+
 variable "subnet_id_runners" {
-  description = "List of subnets used for hosting the gitlab-runners."
+  description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
   type        = string
 }
 
 variable "subnet_ids_gitlab_runner" {
-  description = "Subnet used for hosting the GitLab runner."
+  description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
   type        = list(string)
 }
 
