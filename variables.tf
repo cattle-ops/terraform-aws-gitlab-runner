@@ -22,6 +22,7 @@ variable "vpc_id" {
 variable "subnet_id" {
   description = "Subnet used for the runner and executors."
   type        = string
+  default     = ""
 }
 
 variable "subnet_id_runners" {
