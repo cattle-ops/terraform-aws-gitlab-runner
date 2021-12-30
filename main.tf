@@ -268,7 +268,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
         encrypted             = lookup(block_device_mappings.value, "encrypted", true)
         iops                  = lookup(block_device_mappings.value, "iops", null)
         throughput            = lookup(block_device_mappings.value, "throughput", null)
-        kms_key_id            = lookup(block_device_mappings.value, "`kms_key_id`", null)
+        kms_key_id            = lookup(block_device_mappings.value, "kms_key_id", null)
       }
     }
   }
