@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_subnet" "runners" {
-  id = var.subnet_id ? var.subnet_id : var.subnet_id_runners
+  id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
 }
 
 data "aws_availability_zone" "runners" {
@@ -99,7 +99,7 @@ locals {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
-      runners_subnet_id           = var.subnet_id ? var.subnet_id : var.subnet_id_runners
+      runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
@@ -174,7 +174,7 @@ data "aws_ami" "docker-machine" {
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = var.subnet_id ? [var.subnet_id] : var.subnet_ids_gitlab_runner
+  vpc_zone_identifier       = length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
