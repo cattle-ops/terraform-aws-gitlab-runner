@@ -25,16 +25,6 @@ variable "subnet_id" {
   default     = ""
 }
 
-variable "subnet_id_runners" {
-  description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
-  type        = string
-}
-
-variable "subnet_ids_gitlab_runner" {
-  description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
-  type        = list(string)
-}
-
 variable "extra_security_group_ids_runner_agent" {
   description = "Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default."
   type        = list(string)
@@ -731,4 +721,14 @@ variable "docker_machine_egress_rules" {
     to_port          = 0
     description      = "Allow all egress traffic for docker machine build runners"
   }]
+}
+
+variable "subnet_id_runners" {
+  description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
+  type        = string
+}
+
+variable "subnet_ids_gitlab_runner" {
+  description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
+  type        = list(string)
 }
