@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
+          # repository: ${{github.event.pull_request.head.repo.full_name}}
       - name: check
         run: cat variables.tf
       - name: Terraform Docs
@@ -55,9 +55,9 @@ jobs:
         with:
           working-dir: .
           # find-dir: .
-          git-push: true
           output-file: README.md
-          # output-method: inject
+          output-method: inject
+          git-push: "true"
           
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)
