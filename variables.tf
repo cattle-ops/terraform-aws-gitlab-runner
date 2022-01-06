@@ -130,7 +130,7 @@ variable "runners_token" {
 }
 
 variable "runners_limit" {
-  description = "Limit for the runners, will be used in the runner config.toml."
+  description = "Limit for the runners, will be used in the runner `config.toml`."
   type        = number
   default     = 0
 }
