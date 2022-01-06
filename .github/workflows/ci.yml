@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         terraform: [0.13.0, 0.14.0, 0.15.0, 1.0.8]
-        example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
+        example: [-default", "run"runnerner-docker", "runner-pre-registered", "runner-public"]
     defaults:
       run:
         working-directory: examples/${{ matrix.example }}
@@ -40,6 +40,20 @@ jobs:
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
+  docs:
+    needs: verify_module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+      - name: Terraform Docs
+        uses: terraform-docs/gh-actions@v0.11.0
+        with:
+          working-dir: .
+          git-push: true
+          recursive: true
 
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)
