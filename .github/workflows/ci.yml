@@ -52,10 +52,10 @@ jobs:
         uses: terraform-docs/gh-actions@v0.11.0
         with:
           working-dir: .
-          find-dir: .
+          # find-dir: .
           git-push: true
           output-file: README.md
-          output-method: inject
+          # output-method: inject
           
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)

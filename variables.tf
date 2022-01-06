@@ -726,3 +726,8 @@ variable "docker_machine_egress_rules" {
     description      = "Allow all egress traffic for docker machine build runners"
   }]
 }
+
+variable "test" {
+  description = "abc"
+  default     = ""
+}
