@@ -17,6 +17,8 @@ This examples shows:
 
 The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv). If you are not using `tfenv` please check `.terraform-version` for the tested version.
 
+<!-- BEGIN_TF_DOCS -->
+
 ## Providers
 
 | Name | Version |
@@ -39,3 +41,5 @@ The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv)
 ## Outputs
 
 No output.
+
+<!-- END_TF_DOCS -->

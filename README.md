@@ -4,6 +4,7 @@
 
 - [The module](#the-module)
 - [Prerequisites](#prerequisites)
+- [Cost Estimation](#cost-estimation)
 - [Usage](#usage)
 - [Examples](#examples)
 - [Requirements](#requirements)
@@ -244,7 +245,7 @@ To destroy the runner, run:
 terraform destroy
 ```
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -448,7 +449,7 @@ terraform destroy
 | <a name="output_runner_role_arn"></a> [runner\_role\_arn](#output\_runner\_role\_arn) | ARN of the role used for the docker machine runners. |
 | <a name="output_runner_role_name"></a> [runner\_role\_name](#output\_runner\_role\_name) | Name of the role used for the docker machine runners. |
 | <a name="output_runner_sg_id"></a> [runner\_sg\_id](#output\_runner\_sg\_id) | ID of the security group attached to the docker machine runners. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 ## Contributors ✨
 

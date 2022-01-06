@@ -24,7 +24,7 @@ module "runner" {
 
 }
 ```
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -75,4 +75,4 @@ No modules.
 | <a name="output_arn"></a> [arn](#output\_arn) | The ARN of the created bucket. |
 | <a name="output_bucket"></a> [bucket](#output\_bucket) | Name of the created bucket. |
 | <a name="output_policy_arn"></a> [policy\_arn](#output\_policy\_arn) | Policy for users of the cache (bucket). |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
