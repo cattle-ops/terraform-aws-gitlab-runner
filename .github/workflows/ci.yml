@@ -41,7 +41,7 @@ jobs:
       - run: terraform validate
 
   docs:
-    needs: verify_module
+    needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -55,13 +55,12 @@ jobs:
           find-dir: .
           git-push: true
           output-file: README.md
-          # output-file: README.md
           output-method: inject
           
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)
     name: Release
-    needs: [verify_module, verify_examples, docs]
+    needs: [docs]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
