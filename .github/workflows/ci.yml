@@ -4,7 +4,7 @@ on:
     branches:
       - master
       - develop
-      - auto-update-tfdocs
+  pull_request:
 
 jobs:
   verify_module:
