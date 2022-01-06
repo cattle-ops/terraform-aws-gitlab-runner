@@ -113,7 +113,7 @@ variable "runners_executor" {
 }
 
 variable "runners_install_amazon_ecr_credential_helper" {
-  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
+  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script."
   type        = bool
   default     = false
 }
@@ -160,55 +160,55 @@ variable "runners_max_builds" {
 }
 
 variable "runners_image" {
-  description = "Image to run builds, will be used in the runner config.toml"
+  description = "Image to run builds, will be used in the runner `config.toml`."
   type        = string
   default     = "docker:18.03.1-ce"
 }
 
 variable "runners_privileged" {
-  description = "Runners will run in privileged mode, will be used in the runner config.toml"
+  description = "Runners will run in privileged mode, will be used in the runner `config.toml`."
   type        = bool
   default     = true
 }
 
 variable "runners_disable_cache" {
-  description = "Runners will not use local cache, will be used in the runner config.toml"
+  description = "Runners will not use local cache, will be used in the runner `config.toml`."
   type        = bool
   default     = false
 }
 
 variable "runners_add_dind_volumes" {
-  description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
+  description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)."
   type        = bool
   default     = false
 }
 
 variable "runners_additional_volumes" {
-  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
+  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket."
   type        = list(any)
   default     = []
 }
 
 variable "runners_shm_size" {
-  description = "shm_size for the runners, will be used in the runner config.toml"
+  description = "shm_size for the runners, will be used in the runner `config.toml`."
   type        = number
   default     = 0
 }
 
 variable "runners_docker_runtime" {
-  description = "docker runtime for runners, will be used in the runner config.toml"
+  description = "docker runtime for runners, will be used in the runner `config.toml`."
   type        = string
   default     = ""
 }
 
 variable "runners_helper_image" {
-  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
+  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner `config.toml`."
   type        = string
   default     = ""
 }
 
 variable "runners_pull_policy" {
-  description = "pull_policy for the runners, will be used in the runner config.toml"
+  description = "pull_policy for the runners, will be used in the runner `config.toml`."
   type        = string
   default     = "always"
 }
@@ -243,31 +243,31 @@ variable "runners_root_size" {
 }
 
 variable "runners_iam_instance_profile_name" {
-  description = "IAM instance profile name of the runners, will be used in the runner config.toml"
+  description = "IAM instance profile name of the runners, will be used in the runner `config.toml`."
   type        = string
   default     = ""
 }
 
 variable "runners_docker_registry_mirror" {
-  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
+  description = "The docker registry mirror to use to avoid rate limiting by `hub.docker.com`."
   type        = string
   default     = ""
 }
 
 variable "runners_environment_vars" {
-  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml"
+  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml."
   type        = list(string)
   default     = []
 }
 
 variable "runners_pre_build_script" {
-  description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
+  description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml."
   type        = string
   default     = "\"\""
 }
 
 variable "runners_post_build_script" {
-  description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
+  description = "Commands to be executed on the Runner just after executing the build, but before executing after_script."
   type        = string
   default     = "\"\""
 }
@@ -279,25 +279,25 @@ variable "runners_pre_clone_script" {
 }
 
 variable "runners_request_concurrency" {
-  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)"
+  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
   type        = number
   default     = 1
 }
 
 variable "runners_output_limit" {
-  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)"
+  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
   type        = number
   default     = 4096
 }
 
 variable "userdata_pre_install" {
-  description = "User-data script snippet to insert before GitLab runner install"
+  description = "User-data script snippet to insert before GitLab runner install."
   type        = string
   default     = ""
 }
 
 variable "userdata_post_install" {
-  description = "User-data script snippet to insert after GitLab runner install"
+  description = "User-data script snippet to insert after GitLab runner install."
   type        = string
   default     = ""
 }
@@ -315,7 +315,7 @@ variable "runner_agent_uses_private_address" {
 }
 
 variable "runners_request_spot_instance" {
-  description = "Whether or not to request spot instances via docker-machine"
+  description = "Whether or not to request spot instances via docker-machine."
   type        = bool
   default     = true
 }
@@ -401,13 +401,13 @@ variable "gitlab_runner_egress_rules" {
 }
 
 variable "gitlab_runner_security_group_ids" {
-  description = "A list of security group ids that are allowed to access the gitlab runner agent"
+  description = "A list of security group ids that are allowed to access the gitlab runner agent."
   type        = list(string)
   default     = []
 }
 
 variable "gitlab_runner_security_group_description" {
-  description = "A description for the gitlab-runner security group"
+  description = "A description for the gitlab-runner security group."
   type        = string
   default     = "A security group containing gitlab-runner agent instances"
 }
@@ -419,7 +419,7 @@ variable "enable_cloudwatch_logging" {
 }
 
 variable "cloudwatch_logging_retention_in_days" {
-  description = "Retention for cloudwatch logs. Defaults to unlimited"
+  description = "Retention for cloudwatch logs. Defaults to unlimited."
   type        = number
   default     = 0
 }
@@ -455,7 +455,7 @@ variable "allow_iam_service_linked_role_creation" {
 }
 
 variable "docker_machine_options" {
-  description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
+  description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'."
   type        = list(string)
   default     = []
 }
@@ -526,13 +526,13 @@ variable "gitlab_runner_registration_config" {
 }
 
 variable "secure_parameter_store_runner_token_key" {
-  description = "The key name used store the Gitlab runner token in Secure Parameter Store"
+  description = "The key name used store the Gitlab runner token in Secure Parameter Store."
   type        = string
   default     = "runner-token"
 }
 
 variable "secure_parameter_store_runner_sentry_dsn" {
-  description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
+  description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store."
   type        = string
   default     = "sentry-dsn"
 }
@@ -590,7 +590,7 @@ variable "schedule_config" {
 }
 
 variable "runner_root_block_device" {
-  description = "The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
+  description = "The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`."
   type        = map(string)
   default     = {}
 }
@@ -636,7 +636,7 @@ variable "enable_kms" {
 }
 
 variable "kms_alias_name" {
-  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
+  description = "Alias added to the kms_key (if created and not provided by kms_key_id)."
   type        = string
   default     = ""
 }
@@ -648,7 +648,7 @@ variable "kms_deletion_window_in_days" {
 }
 
 variable "enable_eip" {
-  description = "Enable the assignment of an EIP to the gitlab runner instance"
+  description = "Enable the assignment of an EIP to the gitlab runner instance."
   default     = false
   type        = bool
 }
@@ -672,7 +672,7 @@ variable "asg_max_instance_lifetime" {
 }
 
 variable "permissions_boundary" {
-  description = "Name of permissions boundary policy to attach to AWS IAM roles"
+  description = "Name of permissions boundary policy to attach to AWS IAM roles."
   default     = ""
   type        = string
 }
@@ -697,7 +697,7 @@ variable "docker_machine_iam_policy_arns" {
 
 variable "sentry_dsn" {
   default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
-  description = "Sentry DSN of the project for the runner to use (uses legacy DSN format)"
+  description = "Sentry DSN of the project for the runner to use (uses legacy DSN format)."
   type        = string
 }
 
