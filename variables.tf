@@ -728,6 +728,6 @@ variable "docker_machine_egress_rules" {
 }
 
 variable "test" {
-  description = "abc"
+  description = "abcd"
   default     = ""
 }
