@@ -48,6 +48,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+      - name: check
+        run: cat variables.tf
       - name: Terraform Docs
         uses: terraform-docs/gh-actions@v0.11.0
         with:
