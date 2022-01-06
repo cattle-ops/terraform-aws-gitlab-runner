@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.37.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.36.0...4.37.0) (2022-01-06)
+
+
+### Features
+
+* Add launch template name to module outputs ([#415](https://github.com/npalm/terraform-aws-gitlab-runner/issues/415)) ([5d66571](https://github.com/npalm/terraform-aws-gitlab-runner/commit/5d66571efe35ae7b870c0fb6b768aad4bb4337b9))
+
+
+### Bug Fixes
+
+* Removed extra backticks for KMS key in EBS config. ([#422](https://github.com/npalm/terraform-aws-gitlab-runner/issues/422)) ([c46b080](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c46b080ebc648286bce7693f2c82837a81328db0))
+
 ## [4.36.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.35.0...4.36.0) (2021-12-09)
 
 
