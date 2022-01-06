@@ -444,6 +444,7 @@ terraform destroy
 | <a name="output_runner_cache_bucket_arn"></a> [runner\_cache\_bucket\_arn](#output\_runner\_cache\_bucket\_arn) | ARN of the S3 for the build cache. |
 | <a name="output_runner_cache_bucket_name"></a> [runner\_cache\_bucket\_name](#output\_runner\_cache\_bucket\_name) | Name of the S3 for the build cache. |
 | <a name="output_runner_eip"></a> [runner\_eip](#output\_runner\_eip) | EIP of the Gitlab Runner |
+| <a name="output_runner_launch_template_name"></a> [runner\_launch\_template\_name](#output\_runner\_launch\_template\_name) | The name of the runner's launch template. |
 | <a name="output_runner_role_arn"></a> [runner\_role\_arn](#output\_runner\_role\_arn) | ARN of the role used for the docker machine runners. |
 | <a name="output_runner_role_name"></a> [runner\_role\_name](#output\_runner\_role\_name) | Name of the role used for the docker machine runners. |
 | <a name="output_runner_sg_id"></a> [runner\_sg\_id](#output\_runner\_sg\_id) | ID of the security group attached to the docker machine runners. |

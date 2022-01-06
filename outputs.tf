@@ -47,3 +47,8 @@ output "runner_eip" {
   description = "EIP of the Gitlab Runner"
   value       = element(concat(aws_eip.gitlab_runner.*.public_ip, [""]), 0)
 }
+
+output "runner_launch_template_name" {
+  description = "The name of the runner's launch template."
+  value       = aws_launch_template.gitlab_runner_instance.name
+}
