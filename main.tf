@@ -28,6 +28,7 @@ data "aws_ssm_parameter" "current_runner_registration_token" {
   name = local.secure_parameter_store_runner_token_key
 }
 
+# be careful changing this resource. If Terraform decides to destroy it, the Runner will be removed from Gitlab and can't connect any longer
 resource "null_resource" "remove_runner" {
   depends_on = [aws_ssm_parameter.runner_registration_token]
 
@@ -404,6 +405,9 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   count      = var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0
+  /* If the S3 cache adapter is configured to use an IAM instance profile, the
+     adapter uses the profile attached to the GitLab Runner machine. So do not
+     use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }
