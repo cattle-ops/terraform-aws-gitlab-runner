@@ -20,7 +20,7 @@ module "vpc" {
 }
 
 module "cache" {
-  source      = "../../modules/cache"
+  source = "../../modules/cache"
 
   environment = var.environment
 
