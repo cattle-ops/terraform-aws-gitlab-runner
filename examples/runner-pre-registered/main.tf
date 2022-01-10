@@ -46,4 +46,8 @@ module "runner" {
       timezone   = var.timezone
     }
   ]
+
+  providers = {
+    aws.cache_bucket = aws
+  }
 }

@@ -96,6 +96,10 @@ module "runner" {
   EOT
 
   runners_post_build_script = "\"echo 'single line'\""
+
+  providers = {
+    aws.cache_bucket = aws
+  }
 }
 
 resource "null_resource" "cancel_spot_requests" {

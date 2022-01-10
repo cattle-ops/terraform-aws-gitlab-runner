@@ -47,4 +47,8 @@ module "runner" {
     run_untagged       = "false"
     maximum_timeout    = "3600"
   }
+
+  providers = {
+    aws.cache_bucket = aws
+  }
 }

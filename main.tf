@@ -324,6 +324,10 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+
+  providers = {
+    aws.cache_bucket = aws
+  }
 }
 
 ################################################################################

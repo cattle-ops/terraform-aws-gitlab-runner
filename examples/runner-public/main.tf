@@ -21,7 +21,12 @@ module "vpc" {
 
 module "cache" {
   source      = "../../modules/cache"
+
   environment = var.environment
+
+  providers = {
+    aws.cache_bucket = aws
+  }
 }
 
 module "runner" {
@@ -68,6 +73,10 @@ module "runner" {
     policy = "${module.cache.policy_arn}"
     bucket = "${module.cache.bucket}"
   }
+
+  providers = {
+    aws.cache_bucket = aws
+  }
 }
 
 module "runner2" {
@@ -102,6 +111,10 @@ module "runner2" {
     create = false
     policy = "${module.cache.policy_arn}"
     bucket = "${module.cache.bucket}"
+  }
+
+  providers = {
+    aws.cache_bucket = aws
   }
 }
 
