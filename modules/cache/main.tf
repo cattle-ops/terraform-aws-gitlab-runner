@@ -59,6 +59,8 @@ resource "aws_s3_bucket" "build_cache" {
       }
     }
   }
+
+  provider = aws.cache_bucket
 }
 
 # block public access to S3 cache bucket
