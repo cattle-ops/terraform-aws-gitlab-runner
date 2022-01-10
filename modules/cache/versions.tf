@@ -10,7 +10,7 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 3.35.0"
 
-      configuration_aliases = [aws.cache_bucket]
+      configuration_aliases = [cache_bucket]
     }
   }
 }
