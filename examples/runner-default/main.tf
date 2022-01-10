@@ -98,6 +98,7 @@ module "runner" {
   runners_post_build_script = "\"echo 'single line'\""
 
   providers = {
+    aws              = aws
     aws.cache_bucket = aws
   }
 }

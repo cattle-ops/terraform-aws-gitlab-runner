@@ -25,6 +25,7 @@ module "cache" {
   environment = var.environment
 
   providers = {
+    aws              = aws
     aws.cache_bucket = aws
   }
 }
@@ -75,6 +76,7 @@ module "runner" {
   }
 
   providers = {
+    aws              = aws
     aws.cache_bucket = aws
   }
 }
@@ -114,6 +116,7 @@ module "runner2" {
   }
 
   providers = {
+    aws              = aws
     aws.cache_bucket = aws
   }
 }

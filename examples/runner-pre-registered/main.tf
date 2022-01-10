@@ -48,6 +48,7 @@ module "runner" {
   ]
 
   providers = {
+    aws              = aws
     aws.cache_bucket = aws
   }
 }
