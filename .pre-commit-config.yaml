@@ -3,6 +3,8 @@ repos:
     rev: v1.55.0
     hooks:
       - id: terraform_fmt
+        args:
+          - --args=-recursive
       - id: terraform_tflint
       - id: terraform_docs
   - repo: git://github.com/pre-commit/pre-commit-hooks
