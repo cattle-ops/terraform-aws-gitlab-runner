@@ -31,9 +31,8 @@ module "runner" {
   docker_machine_security_group_description = "Custom description for docker-machine"
   gitlab_runner_security_group_description  = "Custom description for gitlab-runner"
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.public_subnets, 0)
 
   runners_executor   = "docker"
   runners_name       = var.runner_name
