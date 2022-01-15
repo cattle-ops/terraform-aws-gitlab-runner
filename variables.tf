@@ -723,6 +723,25 @@ variable "docker_machine_egress_rules" {
   }]
 }
 
+variable "session_server" {
+  description = "Enables the session server support."
+  type = object({
+    timeout              = number
+    port                 = number
+    listen_address       = string
+    advertise_address    = string
+    incoming_cidr_blocks = list(string)
+    }
+  )
+
+  default = null
+  # session_timeout       - Time in seconds how long the session stays active after the job completes. (1800)
+  # port                  - Port which is used to connect to the session server. Don't forget to expose this port if you use the docker runner image. (8093)
+  # listen_address        - Listen address of the session server, e.g. [::] without a port. Session_server_port is used for the port.
+  # advertise_address     - The URL exposed to Gitlab used to access the session server, e.g. runner-host-name.tld. session_server_port is used for the port.
+  # incoming_cidr_blocks  - CIDR blocks which are allowed to connect to the session server.
+}
+
 variable "subnet_id_runners" {
   description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
   type        = string
