@@ -53,9 +53,9 @@ jobs:
       - name: Terraform Docs
         uses: terraform-docs/gh-actions@main
         with:
-          working-dir: .
+          #working-dir: .
           recursive: true
-          # find-dir: .
+          find-dir: .
           output-file: README.md
           output-method: inject
           git-push: "true"
