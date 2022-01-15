@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform: [0.13.0, 0.14.0, 0.15.0, 1.0.8]
+        terraform: [1.0.8]
         example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
     defaults:
       run:
@@ -54,7 +54,6 @@ jobs:
         uses: terraform-docs/gh-actions@main
         with:
           #working-dir: .
-          recursive: true
           find-dir: .
           output-file: README.md
           output-method: inject
