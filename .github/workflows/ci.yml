@@ -1,5 +1,5 @@
 name: CI
-on: 
+on:
   push:
     branches:
       - master
@@ -11,7 +11,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.0.8]    
+        terraform: [1.0.8]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
-    steps:   
+    steps:
       - uses: actions/checkout@v2
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.0.')
@@ -54,11 +54,12 @@ jobs:
         uses: terraform-docs/gh-actions@v0.11.0
         with:
           working-dir: .
+          recursive: true
           # find-dir: .
           output-file: README.md
           output-method: inject
           git-push: "true"
-          
+
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)
     name: Release
@@ -84,5 +85,5 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           cp .release/* .
-          yarn 
+          yarn
           yarn release --repositoryUrl https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
