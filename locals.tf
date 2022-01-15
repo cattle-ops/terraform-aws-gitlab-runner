@@ -10,6 +10,16 @@ locals {
   // Ensure max builds is optional
   runners_max_builds_string = var.runners_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runners_max_builds)
 
+  // convert the options for the session server
+  session_server_string = var.session_server == null ? "" : join("",
+    formatlist("%s", [
+      format("listen_address = \"%s:%d\"\n", var.session_server.listen_address, var.session_server.port),
+      format("advertise_address = \"%q:%d\"\n", var.session_server.advertise_address, var.session_server.port),
+      format("session_timeout = %s\n", var.session_server.timeout)
+      ]
+    )
+  )
+
   // Define key for runner token for SSM
   secure_parameter_store_runner_token_key  = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
   secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.secure_parameter_store_runner_sentry_dsn}"

@@ -2,6 +2,9 @@ concurrent = ${runners_concurrent}
 check_interval = ${runners_check_interval}
 sentry_dsn = "${sentry_dsn}"
 
+[[session_server]]
+${session_server_string}
+
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"

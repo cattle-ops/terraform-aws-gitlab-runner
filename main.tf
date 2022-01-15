@@ -154,6 +154,7 @@ locals {
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
+      session_server_string             = var.session_server == null ? "" : local.session_server_string
     }
   )
 }
