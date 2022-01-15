@@ -732,6 +732,11 @@ variable "session_server" {
     }
   )
 
+  validation {
+    condition     = var.enable_eip
+    error_message = "Session Server can be used with EIP only (enable_eip = true)."
+  }
+
   default = null
 }
 
