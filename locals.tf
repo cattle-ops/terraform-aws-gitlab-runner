@@ -14,7 +14,7 @@ locals {
   session_server_string = var.session_server == null ? "" : join("",
     formatlist("%s", [
       format("listen_address = \"[::]:%d\"\n", var.session_server.port),
-      format("advertise_address = \"%q:%d\"\n", aws_eip.ip[0].public_ip, var.session_server.port),
+      format("advertise_address = \"%q:%d\"\n", aws_eip.gitlab_runner[0].public_ip, var.session_server.port),
       format("session_timeout = %s\n", var.session_server.timeout)
       ]
     )
