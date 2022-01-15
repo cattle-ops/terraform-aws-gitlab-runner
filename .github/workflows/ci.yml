@@ -51,7 +51,7 @@ jobs:
       - name: check
         run: cat variables.tf
       - name: Terraform Docs
-        uses: terraform-docs/gh-actions@v0.11.0
+        uses: terraform-docs/gh-actions@main
         with:
           working-dir: .
           recursive: true
