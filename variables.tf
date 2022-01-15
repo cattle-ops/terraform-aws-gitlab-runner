@@ -723,12 +723,11 @@ variable "docker_machine_egress_rules" {
   }]
 }
 
-<<<<<<< HEAD
 variable "test" {
   description = "abcd"
   default     = ""
 }
-=======
+
 variable "subnet_id_runners" {
   description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
   type        = string
@@ -740,4 +739,3 @@ variable "subnet_ids_gitlab_runner" {
   type        = list(string)
   default     = []
 }
->>>>>>> 36633fa6286343cce72b0d9c0c3451305a36be11
