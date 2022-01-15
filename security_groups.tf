@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "runner_session_server" {
   to_port   = var.session_server["port"]
   protocol  = "tcp"
 
-  cidr_blocks       = var.session_server["incoming_cidr_blocks"]
+  cidr_blocks       = [var.session_server["gitlab_cidr_block"]]
   security_group_id = aws_security_group.runner.id
 }
 
