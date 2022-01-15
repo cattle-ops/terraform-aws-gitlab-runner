@@ -19,14 +19,10 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "subnet_id_runners" {
-  description = "List of subnets used for hosting the gitlab-runners."
+variable "subnet_id" {
+  description = "Subnet id used for the runner and executors. Must belong to the VPC specified above."
   type        = string
-}
-
-variable "subnet_ids_gitlab_runner" {
-  description = "Subnet used for hosting the GitLab runner."
-  type        = list(string)
+  default     = "" # TODO remove as soon as subnet_id_runners and subnet_ids_gitlab_runner are gone. Variable is mandatory now.
 }
 
 variable "extra_security_group_ids_runner_agent" {
@@ -727,7 +723,21 @@ variable "docker_machine_egress_rules" {
   }]
 }
 
+<<<<<<< HEAD
 variable "test" {
   description = "abcd"
   default     = ""
 }
+=======
+variable "subnet_id_runners" {
+  description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
+  type        = string
+  default     = ""
+}
+
+variable "subnet_ids_gitlab_runner" {
+  description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
+  type        = list(string)
+  default     = []
+}
+>>>>>>> 36633fa6286343cce72b0d9c0c3451305a36be11
