@@ -733,4 +733,5 @@ variable "subnet_ids_gitlab_runner" {
 variable "aws_region" {
   description = "Deprecated. Is now calculated internally. AWS region."
   type        = string
+  default     = null
 }
