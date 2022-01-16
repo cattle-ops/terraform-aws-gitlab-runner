@@ -1,5 +1,12 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "default" {
+}
+
+data "aws_region" "cache" {
+  provider = aws.cache_bucket
+}
+
 data "aws_subnet" "runners" {
   id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
 }
@@ -32,7 +39,7 @@ resource "null_resource" "remove_runner" {
   depends_on = [aws_ssm_parameter.runner_registration_token]
 
   triggers = {
-    aws_region                = var.aws_region
+    aws_region                = data.aws_region.default.name
     runners_gitlab_url        = var.runners_gitlab_url
     runner_registration_token = data.aws_ssm_parameter.current_runner_registration_token.value
   }
@@ -83,7 +90,7 @@ locals {
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
-      secure_parameter_store_region                = var.aws_region
+      secure_parameter_store_region                = data.aws_region.default.name
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
       giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
@@ -96,8 +103,9 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
-      aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
+      cache_region                = data.aws_region.cache.name
+      runners_region               = data.aws_region.default.name
       runners_vpc_id              = var.vpc_id
       runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
@@ -326,8 +334,7 @@ module "cache" {
   cache_expiration_days                = var.cache_expiration_days
 
   providers = {
-    aws              = aws
-    aws.cache_bucket = aws
+    aws.cache_bucket = aws.cache_bucket
   }
 }
 

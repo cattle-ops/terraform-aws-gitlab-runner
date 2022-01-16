@@ -34,7 +34,7 @@ sentry_dsn = "${sentry_dsn}"
     [runners.cache.s3]
       ServerAddress = "s3.amazonaws.com"
       BucketName = "${bucket_name}"
-      BucketLocation = "${aws_region}"
+      BucketLocation = "${cache_region}"
       Insecure = false
   [runners.machine]
     IdleCount = ${runners_idle_count}
@@ -44,7 +44,7 @@ sentry_dsn = "${sentry_dsn}"
     MachineName = "runner-%s"
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
-      "amazonec2-region=${aws_region}",
+      "amazonec2-region=${runners_region}",
       "amazonec2-zone=${runners_aws_zone}",
       "amazonec2-vpc-id=${runners_vpc_id}",
       "amazonec2-subnet-id=${runners_subnet_id}",

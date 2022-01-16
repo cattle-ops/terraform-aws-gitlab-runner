@@ -1,8 +1,3 @@
-variable "aws_region" {
-  description = "AWS region."
-  type        = string
-}
-
 variable "arn_format" {
   type        = string
   default     = "arn:aws"
@@ -733,4 +728,9 @@ variable "subnet_ids_gitlab_runner" {
   description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
   type        = list(string)
   default     = []
+}
+
+variable "aws_region" {
+  description = "Deprecated. Is now calculated internally. AWS region."
+  type        = string
 }
