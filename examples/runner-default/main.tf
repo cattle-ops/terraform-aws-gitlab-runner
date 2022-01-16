@@ -30,7 +30,6 @@ module "vpc" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
   environment = var.environment
 
   vpc_id              = module.vpc.vpc_id
