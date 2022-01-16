@@ -20,6 +20,6 @@ terraform {
 }
 
 provider "aws" {
-  alias = "cache_bucket"
+  alias  = "cache_bucket"
   region = "eu-central-1"
 }

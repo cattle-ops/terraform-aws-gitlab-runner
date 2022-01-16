@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "cache_bucket"
+  alias  = "cache_bucket"
   region = var.aws_region
 }
 
