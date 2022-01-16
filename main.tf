@@ -105,7 +105,7 @@ locals {
     {
       gitlab_url                  = var.runners_gitlab_url
       cache_region                = data.aws_region.cache.name
-      runners_region               = data.aws_region.default.name
+      runners_region              = data.aws_region.default.name
       runners_vpc_id              = var.vpc_id
       runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
