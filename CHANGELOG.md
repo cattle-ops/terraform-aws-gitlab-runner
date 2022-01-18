@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.38.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.37.0...4.38.0) (2022-01-18)
+
+
+### Features
+
+* Request new Runner token if invalid ([#425](https://github.com/npalm/terraform-aws-gitlab-runner/issues/425)) ([2706c09](https://github.com/npalm/terraform-aws-gitlab-runner/commit/2706c094a119233a003cd1517ddaba3fc9e52d7c))
+
 ## [4.37.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.36.0...4.37.0) (2022-01-06)
 
 
