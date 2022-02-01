@@ -76,7 +76,7 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
 resource "aws_iam_policy" "docker_machine_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
-  name        = "${var.environment}-docker-machine-cache"
+  name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
   tags        = local.tags
