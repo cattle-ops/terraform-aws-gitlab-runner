@@ -541,7 +541,7 @@ variable "enable_manage_gitlab_token" {
 
 variable "overrides" {
   description = <<-EOT
-    This maps provides the possibility to override some defaults. 
+    This map provides the possibility to override some defaults. 
     The following attributes are supported: 
       * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. 
       * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. 
