@@ -332,7 +332,7 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  name = "${local.name_iam_objects}-instance-profile"
+  name = "${local.name_iam_objects}-instance"
   role = aws_iam_role.instance.name
   tags = local.tags
 }
@@ -350,7 +350,7 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  name        = "${local.name_iam_objects}-docker-machine-policy"
+  name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
   policy = templatefile("${path.module}/policies/instance-docker-machine-policy.json",
@@ -414,14 +414,14 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
-  name                 = "${local.name_iam_objects}-docker-machine-role"
+  name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  name = "${local.name_iam_objects}-docker-machine-profile"
+  name = "${local.name_iam_objects}-docker-machine"
   role = aws_iam_role.docker_machine.name
   tags = local.tags
 }
