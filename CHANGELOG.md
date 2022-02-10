@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.39.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.38.0...4.39.0) (2022-02-10)
+
+
+### Features
+
+* Switch gitlab runner agent logging to JSON ([#438](https://github.com/npalm/terraform-aws-gitlab-runner/issues/438)) ([325b919](https://github.com/npalm/terraform-aws-gitlab-runner/commit/325b919a4421b5ea9b97c6ba2f3c73b9bf8da70a))
+
 ## [4.38.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.37.0...4.38.0) (2022-01-18)
 
 
