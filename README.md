@@ -205,9 +205,13 @@ module "runner" {
 }
 ```
 
+### Removing the module
+
+Remove the module from your Terraform code and deregister the runner manually from your Gitlab instance.
+
 ## Examples
 
-A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/examples/) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory.
+A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/examples/) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory. Don't forget to remove the runners manually from your Gitlab instance as soon as your are done.
 
 ### SSH keys
 
