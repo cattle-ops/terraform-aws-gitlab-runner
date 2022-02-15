@@ -88,7 +88,7 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_download_url" {
   description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
   type        = string
-  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
+  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.13/docker-machine-Linux-x86_64"
 }
 
 variable "docker_machine_version" {
