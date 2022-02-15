@@ -306,7 +306,7 @@ terraform destroy
 | cache\_expiration\_days | Number of days before cache objects expires. | `number` | `1` | no |
 | cache\_shared | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
 | cloudwatch\_logging\_retention\_in\_days | Retention for cloudwatch logs. Defaults to unlimited | `number` | `0` | no |
-| docker\_machine\_download\_url | Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine. | `string` | `"https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"` | no |
+| docker\_machine\_download\_url | Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine. | `string` | `"https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.13/docker-machine-Linux-x86_64"` | no |
 | docker\_machine\_iam\_policy\_arns | List of policy ARNs to be added to the instance profile of the docker machine runners. | `list(string)` | `[]` | no |
 | docker\_machine\_instance\_type | Instance type used for the instances hosting docker-machine. | `string` | `"m5.large"` | no |
 | docker\_machine\_options | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | `list(string)` | `[]` | no |
