@@ -1,7 +1,7 @@
 locals {
   // Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
-    ",%s",
+    ",\"amazonec2-metadata-token=required\", \"amazonec2-metadata-token-response-hop-limit=2\",%s",
     join(",", formatlist("%q", concat(var.docker_machine_options, local.runners_docker_registry_mirror_option))),
   )
 
