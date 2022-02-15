@@ -23,8 +23,8 @@ variable "cache_bucket_name_include_account_id" {
 
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = string
-  default     = "false"
+  type        = bool
+  default     = false
 }
 
 variable "cache_expiration_days" {
