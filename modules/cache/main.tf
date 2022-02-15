@@ -29,36 +29,55 @@ resource "aws_s3_bucket" "build_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
   bucket = local.cache_bucket_name
-  acl    = "private"
 
   tags = local.tags
 
   force_destroy = true
 
-  versioning {
-    enabled = var.cache_bucket_versioning
+}
+
+resource "aws_s3_bucket_acl" "build_cache_acl" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  acl = "private"
+}
+
+resource "aws_s3_bucket_versioning" "build_cache_versioning" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  versioning_configuration {
+    status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
+}
 
-  lifecycle_rule {
-    id      = "clear"
-    enabled = var.cache_lifecycle_clear
+resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
 
-    prefix = var.cache_lifecycle_prefix
+  rule {
+    id     = "clear"
+    status = var.cache_lifecycle_clear ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.cache_lifecycle_prefix
+    }
 
     expiration {
       days = var.cache_expiration_days
-    }
-
-    noncurrent_version_expiration {
-      days = var.cache_expiration_days
+      expired_object_delete_marker = var.cache_expiration_days > 0 ? true : false
     }
   }
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
