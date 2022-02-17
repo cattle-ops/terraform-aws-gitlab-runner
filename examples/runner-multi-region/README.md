@@ -75,7 +75,7 @@ The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv)
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
 | aws\_main\_region | Main AWS region to deploy to. | `string` | `"eu-west-1"` | no |
-| aws\_alternate\_region | Main AWS region to deploy to. | `string` | `"eu-cetnral-1"` | no |
+| aws\_alternate\_region | Main AWS region to deploy to. | `string` | `"eu-central-1"` | no |
 | environment | A name that identifies the environment, will used as prefix and for tagging. | `string` | `"runner-public"` | no |
 | gitlab\_url | URL of the gitlab instance to connect to. | `string` | `"https://gitlab.com"` | no |
 | registration\_token | n/a | `any` | n/a | yes |
