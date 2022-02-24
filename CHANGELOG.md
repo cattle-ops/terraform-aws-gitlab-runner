@@ -1,5 +1,12 @@
 # Changelog
 
+### [4.39.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.39.0...4.39.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* Lock AWS provider to 3.x ([#448](https://github.com/npalm/terraform-aws-gitlab-runner/issues/448)) ([c6b7014](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c6b70144474d84b635bc01f80ce86630b65eff96))
+
 ## [4.39.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.38.0...4.39.0) (2022-02-10)
 
 
