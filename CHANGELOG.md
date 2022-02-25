@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.40.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.39.1...4.40.0) (2022-02-25)
+
+
+### Features
+
+* Add ASG lifecycle management Lambda function ([#392](https://github.com/npalm/terraform-aws-gitlab-runner/issues/392)) ([5beb9d7](https://github.com/npalm/terraform-aws-gitlab-runner/commit/5beb9d7b716972c103abd0ffb77df630ce8bbf4f))
+* Skip runner download and install if it's already done ([#446](https://github.com/npalm/terraform-aws-gitlab-runner/issues/446)) ([54c10f3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/54c10f39f60bf6e79b0dfc745d52f5cd34e82781))
+
 ### [4.39.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.39.0...4.39.1) (2022-02-24)
 
 
