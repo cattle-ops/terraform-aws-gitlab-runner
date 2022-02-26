@@ -46,7 +46,6 @@ module "runner_main_region" {
     locked_to_project  = "false"
     run_untagged       = "false"
     maximum_timeout    = "3600"
-    access_level       = "ref_protected"
   }
 
   overrides = {

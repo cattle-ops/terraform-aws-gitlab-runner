@@ -12,8 +12,6 @@ This examples shows:
   - Overrides for tag naming.
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor.
-  - Register runner as [protected](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#prevent-runners-from-revealing-sensitive-information).
-
 
 Note that global AWS resources like IAM policies and S3 buckets must be unique across regions.
 To duplicate the Gitlab runner deployment to multiple regions, we therefore have to use the name overrides for the IAM resources (_overrides.name_iam_objects_) respectively for the S3 cache bucket (_cache_bucket_prefix_) in the modules _runner_main_region_ and _runner_alternate_region_.
