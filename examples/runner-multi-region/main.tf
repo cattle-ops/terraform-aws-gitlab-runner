@@ -43,7 +43,7 @@ module "runner_main_region" {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"
-    locked_to_project  = "true"
+    locked_to_project  = "false"
     run_untagged       = "false"
     maximum_timeout    = "3600"
     access_level       = "ref_protected"

@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         terraform: [0.13.0, 0.14.0, 0.15.0, 1.0.8]
-        example: ["runner-default", "runner-docker", "runner-pre-registered", "runner-public"]
+        example: ["runner-default", "runner-docker", "runner-multi-region", "runner-pre-registered", "runner-public"]
     defaults:
       run:
         working-directory: examples/${{ matrix.example }}
