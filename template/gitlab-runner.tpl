@@ -1,9 +1,15 @@
+# Provide the parent instance id in the spawned runner tags
+PARENT_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id);
+PARENT_TAG="gitlab-runner-parent-id,$${PARENT_INSTANCE_ID}"
+
 mkdir -p /etc/gitlab-runner
 cat > /etc/gitlab-runner/config.toml <<- EOF
 
 ${runners_config}
 
 EOF
+
+sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
 
 ${pre_install}
 
@@ -28,8 +34,11 @@ then
   yum install amazon-ecr-credential-helper -y
 fi
 
-curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
-yum install gitlab-runner-${gitlab_runner_version} -y
+if ! ( rpm -q gitlab-runner >/dev/null )
+then
+  curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
+  yum install gitlab-runner-${gitlab_runner_version} -y
+fi
 
 if [[ `echo ${docker_machine_download_url}` == "" ]]
 then
