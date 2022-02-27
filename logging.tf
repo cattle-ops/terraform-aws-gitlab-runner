@@ -1,6 +1,6 @@
 resource "aws_iam_role_policy" "instance" {
   count  = var.enable_cloudwatch_logging ? 1 : 0
-  name   = "${var.environment}-instance-role"
+  name   = "${local.name_iam_objects}-instance-role"
   role   = aws_iam_role.instance.name
   policy = templatefile("${path.module}/policies/instance-logging-policy.json", { arn_format = var.arn_format })
 }

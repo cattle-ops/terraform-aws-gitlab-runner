@@ -324,6 +324,8 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+
+  name_iam_objects = local.name_iam_objects
 }
 
 ################################################################################
@@ -491,7 +493,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 resource "aws_iam_policy" "eip" {
   count = var.enable_eip ? 1 : 0
 
-  name        = "${var.environment}-eip"
+  name        = "${local.name_iam_objects}-eip"
   path        = "/"
   description = "Policy for runner to assign EIP"
   policy      = templatefile("${path.module}/policies/instance-eip.json", {})
