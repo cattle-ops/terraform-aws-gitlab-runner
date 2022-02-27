@@ -1,8 +1,8 @@
 name: CI
-on: 
+on:
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
 
@@ -11,7 +11,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.0.8]    
+        terraform: [1.0.8]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -26,23 +26,29 @@ jobs:
       fail-fast: false
       matrix:
         terraform: [0.13.0, 0.14.0, 0.15.0, 1.0.8]
-        example: ["runner-default", "runner-docker", "runner-multi-region", "runner-pre-registered", "runner-public"]
+        example:
+          [
+            "runner-default",
+            "runner-docker",
+            "runner-multi-region",
+            "runner-pre-registered",
+            "runner-public",
+          ]
     defaults:
       run:
         working-directory: examples/${{ matrix.example }}
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
-    steps:   
+    steps:
       - uses: actions/checkout@v2
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.0.')
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
-
   release:
-    if: github.event_name != 'pull_request' && contains('refs/heads/master', github.ref)
+    if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
     name: Release
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
