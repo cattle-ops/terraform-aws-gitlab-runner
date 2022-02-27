@@ -86,9 +86,9 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
+  description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
-  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
+  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.12/docker-machine"
 }
 
 variable "docker_machine_version" {
@@ -359,9 +359,9 @@ variable "cache_shared" {
 }
 
 variable "gitlab_runner_version" {
-  description = "Version of the GitLab runner."
+  description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "14.0.1"
+  default     = "14.8.0"
 }
 
 variable "enable_ping" {

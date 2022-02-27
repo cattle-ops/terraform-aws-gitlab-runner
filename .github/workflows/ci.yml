@@ -11,7 +11,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.0.8]
+        terraform: [1.0.11]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform: [0.13.0, 0.14.0, 0.15.0, 1.0.8]
+        terraform: [0.15.0, 1.0.11, latest]
         example:
           [
             "runner-default",
