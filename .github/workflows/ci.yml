@@ -31,7 +31,6 @@ jobs:
             "runner-default",
             "runner-docker",
             "runner-multi-region",
-            "runner-pre-registered",
             "runner-public",
           ]
     defaults:
