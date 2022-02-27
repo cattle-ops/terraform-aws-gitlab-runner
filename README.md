@@ -32,6 +32,7 @@ overrides  = {
   name_sg                     = ""
   name_runner_agent_instance  = "Gitlab Runner Agent"
   name_docker_machine_runners = "Gitlab Runner Terraform"
+  name_iam_objects = "gitlab-runner"
 }
 
 //this doesn't work
@@ -171,6 +172,8 @@ By default the module creates a a cache for the runner in S3. Old objects are au
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/cache). An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
 
+
+
 ## Usage
 
 ### Configuration
@@ -185,7 +188,7 @@ runner_token = "RUNNER_TOKEN"
 
 The base image used to host the GitLab Runner agent is the latest available Amazon Linux 2 HVM EBS AMI. In previous versions of this module a hard coded list of AMIs per region was provided. This list has been replaced by a search filter to find the latest AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow you to version lock the target AMI.
 
-### Usage module
+### Scenario: Basic usage
 
 Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC and SSH keys, have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/examples/runner-default).
 
@@ -215,6 +218,46 @@ module "runner" {
     maximum_timeout    = "3600"
   }
 
+}
+```
+
+### Scenario: Multi-region deployment
+
+Name clashes due to multi-region deployments for global AWS ressources create by this module (IAM, S3) can be avoided by including a distinguishing region specific prefix via the _cache_bucket_prefix_ string respectively via _name_iam_objects_ in the _overrides_ map. A simple example for this would be to set _region-specific-prefix_ to the AWS region the module is deployed to.
+
+
+
+```hcl
+module "runner" {
+  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
+  source  = "npalm/gitlab-runner/aws"
+
+  aws_region  = "eu-west-1"
+  environment = "spot-runners"
+
+  ssh_public_key = local_file.public_ssh_key.content
+
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids_gitlab_runner = module.vpc.private_subnets
+  subnet_id_runners        = element(module.vpc.private_subnets, 0)
+
+  runners_name       = "docker-default"
+  runners_gitlab_url = "https://gitlab.com"
+
+  gitlab_runner_registration_config = {
+    registration_token = "my-token
+    tag_list           = "docker"
+    description        = "runner default"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+  
+  overrides = {
+    name_iam_objects = "<region-specific-prefix>-gitlab-runner-iam"
+  }
+  
+  cache_bucket_prefix = "<region-specific-prefix>"
 }
 ```
 
@@ -396,7 +439,7 @@ terraform destroy
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
 | <a name="input_log_group_name"></a> [log\_group\_name](#input\_log\_group\_name) | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
 | <a name="input_metrics_autoscaling"></a> [metrics\_autoscaling](#input\_metrics\_autoscaling) | A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances. | `list(string)` | `null` | no |
-| <a name="input_overrides"></a> [overrides](#input\_overrides) | This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
+| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults. <br>The following attributes are supported: <br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. <br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. <br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent. <br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
 | <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | <a name="input_role_tags"></a> [role\_tags](#input\_role\_tags) | Map of tags that will be added to the role created. Useful for tag based authorization. | `map(string)` | `{}` | no |
 | <a name="input_runner_agent_uses_private_address"></a> [runner\_agent\_uses\_private\_address](#input\_runner\_agent\_uses\_private\_address) | Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent. | `bool` | `true` | no |
