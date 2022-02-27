@@ -11,7 +11,7 @@ This examples shows:
 - A multiline pre build script
 - A single line post build script
 
-![runners-default](https://github.com/npalm/assets/raw/master/images/terraform-aws-gitlab-runner/runner-default.png)
+![runners-default](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-default.png)
 
 
 ## Prerequisite

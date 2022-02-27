@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_subnet" "runners" {
-  id = var.subnet_id_runners
+  id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
 }
 
 data "aws_availability_zone" "runners" {
@@ -99,7 +99,7 @@ locals {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
-      runners_subnet_id           = var.subnet_id_runners
+      runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
@@ -109,9 +109,9 @@ locals {
       runners_ebs_optimized       = var.runners_ebs_optimized
       runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
       runners_additional_volumes  = local.runners_additional_volumes
-      docker_machine_options      = length(var.docker_machine_options) == 0 ? "" : local.docker_machine_options_string
+      docker_machine_options      = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_name                = var.runners_name
-      runners_tags = replace(var.overrides["name_docker_machine_runners"] == "" ? format(
+      runners_tags = replace(replace(var.overrides["name_docker_machine_runners"] == "" ? format(
         "Name,%s-docker-machine,%s,%s",
         var.environment,
         local.tags_string,
@@ -121,7 +121,7 @@ locals {
         local.tags_string,
         local.runner_tags_string,
         var.overrides["name_docker_machine_runners"],
-      ), ",,", ",")
+      ), ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
@@ -148,6 +148,7 @@ locals {
       runners_pre_clone_script          = var.runners_pre_clone_script
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
+      runners_check_interval            = var.runners_check_interval
       runners_volumes_tmpfs             = join(",", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
@@ -173,7 +174,7 @@ data "aws_ami" "docker-machine" {
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = var.subnet_ids_gitlab_runner
+  vpc_zone_identifier       = length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -267,7 +268,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
         encrypted             = lookup(block_device_mappings.value, "encrypted", true)
         iops                  = lookup(block_device_mappings.value, "iops", null)
         throughput            = lookup(block_device_mappings.value, "throughput", null)
-        kms_key_id            = lookup(block_device_mappings.value, "`kms_key_id`", null)
+        kms_key_id            = lookup(block_device_mappings.value, "kms_key_id", null)
       }
     }
   }
@@ -323,6 +324,8 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+
+  name_iam_objects = local.name_iam_objects
 }
 
 ################################################################################
@@ -490,7 +493,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 resource "aws_iam_policy" "eip" {
   count = var.enable_eip ? 1 : 0
 
-  name        = "${var.environment}-eip"
+  name        = "${local.name_iam_objects}-eip"
   path        = "/"
   description = "Policy for runner to assign EIP"
   policy      = templatefile("${path.module}/policies/instance-eip.json", {})
@@ -502,4 +505,25 @@ resource "aws_iam_role_policy_attachment" "eip" {
 
   role       = aws_iam_role.instance.name
   policy_arn = aws_iam_policy.eip[0].arn
+}
+
+################################################################################
+### Lambda function for ASG instance termination lifecycle hook
+################################################################################
+module "terminate_instances_lifecycle_function" {
+  source = "./modules/terminate-instances"
+
+  count = var.asg_terminate_lifecycle_hook_create ? 1 : 0
+
+  name                                 = var.asg_terminate_lifecycle_hook_name == null ? "terminate-instances" : var.asg_terminate_lifecycle_hook_name
+  environment                          = var.environment
+  asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
+  asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
+  cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
+  lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
+  lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
+  name_iam_objects                     = local.name_iam_objects
+  role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
+  tags                                 = local.tags
 }

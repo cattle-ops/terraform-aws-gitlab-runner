@@ -1,9 +1,15 @@
+# Provide the parent instance id in the spawned runner tags
+PARENT_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id);
+PARENT_TAG="gitlab-runner-parent-id,$${PARENT_INSTANCE_ID}"
+
 mkdir -p /etc/gitlab-runner
 cat > /etc/gitlab-runner/config.toml <<- EOF
 
 ${runners_config}
 
 EOF
+
+sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
 
 ${pre_install}
 
@@ -28,8 +34,11 @@ then
   yum install amazon-ecr-credential-helper -y
 fi
 
-curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
-yum install gitlab-runner-${gitlab_runner_version} -y
+if ! ( rpm -q gitlab-runner >/dev/null )
+then
+  curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
+  yum install gitlab-runner-${gitlab_runner_version} -y
+fi
 
 if [[ `echo ${docker_machine_download_url}` == "" ]]
 then
@@ -58,8 +67,17 @@ if ! [ -x "$(command -v jq)" ]; then
   yum install jq -y
 fi
 
+# fetch Runner token from SSM and validate it
 token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
-if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]]
+
+valid_token=true
+if [[ `echo $token` != "null" ]]
+then
+  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
+  [[ `echo $valid_token_response` != "200" ]] && valid_token=false
+fi
+
+if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]] || [[ `echo $valid_token` == "false" ]]
 then
   token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
