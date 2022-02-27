@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.41.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.40.0...4.41.0) (2022-02-27)
+
+
+### Features
+
+* Support multi-region deployments ([#437](https://github.com/npalm/terraform-aws-gitlab-runner/issues/437)) ([583700c](https://github.com/npalm/terraform-aws-gitlab-runner/commit/583700c34ab1c36edad6685961a84bb9e9694692))
+* Update default versions / drop support Terraform before 0.15 ([#454](https://github.com/npalm/terraform-aws-gitlab-runner/issues/454)) ([c02c6b3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c02c6b3633379e8a5d0eb76e248b6ec0cb1aa6e6))
+
 ## [4.40.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.39.1...4.40.0) (2022-02-25)
 
 
