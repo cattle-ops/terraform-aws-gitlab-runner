@@ -1,6 +1,7 @@
 concurrent = ${runners_concurrent}
 check_interval = ${runners_check_interval}
 sentry_dsn = "${sentry_dsn}"
+log_format = "json"
 
 [[runners]]
   name = "${runners_name}"
@@ -53,7 +54,7 @@ sentry_dsn = "${sentry_dsn}"
       "amazonec2-request-spot-instance=${runners_request_spot_instance}",
       "amazonec2-spot-price=${runners_spot_price_bid}",
       "amazonec2-security-group=${runners_security_group_name}",
-      "amazonec2-tags=${runners_tags}",
+      "amazonec2-tags=${runners_tags},__PARENT_TAG__",
       "amazonec2-use-ebs-optimized-instance=${runners_ebs_optimized}",
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",

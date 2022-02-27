@@ -81,9 +81,9 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. For example the GitLab version, https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine."
+  description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
-  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
+  default     = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.12/docker-machine"
 }
 
 variable "docker_machine_version" {
@@ -354,9 +354,9 @@ variable "cache_shared" {
 }
 
 variable "gitlab_runner_version" {
-  description = "Version of the GitLab runner."
+  description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "14.0.1"
+  default     = "14.8.0"
 }
 
 variable "enable_ping" {
@@ -535,7 +535,14 @@ variable "enable_manage_gitlab_token" {
 }
 
 variable "overrides" {
-  description = "This maps provides the possibility to override some defaults. The following attributes are supported: `name_sg` overwrite the `Name` tag for all security groups created by this module. `name_runner_agent_instance` override the `Name` tag for the ec2 instance defined in the auto launch configuration. `name_docker_machine_runners` ovverrid the `Name` tag spot instances created by the runner agent."
+  description = <<-EOT
+    This map provides the possibility to override some defaults.
+    The following attributes are supported:
+      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
+      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
+      * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent.
+      * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
+  EOT
   type        = map(string)
 
   default = {
@@ -728,6 +735,36 @@ variable "subnet_ids_gitlab_runner" {
   description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
   type        = list(string)
   default     = []
+}
+
+variable "asg_terminate_lifecycle_hook_name" {
+  description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
+  type        = string
+  default     = null
+}
+
+variable "asg_terminate_lifecycle_hook_create" {
+  description = "Boolean toggling the creation of the ASG instance terminate lifecycle hook."
+  type        = bool
+  default     = true
+}
+
+variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
+  description = "The amount of time, in seconds, for the instances to remain in wait state."
+  type        = number
+  default     = 90
+}
+
+variable "asg_terminate_lifecycle_lambda_memory_size" {
+  description = "The memory size in MB to allocate to the terminate-instances Lambda function."
+  type        = number
+  default     = 128
+}
+
+variable "asg_terminate_lifecycle_lambda_timeout" {
+  description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
+  default     = 30
+  type        = number
 }
 
 variable "aws_region" {
