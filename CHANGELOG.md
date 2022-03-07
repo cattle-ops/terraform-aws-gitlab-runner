@@ -1,5 +1,13 @@
 # Changelog
 
+### [4.41.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.41.0...4.41.1) (2022-03-07)
+
+
+### Bug Fixes
+
+* remove the null resource ([#441](https://github.com/npalm/terraform-aws-gitlab-runner/issues/441)) ([3037c54](https://github.com/npalm/terraform-aws-gitlab-runner/commit/3037c54592c0ab3692b6f7eafda485c104267354))
+* Replace default GitLab version and fix for docker-machine download url. ([#458](https://github.com/npalm/terraform-aws-gitlab-runner/issues/458)) ([c8113bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c8113bb2fc30b8faab6c889a06db53c1dc425f70)), closes [#457](https://github.com/npalm/terraform-aws-gitlab-runner/issues/457) [#456](https://github.com/npalm/terraform-aws-gitlab-runner/issues/456)
+
 ## [4.41.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.40.0...4.41.0) (2022-02-27)
 
 
