@@ -42,7 +42,7 @@ fi
 
 if [[ `echo ${docker_machine_download_url}` == "" ]]
 then
-  curl --fail --retry 6 -L https://github.com/docker/machine/releases/download/v${docker_machine_version}/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
+  curl --fail --retry 6 -L https://gitlab-docker-machine-downloads.s3.amazonaws.com/v${docker_machine_version}/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
 else
   curl --fail --retry 6 -L ${docker_machine_download_url} >/tmp/docker-machine
 fi
