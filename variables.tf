@@ -86,7 +86,7 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "Full url pointing to a linux x64 distribution of docker machine. Once set `docker_machine_version` will be ingored. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machien. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
