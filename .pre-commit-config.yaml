@@ -1,5 +1,5 @@
 repos:
-  - repo: git://github.com/antonbabenko/pre-commit-terraform
+  - repo: http://github.com/antonbabenko/pre-commit-terraform
     rev: v1.55.0
     hooks:
       - id: terraform_fmt
@@ -7,7 +7,7 @@ repos:
           - --args=-recursive
       - id: terraform_tflint
       - id: terraform_docs
-  - repo: git://github.com/pre-commit/pre-commit-hooks
+  - repo: http://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
       - id: check-merge-conflict

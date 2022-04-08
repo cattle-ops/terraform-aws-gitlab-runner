@@ -704,6 +704,12 @@ variable "sentry_dsn" {
   type        = string
 }
 
+variable "prometheus_listen_address" {
+  default     = ""
+  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
+  type        = string
+}
+
 variable "docker_machine_egress_rules" {
   description = "List of egress rules for the docker-machine instance(s)."
   type = list(object({
