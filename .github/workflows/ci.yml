@@ -48,6 +48,8 @@ jobs:
       - run: terraform validate
 
   docs:
+    name: Auto update terraform docs
+    needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
     steps:
     - name: CHeckout branch
