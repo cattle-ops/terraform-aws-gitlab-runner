@@ -275,13 +275,13 @@ variable "runners_pre_clone_script" {
 }
 
 variable "runners_request_concurrency" {
-  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)"
+  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
   type        = number
   default     = 1
 }
 
 variable "runners_output_limit" {
-  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)"
+  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
   type        = number
   default     = 4096
 }
