@@ -50,10 +50,12 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - if: ${{ ! github.event.issue.pull_request }}
+    - name: CHeckout branch
+      if: github.event_name != 'pull_request'
       uses: actions/checkout@v2
 
-    - if: ${{ github.event.issue.pull_request }}
+    - name: Checkout PR
+      if: github.event_name === 'pull_request'
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.pull_request.head.ref }}
