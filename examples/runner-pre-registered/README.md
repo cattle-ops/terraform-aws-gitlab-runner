@@ -67,7 +67,7 @@ No output.
 | <a name="input_gitlab_url"></a> [gitlab\_url](#input\_gitlab\_url) | URL of the gitlab instance to connect to. | `string` | n/a | yes |
 | <a name="input_runner_name"></a> [runner\_name](#input\_runner\_name) | Name of the runner, will be used in the runner config.toml | `string` | n/a | yes |
 | <a name="input_runner_token"></a> [runner\_token](#input\_runner\_token) | Token for the runner, will be used in the runner config.toml | `string` | n/a | yes |
-| <a name="input_timezone"></a> [timezone](#input\_timezone) | Name of the timezone that the runner will be used in. | `string` | `"Europe/Amsterdam"` | no |
+| <a name="input_timezone"></a> [timezone](#input\_timezone) | Timezone that will be set for the runner. | `string` | `"Europe/Amsterdam"` | no |
 
 ## Outputs
 
