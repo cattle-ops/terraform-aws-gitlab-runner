@@ -68,7 +68,6 @@ jobs:
         recursive: true
         find-dir: .
         git-commit-message: "docs: auto update terraform docs"
-        git-push: true
 
     # - name: Generate TF docs examples
     #   uses: terraform-docs/gh-actions@v1.0.0
