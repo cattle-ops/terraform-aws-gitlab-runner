@@ -47,6 +47,27 @@ jobs:
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - if: ${{ ! github.event.issue.pull_request }}
+      uses: actions/checkout@v2
+
+    - if: ${{ github.event.issue.pull_request }}
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Generate TF docs
+      uses: terraform-docs/gh-actions@v1.0.0
+      with:
+        recursive: true
+
+    - name: Generate TF docs examples
+      uses: terraform-docs/gh-actions@v1.0.0
+      with:
+        find-dir: examples/
+
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
     name: Release
