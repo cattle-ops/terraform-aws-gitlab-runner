@@ -126,8 +126,8 @@ locals {
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
-      runners_volumes_tmpfs             = join(",", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
