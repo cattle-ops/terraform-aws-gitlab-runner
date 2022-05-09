@@ -16,7 +16,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: terraform init -get -backend=false -input=false
       - run: terraform fmt -recursive -check=true -write=false
 
@@ -41,11 +41,41 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.0.')
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
+
+  docs:
+    name: Auto update terraform docs
+    needs: [verify_module, verify_examples]
+    runs-on: ubuntu-latest
+    steps:
+    - name: CHeckout branch
+      if: github.event_name != 'pull_request'
+      uses: actions/checkout@v3
+
+    - name: Checkout PR
+      if: github.event_name == 'pull_request'
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Generate TF docs
+      uses: terraform-docs/gh-actions@v1.0.0
+      with:
+        # recursive: true
+        find-dir: .
+        git-commit-message: "docs: auto update terraform docs"
+        git-push: true
+
+    # - name: Generate TF docs examples
+    #   uses: terraform-docs/gh-actions@v1.0.0
+    #   with:
+    #     find-dir: examples/
+    #     git-commit-message: "docs: auto update terraform docs"
+    #     git-push: true
 
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
@@ -53,7 +83,7 @@ jobs:
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: false
