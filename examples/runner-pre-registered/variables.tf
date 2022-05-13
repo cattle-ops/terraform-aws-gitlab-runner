@@ -26,7 +26,7 @@ variable "runner_token" {
 }
 
 variable "timezone" {
-  description = "Name of the timezone that the runner will be used in."
+  description = "Timezone that will be set for the runner."
   type        = string
   default     = "Europe/Amsterdam"
 }
