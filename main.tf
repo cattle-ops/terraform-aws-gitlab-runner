@@ -132,6 +132,7 @@ locals {
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
       prometheus_listen_address         = var.prometheus_listen_address
+      auth_type                         = var.auth_type_cache_sr
     }
   )
 }
