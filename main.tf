@@ -126,8 +126,8 @@ locals {
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
-      runners_volumes_tmpfs             = join(",", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
@@ -227,8 +227,11 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
-      spot_options {
-        max_price = var.runner_instance_spot_price == "on-demand-price" ? "" : var.runner_instance_spot_price
+      dynamic "spot_options" {
+        for_each = var.runner_instance_spot_price == "on-demand-price" ? [] : [0]
+        content {
+          max_price = var.runner_instance_spot_price
+        }
       }
     }
   }
@@ -499,6 +502,7 @@ module "terminate_instances_lifecycle_function" {
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
   lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
+  lambda_runtime                       = var.asg_terminate_lifecycle_lambda_runtime
   lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
