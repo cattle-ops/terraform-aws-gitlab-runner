@@ -226,8 +226,11 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
-      spot_options {
-        max_price = var.runner_instance_spot_price == "on-demand-price" ? "" : var.runner_instance_spot_price
+      dynamic "spot_options" {
+        for_each = var.runner_instance_spot_price == "on-demand-price" ? [] : [0]
+        content {
+            max_price = var.runner_instance_spot_price
+        }
       }
     }
   }
