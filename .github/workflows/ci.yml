@@ -11,7 +11,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.0.11]
+        terraform: [1.1.9]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -48,34 +48,22 @@ jobs:
       - run: terraform validate
 
   docs:
+    # update docs after merge back to develop
+    if: github.event_name != 'pull_request' && contains('refs/heads/develop', github.ref)
     name: Auto update terraform docs
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
+    
     steps:
     - name: CHeckout branch
-      if: github.event_name != 'pull_request'
       uses: actions/checkout@v3
-
-    - name: Checkout PR
-      if: github.event_name == 'pull_request'
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Generate TF docs
       uses: terraform-docs/gh-actions@v1.0.0
       with:
-        # recursive: true
         find-dir: .
         git-commit-message: "docs: auto update terraform docs"
         git-push: true
-
-    # - name: Generate TF docs examples
-    #   uses: terraform-docs/gh-actions@v1.0.0
-    #   with:
-    #     find-dir: examples/
-    #     git-commit-message: "docs: auto update terraform docs"
-    #     git-push: true
 
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
