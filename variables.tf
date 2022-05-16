@@ -9,6 +9,12 @@ variable "arn_format" {
   description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
 }
 
+variable "auth_type_cache_sr" {
+  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
+  type        = string
+  default     = "iam"
+}
+
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string
@@ -275,13 +281,13 @@ variable "runners_pre_clone_script" {
 }
 
 variable "runners_request_concurrency" {
-  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)"
+  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
   type        = number
   default     = 1
 }
 
 variable "runners_output_limit" {
-  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)"
+  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
   type        = number
   default     = 4096
 }
@@ -704,6 +710,12 @@ variable "sentry_dsn" {
   type        = string
 }
 
+variable "prometheus_listen_address" {
+  default     = ""
+  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
+  type        = string
+}
+
 variable "docker_machine_egress_rules" {
   description = "List of egress rules for the docker-machine instance(s)."
   type = list(object({
@@ -764,6 +776,12 @@ variable "asg_terminate_lifecycle_lambda_memory_size" {
   description = "The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
+}
+
+variable "asg_terminate_lifecycle_lambda_runtime" {
+  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
+  type        = string
+  default     = "python3.8"
 }
 
 variable "asg_terminate_lifecycle_lambda_timeout" {
