@@ -9,7 +9,7 @@ variable "arn_format" {
   description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
 }
 
-variable "auth_type" {
+variable "auth_type_cache_sr" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
   type        = string
   default     = "iam"
