@@ -132,6 +132,7 @@ locals {
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
       gitlab_runner_major_version       = tonumber(split(".", var.gitlab_runner_version)[0])
+      auth_type                         = var.auth_type_cache_sr
     }
   )
 }

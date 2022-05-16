@@ -38,8 +38,6 @@ log_format = "json"
       BucketName = "${bucket_name}"
       BucketLocation = "${aws_region}"
       Insecure = false
-%{ if gitlab_runner_major_version >= 15 }      AuthenticationType = "IAM"
-%{ endif ~}
   [runners.machine]
     IdleCount = ${runners_idle_count}
     IdleTime = ${runners_idle_time}
