@@ -33,6 +33,7 @@ log_format = "json"
     Type = "s3"
     Shared = ${shared_cache}
     [runners.cache.s3]
+      AuthenticationType = "${auth_type}"
       ServerAddress = "s3.amazonaws.com"
       BucketName = "${bucket_name}"
       BucketLocation = "${aws_region}"
