@@ -11,7 +11,8 @@ variable "arn_format" {
 
 variable "auth_type" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
-  type        = string
+  type        = strings
+  default = "iam"
 }
 
 variable "environment" {
