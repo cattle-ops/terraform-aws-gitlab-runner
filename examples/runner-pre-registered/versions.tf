@@ -1,14 +1,14 @@
 
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 0.15"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.35"
+      version = "~> 3.74"
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 1.4"
+      version = "~> 2.2"
     }
     null = {
       source  = "hashicorp/null"
@@ -16,7 +16,7 @@ terraform {
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "~> 2.2"
+      version = "~> 3.3"
     }
     random = {
       source  = "hashicorp/random"
