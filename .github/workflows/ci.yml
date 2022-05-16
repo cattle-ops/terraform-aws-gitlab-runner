@@ -11,7 +11,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.0.11]
+        terraform: [1.1.9]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -69,13 +69,6 @@ jobs:
         find-dir: .
         git-commit-message: "docs: auto update terraform docs"
         git-push: true
-
-    # - name: Generate TF docs examples
-    #   uses: terraform-docs/gh-actions@v1.0.0
-    #   with:
-    #     find-dir: examples/
-    #     git-commit-message: "docs: auto update terraform docs"
-    #     git-push: true
 
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
