@@ -229,7 +229,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
       dynamic "spot_options" {
         for_each = var.runner_instance_spot_price == "on-demand-price" ? [] : [0]
         content {
-            max_price = var.runner_instance_spot_price
+          max_price = var.runner_instance_spot_price
         }
       }
     }
