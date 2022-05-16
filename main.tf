@@ -498,6 +498,7 @@ module "terminate_instances_lifecycle_function" {
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
   lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
+  lambda_runtime                       = var.asg_terminate_lifecycle_lambda_runtime
   lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
