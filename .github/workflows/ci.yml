@@ -48,11 +48,12 @@ jobs:
       - run: terraform validate
 
   docs:
+    # update docs after merge back to develop
+    if: github.event_name != 'pull_request' && contains('refs/heads/develop', github.ref)
     name: Auto update terraform docs
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-
+    
     steps:
     - name: CHeckout branch
       uses: actions/checkout@v3
