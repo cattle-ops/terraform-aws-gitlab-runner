@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.42.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.41.1...4.42.0) (2022-05-16)
+
+
+### Features
+
+* Add option to specify prometheus metrics listen address [#478](https://github.com/npalm/terraform-aws-gitlab-runner/issues/478) ([d441e27](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d441e2781d4bbf124fb5e961478dee2270fd8ed3))
+* support runner AuthenticationType configuration ([7d3617e](https://github.com/npalm/terraform-aws-gitlab-runner/commit/7d3617e013badb95bcffa85b1254c248bcd48d52))
+
+
+### Bug Fixes
+
+* join the volumes with \n instead of , ([#480](https://github.com/npalm/terraform-aws-gitlab-runner/issues/480)) ([f9de728](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f9de728e11f7e89ebb287c346f3058900b663836))
+
 ### [4.41.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.41.0...4.41.1) (2022-03-07)
 
 
