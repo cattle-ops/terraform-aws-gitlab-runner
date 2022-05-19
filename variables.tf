@@ -670,6 +670,16 @@ variable "runners_services_volumes_tmpfs" {
   default = []
 }
 
+variable "runners_docker_services" {
+  type = list(object({
+    name       = string
+    alias      = string
+    entrypoint = list(string)
+    command    = list(string)
+  }))
+  default = []
+}
+
 variable "kms_key_id" {
   description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
   type        = string

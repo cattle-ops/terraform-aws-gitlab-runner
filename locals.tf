@@ -26,4 +26,9 @@ locals {
     runners_machine_autoscaling = var.runners_machine_autoscaling
     }
   )
+
+  runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tpl", {
+    runners_docker_services = var.runners_docker_services
+    }
+  )
 }

@@ -94,6 +94,15 @@ module "runner" {
   EOT
 
   runners_post_build_script = "\"echo 'single line'\""
+
+  # Configure a docker service so that registry mirror is used in auto-devops jobs
+  # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27171 and https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#the-service-in-the-gitlab-runner-configuration-file
+  runners_docker_services = [{
+    name       = "docker:20.10.16-dind"
+    alias      = "docker"
+    command    = ["--registry-mirror", "https://mirror.gcr.io"]
+    entrypoint = ["dockerd-entrypoint.sh"]
+  }]
 }
 
 resource "null_resource" "cancel_spot_requests" {
