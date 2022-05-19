@@ -92,7 +92,7 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machien. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
