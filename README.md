@@ -6,7 +6,6 @@
 - [Prerequisites](#prerequisites)
 - [Usage](#usage)
 - [Examples](#examples)
-- [Requirements](#requirements)
 - [Providers](#providers)
 - [Modules](#modules)
 - [Resources](#resources)
@@ -298,7 +297,6 @@ terraform destroy
 ```
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-## Requirements
 
 | Name | Version |
 |------|---------|
