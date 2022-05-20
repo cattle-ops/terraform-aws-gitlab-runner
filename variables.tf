@@ -67,16 +67,54 @@ variable "runner_instance_spot_price" {
   default     = null
 }
 
+variable "runner_instance_metadata_options" {
+  description = "Enable the Gitlab runner agent instance metadata service."
+  type = object({
+    http_endpoint               = string
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+    instance_metadata_tags      = string
+  })
+  default = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "disabled"
+  }
+}
+
+variable "docker_machine_instance_metadata_options" {
+  description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
+  type = object({
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+  })
+  default = {
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+}
+
 variable "runner_instance_metadata_options_http_endpoint" {
-  description = "Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled."
+  description = "DEPRECATED, replaced by runner_instance_metadata_options. Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled."
   type        = string
-  default     = "enabled"
+  default     = null
+
+  validation {
+    condition     = var.runner_instance_metadata_options_http_endpoint == null
+    error_message = "The \"runner_instance_metadata_options_http_endpoint\" variable is no longer used. To migrate, set the \"runner_instance_metadata_options.http_endpoint\" variable to the original value."
+  }
 }
 
 variable "runner_instance_metadata_options_http_tokens" {
-  description = "Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required."
+  description = "EPRECATED, replaced by runner_instance_metadata_options. Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required."
   type        = string
-  default     = "optional"
+  default     = null
+
+  validation {
+    condition     = var.runner_instance_metadata_options_http_tokens == null
+    error_message = "The \"runner_instance_metadata_options_http_tokens\" variable is no longer used. To migrate, set the \"runner_instance_metadata_options.http_token\" variable to the original value."
+  }
 }
 
 variable "docker_machine_instance_type" {
@@ -92,7 +130,7 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machien. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
@@ -100,7 +138,7 @@ variable "docker_machine_download_url" {
 variable "docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2-gitlab.12"
+  default     = "0.16.2-gitlab.15"
 }
 
 variable "runners_name" {
@@ -367,7 +405,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "14.8.2"
+  default     = "14.8.3"
 }
 
 variable "enable_ping" {

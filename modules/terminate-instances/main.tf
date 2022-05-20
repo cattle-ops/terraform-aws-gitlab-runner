@@ -17,6 +17,7 @@ data "archive_file" "terminate_runner_instances_lambda" {
 }
 
 resource "aws_lambda_function" "terminate_runner_instances" {
+  architectures    = ["x86_64"]
   description      = "Lifecycle hook for terminating GitLab runner instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
   source_code_hash = data.archive_file.terminate_runner_instances_lambda.output_base64sha256

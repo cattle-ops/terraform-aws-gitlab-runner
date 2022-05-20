@@ -19,7 +19,6 @@ locals {
     var.tags,
     var.agent_tags
   )
-  agent_tags_propagated = [for tag_key, tag_value in local.agent_tags : { key = tag_key, value = tag_value, propagate_at_launch = true }]
 
   tags_string = join(",", flatten([
     for key in keys(local.tags) : [key, lookup(local.tags, key)]
