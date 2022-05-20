@@ -160,7 +160,16 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   max_instance_lifetime     = var.asg_max_instance_lifetime
   enabled_metrics           = var.metrics_autoscaling
-  tags                      = local.agent_tags_propagated
+
+  dynamic "tag" {
+    for_each = local.agent_tags
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 
   launch_template {
     id      = aws_launch_template.gitlab_runner_instance.id
