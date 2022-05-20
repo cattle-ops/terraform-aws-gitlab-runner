@@ -1,5 +1,22 @@
 # Changelog
 
+## [5.0.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.42.0...5.0.0) (2022-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+* By default, AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
+
+
+Co-authored-by: Matthias Kay <github@matthiaskay.de>
+Co-authored-by: Mustafa Abdul-Kader <mustafa@muszr.me>
+Co-authored-by: Steve Wilson <steve@swsystem.co.uk>
+
+### Features
+
+* Terraform AWS Provider Version 4 Upgrade ([#460](https://github.com/npalm/terraform-aws-gitlab-runner/issues/460)) ([bced356](https://github.com/npalm/terraform-aws-gitlab-runner/commit/bced3562c2f275c6eb37c87d144c77a75ce4d04e)), closes [#490](https://github.com/npalm/terraform-aws-gitlab-runner/issues/490)
+
 ## [4.42.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.41.1...4.42.0) (2022-05-16)
 
 
