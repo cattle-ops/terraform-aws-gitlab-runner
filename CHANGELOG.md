@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.0.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.0...5.0.1) (2022-05-20)
+
+
+### Bug Fixes
+
+* Pass token to metadata service requests. ([85f59ff](https://github.com/npalm/terraform-aws-gitlab-runner/commit/85f59ffc5b953fd86acbd5355adf34bd16b19ca2)), closes [#476](https://github.com/npalm/terraform-aws-gitlab-runner/issues/476)
+
 ## [5.0.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/4.42.0...5.0.0) (2022-05-20)
 
 
