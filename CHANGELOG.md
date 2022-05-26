@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.0.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.1...5.0.2) (2022-05-26)
+
+
+### Bug Fixes
+
+* use IMDSv2 url when setting PARENT_INSTANCE_ID ([#497](https://github.com/npalm/terraform-aws-gitlab-runner/issues/497)) ([536535f](https://github.com/npalm/terraform-aws-gitlab-runner/commit/536535f266930ce57136276325a58c84a3ceb341))
+
 ### [5.0.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.0...5.0.1) (2022-05-20)
 
 
