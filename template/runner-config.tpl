@@ -4,7 +4,7 @@ sentry_dsn = "${sentry_dsn}"
 log_format = "json"
 listen_address = "${prometheus_listen_address}"
 
-%{ for subnet_id in runners_subnets ~}
+%{ for subnet_id in executor_subnets ~}
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"

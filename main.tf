@@ -1,19 +1,12 @@
-locals {
-  subnets = try(
-    [tostring(var.subnet_id)],
-    toList(var.subnet_id)
-  )
-}
-
 data "aws_caller_identity" "current" {}
 
 data "aws_subnet" "runners" {
-  for_each = local.subnets
+  for_each = var.executor_subnets
   id       = each.key
 }
 
 data "aws_availability_zone" "runners" {
-  for_each = local.subnets
+  for_each = var.executor_subnets
   name     = data.aws_subnet.runners[each.key].availability_zone
 }
 
@@ -83,9 +76,9 @@ locals {
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
       aws_region                  = var.aws_region
+      executor_subnets            = var.executor_subnets
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
-      runners_subnets             = local.subnets
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id
@@ -161,7 +154,7 @@ data "aws_ami" "docker-machine" {
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = local.subnets
+  vpc_zone_identifier       = [var.subnet_id]
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"

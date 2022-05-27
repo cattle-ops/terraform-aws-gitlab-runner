@@ -25,8 +25,13 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "executor_subnets" {
+  description = "Subnets used for the executor. Must belong to the VPC specified above."
+  type        = list(string)
+}
+
 variable "subnet_id" {
-  description = "Subnet id, or list of subnet ids, used for the runner and executors. Must belong to the VPC specified above."
+  description = "Subnet id used for the runner. Must belong to the VPC specified above."
   type        = string
 }
 
