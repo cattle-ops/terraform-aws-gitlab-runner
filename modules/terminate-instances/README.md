@@ -58,7 +58,6 @@ module "runner" {
   runners_machine_autoscaling   = var.runners_machine_autoscaling
 
   vpc_id                   = data.aws_vpc.current.id
-  subnet_ids_gitlab_runner = [data.aws_subnet.runner_a.id, data.aws_subnet.runner_b.id]
 
   asg_max_instance_lifetime                   = 604800
   asg_terminate_lifecycle_hook_create         = true

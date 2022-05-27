@@ -78,7 +78,6 @@ module "runner2" {
   runners_use_private_address = false
 
   vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
 
   docker_machine_spot_price_bid = "on-demand-price"
 
