@@ -4,6 +4,7 @@ sentry_dsn = "${sentry_dsn}"
 log_format = "json"
 listen_address = "${prometheus_listen_address}"
 
+%{ for subnet_id in runners_subnets ~}
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
@@ -48,9 +49,9 @@ listen_address = "${prometheus_listen_address}"
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
       "amazonec2-region=${aws_region}",
-      "amazonec2-zone=${runners_aws_zone}",
+      "amazonec2-zone=${data.aws_availability_zone.runners[subnet_id].name_suffix}",
       "amazonec2-vpc-id=${runners_vpc_id}",
-      "amazonec2-subnet-id=${runners_subnet_id}",
+      "amazonec2-subnet-id=${subnet_id}",
       "amazonec2-private-address-only=${runners_use_private_address_only}",
       "amazonec2-use-private-address=${runners_use_private_address}",
       "amazonec2-request-spot-instance=${runners_request_spot_instance}",
@@ -64,5 +65,7 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]
+
+%{ endfor ~}
 
 ${runners_machine_autoscaling}

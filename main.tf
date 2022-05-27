@@ -1,11 +1,20 @@
+locals {
+  subnets = try(
+    [tostring(var.subnet_id)],
+    toList(var.subnet_id)
+  )
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_subnet" "runners" {
-  id = var.subnet_id
+  for_each = local.subnets
+  id       = each.key
 }
 
 data "aws_availability_zone" "runners" {
-  name = data.aws_subnet.runners.availability_zone
+  for_each = local.subnets
+  name     = data.aws_subnet.runners[each.key].availability_zone
 }
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
@@ -76,8 +85,7 @@ locals {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
-      runners_subnet_id           = var.subnet_id
-      runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
+      runners_subnets             = local.subnets
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
       runners_ami                 = data.aws_ami.docker-machine.id
@@ -153,7 +161,7 @@ data "aws_ami" "docker-machine" {
 
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = [var.subnet_id]
+  vpc_zone_identifier       = local.subnets
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"

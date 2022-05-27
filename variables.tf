@@ -26,9 +26,8 @@ variable "vpc_id" {
 }
 
 variable "subnet_id" {
-  description = "Subnet id used for the runner and executors. Must belong to the VPC specified above."
+  description = "Subnet id, or list of subnet ids, used for the runner and executors. Must belong to the VPC specified above."
   type        = string
-  default     = "" # TODO remove
 }
 
 variable "extra_security_group_ids_runner_agent" {
