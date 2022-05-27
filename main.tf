@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_subnet" "runners" {
-  id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
+  id = var.subnet_id
 }
 
 data "aws_availability_zone" "runners" {
@@ -76,7 +76,7 @@ locals {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
       runners_vpc_id              = var.vpc_id
-      runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
+      runners_subnet_id           = var.subnet_id
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
