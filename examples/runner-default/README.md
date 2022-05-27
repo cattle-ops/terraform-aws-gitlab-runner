@@ -9,7 +9,7 @@ This examples shows:
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor.
   - Additional security groups that are allowed access to the runner agent
-  - Use of `runners.docker.services` to configure docker registry mirror 
+  - Use of `runners.docker.services` to configure docker registry mirror (commented out - uncomment to apply)
 
 ![runners-default](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-default.png)
 
