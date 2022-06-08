@@ -43,7 +43,7 @@ resource "aws_lambda_permission" "current_version_triggers" {
 
 resource "aws_lambda_permission" "unqualified_alias_triggers" {
   function_name = aws_lambda_function.terminate_runner_instances.function_name
-  statement_id  = "TerminateInstanceEvent"
+  statement_id  = "TerminateInstanceEventUnqualified"
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.terminate_instances.arn
