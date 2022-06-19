@@ -200,19 +200,19 @@ variable "runners_max_builds" {
 }
 
 variable "runners_image" {
-  description = "Image to run builds, will be used in the runner config.toml"
+  description = "(Deprecated, use image in runners_docker_options instead) Image to run builds, will be used in the runner config.toml"
   type        = string
   default     = "docker:18.03.1-ce"
 }
 
 variable "runners_privileged" {
-  description = "Runners will run in privileged mode, will be used in the runner config.toml"
+  description = "(Deprecated, use privileged in runners_docker_options instead) Runners will run in privileged mode, will be used in the runner config.toml"
   type        = bool
   default     = true
 }
 
 variable "runners_disable_cache" {
-  description = "Runners will not use local cache, will be used in the runner config.toml"
+  description = "(Deprecated, use disable_cache in runners_docker_options instead) Runners will not use local cache, will be used in the runner config.toml"
   type        = bool
   default     = false
 }
@@ -224,33 +224,56 @@ variable "runners_add_dind_volumes" {
 }
 
 variable "runners_additional_volumes" {
-  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
+  description = " (Deprecated, use volumes in runners_docker_options instead) Additional volumes that will be used in the runner config.toml, e.g Docker socket"
   type        = list(any)
   default     = []
 }
 
 variable "runners_shm_size" {
-  description = "shm_size for the runners, will be used in the runner config.toml"
+  description = "(Deprecated, use shm_size in runners_docker_options instead) shm_size for the runners, will be used in the runner config.toml"
   type        = number
   default     = 0
 }
 
 variable "runners_docker_runtime" {
-  description = "docker runtime for runners, will be used in the runner config.toml"
+  description = "(Deprecated, use runtime in runners_docker_options instead) docker runtime for runners, will be used in the runner config.toml"
   type        = string
   default     = ""
 }
 
 variable "runners_helper_image" {
-  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
+  description = "(Deprecated, use helper_image in runners_docker_options instead) Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
   type        = string
   default     = ""
 }
 
 variable "runners_pull_policy" {
-  description = "pull_policy for the runners, will be used in the runner config.toml"
+  description = "(Deprecated, use pull_policy in runners_docker_options instead) pull_policy for the runners, will be used in the runner config.toml"
   type        = string
   default     = "always"
+}
+
+variable "enable_docker_options" {
+  # TODO remove this variable as soon as the above mentioned deprecated variables have been removed
+  type = boolean
+  description = "Set to <true> to use the runners_docker_options variable."
+  default = false
+}
+
+variable "runners_docker_options" {
+  description = "Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. Don't forget to enable the usage via enable_docker_options!"
+  type = map
+  default = {
+    tls_verify = "false"
+    image = "docker:18.03.1-ce"
+    privileged = "true"
+    disable_cache = "false"
+    volumes = "/cache"
+    shm_size = 0
+    pull_policy = "always"
+    runtime = ""
+    helper_image = ""
+  }
 }
 
 variable "runners_monitoring" {

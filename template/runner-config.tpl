@@ -17,15 +17,7 @@ listen_address = "${prometheus_listen_address}"
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
   [runners.docker]
-    tls_verify = false
-    image = "${runners_image}"
-    privileged = ${runners_privileged}
-    disable_cache = ${runners_disable_cache}
-    volumes = ["/cache"${runners_additional_volumes}]
-    shm_size = ${runners_shm_size}
-    pull_policy = "${runners_pull_policy}"
-    runtime = "${runners_docker_runtime}"
-    helper_image = "${runners_helper_image}"
+    ${runners_docker_options}
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
   [runners.docker.services_tmpfs]
