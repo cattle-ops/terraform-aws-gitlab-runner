@@ -464,8 +464,6 @@ resource "aws_eip" "gitlab_runner" {
 ### AWS Systems Manager access to store runner token once registered
 ################################################################################
 resource "aws_iam_policy" "ssm" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
@@ -474,10 +472,8 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-
   role       = aws_iam_role.instance.name
-  policy_arn = aws_iam_policy.ssm[0].arn
+  policy_arn = aws_iam_policy.ssm.arn
 }
 
 ################################################################################
