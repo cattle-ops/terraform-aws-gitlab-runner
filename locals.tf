@@ -7,6 +7,7 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
+  # FIXME what to do with runners_additional_volumes???
   runners_docker_options               = var.runners_enable_docker_options ? local.runners_docker_options_map_string : local.runners_docker_options_single_string
   runners_docker_options_map_string    = join("\n", [for k, v in var.runners_docker_options : "${k} = ${v}"])
   runners_docker_options_single_string = <<-EOT
