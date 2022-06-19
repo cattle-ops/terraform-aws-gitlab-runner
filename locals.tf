@@ -7,7 +7,19 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
-  runners_docker_options = ""
+  runners_docker_options               = var.runners_enable_docker_options ? local.runners_docker_options_map_string : local.runners_docker_options_single_string
+  runners_docker_options_map_string    = join("\n", [for k, v in var.runners_docker_options : "${k} = ${v}"])
+  runners_docker_options_single_string = <<-EOT
+    tls_verify = false
+    image = "${runners_image}"
+    privileged = ${runners_privileged}
+    disable_cache = ${runners_disable_cache}
+    volumes = ["/cache"${runners_additional_volumes}]
+    shm_size = ${runners_shm_size}
+    pull_policy = "${runners_pull_policy}"
+    runtime = "${runners_docker_runtime}"
+    helper_image = "${runners_helper_image}"
+  EOT
 
   // Ensure max builds is optional
   runners_max_builds_string = var.runners_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runners_max_builds)

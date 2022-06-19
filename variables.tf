@@ -253,26 +253,26 @@ variable "runners_pull_policy" {
   default     = "always"
 }
 
-variable "enable_docker_options" {
+variable "runners_enable_docker_options" {
   # TODO remove this variable as soon as the above mentioned deprecated variables have been removed
-  type = boolean
+  type        = bool
   description = "Set to <true> to use the runners_docker_options variable."
-  default = false
+  default     = false
 }
 
 variable "runners_docker_options" {
   description = "Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. Don't forget to enable the usage via enable_docker_options!"
-  type = map
+  type        = map(any)
   default = {
-    tls_verify = "false"
-    image = "docker:18.03.1-ce"
-    privileged = "true"
+    tls_verify    = "false"
+    image         = "docker:18.03.1-ce"
+    privileged    = "true"
     disable_cache = "false"
-    volumes = "/cache"
-    shm_size = 0
-    pull_policy = "always"
-    runtime = ""
-    helper_image = ""
+    volumes       = "/cache"
+    shm_size      = 0
+    pull_policy   = "always"
+    runtime       = ""
+    helper_image  = ""
   }
 }
 
