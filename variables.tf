@@ -268,7 +268,7 @@ variable "runners_docker_options" {
     image         = "docker:18.03.1-ce"
     privileged    = "true"
     disable_cache = "false"
-    volumes       = "/cache"
+    volumes       = ""
     shm_size      = 0
     pull_policy   = "always"
     runtime       = ""
