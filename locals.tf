@@ -7,8 +7,17 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
-  runners_docker_options               = var.runners_enable_docker_options ? local.runners_docker_options_map_string : local.runners_docker_options_single_string
-  runners_docker_options_map_string    = join("\n", [for k, v in var.runners_docker_options : k == "volumes" ? "${k} = ${v}" : "${k} = \"${v}\""])
+  runners_docker_options = var.runners_enable_docker_options ? local.runners_docker_options_map_string : local.runners_docker_options_single_string
+  # TODO add all other variables
+  runners_docker_options_map_string    = <<-EOT
+            disable_cache = %{if var.runners_docker_options.disable_cache != null} ${var.runners_docker_options.disable_cache} %{else} false %{endif}
+            image         = %{if var.runners_docker_options.image != null} ${var.runners_docker_options.image} %{else} "docker:18.03.1-ce" %{endif}
+            privileged    = %{if var.runners_docker_options.privileged != null} ${var.runners_docker_options.privileged} %{else} true %{endif}
+            pull_policy   = %{if var.runners_docker_options.pull_policy != null} ${var.runners_docker_options.pull_policy} %{else} "always" %{endif}
+            shm_size      = %{if var.runners_docker_options.shm_size != null} ${var.runners_docker_options.shm_size} %{else} 0 %{endif}
+            tls_verify    = %{if var.runners_docker_options.tls_verify != null} ${var.runners_docker_options.tls_verify} %{else} false %{endif}
+            volumes       = %{if var.runners_docker_options.volumes != null} [${local.runners_docker_volumes}] %{else} ["/cache"] %{endif}
+          EOT
   runners_docker_volumes               = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
   runners_docker_options_single_string = <<-EOT
     tls_verify = false

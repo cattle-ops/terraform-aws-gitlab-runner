@@ -261,21 +261,70 @@ variable "runners_enable_docker_options" {
 }
 
 variable "runners_docker_options" {
-  description = "Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. Don't forget to enable the usage via enable_docker_options!"
-  type        = map(any)
-  default = {
-    tls_verify    = "false"
-    image         = "docker:18.03.1-ce"
-    privileged    = "true"
-    disable_cache = "false"
-    volumes       = ""
-    shm_size      = 0
-    pull_policy   = "always"
-    runtime       = ""
-    helper_image  = ""
-  }
-}
+  description = <<EOT
+    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
+    details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
+    Default values if the variable is not set:
+      disable_cache = "false"
+      image         = "docker:18.03.1-ce"
+      privileged    = "true"
+      pull_policy   = "always"
+      shm_size      = 0
+      tls_verify    = "false"
+      volumes       = "/cache"
+
+    Note: Don't forget to enable the usage via enable_docker_options!
+  EOT
+
+  type = object({
+    allowed_images               = list(string)
+    allowed_pull_policies        = list(string)
+    allowed_services             = list(string)
+    cache_dir                    = string
+    cap_add                      = list(string)
+    cap_drop                     = list(string)
+    container_labels             = list(string)
+    cpuset_cpus                  = string
+    cpu_shares                   = number
+    cpus                         = number
+    devices                      = list(string)
+    device_cgroup_rules          = list(string)
+    disable_cache                = bool
+    disable_entrypoint_overwrite = bool
+    dns                          = list(string)
+    dns_search                   = list(string)
+    extra_hosts                  = list(string)
+    gpus                         = string
+    helper_image                 = string
+    helper_image_flavor          = string
+    host                         = string
+    hostname                     = string
+    image                        = string
+    links                        = list(string)
+    memory                       = string
+    memory_swap                  = string
+    memory_reservation           = string
+    network_mode                 = string
+    oom_kill_disable             = bool
+    oom_score_adjust             = bool
+    privileged                   = bool
+    pull_policy                  = string
+    runtime                      = string
+    security_opt                 = list(string)
+    shm_size                     = number
+    sysctls                      = list(string)
+    tls_cert_path                = string
+    tls_verify                   = bool
+    userns_mode                  = string
+    volumes                      = list(string)
+    volumes_from                 = list(string)
+    volume_driver                = string
+    wait_for_services_timeout    = number
+  })
+
+  default = null
+}
 variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   type        = bool
