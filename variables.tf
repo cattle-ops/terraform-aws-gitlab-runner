@@ -253,13 +253,6 @@ variable "runners_pull_policy" {
   default     = "always"
 }
 
-variable "runners_enable_docker_options" {
-  # TODO remove this variable as soon as the above mentioned deprecated variables have been removed
-  type        = bool
-  description = "Set to <true> to use the runners_docker_options variable."
-  default     = false
-}
-
 variable "runners_docker_options" {
   description = <<EOT
     Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
@@ -273,8 +266,6 @@ variable "runners_docker_options" {
       shm_size      = 0
       tls_verify    = "false"
       volumes       = "/cache"
-
-    Note: Don't forget to enable the usage via enable_docker_options!
   EOT
 
   type = object({

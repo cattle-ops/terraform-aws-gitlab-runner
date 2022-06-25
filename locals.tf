@@ -7,7 +7,7 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
-  runners_docker_options = var.runners_enable_docker_options ? local.runners_docker_options_map_string : local.runners_docker_options_single_string
+  runners_docker_options = var.runners_docker_options != null ? local.runners_docker_options_map_string : local.runners_docker_options_single_string
   # TODO add all other variables
   runners_docker_options_map_string    = <<-EOT
             disable_cache = %{if var.runners_docker_options.disable_cache != null} ${var.runners_docker_options.disable_cache} %{else} false %{endif}
