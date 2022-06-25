@@ -18,16 +18,28 @@ locals {
     tls_verify    = var.runners_docker_options.tls_verify
     volumes       = local.runners_docker_volumes
 
+    allowed_images               = var.runners_docker_options.allowed_images == null ? null : join(", ", [for s in var.runners_docker_options.allowed_images : format("\"%s\"", s)])
+    allowed_pull_policies        = var.runners_docker_options.allowed_pull_policies == null ? null : join(", ", [for s in var.runners_docker_options.allowed_pull_policies : format("\"%s\"", s)])
+    allowed_services             = var.runners_docker_options.allowed_services == null ? null : join(", ", [for s in var.runners_docker_options.allowed_services : format("\"%s\"", s)])
     cache_dir                    = var.runners_docker_options.cache_dir
+    cap_add                      = var.runners_docker_options.cap_add == null ? null : join(", ", [for s in var.runners_docker_options.cap_add : format("\"%s\"", s)])
+    cap_drop                     = var.runners_docker_options.cap_drop == null ? null : join(", ", [for s in var.runners_docker_options.cap_drop : format("\"%s\"", s)])
+    container_labels             = var.runners_docker_options.container_labels == null ? null : join(", ", [for s in var.runners_docker_options.container_labels : format("\"%s\"", s)])
     cpuset_cpus                  = var.runners_docker_options.cpuset_cpus
     cpu_shares                   = var.runners_docker_options.cpu_shares
     cpus                         = var.runners_docker_options.cpus
+    devices                      = var.runners_docker_options.devices == null ? null : join(", ", [for s in var.runners_docker_options.devices : format("\"%s\"", s)])
+    device_cgroup_rules          = var.runners_docker_options.device_cgroup_rules == null ? null : join(", ", [for s in var.runners_docker_options.device_cgroup_rules : format("\"%s\"", s)])
     disable_entrypoint_overwrite = var.runners_docker_options.disable_entrypoint_overwrite
+    dns                          = var.runners_docker_options.dns == null ? null : join(", ", [for s in var.runners_docker_options.dns : format("\"%s\"", s)])
+    dns_search                   = var.runners_docker_options.dns_search == null ? null : join(", ", [for s in var.runners_docker_options.dns_search : format("\"%s\"", s)])
+    extra_hosts                  = var.runners_docker_options.extra_hosts == null ? null : join(", ", [for s in var.runners_docker_options.extra_hosts : format("\"%s\"", s)])
     gpus                         = var.runners_docker_options.gpus
     helper_image                 = var.runners_docker_options.helper_image
     helper_image_flavor          = var.runners_docker_options.helper_image_flavor
     host                         = var.runners_docker_options.host
     hostname                     = var.runners_docker_options.hostname
+    links                        = var.runners_docker_options.links == null ? null : join(", ", [for s in var.runners_docker_options.links : format("\"%s\"", s)])
     memory                       = var.runners_docker_options.memory
     memory_reservation           = var.runners_docker_options.memory_reservation
     memory_swap                  = var.runners_docker_options.memory_swap
@@ -35,9 +47,12 @@ locals {
     oom_kill_disable             = var.runners_docker_options.oom_kill_disable
     oom_score_adjust             = var.runners_docker_options.oom_score_adjust
     runtime                      = var.runners_docker_options.runtime
+    security_opt                 = var.runners_docker_options.security_opt == null ? null : join(", ", [for s in var.runners_docker_options.security_opt : format("\"%s\"", s)])
+    sysctls                      = var.runners_docker_options.sysctls == null ? null : join(", ", [for s in var.runners_docker_options.sysctls : format("\"%s\"", s)])
     tls_cert_path                = var.runners_docker_options.tls_cert_path
     userns_mode                  = var.runners_docker_options.userns_mode
     volume_driver                = var.runners_docker_options.volume_driver
+    volumes_from                 = var.runners_docker_options.volumes_from == null ? null : join(", ", [for s in var.runners_docker_options.volumes_from : format("\"%s\"", s)])
     wait_for_services_timeout    = var.runners_docker_options.wait_for_services_timeout
   })
   runners_docker_volumes               = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
