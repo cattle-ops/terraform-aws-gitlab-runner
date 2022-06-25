@@ -17,6 +17,28 @@ locals {
     shm_size      = var.runners_docker_options.shm_size
     tls_verify    = var.runners_docker_options.tls_verify
     volumes       = local.runners_docker_volumes
+
+    cache_dir                    = var.runners_docker_options.cache_dir
+    cpuset_cpus                  = var.runners_docker_options.cpuset_cpus
+    cpu_shares                   = var.runners_docker_options.cpu_shares
+    cpus                         = var.runners_docker_options.cpus
+    disable_entrypoint_overwrite = var.runners_docker_options.disable_entrypoint_overwrite
+    gpus                         = var.runners_docker_options.gpus
+    helper_image                 = var.runners_docker_options.helper_image
+    helper_image_flavor          = var.runners_docker_options.helper_image_flavor
+    host                         = var.runners_docker_options.host
+    hostname                     = var.runners_docker_options.hostname
+    memory                       = var.runners_docker_options.memory
+    memory_reservation           = var.runners_docker_options.memory_reservation
+    memory_swap                  = var.runners_docker_options.memory_swap
+    network_mode                 = var.runners_docker_options.network_mode
+    oom_kill_disable             = var.runners_docker_options.oom_kill_disable
+    oom_score_adjust             = var.runners_docker_options.oom_score_adjust
+    runtime                      = var.runners_docker_options.runtime
+    tls_cert_path                = var.runners_docker_options.tls_cert_path
+    userns_mode                  = var.runners_docker_options.userns_mode
+    volume_driver                = var.runners_docker_options.volume_driver
+    wait_for_services_timeout    = var.runners_docker_options.wait_for_services_timeout
   })
   runners_docker_volumes               = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
   runners_docker_options_single_string = <<-EOT
