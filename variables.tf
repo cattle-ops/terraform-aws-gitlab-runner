@@ -258,7 +258,7 @@ variable "runners_docker_options" {
     Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
     details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
-    Default values if the variable is not set:
+    Default values if the whole block is not used:
       disable_cache = "false"
       image         = "docker:18.03.1-ce"
       privileged    = "true"
@@ -270,48 +270,48 @@ variable "runners_docker_options" {
 
   type = object({
     allowed_images               = optional(list(string))
-    allowed_pull_policies        = list(string)
-    allowed_services             = list(string)
-    cache_dir                    = string
-    cap_add                      = list(string)
-    cap_drop                     = list(string)
-    container_labels             = list(string)
-    cpuset_cpus                  = string
-    cpu_shares                   = number
-    cpus                         = number
-    devices                      = list(string)
-    device_cgroup_rules          = list(string)
-    disable_cache                = bool
-    disable_entrypoint_overwrite = bool
-    dns                          = list(string)
-    dns_search                   = list(string)
-    extra_hosts                  = list(string)
-    gpus                         = string
-    helper_image                 = string
-    helper_image_flavor          = string
-    host                         = string
-    hostname                     = string
-    image                        = string
-    links                        = list(string)
-    memory                       = string
-    memory_swap                  = string
-    memory_reservation           = string
-    network_mode                 = string
-    oom_kill_disable             = bool
-    oom_score_adjust             = bool
-    privileged                   = bool
-    pull_policy                  = string
-    runtime                      = string
-    security_opt                 = list(string)
-    shm_size                     = number
-    sysctls                      = list(string)
-    tls_cert_path                = string
-    tls_verify                   = bool
-    userns_mode                  = string
-    volumes                      = list(string)
-    volumes_from                 = list(string)
-    volume_driver                = string
-    wait_for_services_timeout    = number
+    allowed_pull_policies        = optional(list(string))
+    allowed_services             = optional(list(string))
+    cache_dir                    = optional(string)
+    cap_add                      = optional(list(string))
+    cap_drop                     = optional(list(string))
+    container_labels             = optional(list(string))
+    cpuset_cpus                  = optional(string)
+    cpu_shares                   = optional(number)
+    cpus                         = optional(number)
+    devices                      = optional(list(string))
+    device_cgroup_rules          = optional(list(string))
+    disable_cache                = optional(bool)
+    disable_entrypoint_overwrite = optional(bool)
+    dns                          = optional(list(string))
+    dns_search                   = optional(list(string))
+    extra_hosts                  = optional(list(string))
+    gpus                         = optional(string)
+    helper_image                 = optional(string)
+    helper_image_flavor          = optional(string)
+    host                         = optional(string)
+    hostname                     = optional(string)
+    image                        = optional(string)
+    links                        = optional(list(string))
+    memory                       = optional(string)
+    memory_swap                  = optional(string)
+    memory_reservation           = optional(string)
+    network_mode                 = optional(string)
+    oom_kill_disable             = optional(bool)
+    oom_score_adjust             = optional(bool)
+    privileged                   = optional(bool)
+    pull_policy                  = optional(string)
+    runtime                      = optional(string)
+    security_opt                 = optional(list(string))
+    shm_size                     = optional(number)
+    sysctls                      = optional(list(string))
+    tls_cert_path                = optional(string)
+    tls_verify                   = optional(bool)
+    userns_mode                  = optional(string)
+    volumes                      = optional(list(string))
+    volumes_from                 = optional(list(string))
+    volume_driver                = optional(string)
+    wait_for_services_timeout    = optional(number)
   })
 
   default = null
