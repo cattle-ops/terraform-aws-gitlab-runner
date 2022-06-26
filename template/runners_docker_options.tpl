@@ -17,7 +17,7 @@ volumes       = %{if volumes != null} [${volumes}] %{else} ["/cache"] %{endif}
 %{ if cpu_shares != null } cpu_shares = ${cpu_shares} %{endif}
 %{ if cpus != null } cpus = ${cpus} %{endif}
 %{ if devices != null } devices = [${devices}] %{endif}
-%{ if devices_cgroup_rules != null } device_cgroup_rules = [${device_cgroup_rules}] %{endif}
+%{ if device_cgroup_rules != null } device_cgroup_rules = [${device_cgroup_rules}] %{endif}
 %{ if disable_entrypoint_overwrite != null } disable_entrypoint_overwrite = ${disable_entrypoint_overwrite} %{endif}
 %{ if dns != null } dns = [${dns}] %{endif}
 %{ if dns_search != null } dns_search = [${dns_search}] %{endif}

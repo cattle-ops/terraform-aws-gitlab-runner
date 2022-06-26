@@ -269,7 +269,7 @@ variable "runners_docker_options" {
   EOT
 
   type = object({
-    allowed_images               = list(string)
+    allowed_images               = optional(list(string))
     allowed_pull_policies        = list(string)
     allowed_services             = list(string)
     cache_dir                    = string

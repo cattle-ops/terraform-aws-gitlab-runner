@@ -94,6 +94,52 @@ module "runner" {
   EOT
 
   runners_post_build_script = "\"echo 'single line'\""
+
+  runners_docker_options = {
+    allowed_images               = ["abc:stable"]
+    allowed_pull_policies        = null
+    allowed_services             = null
+    cache_dir                    = null
+    cap_add                      = null
+    cap_drop                     = null
+    container_labels             = null
+    cpuset_cpus                  = null
+    cpu_shares                   = null
+    cpus                         = null
+    devices                      = null
+    device_cgroup_rules          = null
+    disable_cache                = null
+    disable_entrypoint_overwrite = null
+    dns                          = null
+    dns_search                   = null
+    extra_hosts                  = null
+    gpus                         = null
+    helper_image                 = null
+    helper_image_flavor          = null
+    host                         = null
+    hostname                     = null
+    image                        = null
+    links                        = null
+    memory                       = null
+    memory_swap                  = null
+    memory_reservation           = null
+    network_mode                 = null
+    oom_kill_disable             = null
+    oom_score_adjust             = null
+    privileged                   = null
+    pull_policy                  = null
+    runtime                      = null
+    security_opt                 = null
+    shm_size                     = null
+    sysctls                      = null
+    tls_cert_path                = null
+    tls_verify                   = null
+    userns_mode                  = null
+    volumes                      = null
+    volumes_from                 = null
+    volume_driver                = null
+    wait_for_services_timeout    = null
+  }
 }
 
 resource "null_resource" "cancel_spot_requests" {
