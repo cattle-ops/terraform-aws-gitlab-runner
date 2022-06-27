@@ -7,6 +7,8 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
+  runners_docker_options = var.runners_docker_options != null ? local.template_runners_docker_options : local.runners_docker_options_single_string
+
   template_runners_docker_options = var.runners_docker_options == null ? "" : templatefile("${path.module}/template/runners_docker_options.tpl", {
     disable_cache = var.runners_docker_options.disable_cache
     image         = var.runners_docker_options.image
@@ -52,17 +54,19 @@ locals {
     volume_driver                = var.runners_docker_options.volume_driver
     volumes_from                 = var.runners_docker_options.volumes_from == null ? null : join(", ", [for s in var.runners_docker_options.volumes_from : format("\"%s\"", s)])
     wait_for_services_timeout    = var.runners_docker_options.wait_for_services_timeout
-
-    deprecated_use_new_block = var.runners_docker_options
-    deprecated_disable_cache = var.runners_disable_cache
-    deprecated_helper_image  = var.runners_helper_image
-    deprecated_image         = var.runners_image
-    deprecated_privileged    = var.runners_privileged
-    deprecated_pull_policy   = var.runners_pull_policy
-    deprecated_runtime       = var.runners_docker_runtime
-    deprecated_shm_size      = var.runners_shm_size
-    deprecated_volumes       = local.runners_docker_volumes
   })
+  runners_docker_options_single_string = <<-EOT
+    tls_verify = false
+    image = "${var.runners_image}"
+    privileged = ${var.runners_privileged}
+    disable_cache = ${var.runners_disable_cache}
+    volumes = [${local.runners_docker_volumes}]
+    shm_size = ${var.runners_shm_size}
+    pull_policy = "${var.runners_pull_policy}"
+    runtime = "${var.runners_docker_runtime}"
+    helper_image = "${var.runners_helper_image}"
+  EOT
+
   runners_docker_volumes = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
 
   // Ensure max builds is optional

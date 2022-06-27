@@ -1,22 +1,10 @@
-%{if deprecated_use_new_block}
-  disable_cache = %{if disable_cache != null} ${disable_cache} %{else} false %{endif}
-  image         = %{if image != null} "${image}" %{else} "docker:18.03.1-ce" %{endif}
-  privileged    = %{if privileged != null} ${privileged} %{else} true %{endif}
-  pull_policy   = %{if pull_policy != null} ${pull_policy} %{else} "always" %{endif}
-  shm_size      = %{if shm_size != null} ${shm_size} %{else} 0 %{endif}
-  tls_verify    = %{if tls_verify != null} ${tls_verify} %{else} false %{endif}
-  volumes       = %{if volumes != null} [${volumes}] %{else} ["/cache"] %{endif}
-%{else}
-  disable_cache = ${deprecated_disable_cache}
-  helper_image = "${deprecated_helper_image}"
-  image = "${deprecated_image}"
-  privileged = ${deprecated_privileged}
-  pull_policy = "${deprecated_pull_policy}"
-  runtime = "${deprecated_runtime}"
-  shm_size = ${deprecated_shm_size}
-  tls_verify = false
-  volumes = [${deprecated_volumes}]
-%{endif}
+disable_cache = %{if disable_cache != null} ${disable_cache} %{else} false %{endif}
+image         = %{if image != null} "${image}" %{else} "docker:18.03.1-ce" %{endif}
+privileged    = %{if privileged != null} ${privileged} %{else} true %{endif}
+pull_policy   = %{if pull_policy != null} "${pull_policy}" %{else} "always" %{endif}
+shm_size      = %{if shm_size != null} ${shm_size} %{else} 0 %{endif}
+tls_verify    = %{if tls_verify != null} ${tls_verify} %{else} false %{endif}
+volumes       = %{if volumes != null} [${volumes}] %{else} ["/cache"] %{endif}
 
 %{ if allowed_images != null } allowed_images = [${allowed_images}] %{endif}
 %{ if allowed_pull_policies != null } allowed_pull_policies = [${allowed_pull_policies}] %{endif}
@@ -27,7 +15,7 @@
 %{ if container_labels != null } container_labels = [${container_labels}] %{endif}
 %{ if cpuset_cpus != null } cpuset_cpus = "${cpuset_cpus}" %{endif}
 %{ if cpu_shares != null } cpu_shares = ${cpu_shares} %{endif}
-%{ if cpus != null } cpus = ${cpus} %{endif}
+%{ if cpus != null } cpus = "${cpus}" %{endif}
 %{ if devices != null } devices = [${devices}] %{endif}
 %{ if device_cgroup_rules != null } device_cgroup_rules = [${device_cgroup_rules}] %{endif}
 %{ if disable_entrypoint_overwrite != null } disable_entrypoint_overwrite = ${disable_entrypoint_overwrite} %{endif}
