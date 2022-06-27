@@ -7,8 +7,6 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
-  runners_docker_options = var.runners_docker_options != null ? local.template_runners_docker_options : local.runners_docker_options_single_string
-  # TODO add all other variables
   template_runners_docker_options = var.runners_docker_options == null ? "" : templatefile("${path.module}/template/runners_docker_options.tpl", {
     disable_cache = var.runners_docker_options.disable_cache
     image         = var.runners_docker_options.image
