@@ -56,20 +56,16 @@ locals {
     wait_for_services_timeout    = var.runners_docker_options.wait_for_services_timeout
 
     deprecated_use_new_block = var.runners_docker_options
-    deprecated_runners_image = var.runners_image
+    deprecated_disable_cache = var.runners_disable_cache
+    deprecated_helper_image  = var.runners_helper_image
+    deprecated_image         = var.runners_image
+    deprecated_privileged    = var.runners_privileged
+    deprecated_pull_policy   = var.runners_pull_policy
+    deprecated_runtime       = var.runners_docker_runtime
+    deprecated_shm_size      = var.runners_shm_size
+    deprecated_volumes       = local.runners_docker_volumes
   })
-  runners_docker_volumes               = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
-  runners_docker_options_single_string = <<-EOT
-    tls_verify = false
-    image = "${var.runners_image}"
-    privileged = ${var.runners_privileged}
-    disable_cache = ${var.runners_disable_cache}
-    volumes = [${local.runners_docker_volumes}]
-    shm_size = ${var.runners_shm_size}
-    pull_policy = "${var.runners_pull_policy}"
-    runtime = "${var.runners_docker_runtime}"
-    helper_image = "${var.runners_helper_image}"
-  EOT
+  runners_docker_volumes = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
 
   // Ensure max builds is optional
   runners_max_builds_string = var.runners_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runners_max_builds)
