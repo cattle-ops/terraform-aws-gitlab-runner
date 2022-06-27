@@ -54,6 +54,9 @@ locals {
     volume_driver                = var.runners_docker_options.volume_driver
     volumes_from                 = var.runners_docker_options.volumes_from == null ? null : join(", ", [for s in var.runners_docker_options.volumes_from : format("\"%s\"", s)])
     wait_for_services_timeout    = var.runners_docker_options.wait_for_services_timeout
+
+    deprecated_use_new_block = var.runners_docker_options
+    deprecated_runners_image = var.runners_image
   })
   runners_docker_volumes               = join(", ", formatlist("\"%s\"", concat(["/cache"], var.runners_additional_volumes)))
   runners_docker_options_single_string = <<-EOT
