@@ -34,7 +34,7 @@ volumes       = %{if volumes != null} [${volumes}] %{else} ["/cache"] %{endif}
 %{ if network_mode != null } network_mode = "${network_mode}" %{endif}
 %{ if oom_kill_disable != null } oom_kill_disable = ${oom_kill_disable} %{endif}
 %{ if oom_score_adjust != null } oom_score_adjust = ${oom_score_adjust} %{endif}
-%{ if runtime != null } runtime = "${runtime} %{endif}"
+%{ if runtime != null } runtime = "${runtime}" %{endif}
 %{ if security_opt != null } security_opt = [${security_opt}] %{endif}
 %{ if sysctls != null } sysctls = [${sysctls}] %{endif}
 %{ if tls_cert_path != null } tls_cert_path = "${tls_cert_path}" %{endif}
