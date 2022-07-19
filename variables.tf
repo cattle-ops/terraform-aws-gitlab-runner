@@ -742,6 +742,18 @@ variable "docker_machine_iam_policy_arns" {
   default     = []
 }
 
+variable "runner_iam_role_name" {
+  type        = string
+  description = "Policy/role to be added to the instance profile of the docker machine runners."
+  default     = ""
+}
+
+variable "docker_machine_iam_role_name" {
+  type        = string
+  description = "Policy/role to be added to the instance profile of the docker machine runners."
+  default     = ""
+}
+
 variable "sentry_dsn" {
   default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
   description = "Sentry DSN of the project for the runner to use (uses legacy DSN format)"
