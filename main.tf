@@ -75,12 +75,13 @@ locals {
     {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
+      gitlab_clone_url            = var.runners_clone_url
       runners_vpc_id              = var.vpc_id
       runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
-      runners_ami                 = data.aws_ami.docker-machine.id
+      runners_ami                 = data.aws_ami.docker_machine.id
       runners_security_group_name = aws_security_group.docker_machine.name
       runners_monitoring          = var.runners_monitoring
       runners_ebs_optimized       = var.runners_ebs_optimized
@@ -137,7 +138,7 @@ locals {
   )
 }
 
-data "aws_ami" "docker-machine" {
+data "aws_ami" "docker_machine" {
   most_recent = "true"
 
   dynamic "filter" {

@@ -7,6 +7,7 @@ listen_address = "${prometheus_listen_address}"
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
+  clone_url = "${gitlab_clone_url}"
   token = "${runners_token}"
   executor = "${runners_executor}"
   environment = ${runners_environment_vars}
