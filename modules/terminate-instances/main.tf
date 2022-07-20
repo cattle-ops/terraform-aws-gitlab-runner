@@ -4,8 +4,6 @@
 # Deploys a Lambda function, CloudWatch rule, and associated resources for
 # terminating orphaned runner instances.
 # ----------------------------------------------------------------------------
-data "aws_caller_identity" "current" {}
-
 locals {
   source_sha256 = filesha256("${path.module}/lambda/lambda_function.py")
 }

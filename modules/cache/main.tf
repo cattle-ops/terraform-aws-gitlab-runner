@@ -33,7 +33,6 @@ resource "aws_s3_bucket" "build_cache" {
   tags = local.tags
 
   force_destroy = true
-
 }
 
 resource "aws_s3_bucket_acl" "build_cache_acl" {
