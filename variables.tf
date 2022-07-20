@@ -163,6 +163,12 @@ variable "runners_gitlab_url" {
   type        = string
 }
 
+variable "runners_clone_url" {
+  description = "Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL."
+  type        = string
+  default     = ""
+}
+
 variable "runners_token" {
   description = "Token for the runner, will be used in the runner config.toml."
   type        = string
