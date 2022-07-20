@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.1.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.2...5.1.0) (2022-07-20)
+
+
+### Features
+
+* add `clone_url` to `config.toml` ([#516](https://github.com/npalm/terraform-aws-gitlab-runner/issues/516)) ([9a41525](https://github.com/npalm/terraform-aws-gitlab-runner/commit/9a415257de6ac5e78e16c2e29190868a70483f75))
+* Tag aws_cloudwatch_event_rule resource + linting ([#519](https://github.com/npalm/terraform-aws-gitlab-runner/issues/519)) ([f2e98bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f2e98bb95cee62c23cc6d5ab7fe2531aee3a5504))
+
+
+### Bug Fixes
+
+* Make statement IDs unique ([#503](https://github.com/npalm/terraform-aws-gitlab-runner/issues/503)) ([05055c0](https://github.com/npalm/terraform-aws-gitlab-runner/commit/05055c0f09fd846a9ba43126fad71b5d01495d39))
+
 ### [5.0.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.1...5.0.2) (2022-05-26)
 
 
