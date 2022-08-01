@@ -21,8 +21,8 @@ locals {
   )
 
   runner_tags = merge(
-    ! local.docker_machine_adds_name_tag ?
-      var.overrides["name_docker_machine_runners"] == "" ? { Name = format("%s-docker-machine", var.environment) } : { Name = var.overrides["name_docker_machine_runners"]}
+    !local.docker_machine_adds_name_tag ?
+    var.overrides["name_docker_machine_runners"] == "" ? { Name = format("%s-docker-machine", var.environment) } : { Name = var.overrides["name_docker_machine_runners"] }
     : {},
     var.runner_tags
   )

@@ -28,11 +28,11 @@ locals {
   )
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
-  docker_machine_version_used = split(".", var.docker_machine_version)
+  docker_machine_version_used          = split(".", var.docker_machine_version)
   docker_machine_version_with_name_tag = split(".", "0.16.2")
   docker_machine_version_test = [
-  for i, j in reverse(range(length(local.docker_machine_version_used)))
-  : signum(split("-", local.docker_machine_version_with_name_tag[i])[0] - split("-", local.docker_machine_version_used[i])[0]) * pow(10, j)
+    for i, j in reverse(range(length(local.docker_machine_version_used)))
+    : signum(split("-", local.docker_machine_version_with_name_tag[i])[0] - split("-", local.docker_machine_version_used[i])[0]) * pow(10, j)
   ]
 
   docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0

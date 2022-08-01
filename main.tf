@@ -93,7 +93,7 @@ locals {
         "%s,%s",
         local.tags_string,
         local.runner_tags_string,
-        ), ",,", ","), "/,$/", "")
+      ), ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
