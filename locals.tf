@@ -32,6 +32,7 @@ locals {
   docker_machine_version_with_name_tag = split(".", "0.16.2")
   docker_machine_version_test = [
     for i, j in reverse(range(length(local.docker_machine_version_used)))
+    # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
     : signum(split("-", local.docker_machine_version_with_name_tag[i])[0] - split("-", local.docker_machine_version_used[i])[0]) * pow(10, j)
   ]
 
