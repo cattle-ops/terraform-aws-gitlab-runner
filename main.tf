@@ -89,17 +89,11 @@ locals {
       runners_additional_volumes  = local.runners_additional_volumes
       docker_machine_options      = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_name                = var.runners_name
-      runners_tags = replace(replace(var.overrides["name_docker_machine_runners"] == "" ? format(
-        "Name,%s-docker-machine,%s,%s",
-        var.environment,
+      runners_tags = replace(replace(format(
+        "%s,%s",
         local.tags_string,
         local.runner_tags_string,
-        ) : format(
-        "%s,%s,Name,%s",
-        local.tags_string,
-        local.runner_tags_string,
-        var.overrides["name_docker_machine_runners"],
-      ), ",,", ","), "/,$/", "")
+        ), ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
