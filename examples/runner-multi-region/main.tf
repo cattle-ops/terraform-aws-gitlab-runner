@@ -21,7 +21,8 @@ module "vpc_main_region" {
 
 module "runner_main_region" {
   providers = {
-    aws.cache_bucket = aws
+    aws              = aws
+    aws.cache_bucket = aws # as no cache is deployed here we use the same AWS provider
   }
 
   source = "../../"
@@ -90,7 +91,7 @@ module "vpc_alternate_region" {
 module "runner_alternate_region" {
   providers = {
     aws              = aws.alternate_region
-    aws.cache_bucket = aws.alternate_region
+    aws.cache_bucket = aws.alternate_region # as no cache is deployed here we use the same AWS provider
   }
 
   source = "../../"
