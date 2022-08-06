@@ -2,10 +2,12 @@ concurrent = ${runners_concurrent}
 check_interval = ${runners_check_interval}
 sentry_dsn = "${sentry_dsn}"
 log_format = "json"
+listen_address = "${prometheus_listen_address}"
 
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
+  clone_url = "${gitlab_clone_url}"
   token = "${runners_token}"
   executor = "${runners_executor}"
   environment = ${runners_environment_vars}
@@ -33,6 +35,7 @@ log_format = "json"
     Type = "s3"
     Shared = ${shared_cache}
     [runners.cache.s3]
+      AuthenticationType = "${auth_type}"
       ServerAddress = "s3.amazonaws.com"
       BucketName = "${bucket_name}"
       BucketLocation = "${aws_region}"

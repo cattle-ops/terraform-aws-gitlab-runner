@@ -33,11 +33,11 @@ initial_position = start_of_file
 EOF
 
 # Set the region to send CloudWatch Logs data to (the region where the instance is located)
-region=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+region=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
 sed -i -e "s/region = us-east-1/region = $region/g" /etc/awslogs/awscli.conf
 
 # Replace instance id.
-instanceId=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
+instanceId=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
 sed -i -e "s/{instanceId}/$instanceId/g" /etc/awslogs/awslogs.conf
 
 if grep -q ':2$' /etc/system-release-cpe  ; then

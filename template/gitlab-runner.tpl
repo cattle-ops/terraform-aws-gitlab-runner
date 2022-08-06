@@ -1,5 +1,10 @@
+# Install jq if not exists
+if ! [ -x "$(command -v jq)" ]; then
+  yum install jq -y
+fi
+
 # Provide the parent instance id in the spawned runner tags
-PARENT_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id);
+PARENT_INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
 PARENT_TAG="gitlab-runner-parent-id,$${PARENT_INSTANCE_ID}"
 
 mkdir -p /etc/gitlab-runner
@@ -42,7 +47,7 @@ fi
 
 if [[ `echo ${docker_machine_download_url}` == "" ]]
 then
-  curl --fail --retry 6 -L https://github.com/docker/machine/releases/download/v${docker_machine_version}/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
+  curl --fail --retry 6 -L https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/releases/v${docker_machine_version}/downloads/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
 else
   curl --fail --retry 6 -L ${docker_machine_download_url} >/tmp/docker-machine
 fi
@@ -61,11 +66,6 @@ docker-machine create --driver none --url localhost dummy-machine
 docker-machine rm -y dummy-machine
 unset HOME
 unset USER
-
-# Install jq if not exists
-if ! [ -x "$(command -v jq)" ]; then
-  yum install jq -y
-fi
 
 # fetch Runner token from SSM and validate it
 token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
