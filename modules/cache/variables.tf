@@ -54,7 +54,7 @@ variable "cache_lifecycle_clear" {
 variable "cache_lifecycle_prefix" {
   description = "Object key prefix identifying one or more objects to which the clean up rule applies."
   type        = string
-  default     = "project/"
+  default     = "runner/"
 }
 
 variable "arn_format" {
