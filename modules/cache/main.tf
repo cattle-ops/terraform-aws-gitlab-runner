@@ -1,4 +1,6 @@
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+  provider = aws.cache_bucket
+}
 
 
 locals {
@@ -26,13 +28,14 @@ resource "random_string" "s3_suffix" {
 }
 
 resource "aws_s3_bucket" "build_cache" {
-  count = var.create_cache_bucket ? 1 : 0
-
+  count  = var.create_cache_bucket ? 1 : 0
   bucket = local.cache_bucket_name
 
   tags = local.tags
 
   force_destroy = true
+
+  provider = aws.cache_bucket
 }
 
 resource "aws_s3_bucket_acl" "build_cache_acl" {
@@ -40,6 +43,8 @@ resource "aws_s3_bucket_acl" "build_cache_acl" {
   bucket = aws_s3_bucket.build_cache[0].id
 
   acl = "private"
+
+  provider = aws.cache_bucket
 }
 
 resource "aws_s3_bucket_versioning" "build_cache_versioning" {
@@ -49,6 +54,8 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
   versioning_configuration {
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
+
+  provider = aws.cache_bucket
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
@@ -67,6 +74,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
       days = var.cache_expiration_days
     }
   }
+
+  provider = aws.cache_bucket
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
