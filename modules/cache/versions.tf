@@ -3,12 +3,12 @@
      aws.cache_bucket: a provider to create the S3 cache bucket in another region.
 */
 terraform {
-  required_version = ">= 0.15"
+  required_version = ">= 1"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 3.35.0"
+      version = ">= 4"
 
       configuration_aliases = [aws.cache_bucket]
     }

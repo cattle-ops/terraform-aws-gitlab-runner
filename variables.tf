@@ -4,6 +4,12 @@ variable "arn_format" {
   description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
 }
 
+variable "auth_type_cache_sr" {
+  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
+  type        = string
+  default     = "iam"
+}
+
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string
@@ -56,16 +62,32 @@ variable "runner_instance_spot_price" {
   default     = null
 }
 
-variable "runner_instance_metadata_options_http_endpoint" {
-  description = "Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled."
-  type        = string
-  default     = "enabled"
+variable "runner_instance_metadata_options" {
+  description = "Enable the Gitlab runner agent instance metadata service."
+  type = object({
+    http_endpoint               = string
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+    instance_metadata_tags      = string
+  })
+  default = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "disabled"
+  }
 }
 
-variable "runner_instance_metadata_options_http_tokens" {
-  description = "Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required."
-  type        = string
-  default     = "optional"
+variable "docker_machine_instance_metadata_options" {
+  description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
+  type = object({
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+  })
+  default = {
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
 }
 
 variable "docker_machine_instance_type" {
@@ -81,7 +103,7 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machien. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
@@ -89,7 +111,7 @@ variable "docker_machine_download_url" {
 variable "docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2-gitlab.12"
+  default     = "0.16.2-gitlab.15"
 }
 
 variable "runners_name" {
@@ -112,6 +134,12 @@ variable "runners_install_amazon_ecr_credential_helper" {
 variable "runners_gitlab_url" {
   description = "URL of the GitLab instance to connect to."
   type        = string
+}
+
+variable "runners_clone_url" {
+  description = "Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL."
+  type        = string
+  default     = ""
 }
 
 variable "runners_token" {
@@ -356,7 +384,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "14.8.2"
+  default     = "14.8.3"
 }
 
 variable "enable_ping" {
@@ -606,6 +634,7 @@ variable "enable_docker_machine_ssm_access" {
 }
 
 variable "runners_volumes_tmpfs" {
+  description = "Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
   type = list(object({
     volume  = string
     options = string
@@ -614,6 +643,7 @@ variable "runners_volumes_tmpfs" {
 }
 
 variable "runners_services_volumes_tmpfs" {
+  description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
   type = list(object({
     volume  = string
     options = string
@@ -699,6 +729,12 @@ variable "sentry_dsn" {
   type        = string
 }
 
+variable "prometheus_listen_address" {
+  default     = ""
+  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
+  type        = string
+}
+
 variable "docker_machine_egress_rules" {
   description = "List of egress rules for the docker-machine instance(s)."
   type = list(object({
@@ -759,6 +795,12 @@ variable "asg_terminate_lifecycle_lambda_memory_size" {
   description = "The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
+}
+
+variable "asg_terminate_lifecycle_lambda_runtime" {
+  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
+  type        = string
+  default     = "python3.8"
 }
 
 variable "asg_terminate_lifecycle_lambda_timeout" {

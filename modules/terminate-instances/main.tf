@@ -4,8 +4,6 @@
 # Deploys a Lambda function, CloudWatch rule, and associated resources for
 # terminating orphaned runner instances.
 # ----------------------------------------------------------------------------
-data "aws_caller_identity" "current" {}
-
 locals {
   source_sha256 = filesha256("${path.module}/lambda/lambda_function.py")
 }
@@ -27,7 +25,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   package_type     = "Zip"
   publish          = true
   role             = aws_iam_role.lambda.arn
-  runtime          = "python3.9"
+  runtime          = var.lambda_runtime
   timeout          = var.lambda_timeout
   tags             = var.tags
 }
@@ -43,7 +41,7 @@ resource "aws_lambda_permission" "current_version_triggers" {
 
 resource "aws_lambda_permission" "unqualified_alias_triggers" {
   function_name = aws_lambda_function.terminate_runner_instances.function_name
-  statement_id  = "TerminateInstanceEvent"
+  statement_id  = "TerminateInstanceEventUnqualified"
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.terminate_instances.arn
