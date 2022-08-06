@@ -14,6 +14,8 @@ locals {
 
   cache_bucket_string = var.cache_bucket_name_include_account_id ? format("%s%s-gitlab-runner-cache", var.cache_bucket_prefix, data.aws_caller_identity.current.account_id) : format("%s-gitlab-runner-cache", var.cache_bucket_prefix)
   cache_bucket_name   = var.cache_bucket_set_random_suffix ? format("%s-%s", local.cache_bucket_string, random_string.s3_suffix[0].result) : local.cache_bucket_string
+
+  name_iam_objects = var.name_iam_objects == "" ? local.tags["Name"] : var.name_iam_objects
 }
 
 resource "random_string" "s3_suffix" {
@@ -27,36 +29,53 @@ resource "aws_s3_bucket" "build_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
   bucket = local.cache_bucket_name
-  acl    = "private"
 
   tags = local.tags
 
   force_destroy = true
+}
 
-  versioning {
-    enabled = var.cache_bucket_versioning
+resource "aws_s3_bucket_acl" "build_cache_acl" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  acl = "private"
+}
+
+resource "aws_s3_bucket_versioning" "build_cache_versioning" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  versioning_configuration {
+    status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
+}
 
-  lifecycle_rule {
-    id      = "clear"
-    enabled = var.cache_lifecycle_clear
+resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
 
-    prefix = var.cache_lifecycle_prefix
+  rule {
+    id     = "clear"
+    status = var.cache_lifecycle_clear ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.cache_lifecycle_prefix
+    }
 
     expiration {
       days = var.cache_expiration_days
     }
-
-    noncurrent_version_expiration {
-      days = var.cache_expiration_days
-    }
   }
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
+  count  = var.create_cache_bucket ? 1 : 0
+  bucket = aws_s3_bucket.build_cache[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -76,7 +95,7 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
 resource "aws_iam_policy" "docker_machine_cache" {
   count = var.create_cache_bucket ? 1 : 0
 
-  name        = "${var.environment}-docker-machine-cache"
+  name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
   tags        = local.tags

@@ -1,9 +1,20 @@
+# Install jq if not exists
+if ! [ -x "$(command -v jq)" ]; then
+  yum install jq -y
+fi
+
+# Provide the parent instance id in the spawned runner tags
+PARENT_INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
+PARENT_TAG="gitlab-runner-parent-id,$${PARENT_INSTANCE_ID}"
+
 mkdir -p /etc/gitlab-runner
 cat > /etc/gitlab-runner/config.toml <<- EOF
 
 ${runners_config}
 
 EOF
+
+sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
 
 ${pre_install}
 
@@ -28,12 +39,15 @@ then
   yum install amazon-ecr-credential-helper -y
 fi
 
-curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
-yum install gitlab-runner-${gitlab_runner_version} -y
+if ! ( rpm -q gitlab-runner >/dev/null )
+then
+  curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
+  yum install gitlab-runner-${gitlab_runner_version} -y
+fi
 
 if [[ `echo ${docker_machine_download_url}` == "" ]]
 then
-  curl --fail --retry 6 -L https://github.com/docker/machine/releases/download/v${docker_machine_version}/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
+  curl --fail --retry 6 -L https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/releases/v${docker_machine_version}/downloads/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
 else
   curl --fail --retry 6 -L ${docker_machine_download_url} >/tmp/docker-machine
 fi
@@ -53,13 +67,17 @@ docker-machine rm -y dummy-machine
 unset HOME
 unset USER
 
-# Install jq if not exists
-if ! [ -x "$(command -v jq)" ]; then
-  yum install jq -y
+# fetch Runner token from SSM and validate it
+token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+
+valid_token=true
+if [[ `echo $token` != "null" ]]
+then
+  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
+  [[ `echo $valid_token_response` != "200" ]] && valid_token=false
 fi
 
-token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
-if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]]
+if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]] || [[ `echo $valid_token` == "false" ]]
 then
   token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \

@@ -23,8 +23,8 @@ variable "cache_bucket_name_include_account_id" {
 
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = string
-  default     = "false"
+  type        = bool
+  default     = false
 }
 
 variable "cache_expiration_days" {
@@ -61,4 +61,10 @@ variable "arn_format" {
   type        = string
   default     = "arn:aws"
   description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}
+
+variable "name_iam_objects" {
+  description = "Set the name prefix of all AWS IAM resources created by this module"
+  type        = string
+  default     = ""
 }

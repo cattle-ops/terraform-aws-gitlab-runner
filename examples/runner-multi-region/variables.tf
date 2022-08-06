@@ -1,32 +1,32 @@
-variable "aws_region" {
-  description = "AWS region."
+variable "aws_main_region" {
+  description = "Main AWS region to deploy to."
   type        = string
   default     = "eu-west-1"
 }
 
+variable "aws_alternate_region" {
+  description = "Alternate AWS region to deploy to."
+  type        = string
+  default     = "eu-central-1"
+}
+
 variable "environment" {
   description = "A name that identifies the environment, will used as prefix and for tagging."
-  default     = "ci-runners"
+  default     = "runner-public"
   type        = string
 }
 
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = string
+  default     = "public-auto"
 }
 
 variable "gitlab_url" {
   description = "URL of the gitlab instance to connect to."
   type        = string
+  default     = "https://gitlab.com"
 }
 
-variable "runner_token" {
-  description = "Token for the runner, will be used in the runner config.toml"
-  type        = string
-}
-
-variable "timezone" {
-  description = "Timezone that will be set for the runner."
-  type        = string
-  default     = "Europe/Amsterdam"
+variable "registration_token" {
 }

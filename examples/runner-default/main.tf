@@ -33,10 +33,9 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.private_subnets
-  subnet_id_runners        = element(module.vpc.private_subnets, 0)
-  metrics_autoscaling      = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
+  vpc_id              = module.vpc.vpc_id
+  subnet_id           = element(module.vpc.private_subnets, 0)
+  metrics_autoscaling = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
   runners_name             = var.runner_name
   runners_gitlab_url       = var.gitlab_url
@@ -44,7 +43,6 @@ module "runner" {
 
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
 
-  docker_machine_download_url   = "https://gitlab-docker-machine-downloads.s3.amazonaws.com/v0.16.2-gitlab.2/docker-machine"
   docker_machine_spot_price_bid = "on-demand-price"
 
   gitlab_runner_registration_config = {
