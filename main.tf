@@ -307,12 +307,12 @@ locals {
 }
 
 module "cache" {
+  count  = var.cache_bucket["create"] ? 1 : 0
   source = "./modules/cache"
 
   environment = var.environment
   tags        = local.tags
 
-  create_cache_bucket                  = var.cache_bucket["create"]
   cache_bucket_prefix                  = var.cache_bucket_prefix
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix

@@ -40,7 +40,7 @@ variable "tags" {
 }
 
 variable "create_cache_bucket" {
-  description = "This module is by default included in the runner module. To disable the creation of the bucket this parameter can be disabled."
+  description = "(deprecated) If the cache should not be craeted, remove the whole module call!"
   type        = bool
   default     = true
 }
