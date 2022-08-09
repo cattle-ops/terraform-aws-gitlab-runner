@@ -42,7 +42,12 @@ variable "tags" {
 variable "create_cache_bucket" {
   description = "(deprecated) If the cache should not be craeted, remove the whole module call!"
   type        = bool
-  default     = true
+  default     = null
+
+  validation {
+    condition     = anytrue([var.create_cache_bucket == null])
+    error_message = "Deprecated, don't call the module when not creating a cache bucket."
+  }
 }
 
 variable "cache_lifecycle_clear" {
