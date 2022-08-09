@@ -21,29 +21,6 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   }
 }
 
-# to read the current token for the null_resource. aws_ssm_parameter.runner_registration_token.value is never updated!
-data "aws_ssm_parameter" "current_runner_registration_token" {
-  depends_on = [aws_ssm_parameter.runner_registration_token]
-
-  name = local.secure_parameter_store_runner_token_key
-}
-
-resource "null_resource" "remove_runner" {
-  depends_on = [aws_ssm_parameter.runner_registration_token]
-
-  triggers = {
-    aws_region                = var.aws_region
-    runners_gitlab_url        = var.runners_gitlab_url
-    runner_registration_token = data.aws_ssm_parameter.current_runner_registration_token.value
-  }
-
-  provisioner "local-exec" {
-    when       = destroy
-    on_failure = continue
-    command    = "curl -sS --request DELETE \"${self.triggers.runners_gitlab_url}/api/v4/runners\" --form \"token=${self.triggers.runner_registration_token}\""
-  }
-}
-
 resource "aws_ssm_parameter" "runner_sentry_dsn" {
   name  = local.secure_parameter_store_runner_sentry_dsn
   type  = "SecureString"
@@ -98,12 +75,13 @@ locals {
     {
       aws_region                  = var.aws_region
       gitlab_url                  = var.runners_gitlab_url
+      gitlab_clone_url            = var.runners_clone_url
       runners_vpc_id              = var.vpc_id
       runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
       runners_instance_type       = var.docker_machine_instance_type
       runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
-      runners_ami                 = data.aws_ami.docker-machine.id
+      runners_ami                 = data.aws_ami.docker_machine.id
       runners_security_group_name = aws_security_group.docker_machine.name
       runners_monitoring          = var.runners_monitoring
       runners_ebs_optimized       = var.runners_ebs_optimized
@@ -149,17 +127,19 @@ locals {
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
-      runners_volumes_tmpfs             = join(",", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_services_volumes_tmpfs    = join(",", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
       session_server_string             = var.session_server == null ? "" : local.session_server_string
+      prometheus_listen_address         = var.prometheus_listen_address
+      auth_type                         = var.auth_type_cache_sr
     }
   )
 }
 
-data "aws_ami" "docker-machine" {
+data "aws_ami" "docker_machine" {
   most_recent = "true"
 
   dynamic "filter" {
@@ -182,7 +162,16 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   health_check_grace_period = 0
   max_instance_lifetime     = var.asg_max_instance_lifetime
   enabled_metrics           = var.metrics_autoscaling
-  tags                      = local.agent_tags_propagated
+
+  dynamic "tag" {
+    for_each = local.agent_tags
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 
   launch_template {
     id      = aws_launch_template.gitlab_runner_instance.id
@@ -250,8 +239,11 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
-      spot_options {
-        max_price = var.runner_instance_spot_price == "on-demand-price" ? "" : var.runner_instance_spot_price
+      dynamic "spot_options" {
+        for_each = var.runner_instance_spot_price == "on-demand-price" ? [] : [0]
+        content {
+          max_price = var.runner_instance_spot_price
+        }
       }
     }
   }
@@ -296,8 +288,10 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   tags = local.tags
 
   metadata_options {
-    http_endpoint = var.runner_instance_metadata_options_http_endpoint
-    http_tokens   = var.runner_instance_metadata_options_http_tokens
+    http_endpoint               = var.runner_instance_metadata_options.http_endpoint
+    http_tokens                 = var.runner_instance_metadata_options.http_tokens
+    http_put_response_hop_limit = var.runner_instance_metadata_options.http_put_response_hop_limit
+    instance_metadata_tags      = var.runner_instance_metadata_options.instance_metadata_tags
   }
 
   lifecycle {
@@ -522,6 +516,7 @@ module "terminate_instances_lifecycle_function" {
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
   lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
+  lambda_runtime                       = var.asg_terminate_lifecycle_lambda_runtime
   lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
