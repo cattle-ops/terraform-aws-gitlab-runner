@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.2.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.1.0...5.2.0) (2022-08-15)
+
+
+### Features
+
+* do not add a the Name tag for docker+machine >= 0.16.2 ([#522](https://github.com/npalm/terraform-aws-gitlab-runner/issues/522)) ([7e6d9be](https://github.com/npalm/terraform-aws-gitlab-runner/commit/7e6d9beb9852b0bb62786e83b2349de2ad98d261))
+
+
+### Bug Fixes
+
+* always add the cache policy ([#528](https://github.com/npalm/terraform-aws-gitlab-runner/issues/528)) ([ccaf55d](https://github.com/npalm/terraform-aws-gitlab-runner/commit/ccaf55d043b9673a0464b0abc8f8e62aaf9b3534))
+
 ## [5.1.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.2...5.1.0) (2022-07-20)
 
 
