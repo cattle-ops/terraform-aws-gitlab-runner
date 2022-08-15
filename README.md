@@ -166,7 +166,7 @@ A few option are provided to access the runner instance:
 
 ### GitLab runner cache
 
-By default the module creates a a cache for the runner in S3. Old objects are automatically removed via a configurable life cycle policy on the bucket.
+By default the module creates a cache for the runner in S3. Old objects are automatically removed via a configurable life cycle policy on the bucket.
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/cache). An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
 
@@ -208,7 +208,7 @@ module "runner" {
   runners_gitlab_url = "https://gitlab.com"
 
   gitlab_runner_registration_config = {
-    registration_token = "my-token
+    registration_token = "my-token"
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
@@ -439,7 +439,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
 | <a name="input_log_group_name"></a> [log\_group\_name](#input\_log\_group\_name) | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
 | <a name="input_metrics_autoscaling"></a> [metrics\_autoscaling](#input\_metrics\_autoscaling) | A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances. | `list(string)` | `null` | no |
-| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults. <br>The following attributes are supported: <br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. <br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. <br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent. <br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
+| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults. <br>The following attributes are supported: <br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. <br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. <br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
 | <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | <a name="input_prometheus_listen_address"></a> [prometheus\_listen\_address](#input\_prometheus\_listen\_address) | Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on. | `string` | `""` | no |
 | <a name="input_role_tags"></a> [role\_tags](#input\_role\_tags) | Map of tags that will be added to the role created. Useful for tag based authorization. | `map(string)` | `{}` | no |
