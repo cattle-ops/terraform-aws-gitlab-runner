@@ -399,7 +399,6 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
-  count      = var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }
