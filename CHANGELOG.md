@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.2.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.0...5.2.1) (2022-08-22)
+
+
+### Bug Fixes
+
+* access cache module via index [#530](https://github.com/npalm/terraform-aws-gitlab-runner/issues/530) ([d6f3875](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d6f3875b42b7c1263ad6c1a78e9ebc77d20ab24d))
+
 ## [5.2.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.1.0...5.2.0) (2022-08-15)
 
 
