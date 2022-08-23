@@ -73,33 +73,24 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
-      aws_region                  = var.aws_region
-      gitlab_url                  = var.runners_gitlab_url
-      gitlab_clone_url            = var.runners_clone_url
-      runners_vpc_id              = var.vpc_id
-      runners_subnet_id           = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
-      runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
-      runners_instance_type       = var.docker_machine_instance_type
-      runners_spot_price_bid      = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
-      runners_ami                 = data.aws_ami.docker_machine.id
-      runners_security_group_name = aws_security_group.docker_machine.name
-      runners_monitoring          = var.runners_monitoring
-      runners_ebs_optimized       = var.runners_ebs_optimized
-      runners_instance_profile    = aws_iam_instance_profile.docker_machine.name
-      runners_additional_volumes  = local.runners_additional_volumes
-      docker_machine_options      = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
-      runners_name                = var.runners_name
-      runners_tags = replace(replace(var.overrides["name_docker_machine_runners"] == "" ? format(
-        "Name,%s-docker-machine,%s,%s",
-        var.environment,
-        local.tags_string,
-        local.runner_tags_string,
-        ) : format(
-        "%s,%s,Name,%s",
-        local.tags_string,
-        local.runner_tags_string,
-        var.overrides["name_docker_machine_runners"],
-      ), ",,", ","), "/,$/", "")
+      aws_region                        = var.aws_region
+      gitlab_url                        = var.runners_gitlab_url
+      gitlab_clone_url                  = var.runners_clone_url
+      runners_vpc_id                    = var.vpc_id
+      runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
+      runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
+      runners_instance_type             = var.docker_machine_instance_type
+      runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
+      runners_ami                       = data.aws_ami.docker_machine.id
+      runners_security_group_name       = aws_security_group.docker_machine.name
+      runners_monitoring                = var.runners_monitoring
+      runners_ebs_optimized             = var.runners_ebs_optimized
+      runners_instance_profile          = aws_iam_instance_profile.docker_machine.name
+      runners_additional_volumes        = local.runners_additional_volumes
+      docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
+      docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
+      runners_name                      = var.runners_name
+      runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
@@ -302,17 +293,17 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = var.cache_bucket["create"] ? module.cache.bucket : lookup(var.cache_bucket, "bucket", "")
-  bucket_policy = var.cache_bucket["create"] ? module.cache.policy_arn : lookup(var.cache_bucket, "policy", "")
+  bucket_name   = var.cache_bucket["create"] ? module.cache[0].bucket : lookup(var.cache_bucket, "bucket", "")
+  bucket_policy = var.cache_bucket["create"] ? module.cache[0].policy_arn : lookup(var.cache_bucket, "policy", "")
 }
 
 module "cache" {
+  count  = var.cache_bucket["create"] ? 1 : 0
   source = "./modules/cache"
 
   environment = var.environment
   tags        = local.tags
 
-  create_cache_bucket                  = var.cache_bucket["create"]
   cache_bucket_prefix                  = var.cache_bucket_prefix
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
@@ -400,6 +391,7 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   count = var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0
+
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
