@@ -17,6 +17,8 @@ resource "aws_cloudwatch_event_rule" "terminate_instances" {
   }
 }
 EOF
+
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_event_target" "terminate_instances" {

@@ -95,28 +95,6 @@ variable "docker_machine_instance_metadata_options" {
   }
 }
 
-variable "runner_instance_metadata_options_http_endpoint" {
-  description = "DEPRECATED, replaced by runner_instance_metadata_options. Enable the Gitlab runner agent instance metadata service. The allowed values are enabled, disabled."
-  type        = string
-  default     = null
-
-  validation {
-    condition     = var.runner_instance_metadata_options_http_endpoint == null
-    error_message = "The \"runner_instance_metadata_options_http_endpoint\" variable is no longer used. To migrate, set the \"runner_instance_metadata_options.http_endpoint\" variable to the original value."
-  }
-}
-
-variable "runner_instance_metadata_options_http_tokens" {
-  description = "EPRECATED, replaced by runner_instance_metadata_options. Set if Gitlab runner agent instance metadata service session tokens are required. The allowed values are optional, required."
-  type        = string
-  default     = null
-
-  validation {
-    condition     = var.runner_instance_metadata_options_http_tokens == null
-    error_message = "The \"runner_instance_metadata_options_http_tokens\" variable is no longer used. To migrate, set the \"runner_instance_metadata_options.http_token\" variable to the original value."
-  }
-}
-
 variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
   type        = string
@@ -161,6 +139,12 @@ variable "runners_install_amazon_ecr_credential_helper" {
 variable "runners_gitlab_url" {
   description = "URL of the GitLab instance to connect to."
   type        = string
+}
+
+variable "runners_clone_url" {
+  description = "Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL."
+  type        = string
+  default     = ""
 }
 
 variable "runners_token" {
@@ -652,7 +636,7 @@ variable "overrides" {
     The following attributes are supported: 
       * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. 
       * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. 
-      * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent. 
+      * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
       * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
   EOT
   type        = map(string)
@@ -718,6 +702,7 @@ variable "enable_docker_machine_ssm_access" {
 }
 
 variable "runners_volumes_tmpfs" {
+  description = "Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
   type = list(object({
     volume  = string
     options = string
@@ -726,6 +711,7 @@ variable "runners_volumes_tmpfs" {
 }
 
 variable "runners_services_volumes_tmpfs" {
+  description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
   type = list(object({
     volume  = string
     options = string
