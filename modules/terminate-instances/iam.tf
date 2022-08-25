@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "lambda" {
       variable = "ec2:ResourceTag/gitlab-runner-parent-id"
       values   = ["i-*"]
     }
-    effect = "Allow"
+    effect = "Deny"
   }
 
   # Permit the function to execute the ASG lifecycle action
