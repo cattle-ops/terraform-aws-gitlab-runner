@@ -7,6 +7,7 @@ listen_address = "${prometheus_listen_address}"
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
+  clone_url = "${gitlab_clone_url}"
   token = "${runners_token}"
   executor = "${runners_executor}"
   environment = ${runners_environment_vars}
@@ -45,7 +46,7 @@ listen_address = "${prometheus_listen_address}"
     IdleTime = ${runners_idle_time}
     ${runners_max_builds}
     MachineDriver = "amazonec2"
-    MachineName = "runner-%s"
+    MachineName = "${docker_machine_name}"
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
       "amazonec2-region=${aws_region}",
