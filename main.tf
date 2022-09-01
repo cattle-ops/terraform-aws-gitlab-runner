@@ -82,6 +82,7 @@ locals {
     {
       aws_region                        = var.aws_region
       cache_region                      = data.aws_region.cache.name
+      runners_region                    = data.aws_region.default.name
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
       runners_vpc_id                    = var.vpc_id
