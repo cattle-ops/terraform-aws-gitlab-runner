@@ -584,6 +584,11 @@ variable "overrides" {
     name_runner_agent_instance  = ""
     name_docker_machine_runners = ""
   }
+
+  validation {
+    condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
+    error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
+  }
 }
 
 variable "cache_bucket" {
