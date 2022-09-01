@@ -45,7 +45,7 @@ listen_address = "${prometheus_listen_address}"
     IdleTime = ${runners_idle_time}
     ${runners_max_builds}
     MachineDriver = "amazonec2"
-    MachineName = "runner-%s"
+    MachineName = "${docker_machine_name}"
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
       "amazonec2-region=${runners_region}",

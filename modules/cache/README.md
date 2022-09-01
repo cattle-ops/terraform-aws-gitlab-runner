@@ -69,7 +69,7 @@ No modules.
 | <a name="input_cache_expiration_days"></a> [cache\_expiration\_days](#input\_cache\_expiration\_days) | Number of days before cache objects expires. | `number` | `1` | no |
 | <a name="input_cache_lifecycle_clear"></a> [cache\_lifecycle\_clear](#input\_cache\_lifecycle\_clear) | Enable the rule to cleanup the cache for expired objects. | `bool` | `true` | no |
 | <a name="input_cache_lifecycle_prefix"></a> [cache\_lifecycle\_prefix](#input\_cache\_lifecycle\_prefix) | Object key prefix identifying one or more objects to which the clean up rule applies. | `string` | `"runner/"` | no |
-| <a name="input_create_cache_bucket"></a> [create\_cache\_bucket](#input\_create\_cache\_bucket) | This module is by default included in the runner module. To disable the creation of the bucket this parameter can be disabled. | `bool` | `true` | no |
+| <a name="input_create_cache_bucket"></a> [create\_cache\_bucket](#input\_create\_cache\_bucket) | (deprecated) If the cache should not be craeted, remove the whole module call! | `bool` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | <a name="input_name_iam_objects"></a> [name\_iam\_objects](#input\_name\_iam\_objects) | Set the name prefix of all AWS IAM resources created by this module | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |

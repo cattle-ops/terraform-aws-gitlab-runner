@@ -28,7 +28,6 @@ resource "random_string" "s3_suffix" {
 }
 
 resource "aws_s3_bucket" "build_cache" {
-  count  = var.create_cache_bucket ? 1 : 0
   bucket = local.cache_bucket_name
 
   tags = local.tags
@@ -39,8 +38,7 @@ resource "aws_s3_bucket" "build_cache" {
 }
 
 resource "aws_s3_bucket_acl" "build_cache_acl" {
-  count  = var.create_cache_bucket ? 1 : 0
-  bucket = aws_s3_bucket.build_cache[0].id
+  bucket = aws_s3_bucket.build_cache.id
 
   acl = "private"
 
@@ -48,8 +46,7 @@ resource "aws_s3_bucket_acl" "build_cache_acl" {
 }
 
 resource "aws_s3_bucket_versioning" "build_cache_versioning" {
-  count  = var.create_cache_bucket ? 1 : 0
-  bucket = aws_s3_bucket.build_cache[0].id
+  bucket = aws_s3_bucket.build_cache.id
 
   versioning_configuration {
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
@@ -59,8 +56,7 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
-  count  = var.create_cache_bucket ? 1 : 0
-  bucket = aws_s3_bucket.build_cache[0].id
+  bucket = aws_s3_bucket.build_cache.id
 
   rule {
     id     = "clear"
@@ -79,8 +75,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
-  count  = var.create_cache_bucket ? 1 : 0
-  bucket = aws_s3_bucket.build_cache[0].id
+  bucket = aws_s3_bucket.build_cache.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -93,9 +88,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encry
 
 # block public access to S3 cache bucket
 resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
-  count = var.create_cache_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.build_cache[0].id
+  bucket = aws_s3_bucket.build_cache.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -106,8 +99,6 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
 }
 
 resource "aws_iam_policy" "docker_machine_cache" {
-  count = var.create_cache_bucket ? 1 : 0
-
   name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
@@ -115,7 +106,7 @@ resource "aws_iam_policy" "docker_machine_cache" {
 
   policy = templatefile("${path.module}/policies/cache.json",
     {
-      s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "${var.arn_format}:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
+      s3_cache_arn = aws_s3_bucket.build_cache.arn
     }
   )
 }
