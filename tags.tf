@@ -24,7 +24,7 @@ locals {
     local.tags,
     var.runner_tags,
     # overwrites the `Name` key from `local.tags`
-    var.overrides["name_docker_machine_runners"] == "" ? { Name = format("%s-docker-machine", var.environment) } : { Name = var.overrides["name_docker_machine_runners"] },
+    var.overrides["name_docker_machine_runners"] == "" ? { Name = substr(format("%s-docker-machine", var.environment), 0, 28) } : { Name = var.overrides["name_docker_machine_runners"] },
   )
 
   # remove the `Name` tag if docker+machine adds one to avoid a failure due to a duplicate `Name` tag
