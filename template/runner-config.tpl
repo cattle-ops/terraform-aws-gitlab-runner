@@ -24,7 +24,7 @@ listen_address = "${prometheus_listen_address}"
     disable_cache = ${runners_disable_cache}
     volumes = ["/cache"${runners_additional_volumes}]
     shm_size = ${runners_shm_size}
-    pull_policy = ${runners_pull_policy}
+    pull_policy = ${runners_pull_policies}
     runtime = "${runners_docker_runtime}"
     helper_image = "${runners_helper_image}"
   [runners.docker.tmpfs]
