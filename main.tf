@@ -101,7 +101,7 @@ locals {
       runners_docker_runtime            = var.runners_docker_runtime
       runners_helper_image              = var.runners_helper_image
       runners_shm_size                  = var.runners_shm_size
-      runners_pull_policy               = var.runners_pull_policy
+      runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
