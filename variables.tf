@@ -814,8 +814,8 @@ variable "asg_terminate_lifecycle_lambda_timeout" {
   type        = number
 }
 
-variable "do_yum_update" {
-  description = "Run a yum update as part of starting the instance"
+variable "runner_yum_update" {
+  description = "Run a yum update as part of starting the runner"
   default     = "true"
   type        = string
 }
