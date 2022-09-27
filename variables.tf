@@ -213,6 +213,12 @@ variable "runners_additional_volumes" {
   default     = []
 }
 
+variable "runners_extra_hosts" {
+  description = "Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1"
+  type        = list(string)
+  default     = []
+}
+
 variable "runners_shm_size" {
   description = "shm_size for the runners, will be used in the runner config.toml"
   type        = number
