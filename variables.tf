@@ -215,7 +215,7 @@ variable "runners_additional_volumes" {
 
 variable "runners_extra_hosts" {
   description = "Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1"
-  type        = list(string)
+  type        = list(any)
   default     = []
 }
 
