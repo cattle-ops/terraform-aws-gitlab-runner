@@ -23,6 +23,7 @@ listen_address = "${prometheus_listen_address}"
     privileged = ${runners_privileged}
     disable_cache = ${runners_disable_cache}
     volumes = ["/cache"${runners_additional_volumes}]
+    extra_hosts = ${jsonencode(runners_extra_hosts)}
     shm_size = ${runners_shm_size}
     pull_policy = "${runners_pull_policy}"
     runtime = "${runners_docker_runtime}"
