@@ -14,7 +14,8 @@ token=$(curl -f -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-m
 
 ${eip}
 
-if [[ `echo ${runner_yum_update}` == "true" ]]
+# Checking terraform boolean (1 is true)
+if [[ "$ryu -eq "1" || "$ryu == "true" || "$ryu == "t" || "$ryu == "enable" ]]
 then
   for i in {1..7}; do
     echo "Attempt: ---- " $i
