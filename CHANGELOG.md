@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.2.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.1...5.2.2) (2022-10-09)
+
+
+### Bug Fixes
+
+* Too long host names for docker machines ([#549](https://github.com/npalm/terraform-aws-gitlab-runner/issues/549)) ([808a967](https://github.com/npalm/terraform-aws-gitlab-runner/commit/808a96744f7666d6dd6566dbb2d3712cf757c207))
+
 ### [5.2.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.0...5.2.1) (2022-08-22)
 
 
