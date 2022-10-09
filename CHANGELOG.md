@@ -1,5 +1,18 @@
 # Changelog
 
+## [5.3.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.2...5.3.0) (2022-10-09)
+
+
+### Features
+
+* add extra_hosts to config.toml ([#547](https://github.com/npalm/terraform-aws-gitlab-runner/issues/547)) ([1491698](https://github.com/npalm/terraform-aws-gitlab-runner/commit/14916984276801aaace83941d2d12dd10f670e32))
+
+
+### Bug Fixes
+
+* do not add the cache access policy if there is none ([#540](https://github.com/npalm/terraform-aws-gitlab-runner/issues/540)) ([f69c8bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f69c8bbe5832ef670f1cea4fe01e63d7553e7158))
+* Too long host names for docker machines ([#549](https://github.com/npalm/terraform-aws-gitlab-runner/issues/549)) ([2fc8e77](https://github.com/npalm/terraform-aws-gitlab-runner/commit/2fc8e770337e9daedd536d6eb21a80ad06125f71))
+
 ### [5.2.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.1...5.2.2) (2022-10-09)
 
 
