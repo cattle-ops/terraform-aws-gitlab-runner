@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.4.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.3.0...5.4.0) (2022-10-10)
+
+
+### Features
+
+* Add option to disable yum update during cloud init ([#545](https://github.com/npalm/terraform-aws-gitlab-runner/issues/545)) ([9948417](https://github.com/npalm/terraform-aws-gitlab-runner/commit/99484173f65fb46f7c1fb045bf137decfa1ad757))
+* Add runners_pull_policies to support multiple pull policies ([#544](https://github.com/npalm/terraform-aws-gitlab-runner/issues/544)) ([8c0d420](https://github.com/npalm/terraform-aws-gitlab-runner/commit/8c0d42091894b1cefe15a37966ffd864ac0fcc9c))
+
 ## [5.3.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.2...5.3.0) (2022-10-09)
 
 
