@@ -234,7 +234,7 @@ variable "runners_helper_image" {
 variable "runners_pull_policy" {
   description = "Deprecated! Use runners_pull_policies instead. pull_policy for the runners, will be used in the runner config.toml"
   type        = string
-  default     = "always"
+  default     = ""
 }
 
 variable "runners_pull_policies" {
