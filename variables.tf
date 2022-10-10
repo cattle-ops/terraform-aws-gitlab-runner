@@ -238,9 +238,15 @@ variable "runners_helper_image" {
 }
 
 variable "runners_pull_policy" {
-  description = "pull_policy for the runners, will be used in the runner config.toml"
+  description = "Deprecated! Use runners_pull_policies instead. pull_policy for the runners, will be used in the runner config.toml"
   type        = string
-  default     = "always"
+  default     = ""
+}
+
+variable "runners_pull_policies" {
+  description = "pull policies for the runners, will be used in the runner config.toml, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
+  type        = list(string)
+  default     = ["always"]
 }
 
 variable "runners_monitoring" {
@@ -823,4 +829,10 @@ variable "asg_terminate_lifecycle_lambda_timeout" {
   description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
   default     = 30
   type        = number
+}
+
+variable "runner_yum_update" {
+  description = "Run a yum update as part of starting the runner"
+  type        = bool
+  default     = true
 }
