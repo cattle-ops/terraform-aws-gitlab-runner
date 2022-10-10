@@ -40,10 +40,10 @@ locals {
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
-      yum_update          = var.runner_yum_update ? local.template_yum_update : ""
+      yum_update          = var.runner_yum_update ? local.file_yum_update : ""
   })
 
-  template_yum_update = templatefile("${path.module}/template/yum_update.tpl")
+  file_yum_update = file("${path.module}/template/yum_update.tpl")
 
   template_eip = templatefile("${path.module}/template/eip.tpl", {
     eip = join(",", aws_eip.gitlab_runner.*.public_ip)
