@@ -47,7 +47,10 @@ locals {
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
+      yum_update          = var.runner_yum_update ? local.file_yum_update : ""
   })
+
+  file_yum_update = file("${path.module}/template/yum_update.tpl")
 
   template_eip = templatefile("${path.module}/template/eip.tpl", {
     eip = join(",", aws_eip.gitlab_runner.*.public_ip)
@@ -85,6 +88,7 @@ locals {
       runners_region                    = data.aws_region.default.name
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
+      runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
@@ -110,7 +114,7 @@ locals {
       runners_docker_runtime            = var.runners_docker_runtime
       runners_helper_image              = var.runners_helper_image
       runners_shm_size                  = var.runners_shm_size
-      runners_pull_policy               = var.runners_pull_policy
+      runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
@@ -404,6 +408,8 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
+  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }

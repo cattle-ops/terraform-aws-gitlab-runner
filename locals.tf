@@ -27,6 +27,8 @@ locals {
     }
   )
 
+  runners_pull_policies = var.runners_pull_policy != "" ? "[\"${var.runners_pull_policy}\"]" : "[\"${join("\",\"", var.runners_pull_policies)}\"]"
+
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
   docker_machine_version_used          = split(".", split("-", var.docker_machine_version)[0])

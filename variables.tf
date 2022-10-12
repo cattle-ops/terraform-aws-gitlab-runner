@@ -208,6 +208,12 @@ variable "runners_additional_volumes" {
   default     = []
 }
 
+variable "runners_extra_hosts" {
+  description = "Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1"
+  type        = list(any)
+  default     = []
+}
+
 variable "runners_shm_size" {
   description = "shm_size for the runners, will be used in the runner config.toml"
   type        = number
@@ -227,9 +233,15 @@ variable "runners_helper_image" {
 }
 
 variable "runners_pull_policy" {
-  description = "pull_policy for the runners, will be used in the runner config.toml"
+  description = "Deprecated! Use runners_pull_policies instead. pull_policy for the runners, will be used in the runner config.toml"
   type        = string
-  default     = "always"
+  default     = ""
+}
+
+variable "runners_pull_policies" {
+  description = "pull policies for the runners, will be used in the runner config.toml, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
+  type        = list(string)
+  default     = ["always"]
 }
 
 variable "runners_monitoring" {
@@ -384,7 +396,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "14.8.3"
+  default     = "15.3.0"
 }
 
 variable "enable_ping" {
@@ -578,6 +590,11 @@ variable "overrides" {
     name_iam_objects            = ""
     name_runner_agent_instance  = ""
     name_docker_machine_runners = ""
+  }
+
+  validation {
+    condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
+    error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
   }
 }
 
@@ -813,4 +830,10 @@ variable "aws_region" {
   description = "Deprecated. Is now calculated internally. AWS region."
   type        = string
   default     = null
+}
+
+variable "runner_yum_update" {
+  description = "Run a yum update as part of starting the runner"
+  type        = bool
+  default     = true
 }
