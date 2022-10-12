@@ -72,12 +72,13 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "logs:PutLogEvents",
       "logs:CreateLogStream",
-      "logs:CreateLogGroup",
     ]
     effect = "Allow"
+    # wildcard resources are ok as the log streams are created dynamically during runtime and are not known here
+    # tfsec:ignore:aws-iam-no-policy-wildcards
     resources = [
-      "${aws_cloudwatch_log_group.lambda.arn}:*",
-      "${aws_cloudwatch_log_group.lambda.arn}:*:*"
+      aws_cloudwatch_log_group.lambda.arn,
+      "${aws_cloudwatch_log_group.lambda.arn}:log-stream:*"
     ]
   }
 }
