@@ -22,5 +22,5 @@ resource "aws_cloudwatch_log_group" "environment" {
 
   # ignored as decided by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
-  kms_key_id        = local.kms_key
+  kms_key_id = local.kms_key
 }
