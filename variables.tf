@@ -296,7 +296,7 @@ variable "runners_docker_options" {
     oom_kill_disable             = optional(bool)
     oom_score_adjust             = optional(number)
     privileged                   = optional(bool, true)
-    pull_policy                  = optional(string, always)
+    pull_policy                  = optional(string, "always")
     runtime                      = optional(string)
     security_opt                 = optional(list(string))
     shm_size                     = optional(number, 0)
