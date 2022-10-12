@@ -25,6 +25,8 @@ resource "random_string" "s3_suffix" {
   special = false
 }
 
+# ok, we can go without access logging as it is a cache bucket only
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "build_cache" {
   bucket = local.cache_bucket_name
 
@@ -43,6 +45,8 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
   bucket = aws_s3_bucket.build_cache.id
 
   versioning_configuration {
+    # ok as decided by the user
+    # tfsec:ignore:aws-s3-enable-versioning
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
 }
