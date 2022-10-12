@@ -510,5 +510,6 @@ module "terminate_instances_lifecycle_function" {
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
+  kms_key_id = var.kms_key_id
   tags                                 = local.tags
 }
