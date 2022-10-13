@@ -68,6 +68,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
   }
 }
 
+# ok as it is a cache for Maven, NPM, ... There is no private data.
+# tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
   bucket = aws_s3_bucket.build_cache.id
 
