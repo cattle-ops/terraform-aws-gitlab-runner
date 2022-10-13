@@ -314,6 +314,8 @@ module "cache" {
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
 
+  kms_key_id = local.kms_key
+
   name_iam_objects = local.name_iam_objects
 }
 
@@ -517,5 +519,6 @@ module "terminate_instances_lifecycle_function" {
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
   kms_key_id                           = local.kms_key
+  arn_format                           = var.arn_format
   tags                                 = local.tags
 }

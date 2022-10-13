@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "ec2:TerminateInstances"
     ]
-    resources = ["arn:aws:ec2:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:instance/*"]
+    resources = ["${var.arn_format}:ec2:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:instance/*"]
     condition {
       test     = "StringLike"
       variable = "ec2:ResourceTag/gitlab-runner-parent-id"

@@ -73,3 +73,9 @@ variable "name_iam_objects" {
   type        = string
   default     = ""
 }
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypted the resources."
+  type        = string
+  default     = ""
+}
