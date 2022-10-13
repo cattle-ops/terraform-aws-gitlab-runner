@@ -1,5 +1,12 @@
 # Changelog
 
+### [5.4.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.0...5.4.1) (2022-10-13)
+
+
+### Bug Fixes
+
+* Add var.environment to the name of the S3 cache bucket [#533](https://github.com/npalm/terraform-aws-gitlab-runner/issues/533) ([#555](https://github.com/npalm/terraform-aws-gitlab-runner/issues/555)) ([6e0cd97](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6e0cd97e72e46bca8bb53493121f3eaf59526250))
+
 ## [5.4.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.3.0...5.4.0) (2022-10-10)
 
 
