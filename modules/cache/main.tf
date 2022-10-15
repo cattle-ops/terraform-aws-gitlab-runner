@@ -93,6 +93,15 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
   ignore_public_acls      = true
 }
 
+resource "aws_s3_bucket_logging" "build_cache" {
+  count = var.cache_logging_bucket != null ? 1 : 0
+
+  bucket = aws_s3_bucket.build_cache.id
+
+  target_bucket = var.cache_logging_bucket
+  target_prefix = var.cache_logging_bucket_prefix
+}
+
 resource "aws_iam_policy" "docker_machine_cache" {
   name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"

@@ -33,6 +33,18 @@ variable "cache_expiration_days" {
   default     = 1
 }
 
+variable "cache_logging_bucket" {
+  type        = string
+  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
+  default     = null
+}
+
+variable "cache_logging_bucket_prefix" {
+  type        = string
+  description = "Prefix within the `cache_logging_bucket`."
+  default     = null
+}
+
 variable "tags" {
   description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
   type        = map(string)
