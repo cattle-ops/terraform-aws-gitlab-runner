@@ -1,5 +1,72 @@
 # Changelog
 
+## [5.4.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.3.0...5.4.0) (2022-10-10)
+
+
+### Features
+
+* Add option to disable yum update during cloud init ([#545](https://github.com/npalm/terraform-aws-gitlab-runner/issues/545)) ([9948417](https://github.com/npalm/terraform-aws-gitlab-runner/commit/99484173f65fb46f7c1fb045bf137decfa1ad757))
+* Add runners_pull_policies to support multiple pull policies ([#544](https://github.com/npalm/terraform-aws-gitlab-runner/issues/544)) ([8c0d420](https://github.com/npalm/terraform-aws-gitlab-runner/commit/8c0d42091894b1cefe15a37966ffd864ac0fcc9c))
+
+## [5.3.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.2...5.3.0) (2022-10-09)
+
+
+### Features
+
+* add extra_hosts to config.toml ([#547](https://github.com/npalm/terraform-aws-gitlab-runner/issues/547)) ([1491698](https://github.com/npalm/terraform-aws-gitlab-runner/commit/14916984276801aaace83941d2d12dd10f670e32))
+
+
+### Bug Fixes
+
+* do not add the cache access policy if there is none ([#540](https://github.com/npalm/terraform-aws-gitlab-runner/issues/540)) ([f69c8bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f69c8bbe5832ef670f1cea4fe01e63d7553e7158))
+* Too long host names for docker machines ([#549](https://github.com/npalm/terraform-aws-gitlab-runner/issues/549)) ([2fc8e77](https://github.com/npalm/terraform-aws-gitlab-runner/commit/2fc8e770337e9daedd536d6eb21a80ad06125f71))
+
+### [5.2.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.1...5.2.2) (2022-10-09)
+
+
+### Bug Fixes
+
+* Too long host names for docker machines ([#549](https://github.com/npalm/terraform-aws-gitlab-runner/issues/549)) ([808a967](https://github.com/npalm/terraform-aws-gitlab-runner/commit/808a96744f7666d6dd6566dbb2d3712cf757c207))
+
+### [5.2.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.0...5.2.1) (2022-08-22)
+
+
+### Bug Fixes
+
+* access cache module via index [#530](https://github.com/npalm/terraform-aws-gitlab-runner/issues/530) ([d6f3875](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d6f3875b42b7c1263ad6c1a78e9ebc77d20ab24d))
+
+## [5.2.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.1.0...5.2.0) (2022-08-15)
+
+
+### Features
+
+* do not add a the Name tag for docker+machine >= 0.16.2 ([#522](https://github.com/npalm/terraform-aws-gitlab-runner/issues/522)) ([7e6d9be](https://github.com/npalm/terraform-aws-gitlab-runner/commit/7e6d9beb9852b0bb62786e83b2349de2ad98d261))
+
+
+### Bug Fixes
+
+* always add the cache policy ([#528](https://github.com/npalm/terraform-aws-gitlab-runner/issues/528)) ([ccaf55d](https://github.com/npalm/terraform-aws-gitlab-runner/commit/ccaf55d043b9673a0464b0abc8f8e62aaf9b3534))
+
+## [5.1.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.2...5.1.0) (2022-07-20)
+
+
+### Features
+
+* add `clone_url` to `config.toml` ([#516](https://github.com/npalm/terraform-aws-gitlab-runner/issues/516)) ([9a41525](https://github.com/npalm/terraform-aws-gitlab-runner/commit/9a415257de6ac5e78e16c2e29190868a70483f75))
+* Tag aws_cloudwatch_event_rule resource + linting ([#519](https://github.com/npalm/terraform-aws-gitlab-runner/issues/519)) ([f2e98bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f2e98bb95cee62c23cc6d5ab7fe2531aee3a5504))
+
+
+### Bug Fixes
+
+* Make statement IDs unique ([#503](https://github.com/npalm/terraform-aws-gitlab-runner/issues/503)) ([05055c0](https://github.com/npalm/terraform-aws-gitlab-runner/commit/05055c0f09fd846a9ba43126fad71b5d01495d39))
+
+### [5.0.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.1...5.0.2) (2022-05-26)
+
+
+### Bug Fixes
+
+* use IMDSv2 url when setting PARENT_INSTANCE_ID ([#497](https://github.com/npalm/terraform-aws-gitlab-runner/issues/497)) ([536535f](https://github.com/npalm/terraform-aws-gitlab-runner/commit/536535f266930ce57136276325a58c84a3ceb341))
+
 ### [5.0.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.0...5.0.1) (2022-05-20)
 
 
