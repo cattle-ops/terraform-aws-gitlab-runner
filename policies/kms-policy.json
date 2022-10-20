@@ -6,7 +6,7 @@
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-          "${arn_format}:iam::${account_id}:root"
+          "arn:${partition}:iam::${account_id}:root"
         ]
       },
       "Action": "kms:*",

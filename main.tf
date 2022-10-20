@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 data "aws_subnet" "runners" {
   id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
@@ -40,7 +41,10 @@ locals {
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
+      yum_update          = var.runner_yum_update ? local.file_yum_update : ""
   })
+
+  file_yum_update = file("${path.module}/template/yum_update.tpl")
 
   template_eip = templatefile("${path.module}/template/eip.tpl", {
     eip = join(",", aws_eip.gitlab_runner.*.public_ip)
@@ -76,6 +80,7 @@ locals {
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
+      runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
@@ -101,7 +106,7 @@ locals {
       runners_docker_runtime            = var.runners_docker_runtime
       runners_helper_image              = var.runners_helper_image
       runners_shm_size                  = var.runners_shm_size
-      runners_pull_policy               = var.runners_pull_policy
+      runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
@@ -326,7 +331,7 @@ resource "aws_iam_instance_profile" "instance" {
 resource "aws_iam_role" "instance" {
   name                 = "${local.name_iam_objects}-instance"
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = merge(local.tags, var.role_tags)
 }
 
@@ -375,7 +380,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
   count = var.enable_runner_ssm_access ? 1 : 0
 
   role       = aws_iam_role.instance.name
-  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 ################################################################################
@@ -391,6 +396,8 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
+  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+
   role       = aws_iam_role.instance.name
   policy_arn = local.bucket_policy
 }
@@ -401,7 +408,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 resource "aws_iam_role" "docker_machine" {
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = local.tags
 }
 
@@ -425,7 +432,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
   count = var.enable_docker_machine_ssm_access ? 1 : 0
 
   role       = aws_iam_role.docker_machine.name
-  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 ################################################################################
@@ -437,7 +444,7 @@ resource "aws_iam_policy" "service_linked_role" {
   name        = "${local.name_iam_objects}-service_linked_role"
   path        = "/"
   description = "Policy for creation of service linked roles."
-  policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
+  policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { partition = data.aws_partition.current.partition })
   tags        = local.tags
 }
 
@@ -461,7 +468,7 @@ resource "aws_iam_policy" "ssm" {
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
-  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
+  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { partition = data.aws_partition.current.partition })
   tags        = local.tags
 }
 
@@ -509,7 +516,7 @@ module "terminate_instances_lifecycle_function" {
   lambda_runtime                       = var.asg_terminate_lifecycle_lambda_runtime
   lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
   name_iam_objects                     = local.name_iam_objects
-  role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
   tags                                 = local.tags
 }
