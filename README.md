@@ -7,6 +7,12 @@
 - [Usage](#usage)
 - [Examples](#examples)
 - [Contributors ✨](#contributors-)
+- [Requirements](#requirements)
+- [Providers](#providers)
+- [Modules](#modules)
+- [Resources](#resources)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
 
 ## The module
 
@@ -276,7 +282,7 @@ The version of Terraform is locked down via tfenv, see the `.terraform-version` 
 
 ### Configure
 
-The examples are configured with defaults that should work in general. The examples are in general configured for the region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be found in GitLab in the runner section (global, group or repo scope). Create a file `terrafrom.tfvars` and the registration token.
+The examples are configured with defaults that should work in general. The examples are in general configured for the region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be found in GitLab in the runner section (global, group or repo scope). Create a file `terraform.tfvars` and the registration token.
 
     registration_token = "MY_TOKEN"
 
