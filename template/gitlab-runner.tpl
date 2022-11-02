@@ -73,13 +73,13 @@ token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_ke
 valid_token=true
 if [[ `echo $token` != "null" ]]
 then
-  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
+  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
   [[ `echo $valid_token_response` != "200" ]] && valid_token=false
 fi
 
 if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]] || [[ `echo $valid_token` == "false" ]]
 then
-  token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+  token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
     --form "tag_list=${gitlab_runner_tag_list}" \
     --form "description=${giltab_runner_description}" \
@@ -122,7 +122,7 @@ start() {
 stop() {
     logger "Removing Gitlab Runner Token"
     aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" 2>&1 | logger &
-    curl -sS --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
+    curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
     retval=\$?
     rm -f \$lockfile
     return \$retval

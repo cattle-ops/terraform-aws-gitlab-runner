@@ -64,8 +64,8 @@ module "runner" {
 
   cache_bucket = {
     create = false
-    policy = "${module.cache.policy_arn}"
-    bucket = "${module.cache.bucket}"
+    policy = module.cache.policy_arn
+    bucket = module.cache.bucket
   }
 }
 
@@ -99,8 +99,8 @@ module "runner2" {
 
   cache_bucket = {
     create = false
-    policy = "${module.cache.policy_arn}"
-    bucket = "${module.cache.bucket}"
+    policy = module.cache.policy_arn
+    bucket = module.cache.bucket
   }
 }
 

@@ -35,6 +35,15 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
+  pre_install_certificate = <<-EOT
+    mkdir -p /etc/gitlab-runner/certs/
+    cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
+    ${var.runners_gitlab_certificate}
+    EOF
+    chmod 600 /etc/gitlab-runner/certs/gitlab.crt
+    chmod -R a+r /etc/gitlab-runner
+  EOT
+
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
@@ -58,6 +67,8 @@ locals {
       runners_config                               = local.template_runner_config
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
+      curl_cacert                                  = length(var.runners_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
+      pre_install_certificate                      = length(var.runners_gitlab_certificate) > 0 ? local.pre_install_certificate : ""
       pre_install                                  = var.userdata_pre_install
       post_install                                 = var.userdata_post_install
       runners_gitlab_url                           = var.runners_gitlab_url
@@ -80,6 +91,7 @@ locals {
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
+      tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
