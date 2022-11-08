@@ -454,6 +454,12 @@ variable "enable_cloudwatch_logging" {
   default     = true
 }
 
+variable "create_cloudwatch_log_group" {
+  description = "Whether to create a cloudwatch log group within the module. Requires `enable_cloudwatch_logging = true`."
+  type        = bool
+  default     = true
+}
+
 variable "cloudwatch_logging_retention_in_days" {
   description = "Retention for cloudwatch logs. Defaults to unlimited"
   type        = number
