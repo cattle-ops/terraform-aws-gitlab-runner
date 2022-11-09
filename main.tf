@@ -35,15 +35,6 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  pre_install_certificate = <<-EOT
-    mkdir -p /etc/gitlab-runner/certs/
-    cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
-    ${var.runners_gitlab_certificate}
-    EOF
-    chmod 600 /etc/gitlab-runner/certs/gitlab.crt
-    chmod -R a+r /etc/gitlab-runner
-  EOT
-
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
@@ -68,7 +59,7 @@ locals {
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
       curl_cacert                                  = length(var.runners_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
-      pre_install_certificate                      = length(var.runners_gitlab_certificate) > 0 ? local.pre_install_certificate : ""
+      pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.userdata_pre_install
       post_install                                 = var.userdata_post_install
       runners_gitlab_url                           = var.runners_gitlab_url

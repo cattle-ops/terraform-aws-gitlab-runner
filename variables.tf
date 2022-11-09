@@ -842,3 +842,9 @@ variable "runners_gitlab_certificate" {
   type        = string
   default     = ""
 }
+
+variable "runners_ca_certificate" {
+  description = "Trusted CA certificate bundle. Example: `file(\"$${path.module}/ca.crt\")`"
+  type        = string
+  default     = ""
+}

@@ -16,6 +16,7 @@ EOF
 
 sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
 
+${pre_install_certificates}
 ${pre_install}
 
 if [[ `echo ${runners_executor}` == "docker" ]]
