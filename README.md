@@ -7,6 +7,12 @@
 - [Usage](#usage)
 - [Examples](#examples)
 - [Contributors ✨](#contributors-)
+- [Requirements](#requirements)
+- [Providers](#providers)
+- [Modules](#modules)
+- [Resources](#resources)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
 
 ## The module
 
@@ -276,7 +282,7 @@ The version of Terraform is locked down via tfenv, see the `.terraform-version` 
 
 ### Configure
 
-The examples are configured with defaults that should work in general. The examples are in general configured for the region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be found in GitLab in the runner section (global, group or repo scope). Create a file `terrafrom.tfvars` and the registration token.
+The examples are configured with defaults that should work in general. The examples are in general configured for the region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be found in GitLab in the runner section (global, group or repo scope). Create a file `terraform.tfvars` and the registration token.
 
     registration_token = "MY_TOKEN"
 
@@ -375,6 +381,7 @@ Made with [contributors-img](https://contrib.rocks).
 | [aws_ami.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_availability_zone.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zone) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_subnet.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 
 ## Inputs
@@ -385,7 +392,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_allow_iam_service_linked_role_creation"></a> [allow\_iam\_service\_linked\_role\_creation](#input\_allow\_iam\_service\_linked\_role\_creation) | Boolean used to control attaching the policy to a runner instance to create service linked roles. | `bool` | `true` | no |
 | <a name="input_ami_filter"></a> [ami\_filter](#input\_ami\_filter) | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image. | `map(list(string))` | <pre>{<br>  "name": [<br>    "amzn2-ami-hvm-2.*-x86_64-ebs"<br>  ]<br>}</pre> | no |
 | <a name="input_ami_owners"></a> [ami\_owners](#input\_ami\_owners) | The list of owners used to select the AMI of Gitlab runner agent instances. | `list(string)` | <pre>[<br>  "amazon"<br>]</pre> | no |
-| <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
+| <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `null` | no |
 | <a name="input_asg_delete_timeout"></a> [asg\_delete\_timeout](#input\_asg\_delete\_timeout) | Timeout when trying to delete the Runner ASG. | `string` | `"10m"` | no |
 | <a name="input_asg_max_instance_lifetime"></a> [asg\_max\_instance\_lifetime](#input\_asg\_max\_instance\_lifetime) | The seconds before an instance is refreshed in the ASG. | `number` | `null` | no |
 | <a name="input_asg_terminate_lifecycle_hook_create"></a> [asg\_terminate\_lifecycle\_hook\_create](#input\_asg\_terminate\_lifecycle\_hook\_create) | Boolean toggling the creation of the ASG instance terminate lifecycle hook. | `bool` | `true` | no |
