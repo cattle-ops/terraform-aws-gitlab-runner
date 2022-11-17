@@ -329,7 +329,7 @@ Co-authored-by: Steve Wilson <steve@swsystem.co.uk>
 - Changed: ci: rewrite CI, examples verified for Terraform 13 and 14
 - Changed: fix: failing pip install for assigning eip #280
 - Added: feat: Add option to customize helper image (#293) @stefan-kolb
-- Added: chore: Contributors list (#291)  
+- Added: chore: Contributors list (#291)
 - Added: feat: Support Security Group custom description (#278) @pandarouxbsd
 
 
@@ -341,7 +341,7 @@ Co-authored-by: Steve Wilson <steve@swsystem.co.uk>
 - Added: Option to set docker runtime (#273) by @thomaskelm
 - Added: Option to attach additional policies to the runner (#269) by @bliles
 - Added: Random suffix to s3 bucket (#252) by @fliphess
-  
+
 
 ## 4.20.0 - 2020-10-08
 

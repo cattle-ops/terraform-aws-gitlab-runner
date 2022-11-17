@@ -22,4 +22,3 @@
 ## Outputs
 
 No output.
-

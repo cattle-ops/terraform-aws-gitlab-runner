@@ -7,8 +7,39 @@ on:
   pull_request:
 
 jobs:
+  pre_commit:
+    name: 💍 pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: hashicorp/setup-terraform@v2
+      - name: Install binaries
+        run: |
+          mkdir -p .binaries && cd .binaries
+          curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          mv terraform-docs /usr/local/bin/terraform-docs
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          # Install tfsec
+          curl -sSLo ./tfsec_1.28.0_linux_amd64.tar.gz https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec_1.28.0_linux_amd64.tar.gz
+          mv tfsec_1.28.0_linux_amd64.tar.gz tfsec.tar.gz
+          tar -xzf tfsec.tar.gz
+          chmod +x tfsec
+          mv tfsec /usr/local/bin/tfsec
+          cd ..
+      - name: Run
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install pre-commit checkov
+          pre-commit install
+          pre-commit run --all-files --show-diff-on-failure
+
   verify_module:
     name: Verify module
+    needs: [pre_commit]
     strategy:
       matrix:
         terraform: [1.1.9]
@@ -22,6 +53,7 @@ jobs:
 
   verify_examples:
     name: Verify examples
+    needs: [pre_commit]
     strategy:
       fail-fast: false
       matrix:
@@ -33,6 +65,7 @@ jobs:
             "runner-multi-region",
             "runner-pre-registered",
             "runner-public",
+            "runner-certificates",
           ]
     defaults:
       run:
@@ -53,7 +86,7 @@ jobs:
     name: Auto update terraform docs
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: CHeckout branch
       uses: actions/checkout@v3
@@ -102,5 +135,5 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           cp .release/* .
-          yarn 
+          yarn
           yarn release --repositoryUrl https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git

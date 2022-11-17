@@ -23,6 +23,9 @@ variable "gitlab_url" {
 }
 
 variable "registration_token" {
+  description = "Gitlab runner registration token"
+  type        = string
+  default     = "something"
 }
 
 variable "timezone" {

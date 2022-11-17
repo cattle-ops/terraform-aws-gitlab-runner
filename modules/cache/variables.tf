@@ -62,12 +62,6 @@ variable "cache_lifecycle_prefix" {
   default     = "runner/"
 }
 
-variable "arn_format" {
-  type        = string
-  default     = "arn:aws"
-  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
-}
-
 variable "name_iam_objects" {
   description = "Set the name prefix of all AWS IAM resources created by this module"
   type        = string

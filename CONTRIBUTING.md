@@ -25,7 +25,7 @@ We use the [Terraform Style conventions](https://www.terraform.io/docs/configura
 
 ## Documentation
 
-We use [pre-commit](https://pre-commit.com/) to update the Terraform inputs and outputs in the documentation via [terraform-docs](https://github.com/terraform-docs/terraform-docs). Ensure you have installed those components.
+We use [pre-commit](https://pre-commit.com/) to update the Terraform inputs and outputs in the documentation via [terraform-docs](https://github.com/terraform-docs/terraform-docs) and [Python](https://www.python.org/). Ensure you have installed those components.
 
 ## Testing
 

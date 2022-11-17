@@ -12,7 +12,7 @@
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-> BREAKING CHANGE: The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+> BREAKING CHANGE: The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintenance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
 
 > BREAKING CHANGE: By default AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
 
@@ -309,77 +309,11 @@ Made with [contributors-img](https://contrib.rocks).
 
 
 <!-- BEGIN_TF_DOCS -->
-## Requirements
+----
+## Module Docs
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4 |
-
-## Modules
-
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_cache"></a> [cache](#module\_cache) | ./modules/cache | n/a |
-| <a name="module_terminate_instances_lifecycle_function"></a> [terminate\_instances\_lifecycle\_function](#module\_terminate\_instances\_lifecycle\_function) | ./modules/terminate-instances | n/a |
-
-## Resources
-
-| Name | Type |
-|------|------|
-| [aws_autoscaling_group.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
-| [aws_autoscaling_schedule.scale_in](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_schedule) | resource |
-| [aws_autoscaling_schedule.scale_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_schedule) | resource |
-| [aws_cloudwatch_log_group.environment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
-| [aws_eip.gitlab_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
-| [aws_iam_instance_profile.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
-| [aws_iam_instance_profile.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
-| [aws_iam_policy.eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.instance_docker_machine_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.instance_session_manager_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_role.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
-| [aws_iam_role_policy_attachment.docker_machine_cache_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.docker_machine_session_manager_aws_managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.docker_machine_user_defined_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.instance_docker_machine_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.instance_session_manager_aws_managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.instance_session_manager_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.user_defined_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_kms_alias.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
-| [aws_kms_key.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
-| [aws_launch_template.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
-| [aws_security_group.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group_rule.docker_machine_docker_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.docker_machine_docker_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.docker_machine_ping_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.docker_machine_ping_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.docker_machine_ssh_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.docker_machine_ssh_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.runner_ping_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_ssm_parameter.runner_registration_token](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
-| [aws_ssm_parameter.runner_sentry_dsn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
-| [aws_ami.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
-| [aws_ami.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
-| [aws_availability_zone.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zone) | data source |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
-| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
-| [aws_subnet.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
-
-## Inputs
+----
+### Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
@@ -387,7 +321,6 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_allow_iam_service_linked_role_creation"></a> [allow\_iam\_service\_linked\_role\_creation](#input\_allow\_iam\_service\_linked\_role\_creation) | Boolean used to control attaching the policy to a runner instance to create service linked roles. | `bool` | `true` | no |
 | <a name="input_ami_filter"></a> [ami\_filter](#input\_ami\_filter) | List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image. | `map(list(string))` | <pre>{<br>  "name": [<br>    "amzn2-ami-hvm-2.*-x86_64-ebs"<br>  ]<br>}</pre> | no |
 | <a name="input_ami_owners"></a> [ami\_owners](#input\_ami\_owners) | The list of owners used to select the AMI of Gitlab runner agent instances. | `list(string)` | <pre>[<br>  "amazon"<br>]</pre> | no |
-| <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `null` | no |
 | <a name="input_asg_delete_timeout"></a> [asg\_delete\_timeout](#input\_asg\_delete\_timeout) | Timeout when trying to delete the Runner ASG. | `string` | `"10m"` | no |
 | <a name="input_asg_max_instance_lifetime"></a> [asg\_max\_instance\_lifetime](#input\_asg\_max\_instance\_lifetime) | The seconds before an instance is refreshed in the ASG. | `number` | `null` | no |
 | <a name="input_asg_terminate_lifecycle_hook_create"></a> [asg\_terminate\_lifecycle\_hook\_create](#input\_asg\_terminate\_lifecycle\_hook\_create) | Boolean toggling the creation of the ASG instance terminate lifecycle hook. | `bool` | `true` | no |
@@ -440,7 +373,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
 | <a name="input_log_group_name"></a> [log\_group\_name](#input\_log\_group\_name) | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
 | <a name="input_metrics_autoscaling"></a> [metrics\_autoscaling](#input\_metrics\_autoscaling) | A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances. | `list(string)` | `null` | no |
-| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults. <br>The following attributes are supported: <br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. <br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. <br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
+| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults.<br>The following attributes are supported:<br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.<br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.<br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
 | <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | <a name="input_prometheus_listen_address"></a> [prometheus\_listen\_address](#input\_prometheus\_listen\_address) | Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on. | `string` | `""` | no |
 | <a name="input_role_tags"></a> [role\_tags](#input\_role\_tags) | Map of tags that will be added to the role created. Useful for tag based authorization. | `map(string)` | `{}` | no |
@@ -457,6 +390,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runner_yum_update"></a> [runner\_yum\_update](#input\_runner\_yum\_update) | Run a yum update as part of starting the runner | `bool` | `true` | no |
 | <a name="input_runners_add_dind_volumes"></a> [runners\_add\_dind\_volumes](#input\_runners\_add\_dind\_volumes) | Add certificates and docker.sock to the volumes to support docker-in-docker (dind) | `bool` | `false` | no |
 | <a name="input_runners_additional_volumes"></a> [runners\_additional\_volumes](#input\_runners\_additional\_volumes) | Additional volumes that will be used in the runner config.toml, e.g Docker socket | `list(any)` | `[]` | no |
+| <a name="input_runners_ca_certificate"></a> [runners\_ca\_certificate](#input\_runners\_ca\_certificate) | Trusted CA certificate bundle. Example: `file("${path.module}/ca.crt")` | `string` | `""` | no |
 | <a name="input_runners_check_interval"></a> [runners\_check\_interval](#input\_runners\_check\_interval) | defines the interval length, in seconds, between new jobs check. | `number` | `3` | no |
 | <a name="input_runners_clone_url"></a> [runners\_clone\_url](#input\_runners\_clone\_url) | Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL. | `string` | `""` | no |
 | <a name="input_runners_concurrent"></a> [runners\_concurrent](#input\_runners\_concurrent) | Concurrent value for the runners, will be used in the runner config.toml. | `number` | `10` | no |
@@ -467,6 +401,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_environment_vars"></a> [runners\_environment\_vars](#input\_runners\_environment\_vars) | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | `list(string)` | `[]` | no |
 | <a name="input_runners_executor"></a> [runners\_executor](#input\_runners\_executor) | The executor to use. Currently supports `docker+machine` or `docker`. | `string` | `"docker+machine"` | no |
 | <a name="input_runners_extra_hosts"></a> [runners\_extra\_hosts](#input\_runners\_extra\_hosts) | Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1 | `list(any)` | `[]` | no |
+| <a name="input_runners_gitlab_certificate"></a> [runners\_gitlab\_certificate](#input\_runners\_gitlab\_certificate) | Certificate of the GitLab instance to connect to. Example: `file("${path.module}/my-gitlab.crt")` | `string` | `""` | no |
 | <a name="input_runners_gitlab_url"></a> [runners\_gitlab\_url](#input\_runners\_gitlab\_url) | URL of the GitLab instance to connect to. | `string` | n/a | yes |
 | <a name="input_runners_helper_image"></a> [runners\_helper\_image](#input\_runners\_helper\_image) | Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml | `string` | `""` | no |
 | <a name="input_runners_iam_instance_profile_name"></a> [runners\_iam\_instance\_profile\_name](#input\_runners\_iam\_instance\_profile\_name) | IAM instance profile name of the runners, will be used in the runner config.toml | `string` | `""` | no |
@@ -506,7 +441,16 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_userdata_pre_install"></a> [userdata\_pre\_install](#input\_userdata\_pre\_install) | User-data script snippet to insert before GitLab runner install | `string` | `""` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The target VPC for the docker-machine and runner instances. | `string` | n/a | yes |
 
-## Outputs
+----
+### Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_cache"></a> [cache](#module\_cache) | ./modules/cache | n/a |
+| <a name="module_terminate_instances_lifecycle_function"></a> [terminate\_instances\_lifecycle\_function](#module\_terminate\_instances\_lifecycle\_function) | ./modules/terminate-instances | n/a |
+
+----
+### Outputs
 
 | Name | Description |
 |------|-------------|
@@ -521,4 +465,74 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="output_runner_role_arn"></a> [runner\_role\_arn](#output\_runner\_role\_arn) | ARN of the role used for the docker machine runners. |
 | <a name="output_runner_role_name"></a> [runner\_role\_name](#output\_runner\_role\_name) | Name of the role used for the docker machine runners. |
 | <a name="output_runner_sg_id"></a> [runner\_sg\_id](#output\_runner\_sg\_id) | ID of the security group attached to the docker machine runners. |
+
+----
+### Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4 |
+
+----
+### Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4 |
+
+----
+### Resources
+
+| Name | Type |
+|------|------|
+| [aws_autoscaling_group.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
+| [aws_autoscaling_schedule.scale_in](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_schedule) | resource |
+| [aws_autoscaling_schedule.scale_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_schedule) | resource |
+| [aws_cloudwatch_log_group.environment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_eip.gitlab_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_iam_instance_profile.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_instance_profile.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_policy.eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.instance_docker_machine_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.instance_session_manager_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy.instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy_attachment.docker_machine_cache_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.docker_machine_session_manager_aws_managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.docker_machine_user_defined_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.instance_docker_machine_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.instance_session_manager_aws_managed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.instance_session_manager_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.user_defined_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_kms_alias.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
+| [aws_kms_key.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_launch_template.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
+| [aws_security_group.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group_rule.docker_machine_docker_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.docker_machine_docker_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.docker_machine_ping_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.docker_machine_ping_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.docker_machine_ssh_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.docker_machine_ssh_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.runner_ping_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_ssm_parameter.runner_registration_token](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.runner_sentry_dsn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
+| [aws_ami.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ami.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_availability_zone.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zone) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
+| [aws_subnet.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
+
+----
+
+```
 <!-- END_TF_DOCS -->

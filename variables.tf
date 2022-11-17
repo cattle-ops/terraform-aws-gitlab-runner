@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "arn_format" {
-  type        = string
-  default     = null
-  description = "Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions."
-}
-
 variable "auth_type_cache_sr" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
   type        = string
@@ -581,10 +575,10 @@ variable "enable_manage_gitlab_token" {
 
 variable "overrides" {
   description = <<-EOT
-    This map provides the possibility to override some defaults. 
-    The following attributes are supported: 
-      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. 
-      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. 
+    This map provides the possibility to override some defaults.
+    The following attributes are supported:
+      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
+      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
       * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
       * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
   EOT
