@@ -25,7 +25,7 @@ resource "random_string" "s3_suffix" {
   special = false
 }
 
-# ok, we can go without access logging as it is a cache bucket only
+# ok as user can decide to enable the logging. See aws_s3_bucket_logging resource below.
 # tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "build_cache" {
   bucket = local.cache_bucket_name
