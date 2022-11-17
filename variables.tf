@@ -364,7 +364,7 @@ variable "runners_check_interval" {
 
 variable "cache_logging_bucket" {
   type        = string
-  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
+  description = "S3 Bucket ID where the access logs to the cache bucket are stored. Don't forget to allow logging.s3.amazonaws.com s3:PutObject on your S3 bucket!"
   default     = null
 }
 
