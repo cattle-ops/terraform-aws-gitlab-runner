@@ -1,4 +1,4 @@
-data "aws_caller_identity" "cache" {
+data "aws_caller_identity" "current" {
   provider = aws.cache_bucket
 }
 
