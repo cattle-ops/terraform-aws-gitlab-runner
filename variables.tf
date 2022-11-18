@@ -727,6 +727,18 @@ variable "log_group_name" {
   type        = string
 }
 
+variable "runner_iam_role_name" {
+  type        = string
+  description = "IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used"
+  default     = ""
+}
+
+variable "create_runner_iam_role" {
+  type        = bool
+  description = "Whether to create the runner IAM role of the gitlab runner agent EC2 instance."
+  default     = true
+}
+
 variable "runner_iam_policy_arns" {
   type        = list(string)
   description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
