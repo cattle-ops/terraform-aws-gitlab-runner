@@ -55,7 +55,7 @@ jobs:
         run: |
           npm install -g markdownlint-cli
           
-          find . -name "*.md" -type f -print0 | while IFS= read -r -d '' file; do
+          find . -name "*.md" ! -name "CHANGELOG.md" -type f -print0 | while IFS= read -r -d '' file; do
             echo "Checking $file"
             sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' "$file" | markdownlint -c .markdownlint.yml -s
           done
