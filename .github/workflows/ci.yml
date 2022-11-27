@@ -55,7 +55,7 @@ jobs:
         run: |
           npm install -g markdownlint-cli
           
-          find . -name "*.md" -type f -print0 | cat "{}" | sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' | markdownlint -c .markdownlint.yml
+          find . -name "*.md" -type f -print0 -exec cat "{}" | sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' | markdownlint -c .markdownlint.yml \;
 
   docs:
     # update docs after merge back to develop
