@@ -53,9 +53,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Validate Markdown file
         run: |
+          set -euo pipefail
+          
           npm install -g markdownlint-cli
           
-          find . -name "*.md" -type f -print0 -exec cat "{}" | sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' | markdownlint -c .markdownlint.yml \;
+          find . -name "*.md" -type f -print0 -exec cat "{}" | sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' | markdownlint -c .markdownlint.yml -s || echo "Found errors in file {}" \;
 
   docs:
     # update docs after merge back to develop
