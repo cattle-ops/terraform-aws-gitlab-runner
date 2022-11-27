@@ -54,7 +54,8 @@ jobs:
       - name: Validate Markdown file
         run: |
           npm install -g markdownlint-cli
-          markdownlint -c .markdownlint.yml "**/*.md"
+          
+          find . -name "*.md" -type f -print0 | cat "{}" | sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' | markdownlint -c .markdownlint.yml
 
   docs:
     # update docs after merge back to develop
