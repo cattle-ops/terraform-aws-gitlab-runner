@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.5.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.1...5.5.0) (2022-11-27)
+
+
+### Features
+
+* Support volume type configuration ([#579](https://github.com/npalm/terraform-aws-gitlab-runner/issues/579)) ([b7dd834](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b7dd8340a1c68221c77942fc6ac6a71c5eeb39fb))
+
+
+### Bug Fixes
+
+* Compress (zip) user_data to avoid max size ([#565](https://github.com/npalm/terraform-aws-gitlab-runner/issues/565)) ([64b8594](https://github.com/npalm/terraform-aws-gitlab-runner/commit/64b8594f3aa747a0cd23aafe9a37c051bbf51ceb))
+* ensure a complete `config.toml` before starting the GitLab Agent ([#574](https://github.com/npalm/terraform-aws-gitlab-runner/issues/574)) ([e32f3bc](https://github.com/npalm/terraform-aws-gitlab-runner/commit/e32f3bcec95df40fa655cab68e31da8a3ff8d090))
+* Use runners_pull_policies to set pull_policy instead of allowed_pull_policies ([#557](https://github.com/npalm/terraform-aws-gitlab-runner/issues/557)) ([a67b87b](https://github.com/npalm/terraform-aws-gitlab-runner/commit/a67b87b7e56eb76777133d011481586c2e0079a5))
+
 ### [5.4.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.0...5.4.1) (2022-10-13)
 
 
