@@ -47,6 +47,15 @@ jobs:
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Validate Markdown file
+        run: |
+          npm install -g markdownlint-cli
+          markdownlint -c .markdownlint.yml "**/*.md"
+
   docs:
     # update docs after merge back to develop
     if: github.event_name != 'pull_request' && contains('refs/heads/develop', github.ref)
