@@ -16,6 +16,42 @@ EOF
 
 sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
 
+# fetch Runner token from SSM and validate it
+token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+
+valid_token=true
+if [[ `echo $token` != "null" ]]
+then
+  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
+  [[ `echo $valid_token_response` != "200" ]] && valid_token=false
+fi
+
+if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]] || [[ `echo $valid_token` == "false" ]]
+then
+  token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+    --form "token=${gitlab_runner_registration_token}" \
+    --form "tag_list=${gitlab_runner_tag_list}" \
+    --form "description=${giltab_runner_description}" \
+    --form "locked=${gitlab_runner_locked_to_project}" \
+    --form "run_untagged=${gitlab_runner_run_untagged}" \
+    --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
+    --form "access_level=${gitlab_runner_access_level}" \
+    | jq -r .token)
+  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
+fi
+
+sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
+
+ssm_sentry_dsn=$(aws ssm get-parameters --names "${secure_parameter_store_runner_sentry_dsn}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+if [[ `echo ${sentry_dsn}` == "__SENTRY_DSN_REPLACED_BY_USER_DATA__" && `echo $ssm_sentry_dsn` == "null" ]]
+then
+  ssm_sentry_dsn=""
+fi
+
+# For those of you wondering why commas are used in the sed below instead of forward slashes, see https://stackoverflow.com/a/16778711/13169919
+# It is because the Sentry DSN contains forward slashes as it is an URL so it would break out of the sed command with forward slashes as delimiters :)
+sed -i.bak s,__SENTRY_DSN_REPLACED_BY_USER_DATA__,`echo $ssm_sentry_dsn`,g /etc/gitlab-runner/config.toml
+
 ${pre_install}
 
 if [[ `echo ${runners_executor}` == "docker" ]]
@@ -66,42 +102,6 @@ docker-machine create --driver none --url localhost dummy-machine
 docker-machine rm -y dummy-machine
 unset HOME
 unset USER
-
-# fetch Runner token from SSM and validate it
-token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
-
-valid_token=true
-if [[ `echo $token` != "null" ]]
-then
-  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
-  [[ `echo $valid_token_response` != "200" ]] && valid_token=false
-fi
-
-if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]] || [[ `echo $valid_token` == "false" ]]
-then
-  token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
-    --form "token=${gitlab_runner_registration_token}" \
-    --form "tag_list=${gitlab_runner_tag_list}" \
-    --form "description=${giltab_runner_description}" \
-    --form "locked=${gitlab_runner_locked_to_project}" \
-    --form "run_untagged=${gitlab_runner_run_untagged}" \
-    --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
-    --form "access_level=${gitlab_runner_access_level}" \
-    | jq -r .token)
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
-fi
-
-sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
-
-ssm_sentry_dsn=$(aws ssm get-parameters --names "${secure_parameter_store_runner_sentry_dsn}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
-if [[ `echo ${sentry_dsn}` == "__SENTRY_DSN_REPLACED_BY_USER_DATA__" && `echo $ssm_sentry_dsn` == "null" ]]
-then
-  ssm_sentry_dsn=""
-fi
-
-# For those of you wondering why commas are used in the sed below instead of forward slashes, see https://stackoverflow.com/a/16778711/13169919
-# It is because the Sentry DSN contains forward slashes as it is an URL so it would break out of the sed command with forward slashes as delimiters :)
-sed -i.bak s,__SENTRY_DSN_REPLACED_BY_USER_DATA__,`echo $ssm_sentry_dsn`,g /etc/gitlab-runner/config.toml
 
 # A small script to remove this runner from being registered with Gitlab.
 cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
