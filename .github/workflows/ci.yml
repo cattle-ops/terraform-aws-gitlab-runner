@@ -57,7 +57,10 @@ jobs:
           
           npm install -g markdownlint-cli
           
-          find . -name "*.md" -type f -print0 -exec cat "{}" | sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' | markdownlint -c .markdownlint.yml -s || echo "Found errors in file {}" \;
+          find . -name "*.md" -type f -print0 | while read -r file; do
+            echo "Checking $file"
+            sed '/^<\!-- BEGIN_TF_DOCS -->$/,/<\!-- END_TF_DOCS -->/d' "$file" | markdownlint -c .markdownlint.yml -s
+          done
 
   docs:
     # update docs after merge back to develop
