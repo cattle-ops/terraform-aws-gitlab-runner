@@ -112,6 +112,7 @@ locals {
       runners_max_builds                = local.runners_max_builds_string
       runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
+      runners_volume_type               = var.runners_volume_type
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
       runners_use_private_address       = !var.runners_use_private_address

@@ -487,6 +487,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_request_concurrency"></a> [runners\_request\_concurrency](#input\_runners\_request\_concurrency) | Limit number of concurrent requests for new jobs from GitLab (default 1). | `number` | `1` | no |
 | <a name="input_runners_request_spot_instance"></a> [runners\_request\_spot\_instance](#input\_runners\_request\_spot\_instance) | Whether or not to request spot instances via docker-machine | `bool` | `true` | no |
 | <a name="input_runners_root_size"></a> [runners\_root\_size](#input\_runners\_root\_size) | Runner instance root size in GB. | `number` | `16` | no |
+| <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type_) | Runner instance volume type. | `string` | `gp2` | no |
 | <a name="input_runners_services_volumes_tmpfs"></a> [runners\_services\_volumes\_tmpfs](#input\_runners\_services\_volumes\_tmpfs) | Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | <a name="input_runners_shm_size"></a> [runners\_shm\_size](#input\_runners\_shm\_size) | shm\_size for the runners, will be used in the runner config.toml | `number` | `0` | no |
 | <a name="input_runners_token"></a> [runners\_token](#input\_runners\_token) | Token for the runner, will be used in the runner config.toml. | `string` | `"__REPLACED_BY_USER_DATA__"` | no |
