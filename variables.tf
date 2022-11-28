@@ -748,6 +748,13 @@ variable "use_existing_runner_iam_role" {
   default     = false
 }
 
+variable "attach_policy_to_existing_runner_iam_role" {
+  type        = bool
+  description = "Whether to use an existing IAM role or create a new one with the runner_iam_role_name variable."
+  default     = false
+}
+
+
 variable "runner_iam_role_name" {
   type        = string
   description = "Policy/role to be added to the instance profile of the docker machine runners."

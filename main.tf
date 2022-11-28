@@ -34,6 +34,8 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
+  attach_policy_to_role = (!var.use_existing_runner_iam_role || var.attach_policy_to_existing_runner_iam_role)
+
   template_user_data = templatefile("${path.module}/template/user-data.tpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
@@ -363,7 +365,7 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 ### Policies for runner agent instance to allow connection via Session Manager
 ################################################################################
 resource "aws_iam_policy" "instance_session_manager_policy" {
-  count = var.enable_runner_ssm_access && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_runner_ssm_access && local.attach_policy_to_role ? 1 : 0
 
   name        = "${local.name_iam_objects}-session-manager"
   path        = "/"
@@ -373,14 +375,14 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
-  count = var.enable_runner_ssm_access && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_runner_ssm_access && local.attach_policy_to_role ? 1 : 0
 
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
-  count = var.enable_runner_ssm_access && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_runner_ssm_access && local.attach_policy_to_role ? 1 : 0
 
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -390,18 +392,16 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
-  count      = var.use_existing_runner_iam_role ? 0 : length(var.runner_iam_policy_arns)
+  count      = (var.use_existing_runner_iam_role && !var.attach_policy_to_existing_runner_iam_role) ? 0 : length(var.runner_iam_policy_arns)
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = var.runner_iam_policy_arns[count.index]
 }
-
-# var.use_existing_runner_iam_role == false
 
 ################################################################################
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
-  count      = (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "") && !var.use_existing_runner_iam_role ? 1 : 0
+  count      = (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "") && local.attach_policy_to_role ? 1 : 0
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = local.bucket_policy
 }
@@ -434,7 +434,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies"
 
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
-  count = var.enable_docker_machine_ssm_access && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_docker_machine_ssm_access && local.attach_policy_to_role ? 1 : 0
 
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -444,7 +444,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
 ### Service linked policy, optional
 ################################################################################
 resource "aws_iam_policy" "service_linked_role" {
-  count = var.allow_iam_service_linked_role_creation && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.allow_iam_service_linked_role_creation && local.attach_policy_to_role ? 1 : 0
 
   name        = "${local.name_iam_objects}-service_linked_role"
   path        = "/"
@@ -454,7 +454,7 @@ resource "aws_iam_policy" "service_linked_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
-  count = var.allow_iam_service_linked_role_creation && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.allow_iam_service_linked_role_creation && local.attach_policy_to_role ? 1 : 0
 
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.service_linked_role[0].arn
@@ -468,7 +468,7 @@ resource "aws_eip" "gitlab_runner" {
 ### AWS Systems Manager access to store runner token once registered
 ################################################################################
 resource "aws_iam_policy" "ssm" {
-  count = var.enable_manage_gitlab_token && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_manage_gitlab_token && local.attach_policy_to_role ? 1 : 0
 
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
@@ -478,7 +478,7 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  count = var.enable_manage_gitlab_token && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_manage_gitlab_token && local.attach_policy_to_role ? 1 : 0
 
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.ssm[0].arn
@@ -488,7 +488,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 ### AWS assign EIP
 ################################################################################
 resource "aws_iam_policy" "eip" {
-  count = var.enable_eip && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_eip && local.attach_policy_to_role ? 1 : 0
 
   name        = "${local.name_iam_objects}-eip"
   path        = "/"
@@ -498,7 +498,7 @@ resource "aws_iam_policy" "eip" {
 }
 
 resource "aws_iam_role_policy_attachment" "eip" {
-  count = var.enable_eip && !var.use_existing_runner_iam_role ? 1 : 0
+  count = var.enable_eip && local.attach_policy_to_role ? 1 : 0
 
   role       = var.runner_iam_role_name == ""  ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.eip[0].arn
