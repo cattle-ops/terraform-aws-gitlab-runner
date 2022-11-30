@@ -4,7 +4,6 @@ max-complexity = 10
 exclude =
     __pycache__
     .venv
-# it's not a bug that we aren't using all of hacking
 extend-ignore =
     # E203: Whitespace before ':'; conflicts with Black
     E203
