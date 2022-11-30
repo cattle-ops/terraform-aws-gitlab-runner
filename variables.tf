@@ -272,6 +272,12 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "runners_volume_type" {
+  description = "Runner instance volume type"
+  type        = string
+  default     = "gp2"
+}
+
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = string

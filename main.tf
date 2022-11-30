@@ -68,7 +68,7 @@ locals {
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
-      giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
+      gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
       gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
@@ -115,6 +115,7 @@ locals {
       runners_max_builds                = local.runners_max_builds_string
       runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
+      runners_volume_type               = var.runners_volume_type
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
       runners_use_private_address       = !var.runners_use_private_address
@@ -226,7 +227,7 @@ data "aws_ami" "runner" {
 resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = local.name_runner_agent_instance
   image_id               = data.aws_ami.runner.id
-  user_data              = base64encode(local.template_user_data)
+  user_data              = base64gzip(local.template_user_data)
   instance_type          = var.instance_type
   update_default_version = true
   ebs_optimized          = var.runner_instance_ebs_optimized
