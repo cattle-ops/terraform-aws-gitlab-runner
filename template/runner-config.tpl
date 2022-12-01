@@ -23,8 +23,9 @@ listen_address = "${prometheus_listen_address}"
     privileged = ${runners_privileged}
     disable_cache = ${runners_disable_cache}
     volumes = ["/cache"${runners_additional_volumes}]
+    extra_hosts = ${jsonencode(runners_extra_hosts)}
     shm_size = ${runners_shm_size}
-    pull_policy = "${runners_pull_policy}"
+    pull_policy = ${runners_pull_policies}
     runtime = "${runners_docker_runtime}"
     helper_image = "${runners_helper_image}"
   [runners.docker.tmpfs]
@@ -45,7 +46,7 @@ listen_address = "${prometheus_listen_address}"
     IdleTime = ${runners_idle_time}
     ${runners_max_builds}
     MachineDriver = "amazonec2"
-    MachineName = "runner-%s"
+    MachineName = "${docker_machine_name}"
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
       "amazonec2-region=${aws_region}",
@@ -62,6 +63,7 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
       "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-volume-type=${runners_volume_type}",
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]

@@ -64,6 +64,18 @@ jobs:
         git-commit-message: "docs: auto update terraform docs"
         git-push: true
 
+  tfsec:
+    name: tfsec PR commenter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+      - name: tfsec
+        uses: aquasecurity/tfsec-pr-commenter-action@v1.2.0
+        with:
+          github_token: ${{ github.token }}
+
   release:
     if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
     name: Release
