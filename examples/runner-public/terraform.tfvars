@@ -7,4 +7,4 @@ runner_name = "docker.m3"
 
 gitlab_url = "https://gitlab.com"
 
-registration_token = "-Xmv8rN6dGtSQ6TjWSnf"
+registration_token = "-Xmv8rN6dGtSQ6TjWSnf" #gitleaks:allow
