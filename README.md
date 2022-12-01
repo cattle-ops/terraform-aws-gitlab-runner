@@ -136,7 +136,6 @@ module "gitlab_runner" {
 }
 
 # obtain this token from your Gitlab instance and store it manually in the SSM parameter
-
 resource "aws_ssm_parameter" "gitlab_runner_registration_token" {
   name        = "gitlab-registration-token"
   type        = "SecureString"
@@ -147,7 +146,8 @@ resource "aws_ssm_parameter" "gitlab_runner_registration_token" {
     # the secret is set manually
     ignore_changes = [value]
   }
-}```
+}
+```
 
 ### Auto Scaling Group Instance Termination
 
