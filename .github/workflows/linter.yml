@@ -3,7 +3,7 @@
 # More info at https://megalinter.io
 name: MegaLinter
 
-on:
+on: # yamllint disable-line rule:truthy
   # Trigger mega-linter at every push. Action will also be visible from Pull Requests to main
   pull_request:
     branches:
