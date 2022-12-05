@@ -47,7 +47,7 @@ locals {
   file_yum_update = file("${path.module}/template/yum_update.tpl")
 
   template_eip = templatefile("${path.module}/template/eip.tpl", {
-    eip = join(",", aws_eip.gitlab_runner.*.public_ip)
+    eip = join(",", aws_eip.gitlab_runner[*].public_ip)
   })
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
@@ -58,6 +58,8 @@ locals {
       runners_config                               = local.template_runner_config
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
+      curl_cacert                                  = length(var.runners_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
+      pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.userdata_pre_install
       post_install                                 = var.userdata_post_install
       runners_gitlab_url                           = var.runners_gitlab_url
@@ -66,7 +68,7 @@ locals {
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
-      giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
+      gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
       gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
@@ -80,6 +82,7 @@ locals {
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
+      tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners

@@ -5,12 +5,12 @@ output "runner_as_group_name" {
 
 output "runner_cache_bucket_arn" {
   description = "ARN of the S3 for the build cache."
-  value       = element(concat(module.cache.*.arn, [""]), 0)
+  value       = element(concat(module.cache[*].arn, [""]), 0)
 }
 
 output "runner_cache_bucket_name" {
   description = "Name of the S3 for the build cache."
-  value       = element(concat(module.cache.*.bucket, [""]), 0)
+  value       = element(concat(module.cache[*].bucket, [""]), 0)
 }
 
 output "runner_agent_role_arn" {
@@ -45,7 +45,7 @@ output "runner_sg_id" {
 
 output "runner_eip" {
   description = "EIP of the Gitlab Runner"
-  value       = element(concat(aws_eip.gitlab_runner.*.public_ip, [""]), 0)
+  value       = element(concat(aws_eip.gitlab_runner[*].public_ip, [""]), 0)
 }
 
 output "runner_launch_template_name" {

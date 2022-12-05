@@ -1,4 +1,42 @@
 locals {
+  # Manage certificates
+  pre_install_gitlab_certificate = (
+    length(var.runners_gitlab_certificate) > 0
+    ? <<-EOT
+      mkdir -p /etc/gitlab-runner/certs/
+      cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
+      ${var.runners_gitlab_certificate}
+      EOF
+    EOT
+    : ""
+  )
+  pre_install_ca_certificate = (
+    length(var.runners_ca_certificate) > 0
+    ? <<-EOT
+      mkdir -p /etc/gitlab-runner/certs/
+      cat <<- EOF > /etc/gitlab-runner/certs/ca.crt
+      ${var.runners_ca_certificate}
+      EOF
+    EOT
+    : ""
+  )
+  pre_install_certificates_end = <<-EOT
+    chmod 600 /etc/gitlab-runner/certs/*.crt
+    chmod -R a+r /etc/gitlab-runner
+    cp /etc/gitlab-runner/certs/*.crt /etc/pki/ca-trust/source/anchors
+    update-ca-trust extract
+  EOT
+  pre_install_certificates = (
+    # If either (or both) _certificate variables are specified
+    length(var.runners_gitlab_certificate) + length(var.runners_ca_certificate) > 0
+    ? join("\n", [
+      local.pre_install_gitlab_certificate,
+      local.pre_install_ca_certificate,
+      local.pre_install_certificates_end
+    ])
+    : ""
+  )
+
   # Determine IAM role for runner instance
   aws_iam_role_instance_name = coalesce(
     var.runner_iam_role_name,
