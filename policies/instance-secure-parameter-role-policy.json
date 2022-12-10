@@ -13,7 +13,7 @@
             "Action": [
                 "ssm:GetParameters"
             ],
-            "Resource": "${arn_format}:ssm:*"
+            "Resource": "arn:${partition}:ssm:*"
         }
     ]
 }

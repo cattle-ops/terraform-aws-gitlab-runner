@@ -5,8 +5,8 @@ variable "aws_region" {
 
 variable "arn_format" {
   type        = string
-  default     = "arn:aws"
-  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+  default     = null
+  description = "Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions."
 }
 
 variable "auth_type_cache_sr" {
@@ -276,6 +276,12 @@ variable "runners_root_size" {
   description = "Runner instance root size in GB."
   type        = number
   default     = 16
+}
+
+variable "runners_volume_type" {
+  description = "Runner instance volume type"
+  type        = string
+  default     = "gp2"
 }
 
 variable "runners_iam_instance_profile_name" {
@@ -743,6 +749,18 @@ variable "log_group_name" {
   description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
   default     = null
   type        = string
+}
+
+variable "runner_iam_role_name" {
+  type        = string
+  description = "IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used"
+  default     = ""
+}
+
+variable "create_runner_iam_role" {
+  type        = bool
+  description = "Whether to create the runner IAM role of the gitlab runner agent EC2 instance."
+  default     = true
 }
 
 variable "runner_iam_policy_arns" {
