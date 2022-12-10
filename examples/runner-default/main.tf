@@ -40,10 +40,6 @@ module "runner" {
   runners_name             = var.runner_name
   runners_gitlab_url       = var.gitlab_url
   enable_runner_ssm_access = true
-  cache_bucket = {
-    create = false
-    policy = ""
-  }
 
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
 
