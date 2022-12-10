@@ -4,7 +4,7 @@ locals {
     var.runner_iam_role_name,
     "${local.name_iam_objects}-instance"
   )
-  aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam:${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"
+  aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"
 
   # Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
