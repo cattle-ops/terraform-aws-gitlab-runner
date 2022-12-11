@@ -645,13 +645,18 @@ variable "enable_schedule" {
 }
 
 variable "schedule_config" {
-  description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable_schedule is set to true. "
   type        = map(any)
   default = {
-    scale_in_recurrence  = "0 18 * * 1-5"
-    scale_in_count       = 0
+    # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
-    scale_out_count      = 1
+    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+    # Configure optional scale_in scheduled action
+    scale_in_recurrence = "0 18 * * 1-5"
+    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
 }
 

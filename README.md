@@ -148,7 +148,34 @@ Once you have created the parameter, you must remove the variable `runners_token
 
 Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be removed in future releases.
 
-### Auto Scaling Group Instance Termination
+### Auto Scaling Group
+
+#### Scheduled scaling
+
+When `enable_schedule=true`, the `schedule_config` variable can be used to scale the Auto Scaling group. 
+
+Scaling may be defined with one `scale_out` scheduled action and/or one `scale_in` scheduled action.
+
+For example:
+```hcl
+  module "runner" {
+    ...
+    enable_schedule = true
+    schedule_config = {
+      # Configure optional scale_out scheduled action
+      scale_out_recurrence = "0 8 * * 1-5"
+      scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+      # Configure optional scale_in scheduled action
+      scale_in_recurrence  = "0 18 * * 1-5"
+      scale_in_count       = 0 # Default for min_size, desired_capacity and max_size
+      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+    }
+  }
+```
+
+#### Instance Termination
 
 The Auto Scaling Group may be configured with a
 [lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
@@ -505,7 +532,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_use_private_address"></a> [runners\_use\_private\_address](#input\_runners\_use\_private\_address) | Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent. | `bool` | `true` | no |
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
-| <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
+| <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |
 | <a name="input_secure_parameter_store_runner_token_key"></a> [secure\_parameter\_store\_runner\_token\_key](#input\_secure\_parameter\_store\_runner\_token\_key) | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | <a name="input_sentry_dsn"></a> [sentry\_dsn](#input\_sentry\_dsn) | Sentry DSN of the project for the runner to use (uses legacy DSN format) | `string` | `"__SENTRY_DSN_REPLACED_BY_USER_DATA__"` | no |

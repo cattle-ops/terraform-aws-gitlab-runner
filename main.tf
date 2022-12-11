@@ -185,6 +185,9 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   timeouts {
     delete = var.asg_delete_timeout
   }
+  lifecycle {
+    ignore_changes = [min_size, max_size, desired_capacity]
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
@@ -192,9 +195,9 @@ resource "aws_autoscaling_schedule" "scale_in" {
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_in-${aws_autoscaling_group.gitlab_runner_instance.name}"
   recurrence             = var.schedule_config["scale_in_recurrence"]
-  min_size               = var.schedule_config["scale_in_count"]
-  desired_capacity       = var.schedule_config["scale_in_count"]
-  max_size               = var.schedule_config["scale_in_count"]
+  min_size               = try(var.schedule_config["scale_in_min_size"], var.schedule_config["scale_in_count"])
+  desired_capacity       = try(var.schedule_config["scale_in_desired_capacity"], var.schedule_config["scale_in_count"])
+  max_size               = try(var.schedule_config["scale_in_max_size"], var.schedule_config["scale_in_count"])
 }
 
 resource "aws_autoscaling_schedule" "scale_out" {
@@ -202,9 +205,9 @@ resource "aws_autoscaling_schedule" "scale_out" {
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_out-${aws_autoscaling_group.gitlab_runner_instance.name}"
   recurrence             = var.schedule_config["scale_out_recurrence"]
-  min_size               = var.schedule_config["scale_out_count"]
-  desired_capacity       = var.schedule_config["scale_out_count"]
-  max_size               = var.schedule_config["scale_out_count"]
+  min_size               = try(var.schedule_config["scale_out_min_size"], var.schedule_config["scale_out_count"])
+  desired_capacity       = try(var.schedule_config["scale_out_desired_capacity"], var.schedule_config["scale_out_count"])
+  max_size               = try(var.schedule_config["scale_out_max_size"], var.schedule_config["scale_out_count"])
 }
 
 data "aws_ami" "runner" {
