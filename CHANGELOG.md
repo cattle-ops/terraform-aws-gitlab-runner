@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.6.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.5.0...5.6.0) (2022-12-11)
+
+
+### Features
+
+* allow setting runners.docker.services ([#491](https://github.com/npalm/terraform-aws-gitlab-runner/issues/491)) ([6d73e99](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6d73e994c41bf3f6b53db4c940a7a013e534a685))
+* **asg:** Add fine-grained options for schedule_config scale_in and scale_out ([#586](https://github.com/npalm/terraform-aws-gitlab-runner/issues/586)) ([f72b8e3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f72b8e34c955c06b57ec1cd29714478d0568d71a))
+
+
+### Bug Fixes
+
+* Allow custom runner agent IAM role fixups ([#572](https://github.com/npalm/terraform-aws-gitlab-runner/issues/572)) ([#577](https://github.com/npalm/terraform-aws-gitlab-runner/issues/577)) ([bcb0c0e](https://github.com/npalm/terraform-aws-gitlab-runner/commit/bcb0c0eb9de74f0f67181cdeb8cb0fe91cb0e9b1))
+* runner_agent_role_arn ([#596](https://github.com/npalm/terraform-aws-gitlab-runner/issues/596)) ([b069b88](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b069b88bf03557534ffa40bab6d21c085c09f021))
+
 ## [5.5.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.1...5.5.0) (2022-11-27)
 
 
