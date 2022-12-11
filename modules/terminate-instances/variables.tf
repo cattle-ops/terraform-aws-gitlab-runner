@@ -68,3 +68,20 @@ variable "lambda_timeout" {
   default     = 10
   type        = number
 }
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
+  type        = string
+}
+
+variable "enable_xray_tracing" {
+  description = "Enables X-Ray for debugging and analysis"
+  type        = bool
+  default     = false
+}
+
+variable "arn_format" {
+  type        = string
+  default     = "arn:aws"
+  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}

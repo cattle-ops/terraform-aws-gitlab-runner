@@ -315,6 +315,10 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+  cache_logging_bucket                 = var.cache_logging_bucket
+  cache_logging_bucket_prefix          = var.cache_logging_bucket_prefix
+
+  kms_key_id = local.kms_key
 
   name_iam_objects = local.name_iam_objects
 }
@@ -519,5 +523,7 @@ module "terminate_instances_lifecycle_function" {
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
+  kms_key_id                           = local.kms_key
+  arn_format                           = var.arn_format
   tags                                 = local.tags
 }
