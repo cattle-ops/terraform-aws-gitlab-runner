@@ -34,6 +34,11 @@ locals {
     }
   )
 
+  runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tpl", {
+    runners_docker_services = var.runners_docker_services
+    }
+  )
+
   runners_pull_policies = var.runners_pull_policy != "" ? "[\"${var.runners_pull_policy}\"]" : "[\"${join("\",\"", var.runners_pull_policies)}\"]"
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
