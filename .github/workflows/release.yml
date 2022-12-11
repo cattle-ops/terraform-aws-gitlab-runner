@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get app installation token
+        uses: npalm/action-app-token@v1.0.0
+        id: token
+        with:
+          appId: ${{ secrets.APP_ID }}
+          appPrivateKeyBase64: ${{ secrets.APP_PRIVATE_KEY_BASE64 }}
+          appInstallationType: repo
+          appInstallationValue: ${{ github.repository }}
+
+      # bootstrap-sha and release-as needs to be removed after first release
+      - name: Release
+        uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: terraform-module
+          token: ${{ steps.token.outputs.token }}
+          include-v-in-tag: false
+          signoff: "Niek Palm <dev.npalm@gmail.com>"
+          bootstrap-sha: 3596bacda1c6a990a2e4f5bb6f5dbe07a77f65d6
+          release-as: 5.6.0

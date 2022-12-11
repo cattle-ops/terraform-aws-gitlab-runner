@@ -126,6 +126,7 @@ locals {
       runners_check_interval            = var.runners_check_interval
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_docker_services           = local.runners_docker_services
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
@@ -185,6 +186,9 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   timeouts {
     delete = var.asg_delete_timeout
   }
+  lifecycle {
+    ignore_changes = [min_size, max_size, desired_capacity]
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
@@ -192,9 +196,9 @@ resource "aws_autoscaling_schedule" "scale_in" {
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_in-${aws_autoscaling_group.gitlab_runner_instance.name}"
   recurrence             = var.schedule_config["scale_in_recurrence"]
-  min_size               = var.schedule_config["scale_in_count"]
-  desired_capacity       = var.schedule_config["scale_in_count"]
-  max_size               = var.schedule_config["scale_in_count"]
+  min_size               = try(var.schedule_config["scale_in_min_size"], var.schedule_config["scale_in_count"])
+  desired_capacity       = try(var.schedule_config["scale_in_desired_capacity"], var.schedule_config["scale_in_count"])
+  max_size               = try(var.schedule_config["scale_in_max_size"], var.schedule_config["scale_in_count"])
 }
 
 resource "aws_autoscaling_schedule" "scale_out" {
@@ -202,9 +206,9 @@ resource "aws_autoscaling_schedule" "scale_out" {
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_out-${aws_autoscaling_group.gitlab_runner_instance.name}"
   recurrence             = var.schedule_config["scale_out_recurrence"]
-  min_size               = var.schedule_config["scale_out_count"]
-  desired_capacity       = var.schedule_config["scale_out_count"]
-  max_size               = var.schedule_config["scale_out_count"]
+  min_size               = try(var.schedule_config["scale_out_min_size"], var.schedule_config["scale_out_count"])
+  desired_capacity       = try(var.schedule_config["scale_out_desired_capacity"], var.schedule_config["scale_out_count"])
+  max_size               = try(var.schedule_config["scale_out_max_size"], var.schedule_config["scale_out_count"])
 }
 
 data "aws_ami" "runner" {
@@ -244,7 +248,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
   iam_instance_profile {
-    name = aws_iam_instance_profile.instance.name
+    name = local.aws_iam_role_instance_name
   }
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
@@ -315,6 +319,10 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+  cache_logging_bucket                 = var.cache_logging_bucket
+  cache_logging_bucket_prefix          = var.cache_logging_bucket_prefix
+
+  kms_key_id = local.kms_key
 
   name_iam_objects = local.name_iam_objects
 }
@@ -323,14 +331,16 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  name = "${local.name_iam_objects}-instance"
+  count = var.create_runner_iam_role ? 1 : 0
+
+  name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
   tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
   count                = var.create_runner_iam_role ? 1 : 0
-  name                 = "${local.name_iam_objects}-instance"
+  name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = merge(local.tags, var.role_tags)
@@ -342,6 +352,7 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
+  count       = var.create_runner_iam_role ? 1 : 0
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
@@ -353,8 +364,10 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
+  count = var.create_runner_iam_role ? 1 : 0
+
   role       = local.aws_iam_role_instance_name
-  policy_arn = aws_iam_policy.instance_docker_machine_policy.arn
+  policy_arn = aws_iam_policy.instance_docker_machine_policy[count.index].arn
 }
 
 ################################################################################
@@ -388,7 +401,8 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
-  count      = length(var.runner_iam_policy_arns)
+  count = length(var.runner_iam_policy_arns)
+
   role       = local.aws_iam_role_instance_name
   policy_arn = var.runner_iam_policy_arns[count.index]
 }
@@ -519,5 +533,7 @@ module "terminate_instances_lifecycle_function" {
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
+  kms_key_id                           = local.kms_key
+  arn_format                           = var.arn_format
   tags                                 = local.tags
 }

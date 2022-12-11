@@ -148,7 +148,34 @@ Once you have created the parameter, you must remove the variable `runners_token
 
 Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be removed in future releases.
 
-### Auto Scaling Group Instance Termination
+### Auto Scaling Group
+
+#### Scheduled scaling
+
+When `enable_schedule=true`, the `schedule_config` variable can be used to scale the Auto Scaling group. 
+
+Scaling may be defined with one `scale_out` scheduled action and/or one `scale_in` scheduled action.
+
+For example:
+```hcl
+  module "runner" {
+    ...
+    enable_schedule = true
+    schedule_config = {
+      # Configure optional scale_out scheduled action
+      scale_out_recurrence = "0 8 * * 1-5"
+      scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+      # Configure optional scale_in scheduled action
+      scale_in_recurrence  = "0 18 * * 1-5"
+      scale_in_count       = 0 # Default for min_size, desired_capacity and max_size
+      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+    }
+  }
+```
+
+#### Instance Termination
 
 The Auto Scaling Group may be configured with a
 [lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
@@ -172,9 +199,21 @@ A few option are provided to access the runner instance:
 
 By default the module creates a cache for the runner in S3. Old objects are automatically removed via a configurable life cycle policy on the bucket.
 
-Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/cache). An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
+Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/cache). An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
 
+In case you enable the access logging for the S3 cache bucket, you have to add the following statement to your S3 logging bucket policy.
 
+```
+{
+    "Sid": "Allow access logging",
+    "Effect": "Allow",
+    "Principal": {
+        "Service": "logging.s3.amazonaws.com"
+    },
+    "Action": "s3:PutObject",
+    "Resource": "<s3-arn>/*"
+}
+```
 
 ## Usage
 
@@ -192,7 +231,7 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 
 ### Scenario: Basic usage
 
-Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/examples/runner-default).
+Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
 
 ```hcl
 module "runner" {
@@ -264,7 +303,7 @@ module "runner" {
 
 ## Examples
 
-A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/develop/examples/) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory. Don't forget to remove the runners manually from your Gitlab instance as soon as your are done.
+A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory. Don't forget to remove the runners manually from your Gitlab instance as soon as your are done.
 
 ### Versions
 
@@ -400,6 +439,8 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_cache_bucket_set_random_suffix"></a> [cache\_bucket\_set\_random\_suffix](#input\_cache\_bucket\_set\_random\_suffix) | Append the cache bucket name with a random string suffix | `bool` | `false` | no |
 | <a name="input_cache_bucket_versioning"></a> [cache\_bucket\_versioning](#input\_cache\_bucket\_versioning) | Boolean used to enable versioning on the cache bucket, false by default. | `bool` | `false` | no |
 | <a name="input_cache_expiration_days"></a> [cache\_expiration\_days](#input\_cache\_expiration\_days) | Number of days before cache objects expires. | `number` | `1` | no |
+| <a name="input_cache_logging_bucket"></a> [cache\_logging\_bucket](#input\_cache\_logging\_bucket) | S3 Bucket ID where the access logs to the cache bucket are stored. | `string` | `null` | no |
+| <a name="input_cache_logging_bucket_prefix"></a> [cache\_logging\_bucket\_prefix](#input\_cache\_logging\_bucket\_prefix) | Prefix within the `cache_logging_bucket`. | `string` | `null` | no |
 | <a name="input_cache_shared"></a> [cache\_shared](#input\_cache\_shared) | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
 | <a name="input_cloudwatch_logging_retention_in_days"></a> [cloudwatch\_logging\_retention\_in\_days](#input\_cloudwatch\_logging\_retention\_in\_days) | Retention for cloudwatch logs. Defaults to unlimited | `number` | `0` | no |
 | <a name="input_create_runner_iam_role"></a> [create\_runner\_iam\_role](#input\_create\_runner\_iam\_role) | Whether to create the runner IAM role of the gitlab runner agent EC2 instance. | `bool` | `true` | no |
@@ -461,6 +502,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_disable_cache"></a> [runners\_disable\_cache](#input\_runners\_disable\_cache) | Runners will not use local cache, will be used in the runner config.toml | `bool` | `false` | no |
 | <a name="input_runners_docker_registry_mirror"></a> [runners\_docker\_registry\_mirror](#input\_runners\_docker\_registry\_mirror) | The docker registry mirror to use to avoid rate limiting by hub.docker.com | `string` | `""` | no |
 | <a name="input_runners_docker_runtime"></a> [runners\_docker\_runtime](#input\_runners\_docker\_runtime) | docker runtime for runners, will be used in the runner config.toml | `string` | `""` | no |
+| <a name="input_runners_docker_services"></a> [runners\_docker\_services](#input\_runners\_docker\_services) | adds `runners.docker.services` blocks to config.toml.  All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf) | <pre>list(object({<br>    name       = string<br>    alias      = string<br>    entrypoint = list(string)<br>    command    = list(string)<br>  }))</pre> | `[]` | no |
 | <a name="input_runners_ebs_optimized"></a> [runners\_ebs\_optimized](#input\_runners\_ebs\_optimized) | Enable runners to be EBS-optimized. | `bool` | `true` | no |
 | <a name="input_runners_environment_vars"></a> [runners\_environment\_vars](#input\_runners\_environment\_vars) | Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml | `list(string)` | `[]` | no |
 | <a name="input_runners_executor"></a> [runners\_executor](#input\_runners\_executor) | The executor to use. Currently supports `docker+machine` or `docker`. | `string` | `"docker+machine"` | no |
@@ -493,7 +535,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_use_private_address"></a> [runners\_use\_private\_address](#input\_runners\_use\_private\_address) | Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent. | `bool` | `true` | no |
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
-| <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
+| <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |
 | <a name="input_secure_parameter_store_runner_token_key"></a> [secure\_parameter\_store\_runner\_token\_key](#input\_secure\_parameter\_store\_runner\_token\_key) | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | <a name="input_sentry_dsn"></a> [sentry\_dsn](#input\_sentry\_dsn) | Sentry DSN of the project for the runner to use (uses legacy DSN format) | `string` | `"__SENTRY_DSN_REPLACED_BY_USER_DATA__"` | no |

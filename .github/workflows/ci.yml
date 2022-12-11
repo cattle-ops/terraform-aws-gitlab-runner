@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
 
 jobs:
@@ -48,8 +47,8 @@ jobs:
       - run: terraform validate
 
   docs:
-    # update docs after merge back to develop
-    if: github.event_name != 'pull_request' && contains('refs/heads/develop', github.ref)
+    # update docs after merge back to main
+    if: github.event_name == 'pull_request'
     name: Auto update terraform docs
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
@@ -57,6 +56,8 @@ jobs:
     steps:
     - name: CHeckout branch
       uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Generate TF docs
       uses: terraform-docs/gh-actions@v1.0.0
@@ -76,31 +77,3 @@ jobs:
         uses: aquasecurity/tfsec-pr-commenter-action@v1.2.0
         with:
           github_token: ${{ github.token }}
-
-  release:
-    if: github.event_name != 'pull_request' && contains('refs/heads/main', github.ref)
-    name: Release
-    needs: [verify_module, verify_examples]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Get installation token
-        uses: npalm/action-app-token@v1.0.0
-        id: app-token
-        with:
-          appId: ${{ secrets.APP_ID }}
-          appPrivateKeyBase64: ${{ secrets.APP_PRIVATE_KEY_BASE64 }}
-          appInstallationType: repo
-          appInstallationValue: ${{ github.repository }}
-
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          cp .release/* .
-          yarn 
-          yarn release --repositoryUrl https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
