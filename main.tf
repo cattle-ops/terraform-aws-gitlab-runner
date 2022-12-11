@@ -247,7 +247,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
   iam_instance_profile {
-    name = aws_iam_instance_profile.instance.name
+    name = local.aws_iam_role_instance_name
   }
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
@@ -330,14 +330,16 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  name = "${local.name_iam_objects}-instance"
+  count = var.create_runner_iam_role ? 1 : 0
+
+  name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
   tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
   count                = var.create_runner_iam_role ? 1 : 0
-  name                 = "${local.name_iam_objects}-instance"
+  name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = merge(local.tags, var.role_tags)
@@ -349,6 +351,7 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
+  count       = var.create_runner_iam_role ? 1 : 0
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
@@ -360,8 +363,10 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
+  count = var.create_runner_iam_role ? 1 : 0
+
   role       = local.aws_iam_role_instance_name
-  policy_arn = aws_iam_policy.instance_docker_machine_policy.arn
+  policy_arn = aws_iam_policy.instance_docker_machine_policy[count.index].arn
 }
 
 ################################################################################
@@ -395,7 +400,8 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
-  count      = length(var.runner_iam_policy_arns)
+  count = length(var.runner_iam_policy_arns)
+
   role       = local.aws_iam_role_instance_name
   policy_arn = var.runner_iam_policy_arns[count.index]
 }
