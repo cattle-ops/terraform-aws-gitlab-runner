@@ -1,5 +1,7 @@
 # Contribution guide
 
+dummy only
+
 We appreciate your thought to contribute to open source. :heart: We want to make contributing as easy as possible. You are welcome to:
 
 - Reporting a bug
