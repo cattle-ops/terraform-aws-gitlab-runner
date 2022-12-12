@@ -25,9 +25,10 @@ listen_address = "${prometheus_listen_address}"
     volumes = ["/cache"${runners_additional_volumes}]
     extra_hosts = ${jsonencode(runners_extra_hosts)}
     shm_size = ${runners_shm_size}
-    allowed_pull_policies = ${runners_pull_policies}
+    pull_policy = ${runners_pull_policies}
     runtime = "${runners_docker_runtime}"
     helper_image = "${runners_helper_image}"
+    ${runners_docker_services}
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
   [runners.docker.services_tmpfs]
@@ -63,6 +64,7 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
       "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-volume-type=${runners_volume_type}",
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]

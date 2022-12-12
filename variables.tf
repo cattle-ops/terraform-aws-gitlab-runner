@@ -278,6 +278,12 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "runners_volume_type" {
+  description = "Runner instance volume type"
+  type        = string
+  default     = "gp2"
+}
+
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = string
@@ -360,6 +366,18 @@ variable "runners_check_interval" {
   description = "defines the interval length, in seconds, between new jobs check."
   type        = number
   default     = 3
+}
+
+variable "cache_logging_bucket" {
+  type        = string
+  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
+  default     = null
+}
+
+variable "cache_logging_bucket_prefix" {
+  type        = string
+  description = "Prefix within the `cache_logging_bucket`."
+  default     = null
 }
 
 variable "cache_bucket_prefix" {
@@ -627,13 +645,18 @@ variable "enable_schedule" {
 }
 
 variable "schedule_config" {
-  description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable_schedule is set to true. "
   type        = map(any)
   default = {
-    scale_in_recurrence  = "0 18 * * 1-5"
-    scale_in_count       = 0
+    # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
-    scale_out_count      = 1
+    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+    # Configure optional scale_in scheduled action
+    scale_in_recurrence = "0 18 * * 1-5"
+    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
 }
 
@@ -669,6 +692,17 @@ variable "runners_services_volumes_tmpfs" {
   type = list(object({
     volume  = string
     options = string
+  }))
+  default = []
+}
+
+variable "runners_docker_services" {
+  description = "adds `runners.docker.services` blocks to config.toml.  All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
+  type = list(object({
+    name       = string
+    alias      = string
+    entrypoint = list(string)
+    command    = list(string)
   }))
   default = []
 }
@@ -731,6 +765,18 @@ variable "log_group_name" {
   description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
   default     = null
   type        = string
+}
+
+variable "runner_iam_role_name" {
+  type        = string
+  description = "IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used"
+  default     = ""
+}
+
+variable "create_runner_iam_role" {
+  type        = bool
+  description = "Whether to create the runner IAM role of the gitlab runner agent EC2 instance."
+  default     = true
 }
 
 variable "runner_iam_policy_arns" {

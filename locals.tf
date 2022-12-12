@@ -1,4 +1,11 @@
 locals {
+  # Determine IAM role for runner instance
+  aws_iam_role_instance_name = coalesce(
+    var.runner_iam_role_name,
+    "${local.name_iam_objects}-instance"
+  )
+  aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"
+
   # Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
     ",\"amazonec2-metadata-token=${var.docker_machine_instance_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.docker_machine_instance_metadata_options.http_put_response_hop_limit}\",%s",
@@ -24,6 +31,11 @@ locals {
 
   runners_machine_autoscaling = templatefile("${path.module}/template/runners_machine_autoscaling.tpl", {
     runners_machine_autoscaling = var.runners_machine_autoscaling
+    }
+  )
+
+  runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tpl", {
+    runners_docker_services = var.runners_docker_services
     }
   )
 
