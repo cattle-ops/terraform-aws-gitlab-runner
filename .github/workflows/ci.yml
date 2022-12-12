@@ -56,16 +56,17 @@ jobs:
     steps:
     - name: CHeckout branch
       uses: actions/checkout@v3
-      with:
-        ref: ${{ github.head_ref }}
         
     - name: Generate TF docs
       uses: terraform-docs/gh-actions@v1.0.0
       with:
         find-dir: .
         git-commit-message: "docs: auto update terraform docs"
-        git-push: true
+        git-push: false
 
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "docs: auto update terraform docs"
   tfsec:
     name: tfsec PR commenter
     runs-on: ubuntu-latest
