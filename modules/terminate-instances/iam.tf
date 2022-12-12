@@ -1,3 +1,7 @@
+data "aws_partition" "current" {}
+data "aws_caller_identity" "this" {}
+data "aws_region" "this" {}
+
 # ----------------------------------------------------------------------------
 # Terminate Instances - IAM Resources
 # ----------------------------------------------------------------------------
@@ -49,7 +53,7 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "ec2:TerminateInstances"
     ]
-    resources = ["*"]
+    resources = ["arn:${data.aws_partition.current.partition}:ec2:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:instance/*"]
     condition {
       test     = "StringLike"
       variable = "ec2:ResourceTag/gitlab-runner-parent-id"
@@ -72,12 +76,13 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "logs:PutLogEvents",
       "logs:CreateLogStream",
-      "logs:CreateLogGroup",
     ]
     effect = "Allow"
+    # wildcard resources are ok as the log streams are created dynamically during runtime and are not known here
+    # tfsec:ignore:aws-iam-no-policy-wildcards
     resources = [
-      "${aws_cloudwatch_log_group.lambda.arn}:*",
-      "${aws_cloudwatch_log_group.lambda.arn}:*:*"
+      aws_cloudwatch_log_group.lambda.arn,
+      "${aws_cloudwatch_log_group.lambda.arn}:log-stream:*"
     ]
   }
 }

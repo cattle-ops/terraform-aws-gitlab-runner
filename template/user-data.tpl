@@ -14,10 +14,7 @@ token=$(curl -f -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-m
 
 ${eip}
 
-for i in {1..7}; do
-  echo "Attempt: ---- " $i
-  yum -y update && break || sleep 60
-done
+${yum_update}
 
 ${logging}
 
