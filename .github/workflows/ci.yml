@@ -57,7 +57,7 @@ jobs:
     - name: CHeckout branch
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.ref }}
 
     - name: Generate TF docs
       uses: terraform-docs/gh-actions@v1.0.0
