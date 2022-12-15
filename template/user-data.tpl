@@ -19,3 +19,5 @@ ${yum_update}
 ${logging}
 
 ${gitlab_runner}
+
+${extra_config}
