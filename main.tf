@@ -56,6 +56,7 @@ locals {
       docker_machine_version                       = var.docker_machine_version
       docker_machine_download_url                  = var.docker_machine_download_url
       runners_config                               = local.template_runner_config
+      runners_userdata                             = var.runners_userdata
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
       pre_install                                  = var.userdata_pre_install

@@ -124,6 +124,12 @@ variable "runners_name" {
   type        = string
 }
 
+variable "runners_userdata" {
+  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
+  type        = string
+  default     = ""
+}
+
 variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string

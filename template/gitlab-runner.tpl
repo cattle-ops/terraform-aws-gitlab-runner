@@ -14,6 +14,10 @@ ${runners_config}
 
 EOF
 
+cat > /etc/gitlab-runner/runners_userdata.tpl <<- EOF
+${runners_userdata}
+EOF
+
 sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
 
 # fetch Runner token from SSM and validate it
