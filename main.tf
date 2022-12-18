@@ -248,7 +248,8 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
   iam_instance_profile {
-    name = local.aws_iam_role_instance_name
+    arn  = var.create_runner_iam_role ? aws_iam_instance_profile.instance[0].arn : null
+    name = var.create_runner_iam_role ? null : local.aws_iam_role_instance_name
   }
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
