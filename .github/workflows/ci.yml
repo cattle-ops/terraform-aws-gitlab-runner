@@ -46,27 +46,6 @@ jobs:
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
-  docs:
-    # update docs after merge back to main
-    if: github.event_name == 'pull_request'
-    name: Auto update terraform docs
-    needs: [verify_module, verify_examples]
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: CHeckout branch
-      uses: actions/checkout@v3
-        
-    - name: Generate TF docs
-      uses: terraform-docs/gh-actions@v1.0.0
-      with:
-        find-dir: .
-        git-commit-message: "docs: auto update terraform docs"
-        git-push: false
-
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: "docs: auto update terraform docs"
   tfsec:
     name: tfsec PR commenter
     runs-on: ubuntu-latest
