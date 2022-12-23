@@ -359,8 +359,6 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Modules
 
-test
-
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_cache"></a> [cache](#module\_cache) | ./modules/cache | n/a |
