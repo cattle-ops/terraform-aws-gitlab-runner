@@ -635,7 +635,7 @@ variable "cache_bucket" {
 variable "enable_runner_user_data_trace_log" {
   description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_schedule" {
