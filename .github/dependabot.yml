@@ -1,31 +1,39 @@
+---
 version: 2
+
 updates:
   - package-ecosystem: "terraform"
     directory: "/examples/runner-default"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     commit_message:
       prefix: "chore"
   - package-ecosystem: "terraform"
     directory: "/examples/runner-docker"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     commit_message:
       prefix: "chore"
   - package-ecosystem: "terraform"
     directory: "/examples/runner-public"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     commit_message:
       prefix: "chore"
   - package-ecosystem: "terraform"
     directory: "/examples/pre-registered"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    commit_message:
+      prefix: "chore"
+  - package-ecosystem: "terraform"
+    directory: "/examples/multi-region"
+    schedule:
+      interval: "weekly"
     commit_message:
       prefix: "chore"
 
-  # Enable version updates for Docker
+
   - package-ecosystem: "actions"
     directory: "/.github/workflows"
     schedule:
