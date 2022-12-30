@@ -17,11 +17,17 @@
           "ec2:RequestSpotInstances",
           "ec2:CancelSpotInstanceRequests",
           "ec2:DescribeSubnets",
-          "ec2:AssociateIamInstanceProfile",
-          "iam:PassRole"
+          "ec2:AssociateIamInstanceProfile"
         ],
         "Effect": "Allow",
         "Resource": "*"
+      },
+      {
+        "Action": [
+          "iam:PassRole"
+        ],
+        "Effect": "Allow",
+        "Resource": "${docker_machine_role_arn}"
       }
     ]
   }

@@ -10,14 +10,6 @@ variable "environment" {
   type        = string
 }
 
-variable "public_ssh_key_filename" {
-  default = "generated/id_rsa.pub"
-}
-
-variable "private_ssh_key_filename" {
-  default = "generated/id_rsa"
-}
-
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = string
@@ -27,9 +19,8 @@ variable "runner_name" {
 variable "gitlab_url" {
   description = "URL of the gitlab instance to connect to."
   type        = string
-  default     = "https://www.gitlab.com"
+  default     = "https://gitlab.com"
 }
 
 variable "registration_token" {
 }
-

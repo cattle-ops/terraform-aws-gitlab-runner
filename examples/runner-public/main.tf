@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.5"
+  version = "2.70"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -20,8 +20,8 @@ module "vpc" {
 }
 
 module "cache" {
-  source      = "../../cache"
-  environment = "${var.environment}"
+  source      = "../../modules/cache"
+  environment = var.environment
 }
 
 module "runner" {
@@ -30,14 +30,12 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key              = local_file.public_ssh_key.content
   runners_use_private_address = false
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "0.1"
+  docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name             = var.runner_name
   runners_gitlab_url       = var.gitlab_url
@@ -53,6 +51,7 @@ module "runner" {
     locked_to_project  = "true"
     run_untagged       = "false"
     maximum_timeout    = "3600"
+    access_level       = "ref_protected"
   }
 
   overrides = {
@@ -76,14 +75,13 @@ module "runner2" {
   aws_region  = var.aws_region
   environment = "${var.environment}-2"
 
-  ssh_public_key              = local_file.public_ssh_key.content
   runners_use_private_address = false
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets
   subnet_id_runners        = element(module.vpc.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "0.1"
+  docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name       = var.runner_name
   runners_gitlab_url = var.gitlab_url
@@ -108,9 +106,12 @@ module "runner2" {
 
 resource "null_resource" "cancel_spot_requests" {
   # Cancel active and open spot requests, terminate instances
+  triggers = {
+    environment = var.environment
+  }
 
   provisioner "local-exec" {
-    when    = "destroy"
-    command = "../../ci/bin/cancel-spot-instances.sh ${var.environment}"
+    when    = destroy
+    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
   }
 }

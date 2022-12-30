@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.5.0"
+  version = "2.70"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -29,21 +29,20 @@ module "runner" {
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_public_key = local_file.public_ssh_key.content
-
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.private_subnets
-  subnet_id_runners        = element(module.vpc.private_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
 
   runners_name       = var.runner_name
   runners_gitlab_url = var.gitlab_url
   runners_token      = var.runner_token
 
-  runners_off_peak_timezone   = var.timezone
-  runners_off_peak_idle_count = 0
-  runners_off_peak_idle_time  = 60
-
   # working 9 to 5 :)
-  runners_off_peak_periods = "[\"* * 0-9,17-23 * * mon-fri *\", \"* * * * * sat,sun *\"]"
+  runners_machine_autoscaling = [
+    {
+      periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
+      idle_count = 0
+      idle_time  = 60
+      timezone   = var.timezone
+    }
+  ]
 }
-

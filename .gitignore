@@ -3,6 +3,7 @@
 
 # Module directory
 .terraform/
+.terraform.lock.hcl
 
 # keys
 *id_rsa*
@@ -15,8 +16,19 @@ config-terraform.sh
 
 *.out
 *.secrets*.tfvars
+
 .env
 
 # GO
 # Dependency directories (remove the comment below to include it)
 vendor/
+
+**/node_modules/
+package*.json
+yarn.lock
+
+builds/
+
+# exceptions for semantic release
+!.release/package*
+!.release/*.lock
