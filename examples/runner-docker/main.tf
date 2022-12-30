@@ -19,20 +19,11 @@ module "vpc" {
   }
 }
 
-module "key_pair" {
-  source = "../../modules/key-pair"
-
-  environment = var.environment
-  name        = var.runner_name
-}
-
 module "runner" {
   source = "../../"
 
   aws_region  = var.aws_region
   environment = var.environment
-
-  ssh_key_pair = module.key_pair.key_pair.key_name
 
   runners_use_private_address = false
   enable_eip                  = true
@@ -40,9 +31,8 @@ module "runner" {
   docker_machine_security_group_description = "Custom description for docker-machine"
   gitlab_runner_security_group_description  = "Custom description for gitlab-runner"
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.public_subnets, 0)
 
   runners_executor   = "docker"
   runners_name       = var.runner_name
@@ -57,4 +47,3 @@ module "runner" {
     maximum_timeout    = "3600"
   }
 }
-

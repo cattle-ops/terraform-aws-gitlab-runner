@@ -10,12 +10,11 @@ tee /etc/hosts <<EOL
 127.0.0.1   localhost localhost.localdomain $(hostname)
 EOL
 
+token=$(curl -f -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+
 ${eip}
 
-for i in {1..7}; do
-  echo "Attempt: ---- " $i
-  yum -y update && break || sleep 60
-done
+${yum_update}
 
 ${logging}
 

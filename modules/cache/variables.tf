@@ -23,14 +23,26 @@ variable "cache_bucket_name_include_account_id" {
 
 variable "cache_bucket_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = string
-  default     = "false"
+  type        = bool
+  default     = false
 }
 
 variable "cache_expiration_days" {
   description = "Number of days before cache objects expires."
   type        = number
   default     = 1
+}
+
+variable "cache_logging_bucket" {
+  type        = string
+  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
+  default     = null
+}
+
+variable "cache_logging_bucket_prefix" {
+  type        = string
+  description = "Prefix within the `cache_logging_bucket`."
+  default     = null
 }
 
 variable "tags" {
@@ -40,9 +52,14 @@ variable "tags" {
 }
 
 variable "create_cache_bucket" {
-  description = "This module is by default included in the runner module. To disable the creation of the bucket this parameter can be disabled."
+  description = "(deprecated) If the cache should not be craeted, remove the whole module call!"
   type        = bool
-  default     = true
+  default     = null
+
+  validation {
+    condition     = anytrue([var.create_cache_bucket == null])
+    error_message = "Deprecated, don't call the module when not creating a cache bucket."
+  }
 }
 
 variable "cache_lifecycle_clear" {
@@ -61,4 +78,16 @@ variable "arn_format" {
   type        = string
   default     = "arn:aws"
   description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+}
+
+variable "name_iam_objects" {
+  description = "Set the name prefix of all AWS IAM resources created by this module"
+  type        = string
+  default     = ""
+}
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypted the resources."
+  type        = string
+  default     = ""
 }

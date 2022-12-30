@@ -19,8 +19,6 @@ The terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv)
 | aws\_region | AWS region. | `string` | `"eu-west-1"` | no |
 | environment | A name that identifies the environment, will used as prefix and for tagging. | `string` | `"ci-runners"` | no |
 | gitlab\_url | URL of the gitlab instance to connect to. | `string` | n/a | yes |
-| private\_ssh\_key\_filename | n/a | `string` | `"generated/id_rsa"` | no |
-| public\_ssh\_key\_filename | n/a | `string` | `"generated/id_rsa.pub"` | no |
 | runner\_name | Name of the runner, will be used in the runner config.toml | `string` | n/a | yes |
 | runner\_token | Token for the runner, will be used in the runner config.toml | `string` | n/a | yes |
 | timezone | Name of the timezone that the runner will be used in. | `string` | `"Europe/Amsterdam"` | no |
@@ -28,3 +26,50 @@ The terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv)
 ## Outputs
 
 No output.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.7 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | ~> 2 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 3 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.7 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_runner"></a> [runner](#module\_runner) | ../../ | n/a |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 2.70 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region. | `string` | `"eu-west-1"` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, will used as prefix and for tagging. | `string` | `"ci-runners"` | no |
+| <a name="input_gitlab_url"></a> [gitlab\_url](#input\_gitlab\_url) | URL of the gitlab instance to connect to. | `string` | n/a | yes |
+| <a name="input_runner_name"></a> [runner\_name](#input\_runner\_name) | Name of the runner, will be used in the runner config.toml | `string` | n/a | yes |
+| <a name="input_runner_token"></a> [runner\_token](#input\_runner\_token) | Token for the runner, will be used in the runner config.toml | `string` | n/a | yes |
+| <a name="input_timezone"></a> [timezone](#input\_timezone) | Timezone that will be set for the runner. | `string` | `"Europe/Amsterdam"` | no |
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->

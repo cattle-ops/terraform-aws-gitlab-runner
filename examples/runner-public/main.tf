@@ -24,27 +24,18 @@ module "cache" {
   environment = var.environment
 }
 
-module "key_pair" {
-  source = "../../modules/key-pair"
-
-  environment = var.environment
-  name        = var.runner_name
-}
-
 module "runner" {
   source = "../../"
 
   aws_region  = var.aws_region
   environment = var.environment
 
-  ssh_key_pair                = module.key_pair.key_pair.key_name
   runners_use_private_address = false
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "0.1"
+  docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name             = var.runner_name
   runners_gitlab_url       = var.gitlab_url
@@ -84,14 +75,13 @@ module "runner2" {
   aws_region  = var.aws_region
   environment = "${var.environment}-2"
 
-  ssh_key_pair                = module.key_pair.key_pair.key_name
   runners_use_private_address = false
 
   vpc_id                   = module.vpc.vpc_id
   subnet_ids_gitlab_runner = module.vpc.public_subnets
   subnet_id_runners        = element(module.vpc.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "0.1"
+  docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name       = var.runner_name
   runners_gitlab_url = var.gitlab_url
