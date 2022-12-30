@@ -12,7 +12,7 @@ locals {
     var.tags,
   )
 
-  cache_bucket_string = var.cache_bucket_name_include_account_id ? format("%s%s-gitlab-runner-cache", var.cache_bucket_prefix, data.aws_caller_identity.current.account_id) : format("%s-gitlab-runner-cache", var.cache_bucket_prefix)
+  cache_bucket_string = var.cache_bucket_name_include_account_id ? format("%s-%s%s-gitlab-runner-cache", var.environment, var.cache_bucket_prefix, data.aws_caller_identity.current.account_id) : format("%s-%s-gitlab-runner-cache", var.environment, var.cache_bucket_prefix)
   cache_bucket_name   = var.cache_bucket_set_random_suffix ? format("%s-%s", local.cache_bucket_string, random_string.s3_suffix[0].result) : local.cache_bucket_string
 
   name_iam_objects = var.name_iam_objects == "" ? local.tags["Name"] : var.name_iam_objects
@@ -25,6 +25,8 @@ resource "random_string" "s3_suffix" {
   special = false
 }
 
+# ok as user can decide to enable the logging. See aws_s3_bucket_logging resource below.
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "build_cache" {
   bucket = local.cache_bucket_name
 
@@ -43,6 +45,8 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
   bucket = aws_s3_bucket.build_cache.id
 
   versioning_configuration {
+    # ok as decided by the user
+    # tfsec:ignore:aws-s3-enable-versioning
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
 }
@@ -64,12 +68,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
   }
 }
 
+# decision by user whether to use a customer managed key or not. Resource is encrypted either.
+# tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
   bucket = aws_s3_bucket.build_cache.id
 
   rule {
+    bucket_key_enabled = true
+
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.kms_key_id
     }
   }
 }
@@ -82,6 +91,15 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
   block_public_policy     = true
   restrict_public_buckets = true
   ignore_public_acls      = true
+}
+
+resource "aws_s3_bucket_logging" "build_cache" {
+  count = var.cache_logging_bucket != null ? 1 : 0
+
+  bucket = aws_s3_bucket.build_cache.id
+
+  target_bucket = var.cache_logging_bucket
+  target_prefix = var.cache_logging_bucket_prefix
 }
 
 resource "aws_iam_policy" "docker_machine_cache" {

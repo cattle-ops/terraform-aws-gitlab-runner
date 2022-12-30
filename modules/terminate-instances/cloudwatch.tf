@@ -31,5 +31,9 @@ resource "aws_cloudwatch_log_group" "lambda" {
   name              = "/aws/lambda/${var.environment}-${var.name}"
   retention_in_days = var.cloudwatch_logging_retention_in_days
 
+  # ok as encryption can be activated by the user
+  # tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  kms_key_id = var.kms_key_id
+
   tags = var.tags
 }

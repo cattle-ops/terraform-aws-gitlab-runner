@@ -8,7 +8,8 @@ This examples shows:
   - You can log into the instance via SSM (Session Manager).
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor.
-  - Addtional security groups that are allowed access to the runner agent
+  - Additional security groups that are allowed access to the runner agent
+  - Use of `runners.docker.services` to configure docker registry mirror (commented out - uncomment to apply)
 
 ![runners-default](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-default.png)
 
