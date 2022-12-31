@@ -34,7 +34,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   timeout          = var.lambda_timeout
   # false positive
   # kics-scan ignore-line
-  tags             = var.tags
+  tags = var.tags
 
   dynamic "tracing_config" {
     for_each = var.enable_xray_tracing ? [1] : []

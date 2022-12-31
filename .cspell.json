@@ -1,12 +1,6 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": [
-    "aquasecurity",
-    "oxsecurity",
-    "tfsec",
-    "trivy"
-  ],
-  "flagWords": [
-  ]
+  "words": ["aquasecurity", "kics", "oxsecurity", "tfsec", "trivy"],
+  "flagWords": []
 }

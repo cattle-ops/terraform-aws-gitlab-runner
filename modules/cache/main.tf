@@ -112,7 +112,7 @@ resource "aws_iam_policy" "docker_machine_cache" {
   description = "Policy for docker machine instance to access cache"
   # false positive
   # kics-scan ignore-line
-  tags        = local.tags
+  tags = local.tags
 
   # cSpell:ignore templatefile
   policy = templatefile("${path.module}/policies/cache.json",
