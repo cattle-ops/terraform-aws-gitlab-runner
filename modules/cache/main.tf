@@ -46,6 +46,7 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
 
   versioning_configuration {
     # ok as decided by the user
+    # trivy:ignore:AWS:S3:BucketVersioningEnabled
     # tfsec:ignore:aws-s3-enable-versioning
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
