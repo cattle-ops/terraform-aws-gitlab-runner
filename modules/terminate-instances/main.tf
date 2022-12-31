@@ -32,6 +32,8 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   role             = aws_iam_role.lambda.arn
   runtime          = var.lambda_runtime
   timeout          = var.lambda_timeout
+  # false positive
+  # kics-scan ignore-line
   tags             = var.tags
 
   dynamic "tracing_config" {

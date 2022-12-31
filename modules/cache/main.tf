@@ -30,6 +30,8 @@ resource "random_string" "s3_suffix" {
 resource "aws_s3_bucket" "build_cache" {
   bucket = local.cache_bucket_name
 
+  # false positive
+  # kics-scan ignore-line
   tags = local.tags
 
   force_destroy = true
@@ -48,6 +50,7 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
     # ok as decided by the user
     # trivy:ignore:AWS:S3:BucketVersioningEnabled
     # tfsec:ignore:aws-s3-enable-versioning
+    # kics-scan ignore-line
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
 }
@@ -107,6 +110,8 @@ resource "aws_iam_policy" "docker_machine_cache" {
   name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
+  # false positive
+  # kics-scan ignore-line
   tags        = local.tags
 
   # cSpell:ignore templatefile
