@@ -17,6 +17,8 @@ data "archive_file" "terminate_runner_instances_lambda" {
 # tracing functions can be activated by the user
 # tfsec:ignore:aws-lambda-enable-tracing
 resource "aws_lambda_function" "terminate_runner_instances" {
+  # ts:skip=lambdaXRayTracingDisabled tracing functions can be activated by the user
+  # ts:skip=lambdaNotInVpc there is no need to run this lambda in our VPC
   architectures    = ["x86_64"]
   description      = "Lifecycle hook for terminating GitLab runner instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
