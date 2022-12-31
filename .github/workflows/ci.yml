@@ -1,3 +1,4 @@
+---
 name: CI
 
 on: # yamllint disable-line rule:truthy
@@ -53,19 +54,19 @@ jobs:
     name: Auto update terraform docs
     needs: [verify_module, verify_examples]
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: CHeckout branch
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
 
-    - name: Generate TF docs
-      uses: terraform-docs/gh-actions@v1.0.0
-      with:
-        find-dir: .
-        git-commit-message: "docs: auto update terraform docs"
-        git-push: true
+    steps:
+      - name: CHeckout branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Generate TF docs
+        uses: terraform-docs/gh-actions@v1.0.0
+        with:
+          find-dir: .
+          git-commit-message: "docs: auto update terraform docs"
+          git-push: true
 
   tfsec:
     name: tfsec PR commenter
