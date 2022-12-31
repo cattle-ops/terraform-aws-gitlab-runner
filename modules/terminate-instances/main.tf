@@ -5,6 +5,7 @@
 # terminating orphaned runner instances.
 # ----------------------------------------------------------------------------
 locals {
+  # cSpell:ignore filesha
   source_sha256 = filesha256("${path.module}/lambda/lambda_function.py")
 }
 
