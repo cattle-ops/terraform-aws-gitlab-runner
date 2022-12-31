@@ -17,6 +17,12 @@ config-terraform.sh
 *.out
 *.secrets*.tfvars
 
+.env
+
+# GO
+# Dependency directories (remove the comment below to include it)
+vendor/
+
 **/node_modules/
 package*.json
 yarn.lock
