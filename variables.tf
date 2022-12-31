@@ -708,7 +708,7 @@ variable "runners_docker_services" {
 }
 
 variable "kms_key_id" {
-  description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
+  description = "KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key."
   type        = string
   default     = ""
 }

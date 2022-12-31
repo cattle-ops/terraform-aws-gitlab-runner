@@ -114,6 +114,12 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 }
 ```
 
+### KMS keys
+
+If a KMS key is set via `kms_key_id`, make sure that you also give proper access to the key. Otherwise, you might
+get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
+example checkout [kms-policy.json](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
+
 ### GitLab runner token configuration
 
 By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the AWS SSM parameter store. See [example](examples/runner-pre-registered/) for more details.
