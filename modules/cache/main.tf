@@ -109,6 +109,7 @@ resource "aws_iam_policy" "docker_machine_cache" {
   description = "Policy for docker machine instance to access cache"
   tags        = local.tags
 
+  # cSpell:ignore templatefile
   policy = templatefile("${path.module}/policies/cache.json",
     {
       s3_cache_arn = aws_s3_bucket.build_cache.arn

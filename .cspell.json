@@ -5,7 +5,7 @@
     "aquasecurity",
     "oxsecurity",
     "tfsec",
-    "trivy",
+    "trivy"
   ],
   "flagWords": [
   ]
