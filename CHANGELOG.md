@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.6.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.0...5.6.1) (2022-12-31)
+
+
+### Bug Fixes
+
+* invert user data tracing flag ([#517](https://github.com/npalm/terraform-aws-gitlab-runner/issues/517)) ([61c7805](https://github.com/npalm/terraform-aws-gitlab-runner/commit/61c7805ddfb307139bf5ac115784fcf805c70517))
+
 ## [5.6.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.5.0...5.6.0) (2022-12-11)
 
 
