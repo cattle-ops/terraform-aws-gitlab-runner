@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.7.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.1...5.7.0) (2023-01-01)
+
+
+### Features
+
+* Add user data of agent to outputs ([#618](https://github.com/npalm/terraform-aws-gitlab-runner/issues/618)) ([48ce0e7](https://github.com/npalm/terraform-aws-gitlab-runner/commit/48ce0e7c3c83d58a3f3697d83e64fd279d7daedb))
+
+
+### Bug Fixes
+
+* Invalid Function Arguement when passing bucket as arg ([#266](https://github.com/npalm/terraform-aws-gitlab-runner/issues/266)) ([b9e73fe](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b9e73fe212cabb7d60d6d2ceda5e71c4369dab51))
+
 ## [5.6.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.0...5.6.1) (2022-12-31)
 
 
