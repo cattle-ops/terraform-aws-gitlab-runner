@@ -76,7 +76,7 @@ No modules.
 | <a name="input_cache_logging_bucket_prefix"></a> [cache\_logging\_bucket\_prefix](#input\_cache\_logging\_bucket\_prefix) | Prefix within the `cache_logging_bucket`. | `string` | `null` | no |
 | <a name="input_create_cache_bucket"></a> [create\_cache\_bucket](#input\_create\_cache\_bucket) | (deprecated) If the cache should not be craeted, remove the whole module call! | `bool` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
-| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. | `string` | `""` | no |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. Ensure that your Runner/Executor has access to the KMS key. | `string` | `""` | no |
 | <a name="input_name_iam_objects"></a> [name\_iam\_objects](#input\_name\_iam\_objects) | Set the name prefix of all AWS IAM resources created by this module | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |
 
