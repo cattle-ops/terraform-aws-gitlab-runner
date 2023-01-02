@@ -882,3 +882,9 @@ variable "runner_yum_update" {
   type        = bool
   default     = true
 }
+
+variable "runner_extra_config" {
+  description = "Extra commands to run as part of starting the runner"
+  type        = string
+  default     = ""
+}
