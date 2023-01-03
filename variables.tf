@@ -621,7 +621,7 @@ variable "overrides" {
   }
   
   validation {
-    condition = var.overrides["name_docker_machine_runners"] != "" && can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    condition = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
     error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
   }
 }
