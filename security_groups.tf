@@ -12,7 +12,11 @@ resource "aws_security_group" "runner" {
     iterator = each
 
     content {
-      cidr_blocks      = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
+      cidr_blocks = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
       ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
       prefix_list_ids  = each.value.prefix_list_ids
       from_port        = each.value.from_port
@@ -69,7 +73,11 @@ resource "aws_security_group" "docker_machine" {
     iterator = each
 
     content {
-      cidr_blocks      = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
+      cidr_blocks = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
       ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
       prefix_list_ids  = each.value.prefix_list_ids
       from_port        = each.value.from_port

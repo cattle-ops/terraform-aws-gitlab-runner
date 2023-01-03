@@ -29,6 +29,7 @@ listen_address = "${prometheus_listen_address}"
     pull_policy = ${runners_pull_policies}
     runtime = "${runners_docker_runtime}"
     helper_image = "${runners_helper_image}"
+    ${runners_docker_services}
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
   [runners.docker.services_tmpfs]
