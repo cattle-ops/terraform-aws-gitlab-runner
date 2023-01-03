@@ -1,7 +1,7 @@
 #!/bin/bash -e
 exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
 
-if [[ $(echo ${user_data_trace_log}) == false ]]; then
+if [[ $(echo ${user_data_trace_log}) == true ]]; then
   set -x
 fi
 
@@ -19,3 +19,5 @@ ${yum_update}
 ${logging}
 
 ${gitlab_runner}
+
+${extra_config}
