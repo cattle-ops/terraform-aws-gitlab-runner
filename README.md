@@ -230,7 +230,7 @@ on .terraform/modules/gitlab_runner/main.tf line 400, in resource "aws_iam_role_
 The "count" value depends on resource attributes that cannot be determined until apply, so Terraform cannot predict how many instances will be created. To work around this, use the -target argument to first apply only the resources that the count depends on.
 ```
 
-The workaround is to use a `terraform apply -target module.cache` followed by a `terraform apply` to apply everything else. This is a one time effort needed at the very beginning.
+The workaround is to use a `terraform apply -target=module.cache` followed by a `terraform apply` to apply everything else. This is a one time effort needed at the very beginning.
 
 ## Usage
 
