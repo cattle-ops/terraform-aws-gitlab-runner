@@ -848,31 +848,31 @@ variable "asg_terminate_lifecycle_hook_name" {
 }
 
 variable "asg_terminate_lifecycle_hook_create" {
-  description = "Boolean toggling the creation of the ASG instance terminate lifecycle hook."
+  description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
   type        = bool
   default     = true
 }
 
 variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
-  description = "The amount of time, in seconds, for the instances to remain in wait state."
+  description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
   type        = number
   default     = 90
 }
 
 variable "asg_terminate_lifecycle_lambda_memory_size" {
-  description = "The memory size in MB to allocate to the terminate-instances Lambda function."
+  description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
 }
 
 variable "asg_terminate_lifecycle_lambda_runtime" {
-  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
+  description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
   type        = string
   default     = "python3.8"
 }
 
 variable "asg_terminate_lifecycle_lambda_timeout" {
-  description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
+  description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
   default     = 30
   type        = number
 }

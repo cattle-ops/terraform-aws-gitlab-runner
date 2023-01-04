@@ -39,34 +39,10 @@ variable "cloudwatch_logging_retention_in_days" {
   default     = 30
 }
 
-variable "lifecycle_heartbeat_timeout" {
-  description = "The amount of time, in seconds, for the instances to remain in wait state."
-  type        = number
-  default     = 90
-}
-
 variable "name_iam_objects" {
   description = "The name to use for IAM resources - roles and policies."
   type        = string
   default     = ""
-}
-
-variable "lambda_memory_size" {
-  description = "The memory size in MB to allocate to the Lambda function."
-  type        = number
-  default     = 128
-}
-
-variable "lambda_runtime" {
-  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
-  type        = string
-  default     = "python3.8"
-}
-
-variable "lambda_timeout" {
-  description = "Amount of time the Lambda Function has to run in seconds."
-  default     = 10
-  type        = number
 }
 
 variable "kms_key_id" {
