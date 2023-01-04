@@ -61,6 +61,6 @@ resource "aws_autoscaling_lifecycle_hook" "terminate_instances" {
   name                   = "${var.environment}-${var.name}"
   autoscaling_group_name = var.asg_name
   default_result         = "CONTINUE"
-  heartbeat_timeout      = local.lambda_timeout + 20  # allow some extra time for cold starts
+  heartbeat_timeout      = local.lambda_timeout + 20 # allow some extra time for cold starts
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
 }
