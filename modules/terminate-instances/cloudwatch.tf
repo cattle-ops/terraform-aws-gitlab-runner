@@ -33,6 +33,7 @@ resource "aws_cloudwatch_log_group" "lambda" {
 
   # ok as encryption can be activated by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  # checkov:skip=CKV_AWS_158:Encryption can be activated by the user
   kms_key_id = var.kms_key_id
 
   tags = var.tags

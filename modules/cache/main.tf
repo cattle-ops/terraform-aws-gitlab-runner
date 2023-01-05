@@ -30,6 +30,7 @@ resource "random_string" "s3_suffix" {
 # ok as user can decide to enable the logging. See aws_s3_bucket_logging resource below.
 # tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "build_cache" {
+  # checkov:skip=CKV_AWS_21:Versioning can be decided by user
   # checkov:skip=CKV_AWS_144:It's a cache only. Replication not needed.
   bucket = local.cache_bucket_name
 

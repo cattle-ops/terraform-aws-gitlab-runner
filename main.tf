@@ -226,6 +226,7 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
+  # checkov:skip=CKV_AWS_88:User can decided to add a public IP. Ignored.
   name_prefix            = local.name_runner_agent_instance
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)

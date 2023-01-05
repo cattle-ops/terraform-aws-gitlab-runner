@@ -1,0 +1,84 @@
+# Vulnerabilities we have to accept as they are introduced by transitive dependencies
+
+# github.com/aws/aws-sdk-go
+CVE-2020-8911
+CVE-2020-8912
+
+# github.com/buger/jsonparser
+CVE-2020-10675
+CVE-2020-35381
+
+# github.com/containerd/containerd
+CVE-2021-43816
+CVE-2021-41103
+CVE-2022-23648
+CVE-2021-32760
+CVE-2022-31030
+GHSA-5j5w-g665-5m35
+GHSA-5ffw-gxpp-mxpf
+
+# github.com/containerd/imgcrypt
+CVE-2022-24778
+
+# github.com/dgrijalva/jwt-go
+CVE-2020-26160
+
+# github.com/docker/cli
+CVE-2021-41092
+
+# github.com/docker/distribution
+GHSA-qq97-vm5h-rrhg
+
+# github.com/emicklei/go-restful
+CVE-2022-1996
+
+# github.com/gorilla/handlers
+CVE-2017-20146
+
+# github.com/opencontainers/image-spec
+GHSA-77vh-xpmg-72qh
+
+# github.com/opencontainers/runc
+CVE-2022-29162
+CVE-2022-24769
+
+# github.com/prometheus/client_golang
+CVE-2018-1098
+CVE-2020-15115
+CVE-2018-1099
+GHSA-528j-9r78-wffx
+GHSA-9gp7-6833-wv89
+GHSA-h8g9-6gvh-5mrc
+
+# golang.org/x/crypto
+CVE-2021-43565
+CVE-2022-27191
+
+# golang.org/x/net
+CVE-2021-44716
+CVE-2022-27664
+CVE-2022-41717
+
+# golang.org/x/text
+CVE-2021-38561
+CVE-2022-32149
+
+# k8s.io/kubernetes
+CVE-2019-11253
+CVE-2020-8558
+CVE-2021-25741
+CVE-2019-1002101
+CVE-2019-11250
+CVE-2020-8552
+CVE-2020-8554
+CVE-2020-8555
+CVE-2020-8557
+CVE-2020-8559
+CVE-2020-8561
+CVE-2020-8563
+CVE-2020-8564
+CVE-2020-8565
+CVE-2021-25735
+CVE-2020-8562
+CVE-2021-25740
+CVE-2021-25743
