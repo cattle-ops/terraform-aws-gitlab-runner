@@ -619,6 +619,11 @@ variable "overrides" {
     condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
     error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
   }
+
+  validation {
+    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
+  }
 }
 
 variable "cache_bucket" {
