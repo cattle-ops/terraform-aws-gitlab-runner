@@ -1,9 +1,9 @@
 # ignores: IAM Access Analyzer Not Enabled --> this is an account wide setting
 # kics-scan ignore-line
 resource "aws_iam_role_policy" "instance" {
-  count  = var.enable_cloudwatch_logging && var.create_runner_iam_role ? 1 : 0
-  name   = "${local.name_iam_objects}-logging"
-  role   = local.aws_iam_role_instance_name
+  count = var.enable_cloudwatch_logging && var.create_runner_iam_role ? 1 : 0
+  name  = "${local.name_iam_objects}-logging"
+  role  = local.aws_iam_role_instance_name
   # cSpell:ignore templatefile
   # ends in a "file does not exist" error. May be we should better use the policy directly.
   # tflint-ignore: aws_iam_policy_sid_invalid_characters
@@ -21,14 +21,14 @@ locals {
 }
 
 resource "aws_cloudwatch_log_group" "environment" {
-  count             = var.enable_cloudwatch_logging ? 1 : 0
-  name              = var.log_group_name != null ? var.log_group_name : var.environment
+  count = var.enable_cloudwatch_logging ? 1 : 0
+  name  = var.log_group_name != null ? var.log_group_name : var.environment
   # ignores a false positive: retention_in_days not set
   # kics-scan ignore-line
   retention_in_days = var.cloudwatch_logging_retention_in_days
   # ignores a false positive: tags not used
   # kics-scan ignore-line
-  tags              = local.tags
+  tags = local.tags
 
   # ignored as decided by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
