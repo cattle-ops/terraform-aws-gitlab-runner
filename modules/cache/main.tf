@@ -52,7 +52,7 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
 
   versioning_configuration {
     # ok as decided by the user
-    # trivy:ignore:AWS:S3:BucketVersioningEnabled
+    # trivy:ignore:avd-aws-0090
     # tfsec:ignore:aws-s3-enable-versioning
     # kics-scan ignore-line
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
@@ -120,7 +120,6 @@ resource "aws_iam_policy" "docker_machine_cache" {
   # kics-scan ignore-line
   tags = local.tags
 
-  # cSpell:ignore templatefile
   # ends in a "file does not exist" error. May be we should better use the policy directly.
   # tflint-ignore: aws_iam_policy_sid_invalid_characters
   policy = templatefile("${path.module}/policies/cache.json",

@@ -43,6 +43,7 @@ CVE-2022-29162
 CVE-2022-24769
 
 # github.com/prometheus/client_golang
+CVE-2022-21698
 CVE-2018-1098
 CVE-2020-15115
 CVE-2018-1099

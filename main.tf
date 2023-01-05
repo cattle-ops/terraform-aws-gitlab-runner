@@ -66,7 +66,7 @@ locals {
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
-      giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
+      gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
       gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
@@ -254,6 +254,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
     content {
+      # cSpell:ignore xvda
       device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
       ebs {
         delete_on_termination = lookup(block_device_mappings.value, "delete_on_termination", true)

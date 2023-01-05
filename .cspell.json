@@ -1,6 +1,6 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["aquasecurity", "kics", "markdownlint", "oxsecurity", "tflint", "tfsec", "trivy"],
+  "words": ["aquasecurity", "concat", "kics", "jsonencode", "markdownlint", "oxsecurity", "templatefile", "tflint", "tfsec", "tmpfs", "trivy", "trivyignore", "userdata"],
   "flagWords": []
 }
