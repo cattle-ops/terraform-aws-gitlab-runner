@@ -18,12 +18,15 @@ data "archive_file" "terminate_runner_instances_lambda" {
 # tracing functions can be activated by the user
 # ignore KICS: IAM Access Analyzer Not Enabled --> this is an account wide setting
 # tfsec:ignore:aws-lambda-enable-tracing
-# checkov:skip=CKV_AWS_50:Tracing functions can be activated by the user
-# checkov:skip=CKV_AWS_117:There is no need to run this lambda in our VPC
 # kics-scan ignore-line
 resource "aws_lambda_function" "terminate_runner_instances" {
   # ts:skip=lambdaXRayTracingDisabled:Tracing functions can be activated by the user
   # ts:skip=lambdaNotInVpc:There is no need to run this lambda in our VPC
+  # checkov:skip=CKV_AWS_50:Tracing functions can be activated by the user
+  # checkov:skip=CKV_AWS_115:We do not assign a reserved concurrency as this function can't be called by users
+  # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
+  # checkov:skip=CKV_AWS_117:There is no need to run this lambda in our VPC
+  # checkov:skip=CKV_AWS_272:Code signing would be a nice enhancement, but I guess we can live without it here
   architectures    = ["x86_64"]
   description      = "Lifecycle hook for terminating GitLab runner instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
