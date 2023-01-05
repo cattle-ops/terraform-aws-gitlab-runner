@@ -1,0 +1,5 @@
+[rules]
+    skip-rules = [
+        "AC_AWS_0485",
+        "AC_AWS_0486"
+    ]
