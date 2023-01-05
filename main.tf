@@ -10,11 +10,16 @@ data "aws_availability_zone" "runners" {
 }
 
 # Parameter value is managed by the user-data script of the gitlab runner instance
+
+# ignores: IAM Access Analyzer Not Enabled, Shield Advanced Not In Use --> these are account wide setting
+# kics-scan ignore-line
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
   type  = "SecureString"
   value = "null"
 
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = local.tags
 
   lifecycle {
@@ -27,6 +32,8 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
   type  = "SecureString"
   value = "null"
 
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = local.tags
 
   lifecycle {
@@ -150,6 +157,9 @@ data "aws_ami" "docker_machine" {
   owners = var.runner_ami_owners
 }
 
+# ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
+# ignores: Auto Scaling Group With No Associated ELB --> that's simply not true, as the EC2 instance contacts GitLab. So no ELB needed here.
+# kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
@@ -226,7 +236,7 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
-  # checkov:skip=CKV_AWS_88:User can decided to add a public IP. Ignored.
+  # checkov:skip=CKV_AWS_88:User can decided to add a public IP.
   name_prefix            = local.name_runner_agent_instance
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)
@@ -287,6 +297,8 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
 
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = local.tags
 
   metadata_options {
@@ -314,6 +326,8 @@ module "cache" {
   source = "./modules/cache"
 
   environment = var.environment
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags        = local.tags
 
   cache_bucket_prefix                  = var.cache_bucket_prefix
@@ -337,6 +351,9 @@ resource "aws_iam_instance_profile" "instance" {
 
   name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = local.tags
 }
 
@@ -345,6 +362,9 @@ resource "aws_iam_role" "instance" {
   name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags                 = merge(local.tags, var.role_tags)
 }
 
@@ -362,6 +382,9 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
     {
       docker_machine_role_arn = aws_iam_role.docker_machine.arn
   })
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = local.tags
 }
 
@@ -382,6 +405,9 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
   path        = "/"
   description = "Policy session manager."
   policy      = templatefile("${path.module}/policies/instance-session-manager-policy.json", {})
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags        = local.tags
 }
 
@@ -429,12 +455,18 @@ resource "aws_iam_role" "docker_machine" {
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags                 = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
   name = "${local.name_iam_objects}-docker-machine"
   role = aws_iam_role.docker_machine.name
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = local.tags
 }
 
@@ -465,6 +497,9 @@ resource "aws_iam_policy" "service_linked_role" {
   path        = "/"
   description = "Policy for creation of service linked roles."
   policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { partition = data.aws_partition.current.partition })
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags        = local.tags
 }
 
@@ -477,6 +512,10 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 
 resource "aws_eip" "gitlab_runner" {
   count = var.enable_eip ? 1 : 0
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
+  tags = local.tags
 }
 
 ################################################################################
@@ -489,6 +528,9 @@ resource "aws_iam_policy" "ssm" {
   path        = "/"
   description = "Policy for runner token param access via SSM"
   policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { partition = data.aws_partition.current.partition })
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags        = local.tags
 }
 
@@ -509,6 +551,9 @@ resource "aws_iam_policy" "eip" {
   path        = "/"
   description = "Policy for runner to assign EIP"
   policy      = templatefile("${path.module}/policies/instance-eip.json", {})
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags        = local.tags
 }
 
@@ -540,5 +585,8 @@ module "terminate_instances_lifecycle_function" {
   lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
   kms_key_id                           = local.kms_key
   arn_format                           = var.arn_format
+
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags                                 = local.tags
 }

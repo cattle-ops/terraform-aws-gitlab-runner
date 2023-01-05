@@ -4,14 +4,12 @@ resource "aws_iam_role_policy" "instance" {
   count = var.enable_cloudwatch_logging && var.create_runner_iam_role ? 1 : 0
   name  = "${local.name_iam_objects}-logging"
   role  = local.aws_iam_role_instance_name
-  # cSpell:ignore templatefile
   # ends in a "file does not exist" error. May be we should better use the policy directly.
   # tflint-ignore: aws_iam_policy_sid_invalid_characters
   policy = templatefile("${path.module}/policies/instance-logging-policy.json", { partition = data.aws_partition.current.partition })
 }
 
 locals {
-  # cSpell:ignore templatefile
   logging_user_data = templatefile("${path.module}/template/logging.tpl",
     {
       log_group_name = var.log_group_name != null ? var.log_group_name : var.environment
