@@ -22,5 +22,6 @@ resource "aws_cloudwatch_log_group" "environment" {
 
   # ignored as decided by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  # checkov:skip=CKV_AWS_158:Encryption can be enabled by user
   kms_key_id = local.kms_key
 }
