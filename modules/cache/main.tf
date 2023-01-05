@@ -18,6 +18,8 @@ locals {
   name_iam_objects = var.name_iam_objects == "" ? local.tags["Name"] : var.name_iam_objects
 }
 
+# ignores: IAM Access Analyzer Not Enabled --> this is an account wide setting
+# kics-scan ignore-line
 resource "random_string" "s3_suffix" {
   count   = var.cache_bucket_set_random_suffix ? 1 : 0
   length  = 8
@@ -82,6 +84,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encry
     bucket_key_enabled = true
 
     apply_server_side_encryption_by_default {
+      # ignores a false positive: S3 Bucket SSE Disabled
+      # kics-scan ignore-line
       sse_algorithm     = "aws:kms"
       kms_master_key_id = var.kms_key_id
     }
