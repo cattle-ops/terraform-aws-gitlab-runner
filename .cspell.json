@@ -23,7 +23,6 @@
     "tfvars",
     "tmpfs",
     "trivy",
-    "trivyignore",
     "userdata"
   ],
   "flagWords": []
