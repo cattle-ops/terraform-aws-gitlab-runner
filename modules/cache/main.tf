@@ -120,8 +120,6 @@ resource "aws_iam_policy" "docker_machine_cache" {
   # kics-scan ignore-line
   tags = local.tags
 
-  # ends in a "file does not exist" error. May be we should better use the policy directly.
-  # tflint-ignore: aws_iam_policy_sid_invalid_characters
   policy = templatefile("${path.module}/policies/cache.json",
     {
       s3_cache_arn = aws_s3_bucket.build_cache.arn
