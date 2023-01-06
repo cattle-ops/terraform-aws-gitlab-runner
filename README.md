@@ -28,7 +28,8 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 > 3.x provider. Besides reviewing PR's we will do not any active checking on maintenance on this branch. We strongly
 > advise to update your deployment to the new provider version. For more details about upgrading see the
 > [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
-
+<!-- not able to distinguish between two blockquotes -->
+<!-- markdownlint-disable MD031 -->
 > BREAKING CHANGE: By default AWS metadata service ([IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html))
 > is enabled and required for both the agent instance and the docker machine instance. For docker machine this requires
 > the GitLab managed docker machines distribution is used. Which the module usages by default.
@@ -158,7 +159,8 @@ gitlab_runner_registration_config = {
   locked_to_project  = "true"
   run_untagged       = "false"
   maximum_timeout    = "3600"
-  access_level       = "<not_protected OR ref_protected, ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected>"
+  # ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected
+  access_level       = "<not_protected OR ref_protected>"
 }
 ```
 
@@ -190,6 +192,7 @@ When `enable_schedule=true`, the `schedule_config` variable can be used to scale
 Scaling may be defined with one `scale_out` scheduled action and/or one `scale_in` scheduled action.
 
 For example:
+
 ```hcl
   module "runner" {
     ...
@@ -228,11 +231,14 @@ A few option are provided to access the runner instance:
 
 ### GitLab runner cache
 
-By default the module creates a cache for the runner in S3. Old objects are automatically removed via a configurable life cycle policy on the bucket.
+By default the module creates a cache for the runner in S3. Old objects are automatically removed via a configurable life cycle
+policy on the bucket.
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple
-runners. For this purpose the cache is implemented as a sub module. For more details see the [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/cache).
-An example implementation of this use case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/__GIT_REF__/examples/runner-public) example.
+runners. For this purpose the cache is implemented as a sub module. For more details see the 
+[cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of this use
+case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
+example.
 
 In case you enable the access logging for the S3 cache bucket, you have to add the following statement to your S3 logging bucket
 policy.
@@ -300,13 +306,12 @@ module "runner" {
 ### Removing the module
 
 Remove the module from your Terraform code and deregister the runner manually from your Gitlab instance.
+
 ### Scenario: Multi-region deployment
 
 Name clashes due to multi-region deployments for global AWS resources create by this module (IAM, S3) can be avoided by including a
 distinguishing region specific prefix via the _cache_bucket_prefix_ string respectively via _name_iam_objects_ in the _overrides_
 map. A simple example for this would be to set _region-specific-prefix_ to the AWS region the module is deployed to.
-
-
 
 ```hcl
 module "runner" {
@@ -355,10 +360,12 @@ Providers are locked down as well in the `providers.tf` file.
 ### Configure
 
 The examples are configured with defaults that should work in general. The examples are in general configured for the
-region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be 
+region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab registration token. The token can be
 found in GitLab in the runner section (global, group or repo scope). Create a file `terraform.tfvars` and the registration token.
 
+```hcl
     registration_token = "MY_TOKEN"
+```
 
 ### Run
 
@@ -376,12 +383,14 @@ To destroy the runner, run:
   terraform destroy
 ```
 
-
 ## Contributors ✨
 
 This project exists thanks to all the people who contribute.
 
+<!-- this is the only option to integrate the contributors list in the README.md -->
+<!-- markdownlint-disable MD033 -->
 <a href="https://github.com/npalm/terraform-aws-gitlab-runner/graphs/contributors">
+  <!-- markdownlint-disable MD033 -->
   <img src="https://contrib.rocks/image?repo=npalm/terraform-aws-gitlab-runner" />
 </a>
 
@@ -389,6 +398,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 <!-- markdownlint-disable -->
 <!-- cSpell:disable -->
+<!-- markdown-link-check-disable -->
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -612,3 +622,4 @@ Made with [contributors-img](https://contrib.rocks).
 <!-- END_TF_DOCS -->
 <!-- markdownlint-enable -->
 <!-- cSpell:enable -->
+<!-- markdown-link-check-enable -->
