@@ -64,6 +64,7 @@ resource "aws_security_group_rule" "runner_ping_group" {
 ########################################
 
 resource "aws_security_group" "docker_machine" {
+  # checkov:skip=CKV2_AWS_5:Security group is used within an template and assigned to the docker machines
   name_prefix = "${local.name_sg}-docker-machine"
   vpc_id      = var.vpc_id
   description = var.docker_machine_security_group_description

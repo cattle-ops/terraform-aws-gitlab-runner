@@ -237,6 +237,7 @@ data "aws_ami" "runner" {
 
 resource "aws_launch_template" "gitlab_runner_instance" {
   # checkov:skip=CKV_AWS_88:User can decided to add a public IP.
+  # checkov:skip=CKV_AWS_79:User can decided to enable Metadata service V2. V2 is the default.
   name_prefix            = local.name_runner_agent_instance
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)
@@ -289,7 +290,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     resource_type = "volume"
     # false positive: resource without tags
     # kics-scan ignore-line
-    tags          = local.tags
+    tags = local.tags
   }
   dynamic "tag_specifications" {
     for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
@@ -330,7 +331,7 @@ module "cache" {
   environment = var.environment
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags        = local.tags
+  tags = local.tags
 
   cache_bucket_prefix                  = var.cache_bucket_prefix
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
@@ -367,7 +368,7 @@ resource "aws_iam_role" "instance" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags                 = merge(local.tags, var.role_tags)
+  tags = merge(local.tags, var.role_tags)
 }
 
 ################################################################################
@@ -410,7 +411,7 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags        = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
@@ -460,7 +461,7 @@ resource "aws_iam_role" "docker_machine" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags                 = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
@@ -502,7 +503,7 @@ resource "aws_iam_policy" "service_linked_role" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags        = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
@@ -515,6 +516,7 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 # ignores: Shield Advanced Not In Use --> account setting
 # kics-scan ignore-line
 resource "aws_eip" "gitlab_runner" {
+  # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
   count = var.enable_eip ? 1 : 0
 
   # false positive: resource without tags
@@ -535,7 +537,7 @@ resource "aws_iam_policy" "ssm" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags        = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
@@ -558,7 +560,7 @@ resource "aws_iam_policy" "eip" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags        = local.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "eip" {
@@ -592,5 +594,5 @@ module "terminate_instances_lifecycle_function" {
 
   # false positive: resource without tags
   # kics-scan ignore-line
-  tags                                 = local.tags
+  tags = local.tags
 }
