@@ -36,6 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
           SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.gitignore)
+          TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
           PAT: ${{ secrets.GITHUB_TOKEN }}
 
       # Upload MegaLinter artifacts

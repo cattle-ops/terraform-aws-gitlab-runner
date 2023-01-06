@@ -20,8 +20,8 @@ data "archive_file" "terminate_runner_instances_lambda" {
 # tfsec:ignore:aws-lambda-enable-tracing
 # kics-scan ignore-line
 resource "aws_lambda_function" "terminate_runner_instances" {
-  # ts:skip=lambdaXRayTracingDisabled:Tracing functions can be activated by the user
-  # ts:skip=lambdaNotInVpc:There is no need to run this lambda in our VPC
+  #ts:skip=AC_AWS_0485:Tracing functions can be activated by the user
+  #ts:skip=AC_AWS_0486 There is no need to run this lambda in our VPC
   # checkov:skip=CKV_AWS_50:Tracing functions can be activated by the user
   # checkov:skip=CKV_AWS_115:We do not assign a reserved concurrency as this function can't be called by users
   # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
