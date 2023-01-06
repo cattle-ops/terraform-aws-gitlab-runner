@@ -9,6 +9,7 @@
     "markdownlint",
     "oxsecurity",
     "templatefile",
+    "terrascan",
     "tflint",
     "tfsec",
     "tmpfs",

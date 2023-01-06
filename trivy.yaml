@@ -1,4 +1,0 @@
----
-scan:
-  skip-dirs:
-    - test

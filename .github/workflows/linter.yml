@@ -60,7 +60,7 @@ jobs:
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
-          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+          key: tflint-${{ hashFiles('.tflint.hcl') }}
 
       - uses: terraform-linters/setup-tflint@v2
         name: Setup TFLint
