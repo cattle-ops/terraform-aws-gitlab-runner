@@ -2,7 +2,10 @@
 ## Gitlab-runner agent security group ##
 ########################################
 
+# ignores: IAM Access Analyzer Not Enabled
+# kics-scan ignore-line
 resource "aws_security_group" "runner" {
+  # checkov:skip=CKV2_AWS_5:False positive. Security group is used in a launch template network interface section.
   name_prefix = local.name_sg
   vpc_id      = var.vpc_id
   description = var.gitlab_runner_security_group_description
@@ -28,6 +31,8 @@ resource "aws_security_group" "runner" {
     }
   }
 
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = merge(
     local.tags,
     {
@@ -90,6 +95,8 @@ resource "aws_security_group" "docker_machine" {
     }
   }
 
+  # false positive: resource without tags
+  # kics-scan ignore-line
   tags = merge(
     local.tags,
     {
@@ -125,7 +132,7 @@ resource "aws_security_group_rule" "docker_machine_docker_runner" {
 
 # Combine runner security group id and additional security group IDs
 locals {
-  # Only include runner security group id and addtional if ping is enabled
+  # Only include runner security group id and additional if ping is enabled
   security_groups_ping = var.enable_ping && length(var.gitlab_runner_security_group_ids) > 0 ? concat(var.gitlab_runner_security_group_ids, [aws_security_group.runner.id]) : []
 }
 
