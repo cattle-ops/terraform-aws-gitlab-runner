@@ -26,5 +26,3 @@ jobs:
           token: ${{ steps.token.outputs.token }}
           include-v-in-tag: false
           signoff: "Niek Palm <dev.npalm@gmail.com>"
-          bootstrap-sha: 3596bacda1c6a990a2e4f5bb6f5dbe07a77f65d6
-          release-as: 5.6.0

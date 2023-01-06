@@ -114,6 +114,12 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 }
 ```
 
+### KMS keys
+
+If a KMS key is set via `kms_key_id`, make sure that you also give proper access to the key. Otherwise, you might
+get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
+example checkout [kms-policy.json](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
+
 ### GitLab runner token configuration
 
 By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The manual process is still supported but will be removed in future releases. The runner token will be stored in the AWS SSM parameter store. See [example](examples/runner-pre-registered/) for more details.
@@ -214,6 +220,17 @@ In case you enable the access logging for the S3 cache bucket, you have to add t
     "Resource": "<s3-arn>/*"
 }
 ```
+
+In case you manage the S3 cache bucket yourself it might be necessary to apply the cache before applying the runner module. A typical error message looks like:
+
+```text
+Error: Invalid count argument
+on .terraform/modules/gitlab_runner/main.tf line 400, in resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance":
+  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+The "count" value depends on resource attributes that cannot be determined until apply, so Terraform cannot predict how many instances will be created. To work around this, use the -target argument to first apply only the resources that the count depends on.
+```
+
+The workaround is to use a `terraform apply -target=module.cache` followed by a `terraform apply` to apply everything else. This is a one time effort needed at the very beginning.
 
 ## Usage
 
@@ -462,7 +479,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_enable_manage_gitlab_token"></a> [enable\_manage\_gitlab\_token](#input\_enable\_manage\_gitlab\_token) | Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `true` | no |
 | <a name="input_enable_ping"></a> [enable\_ping](#input\_enable\_ping) | Allow ICMP Ping to the ec2 instances. | `bool` | `false` | no |
 | <a name="input_enable_runner_ssm_access"></a> [enable\_runner\_ssm\_access](#input\_enable\_runner\_ssm\_access) | Add IAM policies to the runner agent instance to connect via the Session Manager. | `bool` | `false` | no |
-| <a name="input_enable_runner_user_data_trace_log"></a> [enable\_runner\_user\_data\_trace\_log](#input\_enable\_runner\_user\_data\_trace\_log) | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `false` | no |
+| <a name="input_enable_runner_user_data_trace_log"></a> [enable\_runner\_user\_data\_trace\_log](#input\_enable\_runner\_user\_data\_trace\_log) | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `true` | no |
 | <a name="input_enable_schedule"></a> [enable\_schedule](#input\_enable\_schedule) | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | <a name="input_extra_security_group_ids_runner_agent"></a> [extra\_security\_group\_ids\_runner\_agent](#input\_extra\_security\_group\_ids\_runner\_agent) | Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default. | `list(string)` | `[]` | no |
@@ -475,7 +492,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
 | <a name="input_kms_alias_name"></a> [kms\_alias\_name](#input\_kms\_alias\_name) | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
 | <a name="input_kms_deletion_window_in_days"></a> [kms\_deletion\_window\_in\_days](#input\_kms\_deletion\_window\_in\_days) | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |
-| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | `""` | no |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key. | `string` | `""` | no |
 | <a name="input_log_group_name"></a> [log\_group\_name](#input\_log\_group\_name) | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
 | <a name="input_metrics_autoscaling"></a> [metrics\_autoscaling](#input\_metrics\_autoscaling) | A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances. | `list(string)` | `null` | no |
 | <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults. <br>The following attributes are supported: <br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. <br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. <br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
@@ -485,6 +502,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runner_agent_uses_private_address"></a> [runner\_agent\_uses\_private\_address](#input\_runner\_agent\_uses\_private\_address) | Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent. | `bool` | `true` | no |
 | <a name="input_runner_ami_filter"></a> [runner\_ami\_filter](#input\_runner\_ami\_filter) | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"<br>  ]<br>}</pre> | no |
 | <a name="input_runner_ami_owners"></a> [runner\_ami\_owners](#input\_runner\_ami\_owners) | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
+| <a name="input_runner_extra_config"></a> [runner\_extra\_config](#input\_runner\_extra\_config) | Extra commands to run as part of starting the runner | `string` | `""` | no |
 | <a name="input_runner_iam_policy_arns"></a> [runner\_iam\_policy\_arns](#input\_runner\_iam\_policy\_arns) | List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance. | `list(string)` | `[]` | no |
 | <a name="input_runner_iam_role_name"></a> [runner\_iam\_role\_name](#input\_runner\_iam\_role\_name) | IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used | `string` | `""` | no |
 | <a name="input_runner_instance_ebs_optimized"></a> [runner\_instance\_ebs\_optimized](#input\_runner\_instance\_ebs\_optimized) | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
@@ -562,4 +580,5 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="output_runner_role_arn"></a> [runner\_role\_arn](#output\_runner\_role\_arn) | ARN of the role used for the docker machine runners. |
 | <a name="output_runner_role_name"></a> [runner\_role\_name](#output\_runner\_role\_name) | Name of the role used for the docker machine runners. |
 | <a name="output_runner_sg_id"></a> [runner\_sg\_id](#output\_runner\_sg\_id) | ID of the security group attached to the docker machine runners. |
+| <a name="output_runner_user_data"></a> [runner\_user\_data](#output\_runner\_user\_data) | The user data of the Gitlab Runner Agent's launch template. |
 <!-- END_TF_DOCS -->

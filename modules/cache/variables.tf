@@ -87,7 +87,7 @@ variable "name_iam_objects" {
 }
 
 variable "kms_key_id" {
-  description = "KMS key id to encrypted the resources."
+  description = "KMS key id to encrypted the resources. Ensure that your Runner/Executor has access to the KMS key."
   type        = string
   default     = ""
 }

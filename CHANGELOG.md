@@ -1,5 +1,45 @@
 # Changelog
 
+## [5.8.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.7.0...5.8.0) (2023-01-05)
+
+
+### Features
+
+* add validation rule for docker machine name ([#627](https://github.com/npalm/terraform-aws-gitlab-runner/issues/627)) ([77a22eb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/77a22eb0ab2f845356a6245662021e2a897598e5))
+
+## [5.7.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.1...5.7.0) (2023-01-01)
+
+
+### Features
+
+* Add user data of agent to outputs ([#618](https://github.com/npalm/terraform-aws-gitlab-runner/issues/618)) ([48ce0e7](https://github.com/npalm/terraform-aws-gitlab-runner/commit/48ce0e7c3c83d58a3f3697d83e64fd279d7daedb))
+
+
+### Bug Fixes
+
+* Invalid Function Arguement when passing bucket as arg ([#266](https://github.com/npalm/terraform-aws-gitlab-runner/issues/266)) ([b9e73fe](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b9e73fe212cabb7d60d6d2ceda5e71c4369dab51))
+
+## [5.6.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.0...5.6.1) (2022-12-31)
+
+
+### Bug Fixes
+
+* invert user data tracing flag ([#517](https://github.com/npalm/terraform-aws-gitlab-runner/issues/517)) ([61c7805](https://github.com/npalm/terraform-aws-gitlab-runner/commit/61c7805ddfb307139bf5ac115784fcf805c70517))
+
+## [5.6.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.5.0...5.6.0) (2022-12-11)
+
+
+### Features
+
+* allow setting runners.docker.services ([#491](https://github.com/npalm/terraform-aws-gitlab-runner/issues/491)) ([6d73e99](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6d73e994c41bf3f6b53db4c940a7a013e534a685))
+* **asg:** Add fine-grained options for schedule_config scale_in and scale_out ([#586](https://github.com/npalm/terraform-aws-gitlab-runner/issues/586)) ([f72b8e3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f72b8e34c955c06b57ec1cd29714478d0568d71a))
+
+
+### Bug Fixes
+
+* Allow custom runner agent IAM role fixups ([#572](https://github.com/npalm/terraform-aws-gitlab-runner/issues/572)) ([#577](https://github.com/npalm/terraform-aws-gitlab-runner/issues/577)) ([bcb0c0e](https://github.com/npalm/terraform-aws-gitlab-runner/commit/bcb0c0eb9de74f0f67181cdeb8cb0fe91cb0e9b1))
+* runner_agent_role_arn ([#596](https://github.com/npalm/terraform-aws-gitlab-runner/issues/596)) ([b069b88](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b069b88bf03557534ffa40bab6d21c085c09f021))
+
 ## [5.5.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.1...5.5.0) (2022-11-27)
 
 

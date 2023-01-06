@@ -625,6 +625,11 @@ variable "overrides" {
     condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
     error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
   }
+
+  validation {
+    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
+  }
 }
 
 variable "cache_bucket" {
@@ -641,7 +646,7 @@ variable "cache_bucket" {
 variable "enable_runner_user_data_trace_log" {
   description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_schedule" {
@@ -714,7 +719,7 @@ variable "runners_docker_services" {
 }
 
 variable "kms_key_id" {
-  description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
+  description = "KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key."
   type        = string
   default     = ""
 }
@@ -887,4 +892,10 @@ variable "runner_yum_update" {
   description = "Run a yum update as part of starting the runner"
   type        = bool
   default     = true
+}
+
+variable "runner_extra_config" {
+  description = "Extra commands to run as part of starting the runner"
+  type        = string
+  default     = ""
 }

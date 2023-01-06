@@ -42,6 +42,7 @@ locals {
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
       yum_update          = var.runner_yum_update ? local.file_yum_update : ""
+      extra_config        = var.runner_extra_config
   })
 
   file_yum_update = file("${path.module}/template/yum_update.tpl")
@@ -305,8 +306,8 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = var.cache_bucket["create"] ? module.cache[0].bucket : lookup(var.cache_bucket, "bucket", "")
-  bucket_policy = var.cache_bucket["create"] ? module.cache[0].policy_arn : lookup(var.cache_bucket, "policy", "")
+  bucket_name   = var.cache_bucket["create"] ? module.cache[0].bucket : var.cache_bucket["bucket"]
+  bucket_policy = var.cache_bucket["create"] ? module.cache[0].policy_arn : var.cache_bucket["policy"]
 }
 
 module "cache" {
@@ -413,6 +414,9 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
+  /* If the S3 cache adapter is configured to use an IAM instance profile, the
+     adapter uses the profile attached to the GitLab Runner machine. So do not
+     use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
   count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
 
   role       = local.aws_iam_role_instance_name
