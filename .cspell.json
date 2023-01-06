@@ -5,6 +5,7 @@
     "aquasecurity",
     "awscli",
     "backports",
+    "blockquotes",
     "concat",
     "dind",
     "gitter",

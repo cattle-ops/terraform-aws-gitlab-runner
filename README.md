@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 [![Terraform registry](https://img.shields.io/github/v/release/npalm/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/npalm/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Actions](https://github.com/npalm/terraform-aws-gitlab-runner/workflows/Verify/badge.svg)](https://github.com/npalm/terraform-aws-gitlab-runner/actions)
+[![Actions](https://github.com/npalm/terraform-aws-gitlab-runner/workflows/Release/badge.svg)](https://github.com/npalm/terraform-aws-gitlab-runner/actions)
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances <!-- omit in toc -->
 
@@ -10,12 +10,7 @@
 - [Usage](#usage)
 - [Examples](#examples)
 - [Contributors ✨](#contributors-)
-- [Requirements](#requirements)
-- [Providers](#providers)
-- [Modules](#modules)
-- [Resources](#resources)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
+- [Module Documentation](#module-documentation)
 
 ## The module
 
@@ -143,9 +138,9 @@ example checkout [kms-policy.json](https://github.com/npalm/terraform-aws-gitlab
 
 ### GitLab runner token configuration
 
-By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The manual
-process is still supported but will be removed in future releases. The runner token will be stored in the AWS SSM parameter store.
-See [example](examples/runner-pre-registered/) for more details.
+By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The
+manual process is still supported but will be removed in future releases. The runner token will be stored in the AWS SSM parameter
+store. See [example](examples/runner-pre-registered/) for more details.
 
 To register the runner automatically set the variable `gitlab_runner_registration_config["registration_token"]`. This token value
 can be found in your GitLab project, group, or global settings. For a generic runner you can find the token in the admin section.
@@ -235,7 +230,7 @@ By default the module creates a cache for the runner in S3. Old objects are auto
 policy on the bucket.
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple
-runners. For this purpose the cache is implemented as a sub module. For more details see the 
+runners. For this purpose the cache is implemented as a sub module. For more details see the
 [cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of this use
 case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
 example.
@@ -268,9 +263,9 @@ gitlab_url   = "GITLAB_URL"
 runner_token = "RUNNER_TOKEN"
 ```
 
-The base image used to host the GitLab Runner agent is the latest available Amazon Linux 2 HVM EBS AMI. In previous versions of this
-module a hard coded list of AMIs per region was provided. This list has been replaced by a search filter to find the latest AMI.
-Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow you to version lock the target AMI.
+The base image used to host the GitLab Runner agent is the latest available Amazon Linux 2 HVM EBS AMI. In previous versions of
+this module a hard coded list of AMIs per region was provided. This list has been replaced by a search filter to find the latest
+AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow you to version lock the target AMI.
 
 ### Scenario: Basic usage
 
@@ -395,6 +390,8 @@ This project exists thanks to all the people who contribute.
 </a>
 
 Made with [contributors-img](https://contrib.rocks).
+
+## Module Documentation
 
 <!-- markdownlint-disable -->
 <!-- cSpell:disable -->
