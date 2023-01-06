@@ -14,7 +14,7 @@ ${runners_config}
 
 EOF
 
-cat > /etc/gitlab-runner/runners_userdata.tpl <<- EOF
+cat > /etc/gitlab-runner/runners_userdata.sh <<- EOF
 ${runners_userdata}
 EOF
 
