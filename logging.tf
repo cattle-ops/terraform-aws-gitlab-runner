@@ -1,9 +1,9 @@
 # ignores: IAM Access Analyzer Not Enabled --> this is an account wide setting
 # kics-scan ignore-line
 resource "aws_iam_role_policy" "instance" {
-  count = var.enable_cloudwatch_logging && var.create_runner_iam_role ? 1 : 0
-  name  = "${local.name_iam_objects}-logging"
-  role  = local.aws_iam_role_instance_name
+  count  = var.enable_cloudwatch_logging && var.create_runner_iam_role ? 1 : 0
+  name   = "${local.name_iam_objects}-logging"
+  role   = local.aws_iam_role_instance_name
   policy = templatefile("${path.module}/policies/instance-logging-policy.json", { partition = data.aws_partition.current.partition })
 }
 
