@@ -287,6 +287,8 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   }
   tag_specifications {
     resource_type = "volume"
+    # false positive: resource without tags
+    # kics-scan ignore-line
     tags          = local.tags
   }
   dynamic "tag_specifications" {
@@ -510,6 +512,8 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
   policy_arn = aws_iam_policy.service_linked_role[0].arn
 }
 
+# ignores: Shield Advanced Not In Use --> account setting
+# kics-scan ignore-line
 resource "aws_eip" "gitlab_runner" {
   count = var.enable_eip ? 1 : 0
 
