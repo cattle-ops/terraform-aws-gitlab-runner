@@ -1,4 +1,4 @@
-module github.com/npalm/terraform-aws-gitlab-runner/test
+module github.com/npalm/terraform-aws-gitlab-runner/test/integration
 
 go 1.12
 
