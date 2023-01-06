@@ -10,7 +10,12 @@
 - [Usage](#usage)
 - [Examples](#examples)
 - [Contributors ✨](#contributors-) <!-- markdown-link-check-disable-line -->
-- [Module Documentation](#module-documentation)
+- [Requirements](#requirements) <!-- markdown-link-check-disable-line -->
+- [Providers](#providers) <!-- markdown-link-check-disable-line -->
+- [Modules](#modules) <!-- markdown-link-check-disable-line -->
+- [Resources](#resources) <!-- markdown-link-check-disable-line -->
+- [Inputs](#inputs) <!-- markdown-link-check-disable-line -->
+- [Outputs](#outputs) <!-- markdown-link-check-disable-line -->
 
 ## The module
 

@@ -72,6 +72,7 @@ jobs:
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
           SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.gitignore|.tflint.hcl)
           TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
+          TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
           PAT: ${{ secrets.GITHUB_TOKEN }}
 
       # Upload MegaLinter artifacts
