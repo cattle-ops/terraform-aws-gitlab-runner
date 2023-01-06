@@ -286,7 +286,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     resource_type = "instance"
     # false positive: resource without tags
     # kics-scan ignore-line
-    tags          = local.tags
+    tags = local.tags
   }
   tag_specifications {
     resource_type = "volume"
