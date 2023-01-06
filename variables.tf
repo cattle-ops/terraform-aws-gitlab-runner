@@ -851,12 +851,22 @@ variable "asg_terminate_lifecycle_hook_create" {
   description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
   type        = bool
   default     = true
+  
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_create
+    error_message = "The hook must be created. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
   description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
   type        = number
-  default     = 90
+  default     = null
+  
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_heartbeat_timeout == null
+    error_message = "The timeout value is managed by the module. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_lambda_memory_size" {
