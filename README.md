@@ -1,6 +1,5 @@
+<!-- markdownlint-disable MD041 -->
 [![Terraform registry](https://img.shields.io/github/v/release/npalm/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/npalm/gitlab-runner/aws/) [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Actions](https://github.com/npalm/terraform-aws-gitlab-runner/workflows/Verify/badge.svg)](https://github.com/npalm/terraform-aws-gitlab-runner/actions)
-
-TEST
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances <!-- omit in toc -->
 
@@ -20,9 +19,15 @@ TEST
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-> BREAKING CHANGE: The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+> BREAKING CHANGE: The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new
+> AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform
+> 3.x provider. Besides reviewing PR's we will do not any active checking on maintenance on this branch. We strongly
+> advise to update your deployment to the new provider version. For more details about upgrading see the
+> [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
 
-> BREAKING CHANGE: By default AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
+> BREAKING CHANGE: By default AWS metadata service ([IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html))
+> is enabled and required for both the agent instance and the docker machine instance. For docker machine this requires
+> the GitLab managed docker machines distribution is used. Which the module usages by default.
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
 
@@ -160,7 +165,7 @@ Finally, the runner still supports the manual runner creation. No changes are re
 
 #### Scheduled scaling
 
-When `enable_schedule=true`, the `schedule_config` variable can be used to scale the Auto Scaling group. 
+When `enable_schedule=true`, the `schedule_config` variable can be used to scale the Auto Scaling group.
 
 Scaling may be defined with one `scale_out` scheduled action and/or one `scale_in` scheduled action.
 
@@ -200,8 +205,8 @@ persist that contains the packaged Lambda function.
 
 A few option are provided to access the runner instance:
 
-1.  Access via the Session Manager (SSM) by setting `enable_runner_ssm_access` to `true`. The policy to allow access via SSM is not very restrictive.
-2.  By setting none of the above, no keys or extra policies will be attached to the instance. You can still configure you own policies by attaching them to `runner_agent_role_arn`.
+1. Access via the Session Manager (SSM) by setting `enable_runner_ssm_access` to `true`. The policy to allow access via SSM is not very restrictive.
+2. By setting none of the above, no keys or extra policies will be attached to the instance. You can still configure you own policies by attaching them to `runner_agent_role_arn`.
 
 ### GitLab runner cache
 
@@ -350,7 +355,7 @@ This project exists thanks to all the people who contribute.
 
 Made with [contributors-img](https://contrib.rocks).
 
-
+<!-- markdownlint-disable -->
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -572,3 +577,4 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="output_runner_sg_id"></a> [runner\_sg\_id](#output\_runner\_sg\_id) | ID of the security group attached to the docker machine runners. |
 | <a name="output_runner_user_data"></a> [runner\_user\_data](#output\_runner\_user\_data) | The user data of the Gitlab Runner Agent's launch template. |
 <!-- END_TF_DOCS -->
+<!-- markdownlint-enable -->

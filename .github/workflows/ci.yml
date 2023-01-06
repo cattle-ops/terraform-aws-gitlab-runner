@@ -2,10 +2,11 @@
 name: CI
 
 on: # yamllint disable-line rule:truthy
-  push:
-    branches:
-      - main
   pull_request:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   verify_module:
@@ -44,9 +45,71 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: terraform init -get -backend=false -input=false
-      - if: contains(matrix.terraform, '1.0.')
-        run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
+
+  linter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    steps:
+      # Git Checkout
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to improve performances
+
+      # MegaLinter
+      - name: MegaLinter
+        id: ml
+        # You can override MegaLinter flavor used to have faster performances
+        # More info at https://megalinter.io/flavors/
+        uses: oxsecurity/megalinter@v6
+        env:
+          # All available variables are described in documentation
+          # https://megalinter.io/configuration/
+          VALIDATE_ALL_CODEBASE: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
+          SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.gitignore|.tflint.hcl)
+          TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
+          PAT: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: ${{ success() }} || ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
+
+  tflint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout source code
+
+      - uses: actions/cache@v2
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-${{ hashFiles('.tflint.hcl') }}
+
+      - uses: terraform-linters/setup-tflint@v2
+        name: Setup TFLint
+        with:
+          tflint_version: latest
+
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint
 
   tfsec:
     name: tfsec PR commenter
@@ -54,7 +117,8 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
+
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
         with:

@@ -108,13 +108,13 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab maintained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
 
 variable "docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ignored once `docker_machine_download_url` is set."
   type        = string
   default     = "0.16.2-gitlab.15"
 }
@@ -509,6 +509,7 @@ variable "allow_iam_service_linked_role_creation" {
 }
 
 variable "docker_machine_options" {
+  # cspell:ignore amazonec
   description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
   type        = list(string)
   default     = []
@@ -633,7 +634,7 @@ variable "cache_bucket" {
 }
 
 variable "enable_runner_user_data_trace_log" {
-  description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
+  description = "Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
   default     = true
 }
