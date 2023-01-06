@@ -9,7 +9,7 @@
 - [Prerequisites](#prerequisites)
 - [Usage](#usage)
 - [Examples](#examples)
-- [Contributors ✨](#contributors-)
+- [Contributors ✨](#contributors-) <!-- markdown-link-check-disable-line -->
 - [Module Documentation](#module-documentation)
 
 ## The module
