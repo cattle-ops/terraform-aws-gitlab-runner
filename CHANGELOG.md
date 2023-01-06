@@ -1,5 +1,126 @@
 # Changelog
 
+## [5.7.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.1...5.7.0) (2023-01-01)
+
+
+### Features
+
+* Add user data of agent to outputs ([#618](https://github.com/npalm/terraform-aws-gitlab-runner/issues/618)) ([48ce0e7](https://github.com/npalm/terraform-aws-gitlab-runner/commit/48ce0e7c3c83d58a3f3697d83e64fd279d7daedb))
+
+
+### Bug Fixes
+
+* Invalid Function Arguement when passing bucket as arg ([#266](https://github.com/npalm/terraform-aws-gitlab-runner/issues/266)) ([b9e73fe](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b9e73fe212cabb7d60d6d2ceda5e71c4369dab51))
+
+## [5.6.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.0...5.6.1) (2022-12-31)
+
+
+### Bug Fixes
+
+* invert user data tracing flag ([#517](https://github.com/npalm/terraform-aws-gitlab-runner/issues/517)) ([61c7805](https://github.com/npalm/terraform-aws-gitlab-runner/commit/61c7805ddfb307139bf5ac115784fcf805c70517))
+
+## [5.6.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.5.0...5.6.0) (2022-12-11)
+
+
+### Features
+
+* allow setting runners.docker.services ([#491](https://github.com/npalm/terraform-aws-gitlab-runner/issues/491)) ([6d73e99](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6d73e994c41bf3f6b53db4c940a7a013e534a685))
+* **asg:** Add fine-grained options for schedule_config scale_in and scale_out ([#586](https://github.com/npalm/terraform-aws-gitlab-runner/issues/586)) ([f72b8e3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f72b8e34c955c06b57ec1cd29714478d0568d71a))
+
+
+### Bug Fixes
+
+* Allow custom runner agent IAM role fixups ([#572](https://github.com/npalm/terraform-aws-gitlab-runner/issues/572)) ([#577](https://github.com/npalm/terraform-aws-gitlab-runner/issues/577)) ([bcb0c0e](https://github.com/npalm/terraform-aws-gitlab-runner/commit/bcb0c0eb9de74f0f67181cdeb8cb0fe91cb0e9b1))
+* runner_agent_role_arn ([#596](https://github.com/npalm/terraform-aws-gitlab-runner/issues/596)) ([b069b88](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b069b88bf03557534ffa40bab6d21c085c09f021))
+
+## [5.5.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.1...5.5.0) (2022-11-27)
+
+
+### Features
+
+* Support volume type configuration ([#579](https://github.com/npalm/terraform-aws-gitlab-runner/issues/579)) ([b7dd834](https://github.com/npalm/terraform-aws-gitlab-runner/commit/b7dd8340a1c68221c77942fc6ac6a71c5eeb39fb))
+
+
+### Bug Fixes
+
+* Compress (zip) user_data to avoid max size ([#565](https://github.com/npalm/terraform-aws-gitlab-runner/issues/565)) ([64b8594](https://github.com/npalm/terraform-aws-gitlab-runner/commit/64b8594f3aa747a0cd23aafe9a37c051bbf51ceb))
+* ensure a complete `config.toml` before starting the GitLab Agent ([#574](https://github.com/npalm/terraform-aws-gitlab-runner/issues/574)) ([e32f3bc](https://github.com/npalm/terraform-aws-gitlab-runner/commit/e32f3bcec95df40fa655cab68e31da8a3ff8d090))
+* Use runners_pull_policies to set pull_policy instead of allowed_pull_policies ([#557](https://github.com/npalm/terraform-aws-gitlab-runner/issues/557)) ([a67b87b](https://github.com/npalm/terraform-aws-gitlab-runner/commit/a67b87b7e56eb76777133d011481586c2e0079a5))
+
+### [5.4.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.4.0...5.4.1) (2022-10-13)
+
+
+### Bug Fixes
+
+* Add var.environment to the name of the S3 cache bucket [#533](https://github.com/npalm/terraform-aws-gitlab-runner/issues/533) ([#555](https://github.com/npalm/terraform-aws-gitlab-runner/issues/555)) ([6e0cd97](https://github.com/npalm/terraform-aws-gitlab-runner/commit/6e0cd97e72e46bca8bb53493121f3eaf59526250))
+
+## [5.4.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.3.0...5.4.0) (2022-10-10)
+
+
+### Features
+
+* Add option to disable yum update during cloud init ([#545](https://github.com/npalm/terraform-aws-gitlab-runner/issues/545)) ([9948417](https://github.com/npalm/terraform-aws-gitlab-runner/commit/99484173f65fb46f7c1fb045bf137decfa1ad757))
+* Add runners_pull_policies to support multiple pull policies ([#544](https://github.com/npalm/terraform-aws-gitlab-runner/issues/544)) ([8c0d420](https://github.com/npalm/terraform-aws-gitlab-runner/commit/8c0d42091894b1cefe15a37966ffd864ac0fcc9c))
+
+## [5.3.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.2...5.3.0) (2022-10-09)
+
+
+### Features
+
+* add extra_hosts to config.toml ([#547](https://github.com/npalm/terraform-aws-gitlab-runner/issues/547)) ([1491698](https://github.com/npalm/terraform-aws-gitlab-runner/commit/14916984276801aaace83941d2d12dd10f670e32))
+
+
+### Bug Fixes
+
+* do not add the cache access policy if there is none ([#540](https://github.com/npalm/terraform-aws-gitlab-runner/issues/540)) ([f69c8bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f69c8bbe5832ef670f1cea4fe01e63d7553e7158))
+* Too long host names for docker machines ([#549](https://github.com/npalm/terraform-aws-gitlab-runner/issues/549)) ([2fc8e77](https://github.com/npalm/terraform-aws-gitlab-runner/commit/2fc8e770337e9daedd536d6eb21a80ad06125f71))
+
+### [5.2.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.1...5.2.2) (2022-10-09)
+
+
+### Bug Fixes
+
+* Too long host names for docker machines ([#549](https://github.com/npalm/terraform-aws-gitlab-runner/issues/549)) ([808a967](https://github.com/npalm/terraform-aws-gitlab-runner/commit/808a96744f7666d6dd6566dbb2d3712cf757c207))
+
+### [5.2.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.2.0...5.2.1) (2022-08-22)
+
+
+### Bug Fixes
+
+* access cache module via index [#530](https://github.com/npalm/terraform-aws-gitlab-runner/issues/530) ([d6f3875](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d6f3875b42b7c1263ad6c1a78e9ebc77d20ab24d))
+
+## [5.2.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.1.0...5.2.0) (2022-08-15)
+
+
+### Features
+
+* do not add a the Name tag for docker+machine >= 0.16.2 ([#522](https://github.com/npalm/terraform-aws-gitlab-runner/issues/522)) ([7e6d9be](https://github.com/npalm/terraform-aws-gitlab-runner/commit/7e6d9beb9852b0bb62786e83b2349de2ad98d261))
+
+
+### Bug Fixes
+
+* always add the cache policy ([#528](https://github.com/npalm/terraform-aws-gitlab-runner/issues/528)) ([ccaf55d](https://github.com/npalm/terraform-aws-gitlab-runner/commit/ccaf55d043b9673a0464b0abc8f8e62aaf9b3534))
+
+## [5.1.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.2...5.1.0) (2022-07-20)
+
+
+### Features
+
+* add `clone_url` to `config.toml` ([#516](https://github.com/npalm/terraform-aws-gitlab-runner/issues/516)) ([9a41525](https://github.com/npalm/terraform-aws-gitlab-runner/commit/9a415257de6ac5e78e16c2e29190868a70483f75))
+* Tag aws_cloudwatch_event_rule resource + linting ([#519](https://github.com/npalm/terraform-aws-gitlab-runner/issues/519)) ([f2e98bb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/f2e98bb95cee62c23cc6d5ab7fe2531aee3a5504))
+
+
+### Bug Fixes
+
+* Make statement IDs unique ([#503](https://github.com/npalm/terraform-aws-gitlab-runner/issues/503)) ([05055c0](https://github.com/npalm/terraform-aws-gitlab-runner/commit/05055c0f09fd846a9ba43126fad71b5d01495d39))
+
+### [5.0.2](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.1...5.0.2) (2022-05-26)
+
+
+### Bug Fixes
+
+* use IMDSv2 url when setting PARENT_INSTANCE_ID ([#497](https://github.com/npalm/terraform-aws-gitlab-runner/issues/497)) ([536535f](https://github.com/npalm/terraform-aws-gitlab-runner/commit/536535f266930ce57136276325a58c84a3ceb341))
+
 ### [5.0.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.0.0...5.0.1) (2022-05-20)
 
 
