@@ -490,7 +490,7 @@ resource "aws_iam_policy" "ssm" {
 
 resource "aws_iam_role_policy_attachment" "ssm" {
   role       = local.aws_iam_role_instance_name
-  policy_arn = aws_iam_policy.ssm[0].arn
+  policy_arn = aws_iam_policy.ssm.arn
 }
 
 ################################################################################
