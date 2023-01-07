@@ -42,6 +42,7 @@ locals {
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
       yum_update          = var.runner_yum_update ? local.file_yum_update : ""
+      extra_config        = var.runner_extra_config
   })
 
   file_yum_update = file("${path.module}/template/yum_update.tpl")
@@ -297,6 +298,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   lifecycle {
     create_before_destroy = true
   }
+
+  # otherwise the agent running on the EC2 instance tries to create the log group
+  depends_on = [aws_cloudwatch_log_group.environment]
 }
 
 ################################################################################

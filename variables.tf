@@ -619,6 +619,11 @@ variable "overrides" {
     condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
     error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
   }
+
+  validation {
+    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
+  }
 }
 
 variable "cache_bucket" {
@@ -891,4 +896,10 @@ variable "runner_yum_update" {
   description = "Run a yum update as part of starting the runner"
   type        = bool
   default     = true
+}
+
+variable "runner_extra_config" {
+  description = "Extra commands to run as part of starting the runner"
+  type        = string
+  default     = ""
 }
