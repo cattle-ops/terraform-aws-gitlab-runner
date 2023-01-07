@@ -298,6 +298,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   lifecycle {
     create_before_destroy = true
   }
+
+  # otherwise the agent running on the EC2 instance tries to create the log group
+  depends_on = [aws_cloudwatch_log_group.environment]
 }
 
 ################################################################################
