@@ -11,8 +11,25 @@ module "vpc" {
 
   azs                     = [data.aws_availability_zones.available.names[0]]
   public_subnets          = ["10.1.101.0/24"]
-  enable_s3_endpoint      = true
   map_public_ip_on_launch = false
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+module "vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "3.18.1"
+
+  vpc_id = module.vpc.vpc_id
+
+  endpoints = {
+    s3 = {
+      service = "s3"
+      tags    = { Name = "s3-vpc-endpoint" }
+    }
+  }
 
   tags = {
     Environment = var.environment
