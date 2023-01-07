@@ -3,24 +3,24 @@ terraform {
   required_version = ">= 1"
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.7"
+      source = "hashicorp/aws"
+      version = "4.49.0"
     }
     local = {
-      source  = "hashicorp/local"
-      version = "~> 2"
+      source = "hashicorp/local"
+      version = "2.2.3"
     }
     null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0"
+      source = "hashicorp/null"
+      version = "3.2.1"
     }
     tls = {
-      source  = "hashicorp/tls"
-      version = "~> 3"
+      source = "hashicorp/tls"
+      version = "4.0.4"
     }
     random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
+      source = "hashicorp/random"
+      version = "3.4.3"
     }
   }
 }
