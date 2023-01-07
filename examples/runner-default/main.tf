@@ -30,7 +30,7 @@ module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "3.18.1"
 
-  vpc_id             = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   endpoints = {
     s3 = {
