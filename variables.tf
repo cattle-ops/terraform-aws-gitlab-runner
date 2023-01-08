@@ -875,6 +875,7 @@ variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
   }
 }
 
+# to be removed in future release
 # tflint-ignore: terraform_unused_declarations
 variable "asg_terminate_lifecycle_lambda_memory_size" {
   description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
@@ -882,6 +883,7 @@ variable "asg_terminate_lifecycle_lambda_memory_size" {
   default     = 128
 }
 
+# to be removed in future release
 # tflint-ignore: terraform_unused_declarations
 variable "asg_terminate_lifecycle_lambda_runtime" {
   description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
@@ -889,6 +891,7 @@ variable "asg_terminate_lifecycle_lambda_runtime" {
   default     = "python3.8"
 }
 
+# to be removed in future release
 # tflint-ignore: terraform_unused_declarations
 variable "asg_terminate_lifecycle_lambda_timeout" {
   description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."

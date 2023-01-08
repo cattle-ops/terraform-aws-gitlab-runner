@@ -75,8 +75,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
           SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.gitignore|.tflint.hcl)
+          # needed to avoid multiple error messages
           TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
+          # format issues fail the build
           TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
+          # do not check generated files and report errors
+          REPOSITORY_DEVSKIM_ARGUMENTS: "-g .vscode/**"
           PAT: ${{ secrets.GITHUB_TOKEN }}
 
       # Upload MegaLinter artifacts
