@@ -1,5 +1,3 @@
-# ignores: IAM Access Analyzer Not Enabled --> this is an account wide setting
-# kics-scan ignore-line
 resource "aws_iam_role_policy" "instance" {
   count  = var.enable_cloudwatch_logging && var.create_runner_iam_role ? 1 : 0
   name   = "${local.name_iam_objects}-logging"
@@ -22,8 +20,6 @@ resource "aws_cloudwatch_log_group" "environment" {
   # ignores a false positive: retention_in_days not set
   # kics-scan ignore-line
   retention_in_days = var.cloudwatch_logging_retention_in_days
-  # ignores a false positive: tags not used
-  # kics-scan ignore-line
   tags = local.tags
 
   # ignored as decided by the user

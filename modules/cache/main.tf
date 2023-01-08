@@ -18,8 +18,6 @@ locals {
   name_iam_objects = var.name_iam_objects == "" ? local.tags["Name"] : var.name_iam_objects
 }
 
-# ignores: IAM Access Analyzer Not Enabled --> this is an account wide setting
-# kics-scan ignore-line
 resource "random_string" "s3_suffix" {
   count   = var.cache_bucket_set_random_suffix ? 1 : 0
   length  = 8
@@ -34,8 +32,6 @@ resource "aws_s3_bucket" "build_cache" {
   # checkov:skip=CKV_AWS_144:It's a cache only. Replication not needed.
   bucket = local.cache_bucket_name
 
-  # false positive
-  # kics-scan ignore-line
   tags = local.tags
 
   force_destroy = true
@@ -115,8 +111,7 @@ resource "aws_iam_policy" "docker_machine_cache" {
   name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
-  # false positive
-  # kics-scan ignore-line
+
   tags = local.tags
 
   policy = templatefile("${path.module}/policies/cache.json",

@@ -5,8 +5,6 @@
 # function from the ASG lifecycle hook.
 # ----------------------------------------------------------------------------
 
-# ignores: IAM Access Analyzer Not Enabled --> these are account wide setting
-# kics-scan ignore-line
 resource "aws_cloudwatch_event_rule" "terminate_instances" {
   name        = "${var.environment}-${var.name}"
   description = "Trigger GitLab runner instance lifecycle hook on termination."
@@ -21,8 +19,6 @@ resource "aws_cloudwatch_event_rule" "terminate_instances" {
 }
 EOF
 
-  # false positive: resource without tags
-  # kics-scan ignore-line
   tags = var.tags
 }
 
@@ -41,7 +37,5 @@ resource "aws_cloudwatch_log_group" "lambda" {
   # checkov:skip=CKV_AWS_158:Encryption can be activated by the user
   kms_key_id = var.kms_key_id
 
-  # false positive: resource without tags
-  # kics-scan ignore-line
   tags = var.tags
 }

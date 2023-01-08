@@ -16,9 +16,7 @@ data "archive_file" "terminate_runner_instances_lambda" {
 }
 
 # tracing functions can be activated by the user
-# ignore KICS: IAM Access Analyzer Not Enabled --> this is an account wide setting
 # tfsec:ignore:aws-lambda-enable-tracing
-# kics-scan ignore-line
 resource "aws_lambda_function" "terminate_runner_instances" {
   #ts:skip=AC_AWS_0485:Tracing functions can be activated by the user
   #ts:skip=AC_AWS_0486 There is no need to run this lambda in our VPC
@@ -39,8 +37,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.8"
   timeout          = local.lambda_timeout
-  # false positive: wrong tags
-  # kics-scan ignore-line
+
   tags = var.tags
 
   dynamic "tracing_config" {
