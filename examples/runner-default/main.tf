@@ -9,7 +9,7 @@ data "aws_security_group" "default" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.70"
+  version = "3.18.1"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -20,7 +20,24 @@ module "vpc" {
 
   enable_nat_gateway = true
   single_nat_gateway = true
-  enable_s3_endpoint = true
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+module "vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "3.18.1"
+
+  vpc_id = module.vpc.vpc_id
+
+  endpoints = {
+    s3 = {
+      service = "s3"
+      tags    = { Name = "s3-vpc-endpoint" }
+    }
+  }
 
   tags = {
     Environment = var.environment

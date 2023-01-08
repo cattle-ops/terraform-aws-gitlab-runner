@@ -255,6 +255,17 @@ policy.
 }
 ```
 
+In case you manage the S3 cache bucket yourself it might be necessary to apply the cache before applying the runner module. A typical error message looks like:
+
+```text
+Error: Invalid count argument
+on .terraform/modules/gitlab_runner/main.tf line 400, in resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance":
+  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+The "count" value depends on resource attributes that cannot be determined until apply, so Terraform cannot predict how many instances will be created. To work around this, use the -target argument to first apply only the resources that the count depends on.
+```
+
+The workaround is to use a `terraform apply -target=module.cache` followed by a `terraform apply` to apply everything else. This is a one time effort needed at the very beginning.
+
 ## Usage
 
 ### Configuration
@@ -543,6 +554,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runner_agent_uses_private_address"></a> [runner\_agent\_uses\_private\_address](#input\_runner\_agent\_uses\_private\_address) | Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent. | `bool` | `true` | no |
 | <a name="input_runner_ami_filter"></a> [runner\_ami\_filter](#input\_runner\_ami\_filter) | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"<br>  ]<br>}</pre> | no |
 | <a name="input_runner_ami_owners"></a> [runner\_ami\_owners](#input\_runner\_ami\_owners) | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
+| <a name="input_runner_extra_config"></a> [runner\_extra\_config](#input\_runner\_extra\_config) | Extra commands to run as part of starting the runner | `string` | `""` | no |
 | <a name="input_runner_iam_policy_arns"></a> [runner\_iam\_policy\_arns](#input\_runner\_iam\_policy\_arns) | List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance. | `list(string)` | `[]` | no |
 | <a name="input_runner_iam_role_name"></a> [runner\_iam\_role\_name](#input\_runner\_iam\_role\_name) | IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used | `string` | `""` | no |
 | <a name="input_runner_instance_ebs_optimized"></a> [runner\_instance\_ebs\_optimized](#input\_runner\_instance\_ebs\_optimized) | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
