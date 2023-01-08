@@ -278,11 +278,11 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   }
   tag_specifications {
     resource_type = "instance"
-    tags = local.tags
+    tags          = local.tags
   }
   tag_specifications {
     resource_type = "volume"
-    tags = local.tags
+    tags          = local.tags
   }
   dynamic "tag_specifications" {
     for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
@@ -322,7 +322,7 @@ module "cache" {
   source = "./modules/cache"
 
   environment = var.environment
-  tags = local.tags
+  tags        = local.tags
 
   cache_bucket_prefix                  = var.cache_bucket_prefix
   cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
