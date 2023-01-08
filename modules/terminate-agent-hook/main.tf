@@ -17,6 +17,7 @@ data "archive_file" "terminate_runner_instances_lambda" {
 
 # tracing functions can be activated by the user
 # tfsec:ignore:aws-lambda-enable-tracing
+# kics-scan ignore-line
 resource "aws_lambda_function" "terminate_runner_instances" {
   #ts:skip=AC_AWS_0485:Tracing functions can be activated by the user
   #ts:skip=AC_AWS_0486 There is no need to run this lambda in our VPC

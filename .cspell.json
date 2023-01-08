@@ -7,6 +7,7 @@
     "backports",
     "blockquotes",
     "concat",
+    "devskim",
     "dind",
     "gitter",
     "kics",

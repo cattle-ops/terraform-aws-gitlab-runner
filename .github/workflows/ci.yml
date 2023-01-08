@@ -80,7 +80,7 @@ jobs:
           # format issues fail the build
           TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
           # do not check generated files and report errors
-          REPOSITORY_DEVSKIM_ARGUMENTS: "-g .vscode/**"
+          REPOSITORY_DEVSKIM_ARGUMENTS: "--ignore-globs .vscode/**"
           # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
           TERRAFORM_KICS_ARGUMENTS: "--exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12"
           PAT: ${{ secrets.GITHUB_TOKEN }}
