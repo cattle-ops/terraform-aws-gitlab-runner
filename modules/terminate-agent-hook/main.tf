@@ -32,7 +32,9 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   tags             = var.tags
 
   environment {
-    ENVIRONMENT = var.environment
+    variables = {
+      ENVIRONMENT = var.environment
+    }
   }
 
   dynamic "tracing_config" {
