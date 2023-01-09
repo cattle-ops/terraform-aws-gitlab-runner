@@ -498,8 +498,8 @@ variable "runner_tags" {
 
 variable "suppressed_tags" {
   description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "role_tags" {
