@@ -91,6 +91,11 @@ def ec2_list(client, **args):
 
 
 def cancel_active_spot_requests(ec2_client, executor_name_part):
+    print(json.dumps({
+        "Level": "info",
+        "Message": f"Removing open spot requests for environment {executor_name_part}"
+    }))
+
     spot_requests_to_cancel = []
 
     next_token = ''
@@ -114,7 +119,7 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
 
                 print(json.dumps({
                     "Level": "info",
-                    "Message": f"Canceling spot request {spot_request['SpotInstanceRequestId']}"
+                    "Message": f"Identified spot request {spot_request['SpotInstanceRequestId']}"
                 }))
 
         if 'NextToken' in response and response['NextToken']:
@@ -125,6 +130,11 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
     if spot_requests_to_cancel:
         try:
             ec2_client.cancel_spot_instance_requests(SpotInstanceRequestIds=spot_requests_to_cancel)
+
+            print(json.dumps({
+                "Level": "info",
+                "Message": "Spot requests deleted"
+            }))
         except Exception as e:
             print(json.dumps({
                 "Level": "exception",
