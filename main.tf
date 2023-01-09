@@ -42,6 +42,7 @@ locals {
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
       yum_update          = var.runner_yum_update ? local.file_yum_update : ""
+      extra_config        = var.runner_extra_config
   })
 
   file_yum_update = file("${path.module}/template/yum_update.tpl")
@@ -297,6 +298,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   lifecycle {
     create_before_destroy = true
   }
+
+  # otherwise the agent running on the EC2 instance tries to create the log group
+  depends_on = [aws_cloudwatch_log_group.environment]
 }
 
 ################################################################################
@@ -518,24 +522,18 @@ resource "aws_iam_role_policy_attachment" "eip" {
 }
 
 ################################################################################
-### Lambda function for ASG instance termination lifecycle hook
+### Lambda function triggered as soon as an agent is terminated.
 ################################################################################
-module "terminate_instances_lifecycle_function" {
-  source = "./modules/terminate-instances"
-
-  count = var.asg_terminate_lifecycle_hook_create ? 1 : 0
+module "terminate_agent_hook" {
+  source = "./modules/terminate-agent-hook"
 
   name                                 = var.asg_terminate_lifecycle_hook_name == null ? "terminate-instances" : var.asg_terminate_lifecycle_hook_name
   environment                          = var.environment
   asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
-  lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
-  lambda_runtime                       = var.asg_terminate_lifecycle_lambda_runtime
-  lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
   name_iam_objects                     = local.name_iam_objects
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
   kms_key_id                           = local.kms_key
   arn_format                           = var.arn_format
   tags                                 = local.tags

@@ -18,17 +18,17 @@ data "archive_file" "terminate_runner_instances_lambda" {
 # tfsec:ignore:aws-lambda-enable-tracing
 resource "aws_lambda_function" "terminate_runner_instances" {
   architectures    = ["x86_64"]
-  description      = "Lifecycle hook for terminating GitLab runner instances"
+  description      = "Lifecycle hook for terminating GitLab runner agent instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
   source_code_hash = data.archive_file.terminate_runner_instances_lambda.output_base64sha256
   function_name    = "${var.environment}-${var.name}"
   handler          = "lambda_function.handler"
-  memory_size      = var.lambda_memory_size
+  memory_size      = 128
   package_type     = "Zip"
   publish          = true
   role             = aws_iam_role.lambda.arn
-  runtime          = var.lambda_runtime
-  timeout          = var.lambda_timeout
+  runtime          = "python3.8"
+  timeout          = local.lambda_timeout
   tags             = var.tags
 
   dynamic "tracing_config" {
@@ -61,6 +61,6 @@ resource "aws_autoscaling_lifecycle_hook" "terminate_instances" {
   name                   = "${var.environment}-${var.name}"
   autoscaling_group_name = var.asg_name
   default_result         = "CONTINUE"
-  heartbeat_timeout      = var.lifecycle_heartbeat_timeout
+  heartbeat_timeout      = local.lambda_timeout + 20 # allow some extra time for cold starts
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
 }

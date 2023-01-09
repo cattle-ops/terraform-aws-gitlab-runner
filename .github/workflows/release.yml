@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get app installation token
-        uses: npalm/action-app-token@v1.0.0
+        uses: npalm/action-app-token@v1.1.0
         id: token
         with:
           appId: ${{ secrets.APP_ID }}

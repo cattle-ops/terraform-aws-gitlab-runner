@@ -6,36 +6,47 @@ updates:
     directory: "/examples/runner-default"
     schedule:
       interval: "weekly"
-    commit_message:
+    commit-message:
       prefix: "chore"
+
   - package-ecosystem: "terraform"
     directory: "/examples/runner-docker"
     schedule:
       interval: "weekly"
-    commit_message:
+    commit-message:
       prefix: "chore"
+
   - package-ecosystem: "terraform"
     directory: "/examples/runner-public"
     schedule:
       interval: "weekly"
-    commit_message:
+    commit-message:
       prefix: "chore"
+
   - package-ecosystem: "terraform"
     directory: "/examples/pre-registered"
     schedule:
       interval: "weekly"
-    commit_message:
+    commit-message:
       prefix: "chore"
+
   - package-ecosystem: "terraform"
     directory: "/examples/multi-region"
     schedule:
       interval: "weekly"
-    commit_message:
+    commit-message:
       prefix: "chore"
 
   - package-ecosystem: "github-actions"
     directory: "/.github/workflows"
     schedule:
       interval: "weekly"
-    commit_message:
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: gomod
+    directory: /test
+    schedule:
+      interval: weekly
+    commit-message:
       prefix: "chore"
