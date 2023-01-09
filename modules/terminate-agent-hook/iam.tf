@@ -136,7 +136,7 @@ resource "aws_iam_policy" "lambda" {
   path   = "/"
   policy = data.aws_iam_policy_document.lambda.json
 
-  tags   = var.tags
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "lambda" {
@@ -149,7 +149,7 @@ resource "aws_iam_policy" "ssh_key_housekeeping" {
   path   = "/"
   policy = data.aws_iam_policy_document.ssh_key_housekeeping.json
 
-  tags   = var.tags
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ssh_key_housekeeping" {
