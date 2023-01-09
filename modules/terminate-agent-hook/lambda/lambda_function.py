@@ -11,6 +11,8 @@ This is rudimentary and doesn't check if a build runner has a current job.
 """
 import boto3
 import json
+import os
+
 
 def ec2_list(client, **args):
 
@@ -87,6 +89,50 @@ def ec2_list(client, **args):
 
     return _terminate_list
 
+
+def cancel_active_spot_requests(ec2_client, executor_name_part):
+    spot_requests_to_cancel = []
+
+    next_token = ''
+    has_more_spot_requests = True
+
+    while has_more_spot_requests:
+        response = ec2_client.describe_spot_instance_requests(Filters=[
+            {
+                "Name": "state",
+                "Values": ['active', 'open']
+            },
+            {
+                "Name": "launch.key-name",
+                "Values": ["runner-*"]
+            }
+        ], MaxResults=1000, NextToken=next_token)
+
+        for spot_request in response["SpotInstanceRequests"]:
+            if executor_name_part in spot_request["LaunchSpecification"]["KeyName"]:
+                spot_requests_to_cancel.append(spot_request["SpotInstanceRequestId"])
+
+                print(json.dumps({
+                    "Level": "info",
+                    "Message": f"Canceling spot request {spot_request['SpotInstanceRequestId']}"
+                }))
+
+        if 'NextToken' in response and response['NextToken']:
+            next_token = response['NextToken']
+        else:
+            has_more_spot_requests = False
+
+    if spot_requests_to_cancel:
+        try:
+            ec2_client.cancel_spot_instance_requests(SpotInstanceRequestIds=spot_requests_to_cancel)
+        except Exception as e:
+            print(json.dumps({
+                "Level": "exception",
+                "Message": "Bulk cancelling spot requests failed",
+                "Exception": str(e)
+            }))
+
+
 def handler(event, context):
     response = []
     event_detail = event['detail']
@@ -102,19 +148,19 @@ def handler(event, context):
         }))
         try:
             client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
-            return f"Terminated instances {', '.join(_terminate_list)}"
         except Exception as e:
             print(json.dumps({
                 "Level": "exception",
                 "Exception": str(e)
             }))
-            raise Exception(f"Encountered exception when terminating instances: {str(e)}")
     else:
         print(json.dumps({
             "Level": "info",
             "Message": "No instances to terminate."
         }))
-        return "No instances to terminate."
+
+    cancel_active_spot_requests(ec2_client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
+
 
 if __name__ == "__main__":
     handler(None, None)

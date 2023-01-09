@@ -87,8 +87,22 @@ data "aws_iam_policy_document" "lambda" {
   }
 }
 
+data "aws_iam_policy_document" "spot_request_housekeeping" {
+  statement {
+    sid = "SpotRequestHousekeepingList"
+
+    effect = "Allow"
+    actions = [
+      "ec2:CancelSpotInstanceRequests",
+      "ec2:DescribeSpotInstanceRequests"
+    ]
+    # I didn't found any condition to limit the access
+    resources = ["*"]
+  }
+}
+
 resource "aws_iam_policy" "lambda" {
-  name   = "${var.name_iam_objects}-${var.name}"
+  name   = "${var.name_iam_objects}-${var.name}-lambda"
   path   = "/"
   policy = data.aws_iam_policy_document.lambda.json
   tags   = var.tags
@@ -97,4 +111,17 @@ resource "aws_iam_policy" "lambda" {
 resource "aws_iam_role_policy_attachment" "lambda" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda.arn
+}
+
+resource "aws_iam_policy" "spot_request_housekeeping" {
+  name   = "${var.name_iam_objects}-${var.name}-cancel-spot"
+  path   = "/"
+  policy = data.aws_iam_policy_document.spot_request_housekeeping.json
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "spot_request_housekeeping" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.spot_request_housekeeping.arn
 }
