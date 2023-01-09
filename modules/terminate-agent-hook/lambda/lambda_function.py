@@ -141,6 +141,11 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
                 "Message": "Bulk cancelling spot requests failed",
                 "Exception": str(e)
             }))
+    else:
+        print(json.dumps({
+            "Level": "info",
+            "Message": "No spot requests to cancel"
+        }))
 
 
 def handler(event, context):
