@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "lambda" {
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "ec2:DescribeRegions",
-      "ec2:DescribeInstanceStatus"
+      "ec2:DescribeInstanceStatus",
     ]
     resources = ["*"]
     effect    = "Allow"
@@ -60,6 +60,22 @@ data "aws_iam_policy_document" "lambda" {
       values   = ["i-*"]
     }
     effect = "Allow"
+  }
+
+  statement {
+    sid = "SSHKeyHousekeeping"
+
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeKeyPairs",
+      "ec2:DeleteKeyPair"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:ec2:${data.aws_region.this.id}:${data.aws_caller_identity.this.account_id}:key-pair/runner-*"]
+    }
   }
 
   # Permit the function to execute the ASG lifecycle action
@@ -87,14 +103,56 @@ data "aws_iam_policy_document" "lambda" {
   }
 }
 
+data "aws_iam_policy_document" "ssh_key_housekeeping" {
+  statement {
+    sid = "SSHKeyHousekeepingList"
+
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeKeyPairs"
+    ]
+    resources = ["*"]
+  }
+
+  # separate statement due to the condition
+  statement {
+    sid = "SSHKeyHousekeepingDelete"
+
+    effect = "Allow"
+    actions = [
+      "ec2:DeleteKeyPair"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "ec2:KeyPairName"
+      values   = ["runner-*"]
+    }
+  }
+}
+
 resource "aws_iam_policy" "lambda" {
-  name   = "${var.name_iam_objects}-${var.name}"
+  name   = "${var.name_iam_objects}-${var.name}-lambda"
   path   = "/"
   policy = data.aws_iam_policy_document.lambda.json
+
   tags   = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "lambda" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda.arn
+}
+
+resource "aws_iam_policy" "ssh_key_housekeeping" {
+  name   = "${var.name_iam_objects}-${var.name}-ssh-key"
+  path   = "/"
+  policy = data.aws_iam_policy_document.ssh_key_housekeeping.json
+
+  tags   = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "ssh_key_housekeeping" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.ssh_key_housekeeping.arn
 }

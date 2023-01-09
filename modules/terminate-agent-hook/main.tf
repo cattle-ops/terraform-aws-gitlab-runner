@@ -33,7 +33,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
 
   environment {
     variables = {
-      ENVIRONMENT = var.environment
+      NAME_EXECUTOR_INSTANCE = var.name_docker_machine_runners
     }
   }
 

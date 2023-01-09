@@ -91,10 +91,10 @@ def ec2_list(client, **args):
     return _terminate_list
 
 
-def remove_unused_ssh_key_pairs(client, environment):
+def remove_unused_ssh_key_pairs(client, executor_name_part):
     print(json.dumps({
         "Level": "info",
-        "Message": f"Removing unused SSH key pairs for environment {environment}"
+        "Message": f"Removing unused SSH key pairs for agent {executor_name_part}"
     }))
 
     reservations = client.describe_instances().get("Reservations")
@@ -103,7 +103,8 @@ def remove_unused_ssh_key_pairs(client, environment):
 
     for reservation in reservations:
         for instance in reservation["Instances"]:
-            if 'KeyName' in instance:
+            instance_state = instance["State"]["Name"]
+            if 'KeyName' in instance and ('pending' in instance_state or 'running' in instance_state):
                 used_key_pairs.append(instance['KeyName'])
 
     all_key_pairs = client.describe_key_pairs()
@@ -114,7 +115,7 @@ def remove_unused_ssh_key_pairs(client, environment):
         if key_name not in used_key_pairs:
             # make sure to delete only those keys which belongs to our module
             # unfortunately there are no tags set on the keys and GitLab runner is not able to do that
-            if key_name.startswith('runner-') and environment in key_name:
+            if key_name.startswith('runner-') and executor_name_part in key_name:
                 try:
                     client.delete_key_pair(KeyName=key_name)
 
@@ -146,20 +147,20 @@ def handler(event, context):
         }))
         try:
             client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
-            return f"Terminated instances {', '.join(_terminate_list)}"
         except Exception as e:
             print(json.dumps({
                 "Level": "exception",
                 "Exception": str(e)
             }))
-            raise Exception(f"Encountered exception when terminating instances: {str(e)}")
     else:
         print(json.dumps({
             "Level": "info",
             "Message": "No instances to terminate."
         }))
 
-    remove_unused_ssh_key_pairs(client=client, environment=os.environ['ENVIRONMENT'])
+    remove_unused_ssh_key_pairs(client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
+
+    return f"Housekeeping done"
 
 
 if __name__ == "__main__":
