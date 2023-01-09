@@ -97,17 +97,29 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
         "Message": f"Removing unused SSH key pairs for agent {executor_name_part}"
     }))
 
-    reservations = client.describe_instances().get("Reservations")
+    reservations = client.describe_instances(Filters=[
+        {
+            "Name": "key-name",
+            "Values": ['runner-*'],
+        },
+        {
+            "Name": "instance-state-name",
+            "Values": ['pending', 'running'],
+        },
+    ]).get("Reservations")
 
     used_key_pairs = []
 
     for reservation in reservations:
         for instance in reservation["Instances"]:
-            instance_state = instance["State"]["Name"]
-            if 'KeyName' in instance and ('pending' in instance_state or 'running' in instance_state):
-                used_key_pairs.append(instance['KeyName'])
+            used_key_pairs.append(instance['KeyName'])
 
-    all_key_pairs = client.describe_key_pairs()
+    all_key_pairs = client.describe_key_pairs(Filters=[
+        {
+            "Name": "key-name",
+            "Values": ['runner-*'],
+        },
+    ])
 
     for key_pair in all_key_pairs['KeyPairs']:
         key_name = key_pair['KeyName']
@@ -115,7 +127,7 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
         if key_name not in used_key_pairs:
             # make sure to delete only those keys which belongs to our module
             # unfortunately there are no tags set on the keys and GitLab runner is not able to do that
-            if key_name.startswith('runner-') and executor_name_part in key_name:
+            if executor_name_part in key_name:
                 try:
                     client.delete_key_pair(KeyName=key_name)
 
