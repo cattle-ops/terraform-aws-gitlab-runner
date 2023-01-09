@@ -1,16 +1,19 @@
 """
-AWS Lambda function to terminate orphaned GitLab runners.
+AWS Lambda function to terminate orphaned GitLab runners and remove unused resources.
 
-This checks for running GitLab runner instances and terminates them,
-intended to be triggered by an ASG life cycle hook at instance termination.
+- This checks for running GitLab runner instances and terminates them, intended to be triggered by an ASG life cycle hook at
+  instance termination.
+- Removes all unused SSH keys
 
-https://github.com/npalm/terraform-aws-gitlab-runner/issues/317 has some
-discussion about this scenario.
+https://github.com/npalm/terraform-aws-gitlab-runner/issues/317 has some discussion about this scenario.
 
 This is rudimentary and doesn't check if a build runner has a current job.
 """
 import boto3
+import botocore
 import json
+import os
+
 
 def ec2_list(client, **args):
 
@@ -87,6 +90,46 @@ def ec2_list(client, **args):
 
     return _terminate_list
 
+
+def remove_unused_ssh_key_pairs(client, environment):
+    print(json.dumps({
+        "Level": "info",
+        "Message": f"Removing unused SSH key pairs for environment {environment}"
+    }))
+
+    reservations = client.describe_instances().get("Reservations")
+
+    used_key_pairs = []
+
+    for reservation in reservations:
+        for instance in reservation["Instances"]:
+            if 'KeyName' in instance:
+                used_key_pairs.append(instance['KeyName'])
+
+    all_key_pairs = client.describe_key_pairs()
+
+    for key_pair in all_key_pairs['KeyPairs']:
+        key_name = key_pair['KeyName']
+
+        if key_name not in used_key_pairs:
+            # make sure to delete only those keys which belongs to our module
+            # unfortunately there are no tags set on the keys and GitLab runner is not able to do that
+            if key_name.startswith('runner-') and environment in key_name:
+                try:
+                    client.delete_key_pair(KeyName=key_name)
+
+                    print(json.dumps({
+                        "Level": "info",
+                        "Message": f"Key pair deleted: {key_name}"
+                    }))
+                except botocore.exceptions.ClientError as error:
+                    print(json.dumps({
+                        "Level": "error",
+                        "Message": f"Unable to delete key pair: {key_name}",
+                        "Exception": str(error)
+                    }))
+
+
 def handler(event, context):
     response = []
     event_detail = event['detail']
@@ -94,6 +137,7 @@ def handler(event, context):
     if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
         exit()
 
+    # find the executors connected to this agent and terminate them as well
     _terminate_list = ec2_list(client=client,parent=event_detail['EC2InstanceId'])
     if len(_terminate_list) > 0:
         print(json.dumps({
@@ -114,7 +158,9 @@ def handler(event, context):
             "Level": "info",
             "Message": "No instances to terminate."
         }))
-        return "No instances to terminate."
+
+    remove_unused_ssh_key_pairs(client=client, environment=os.environ['ENVIRONMENT'])
+
 
 if __name__ == "__main__":
     handler(None, None)

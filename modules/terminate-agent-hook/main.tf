@@ -31,6 +31,10 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   timeout          = local.lambda_timeout
   tags             = var.tags
 
+  environment {
+    ENVIRONMENT = var.environment
+  }
+
   dynamic "tracing_config" {
     for_each = var.enable_xray_tracing ? [1] : []
 
