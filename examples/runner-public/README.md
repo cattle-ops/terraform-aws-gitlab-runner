@@ -66,7 +66,7 @@ No output.
 | <a name="module_cache"></a> [cache](#module\_cache) | ../../modules/cache | n/a |
 | <a name="module_runner"></a> [runner](#module\_runner) | ../../ | n/a |
 | <a name="module_runner2"></a> [runner2](#module\_runner2) | ../../ | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 2.70 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 3.18.1 |
 
 ## Resources
 
