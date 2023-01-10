@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.8.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.0...5.8.1) (2023-01-10)
+
+
+### Bug Fixes
+
+* create the log group before creating the runner agent ([#633](https://github.com/npalm/terraform-aws-gitlab-runner/issues/633)) ([c58aaaa](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c58aaaa52f6387536794da8626f9033517a71e88))
+
 ## [5.8.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.7.0...5.8.0) (2023-01-05)
 
 
