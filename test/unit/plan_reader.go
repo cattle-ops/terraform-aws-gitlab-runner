@@ -8,7 +8,7 @@ import (
 "github.com/stretchr/testify/require"
 )
 
-func readPlan(t *testing.T, planFile string) *tfjson.Plan {
+func readJsonPlan(t *testing.T, planFile string) *tfjson.Plan {
     t.Helper()
 
     planJson, err := ioutil.ReadFile(planFile)
