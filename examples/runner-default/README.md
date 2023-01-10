@@ -63,7 +63,8 @@ No output.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_runner"></a> [runner](#module\_runner) | ../../ | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 2.70 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 3.18.1 |
+| <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 3.18.1 |
 
 ## Resources
 
