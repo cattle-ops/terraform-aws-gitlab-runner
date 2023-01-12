@@ -133,19 +133,19 @@ locals {
 
 # Allow SSH traffic from gitlab-runner agent instances and security group IDs to docker-machine instances
 resource "aws_security_group_rule" "docker_machine_ssh_runner" {
-  count = var.runners_executor == "docker+machine" ? length(local.security_groups_ssh) : 0
+  count = var.runners_executor == "docker+machine" ? 1 : 0
 
   type      = "ingress"
   from_port = 22
   to_port   = 22
   protocol  = "tcp"
 
-  source_security_group_id = element(local.security_groups_ssh, count.index)
+  source_security_group_id = aws_security_group.runner.id
   security_group_id        = aws_security_group.docker_machine[0].id
 
   description = format(
     "Allow SSH traffic from %s to docker-machine instances in group %s on port 22",
-    element(local.security_groups_ssh, count.index),
+    aws_security_group.runner.id,
     aws_security_group.docker_machine[0].name
   )
 }
