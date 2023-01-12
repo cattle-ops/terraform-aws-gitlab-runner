@@ -12,7 +12,11 @@ resource "aws_security_group" "runner" {
     iterator = each
 
     content {
-      cidr_blocks      = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
+      cidr_blocks = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
       ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
       prefix_list_ids  = each.value.prefix_list_ids
       from_port        = each.value.from_port
@@ -33,69 +37,8 @@ resource "aws_security_group" "runner" {
 }
 
 ########################################
-## CIDR ranges to runner agent        ##
-########################################
-
-# Allow SSH traffic from allowed cidr blocks to gitlab-runner agent instances
-resource "aws_security_group_rule" "runner_ssh" {
-  count = length(var.gitlab_runner_ssh_cidr_blocks) > 0 && var.enable_gitlab_runner_ssh_access ? length(var.gitlab_runner_ssh_cidr_blocks) : 0
-
-  type      = "ingress"
-  from_port = 22
-  to_port   = 22
-  protocol  = "tcp"
-
-  cidr_blocks       = [element(var.gitlab_runner_ssh_cidr_blocks, count.index)]
-  security_group_id = aws_security_group.runner.id
-
-  description = format(
-    "Allow SSH traffic from %s to gitlab-runner agent instances in group %s",
-    element(var.gitlab_runner_ssh_cidr_blocks, count.index),
-    aws_security_group.runner.name
-  )
-}
-
-# Allow ICMP traffic from allowed cidr blocks to gitlab-runner agent instances
-resource "aws_security_group_rule" "runner_ping" {
-  count = length(var.gitlab_runner_ssh_cidr_blocks) > 0 && var.enable_ping ? length(var.gitlab_runner_ssh_cidr_blocks) : 0
-
-  type      = "ingress"
-  from_port = -1
-  to_port   = -1
-  protocol  = "icmp"
-
-  cidr_blocks       = [element(var.gitlab_runner_ssh_cidr_blocks, count.index)]
-  security_group_id = aws_security_group.runner.id
-
-  description = format(
-    "Allow ICMP traffic from %s to gitlab-runner agent instances in group %s",
-    element(var.gitlab_runner_ssh_cidr_blocks, count.index),
-    aws_security_group.runner.name
-  )
-}
-
-########################################
 ## Security group IDs to runner agent ##
 ########################################
-
-# Allow SSH traffic from allowed security group IDs to gitlab-runner agent instances
-resource "aws_security_group_rule" "runner_ssh_group" {
-  count = length(var.gitlab_runner_security_group_ids) > 0 && var.enable_gitlab_runner_ssh_access ? length(var.gitlab_runner_security_group_ids) : 0
-
-  type      = "ingress"
-  from_port = 22
-  to_port   = 22
-  protocol  = "tcp"
-
-  source_security_group_id = element(var.gitlab_runner_security_group_ids, count.index)
-  security_group_id        = aws_security_group.runner.id
-
-  description = format(
-    "Allow SSH traffic from %s to gitlab-runner agent instances in group %s",
-    element(var.gitlab_runner_security_group_ids, count.index),
-    aws_security_group.runner.name
-  )
-}
 
 # Allow ICMP traffic from allowed security group IDs to gitlab-runner agent instances
 resource "aws_security_group_rule" "runner_ping_group" {
@@ -131,7 +74,11 @@ resource "aws_security_group" "docker_machine" {
     iterator = each
 
     content {
-      cidr_blocks      = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
+      cidr_blocks = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
       ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
       prefix_list_ids  = each.value.prefix_list_ids
       from_port        = each.value.from_port
@@ -180,9 +127,6 @@ resource "aws_security_group_rule" "docker_machine_docker_runner" {
 
 # Combine runner security group id and additional security group IDs
 locals {
-  # Always include the runner security group id, add additional if ssh is enabled
-  security_groups_ssh = var.enable_gitlab_runner_ssh_access && length(var.gitlab_runner_security_group_ids) > 0 ? concat(var.gitlab_runner_security_group_ids, [aws_security_group.runner.id]) : [aws_security_group.runner.id]
-
   # Only include runner security group id and addtional if ping is enabled
   security_groups_ping = var.enable_ping && length(var.gitlab_runner_security_group_ids) > 0 ? concat(var.gitlab_runner_security_group_ids, [aws_security_group.runner.id]) : []
 }
