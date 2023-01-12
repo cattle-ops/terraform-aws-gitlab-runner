@@ -142,6 +142,13 @@ module "runner" {
   #   command    = ["--registry-mirror", "https://mirror.gcr.io"]
   #   entrypoint = ["dockerd-entrypoint.sh"]
   # }]
+
+
+  # Example how to configure runners, to utilize EC2 user-data feature
+  # example template, creates (configurable) swap file for the runner
+  # runners_userdata = templatefile("${path.module}/../../templates/swap.tpl", {
+  #   swap_size = "512"
+  # })
 }
 
 resource "null_resource" "cancel_spot_requests" {
