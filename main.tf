@@ -345,7 +345,7 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 resource "aws_iam_role" "instance" {
-  count                = var.create_runner_iam_role ? 1 : 0
+  count = var.create_runner_iam_role ? 1 : 0
 
   name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
