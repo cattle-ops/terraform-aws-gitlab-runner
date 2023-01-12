@@ -1,0 +1,28 @@
+---
+name: PR opened
+on:
+  pull_request_target:
+    types:
+      - opened
+
+jobs:
+  add-welcome-message:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            Hey @${{ github.event.pull_request.user.login }}! 👋
+            
+            Thank you for your contribution to the project. Please refer to the [contribution rules](blob/main/CONTRIBUTING.md) for a quick overview of the process.
+            
+            Make sure that this pull request clearly explains:
+            
+            - the problem being solved
+            - the best way a reviewer and you can test your changes
+            
+            With submitting this PR you confirm that you have the rights of the code added and agree that it will published under the [MIT license](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/LICENSE).
+            
+            _This message was generated automatically. You are welcome to [improve it](blob/main/.github/workflows/pr-opened.yml)._
