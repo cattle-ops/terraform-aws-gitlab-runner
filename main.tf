@@ -87,11 +87,11 @@ locals {
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
-      runners_ami                       = data.aws_ami.docker_machine.id
-      runners_security_group_name       = aws_security_group.docker_machine.name
+      runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
       runners_monitoring                = var.runners_monitoring
       runners_ebs_optimized             = var.runners_ebs_optimized
-      runners_instance_profile          = aws_iam_instance_profile.docker_machine.name
+      runners_instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
       runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
@@ -137,7 +137,9 @@ locals {
   )
 }
 
-data "aws_ami" "docker_machine" {
+data "aws_ami" "docker-machine" {
+  count = var.runners_executor == "docker+machine" ? 1 : 0
+
   most_recent = "true"
 
   dynamic "filter" {
@@ -343,7 +345,8 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 resource "aws_iam_role" "instance" {
-  count                = var.create_runner_iam_role ? 1 : 0
+  count = var.create_runner_iam_role ? 1 : 0
+
   name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
@@ -356,22 +359,23 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  count       = var.create_runner_iam_role ? 1 : 0
+  count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
   policy = templatefile("${path.module}/policies/instance-docker-machine-policy.json",
     {
-      docker_machine_role_arn = aws_iam_role.docker_machine.arn
+      docker_machine_role_arn = aws_iam_role.docker_machine[0].arn
   })
   tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
-  count = var.create_runner_iam_role ? 1 : 0
+  count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
 
-  role       = local.aws_iam_role_instance_name
-  policy_arn = aws_iam_policy.instance_docker_machine_policy[count.index].arn
+  role       = aws_iam_role.instance[0].name
+  policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
 }
 
 ################################################################################
@@ -418,7 +422,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
-  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+  count = var.runners_executor == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
 
   role       = local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
@@ -428,6 +432,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
+  count                = var.runners_executor == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
@@ -435,25 +440,27 @@ resource "aws_iam_role" "docker_machine" {
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  name = "${local.name_iam_objects}-docker-machine"
-  role = aws_iam_role.docker_machine.name
-  tags = local.tags
+  count = var.runners_executor == "docker+machine" ? 1 : 0
+  name  = "${local.name_iam_objects}-docker-machine"
+  role  = aws_iam_role.docker_machine[0].name
+  tags  = local.tags
 }
 
 ################################################################################
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
-  count      = length(var.docker_machine_iam_policy_arns)
-  role       = aws_iam_role.docker_machine.name
+  count = var.runners_executor == "docker+machine" ? length(var.docker_machine_iam_policy_arns) : 0
+
+  role       = aws_iam_role.docker_machine[0].name
   policy_arn = var.docker_machine_iam_policy_arns[count.index]
 }
 
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
-  count = var.enable_docker_machine_ssm_access ? 1 : 0
+  count = (var.runners_executor == "docker+machine" && var.enable_docker_machine_ssm_access) ? 1 : 0
 
-  role       = aws_iam_role.docker_machine.name
+  role       = aws_iam_role.docker_machine[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
