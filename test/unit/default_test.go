@@ -1,13 +1,13 @@
 package unittest
 
 import (
-"fmt"
-"testing"
-"github.com/stretchr/testify/assert"
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestDummy(t *testing.T) {
-    plan := readJsonPlan(t, "terraform/plans/default.tfplan.json")
+	plan := readJsonPlan(t, "terraform/plans/default.tfplan.json")
 
-    assert.True(t, true)
+	assert.True(t, true)
 }
