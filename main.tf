@@ -346,6 +346,7 @@ resource "aws_iam_instance_profile" "instance" {
 
 resource "aws_iam_role" "instance" {
   count                = var.create_runner_iam_role ? 1 : 0
+
   name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
@@ -373,7 +374,7 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
   count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
 
-  role       = aws_iam_role.instance.name
+  role       = aws_iam_role.instance[0].name
   policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
 }
 
