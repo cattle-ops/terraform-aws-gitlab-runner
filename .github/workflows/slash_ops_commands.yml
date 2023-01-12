@@ -1,5 +1,5 @@
 ---
-name: Execute SlashOps command
+name: Execute ChatOps command
 
 on:
   repository_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   help-command:
-    name: "SlashOps: Help"
+    name: "ChathOps: Help"
     runs-on: ubuntu-latest
     steps:
       - name: Choose maintainer
