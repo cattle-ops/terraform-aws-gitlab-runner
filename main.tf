@@ -78,24 +78,24 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
-      aws_region                  = var.aws_region
-      gitlab_url                  = var.runners_gitlab_url
-      gitlab_clone_url            = var.runners_clone_url
-      runners_extra_hosts         = var.runners_extra_hosts
-      runners_vpc_id              = var.vpc_id
+      aws_region                        = var.aws_region
+      gitlab_url                        = var.runners_gitlab_url
+      gitlab_clone_url                  = var.runners_clone_url
+      runners_extra_hosts               = var.runners_extra_hosts
+      runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
-      runners_aws_zone            = data.aws_availability_zone.runners.name_suffix
-      runners_instance_type       = var.docker_machine_instance_type
+      runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
+      runners_instance_type             = var.docker_machine_instance_type
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
-      runners_ami                 = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
-      runners_security_group_name = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
-      runners_monitoring          = var.runners_monitoring
-      runners_ebs_optimized       = var.runners_ebs_optimized
-      runners_instance_profile    = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-      runners_additional_volumes  = local.runners_additional_volumes
+      runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+      runners_monitoring                = var.runners_monitoring
+      runners_ebs_optimized             = var.runners_ebs_optimized
+      runners_instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+      runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
-      runners_name                = var.runners_name
+      runners_name                      = var.runners_name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
       runners_executor                  = var.runners_executor
@@ -421,9 +421,9 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
-  count      = var.runners_executor == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
+  count = var.runners_executor == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
 
-role       = local.aws_iam_role_instance_name
+  role       = local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
 }
 
