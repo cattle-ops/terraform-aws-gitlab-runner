@@ -12,18 +12,12 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: mshick/add-pr-comment@v2
+      - uses: actions/github-script@v6
         with:
-          message: |
-            Hey @${{ github.event.pull_request.user.login }}! 👋
-            
-            Thank you for your contribution to the project. Please refer to the [contribution rules](blob/main/CONTRIBUTING.md) for a quick overview of the process.
-            
-            Make sure that this PR clearly explains:
-            
-            - the problem being solved
-            - the best way a reviewer and you can test your changes
-            
-            With submitting this PR you confirm that you have the rights of the code added and agree that it will published under the [MIT license](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/LICENSE).
-            
-            _This message was generated automatically. You are welcome to [improve it](blob/main/.github/workflows/pr-opened.yml)._
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Hey @${{ github.event.pull_request.user.login }}! 👋\n\nThank you for your contribution to the project. Please refer to the [contribution rules](blob/main/CONTRIBUTING.md) for a quick overview of the process.\n\nMake sure that this PR clearly explains:\n\n- the problem being solved\n- the best way a reviewer and you can test your changes\n\nWith submitting this PR you confirm that you have the rights of the code added and agree that it will published under the [MIT license](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/LICENSE).\n\n_This message was generated automatically. You are welcome to [improve it](blob/main/.github/workflows/pr-opened.yml)._'
+            })
