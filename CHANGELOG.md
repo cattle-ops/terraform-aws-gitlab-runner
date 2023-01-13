@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.9.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.1...5.9.0) (2023-01-12)
+
+
+### Features
+
+* add `amazonec2 userdata` for docker machines ([#608](https://github.com/npalm/terraform-aws-gitlab-runner/issues/608)) ([be789ff](https://github.com/npalm/terraform-aws-gitlab-runner/commit/be789ff6475d5c1a9ae2309c6fee678e1d20914a))
+* suppress default tags from module ([#651](https://github.com/npalm/terraform-aws-gitlab-runner/issues/651)) ([0021915](https://github.com/npalm/terraform-aws-gitlab-runner/commit/002191506e1d34688856056856aeb853a5ec997c))
+
 ## [5.8.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.0...5.8.1) (2023-01-10)
 
 
