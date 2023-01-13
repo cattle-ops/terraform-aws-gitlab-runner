@@ -25,12 +25,12 @@ output "runner_agent_role_name" {
 
 output "runner_role_arn" {
   description = "ARN of the role used for the docker machine runners."
-  value       = aws_iam_role.docker_machine.arn
+  value       = element(concat(aws_iam_role.docker_machine.*.arn, [""]), 0)
 }
 
 output "runner_role_name" {
   description = "Name of the role used for the docker machine runners."
-  value       = aws_iam_role.docker_machine.name
+  value       = element(concat(aws_iam_role.docker_machine.*.name, [""]), 0)
 }
 
 output "runner_agent_sg_id" {
@@ -40,7 +40,7 @@ output "runner_agent_sg_id" {
 
 output "runner_sg_id" {
   description = "ID of the security group attached to the docker machine runners."
-  value       = aws_security_group.docker_machine.id
+  value       = element(concat(aws_security_group.docker_machine.*.id, [""]), 0)
 }
 
 output "runner_eip" {

@@ -124,6 +124,12 @@ variable "runners_name" {
   type        = string
 }
 
+variable "runners_userdata" {
+  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
+  type        = string
+  default     = ""
+}
+
 variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
@@ -494,6 +500,12 @@ variable "runner_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
   default     = {}
+}
+
+variable "suppressed_tags" {
+  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
+  type        = list(string)
+  default     = []
 }
 
 variable "role_tags" {
