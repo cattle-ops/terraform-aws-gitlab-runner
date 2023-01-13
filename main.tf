@@ -396,14 +396,14 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
   count = var.enable_runner_ssm_access ? 1 : 0
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
   count = var.enable_runner_ssm_access ? 1 : 0
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
@@ -413,7 +413,7 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
   count = length(var.runner_iam_policy_arns)
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = var.runner_iam_policy_arns[count.index]
 }
 
@@ -426,7 +426,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
   count = var.runners_executor == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = local.bucket_policy
 }
 
