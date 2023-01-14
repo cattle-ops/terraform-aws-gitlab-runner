@@ -15,6 +15,7 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
+            # adds a comment to the PR (there is the issue API only which works work PRs too)
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
