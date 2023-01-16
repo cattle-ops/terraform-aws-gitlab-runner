@@ -3,6 +3,9 @@ name: PR opened
 
 on:
   pull_request_target:
+    # GITHUB_TOKEN is readonly and the action will fail for Dependabot
+    branches-ignore:
+      - 'dependabot/**'
     types:
       - opened
 
