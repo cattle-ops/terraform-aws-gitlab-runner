@@ -8,6 +8,7 @@ listen_address = "${prometheus_listen_address}"
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
+  clone_url = "${gitlab_clone_url}"
   token = "${runners_token}"
   executor = "${runners_executor}"
   environment = ${runners_environment_vars}
@@ -23,10 +24,12 @@ listen_address = "${prometheus_listen_address}"
     privileged = ${runners_privileged}
     disable_cache = ${runners_disable_cache}
     volumes = ["/cache"${runners_additional_volumes}]
+    extra_hosts = ${jsonencode(runners_extra_hosts)}
     shm_size = ${runners_shm_size}
-    pull_policy = "${runners_pull_policy}"
+    pull_policy = ${runners_pull_policies}
     runtime = "${runners_docker_runtime}"
     helper_image = "${runners_helper_image}"
+    ${runners_docker_services}
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
   [runners.docker.services_tmpfs]
@@ -45,7 +48,7 @@ listen_address = "${prometheus_listen_address}"
     IdleTime = ${runners_idle_time}
     ${runners_max_builds}
     MachineDriver = "amazonec2"
-    MachineName = "runner-%s"
+    MachineName = "${docker_machine_name}"
     MachineOptions = [
       "amazonec2-instance-type=${runners_instance_type}",
       "amazonec2-region=${aws_region}",
@@ -62,6 +65,8 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
       "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-volume-type=${runners_volume_type}",
+      "amazonec2-userdata=%{ if runners_userdata != "" }/etc/gitlab-runner/runners_userdata.sh%{ endif ~}",
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]

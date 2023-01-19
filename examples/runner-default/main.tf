@@ -9,7 +9,7 @@ data "aws_security_group" "default" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.70"
+  version = "3.19.0"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -20,7 +20,24 @@ module "vpc" {
 
   enable_nat_gateway = true
   single_nat_gateway = true
-  enable_s3_endpoint = true
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+module "vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "3.19.0"
+
+  vpc_id = module.vpc.vpc_id
+
+  endpoints = {
+    s3 = {
+      service = "s3"
+      tags    = { Name = "s3-vpc-endpoint" }
+    }
+  }
 
   tags = {
     Environment = var.environment
@@ -94,6 +111,44 @@ module "runner" {
   EOT
 
   runners_post_build_script = "\"echo 'single line'\""
+
+  # Uncomment the HCL code below to configure a docker service so that registry mirror is used in auto-devops jobs
+  # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27171 and https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#the-service-in-the-gitlab-runner-configuration-file
+  # You can check this works with a CI job like:
+  # <pre>
+  # default:
+  #    tags:
+  #        - "docker_spot_runner"
+  # docker-mirror-check:
+  #    image: docker:20.10.16
+  #    stage: build
+  #    variables: 
+  #        DOCKER_TLS_CERTDIR: ''
+  #    script:
+  #        - |
+  #        - docker info
+  #          if ! docker info | grep -i mirror
+  #            then
+  #              exit 1
+  #              echo "No mirror config found"
+  #          fi
+  # </pre>
+  #
+  # If not using an official docker image for your job, you may need to specify `DOCKER_HOST: tcp://docker:2375`
+  ## UNCOMMENT 6 LINES BELOW
+  # runners_docker_services = [{
+  #   name       = "docker:20.10.16-dind"
+  #   alias      = "docker"
+  #   command    = ["--registry-mirror", "https://mirror.gcr.io"]
+  #   entrypoint = ["dockerd-entrypoint.sh"]
+  # }]
+
+
+  # Example how to configure runners, to utilize EC2 user-data feature
+  # example template, creates (configurable) swap file for the runner
+  # runners_userdata = templatefile("${path.module}/../../templates/swap.tpl", {
+  #   swap_size = "512"
+  # })
 }
 
 resource "null_resource" "cancel_spot_requests" {
