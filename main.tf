@@ -482,7 +482,7 @@ resource "aws_iam_policy" "service_linked_role" {
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
   count = var.allow_iam_service_linked_role_creation ? 1 : 0
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.service_linked_role[0].arn
 }
 
@@ -506,7 +506,7 @@ resource "aws_iam_policy" "ssm" {
 resource "aws_iam_role_policy_attachment" "ssm" {
   count = var.enable_manage_gitlab_token ? 1 : 0
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.ssm[0].arn
 }
 
@@ -526,7 +526,7 @@ resource "aws_iam_policy" "eip" {
 resource "aws_iam_role_policy_attachment" "eip" {
   count = var.enable_eip ? 1 : 0
 
-  role       = local.aws_iam_role_instance_name
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : var.runner_iam_role_name
   policy_arn = aws_iam_policy.eip[0].arn
 }
 
