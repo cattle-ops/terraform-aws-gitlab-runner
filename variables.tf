@@ -119,12 +119,6 @@ variable "docker_machine_driver" {
   default     = "amazonec2"
 }
 
-variable "docker_machine_name" {
-  description = "MachineName parameter in [runners.machine] settings. Set it to use a custom name."
-  type        = string
-  default     = "runner-%s"
-}
-
 variable "docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
