@@ -1,11 +1,12 @@
 repos:
-  - repo: git://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.45.0
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.64.1
     hooks:
       - id: terraform_fmt
+        args:
+          - --args=-recursive
       - id: terraform_tflint
-      - id: terraform_docs
-  - repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.5.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
     hooks:
       - id: check-merge-conflict

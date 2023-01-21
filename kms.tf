@@ -7,7 +7,7 @@ resource "aws_kms_key" "default" {
   tags                    = local.tags
   policy = templatefile("${path.module}/policies/kms-policy.json",
     {
-      arn_format = var.arn_format
+      partition  = data.aws_partition.current.partition
       aws_region = var.aws_region
       account_id = data.aws_caller_identity.current.account_id
     }

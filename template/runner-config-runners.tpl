@@ -1,6 +1,7 @@
 [[runners]]
   name = "${name}"
   url = "${gitlab_url}"
+  clone_url = "${gitlab_clone_url}"
   token = "${token}"
   executor = "${executor}"
   environment = ${environment_vars}
@@ -16,10 +17,12 @@
     privileged = ${privileged}
     disable_cache = false
     volumes = ["/cache"${additional_volumes}]
+    extra_hosts = ${jsonencode(extra_hosts)}
     shm_size = ${shm_size}
-    pull_policy = "${pull_policy}"
+    pull_policy = "${pull_policies}"
     runtime = "${docker_runtime}"
     helper_image = "${helper_image}"
+    ${docker_services}
   [runners.docker.tmpfs]
     ${volumes_tmpfs}
   [runners.docker.services_tmpfs]
@@ -28,6 +31,7 @@
     Type = "s3"
     Shared = ${shared_cache}
     [runners.cache.s3]
+      AuthenticationType = "${auth_type}"
       ServerAddress = "s3.amazonaws.com"
       BucketName = "${bucket_name}"
       BucketLocation = "${aws_region}"
@@ -36,7 +40,7 @@
     IdleCount = ${idle_count}
     IdleTime = ${idle_time}
     ${max_builds}
-    MachineDriver = "${machine_driver}"
+    MachineDriver = "amazonec2"
     MachineName = "${machine_name}"
     MachineOptions = [
 %{~ if machine_driver == "amazonec2" }
@@ -50,18 +54,16 @@
       "amazonec2-request-spot-instance=${request_spot_instance}",
       "amazonec2-spot-price=${spot_price_bid}",
       "amazonec2-security-group=${security_group_name}",
-      "amazonec2-tags=${tags}",
+      "amazonec2-tags=${runners_tags},__PARENT_TAG__",
       "amazonec2-use-ebs-optimized-instance=${ebs_optimized}",
       "amazonec2-monitoring=${monitoring}",
       "amazonec2-iam-instance-profile=%{ if iam_instance_profile_name != "" }${iam_instance_profile_name}%{ else }${instance_profile}%{ endif ~}",
       "amazonec2-root-size=${root_size}",
-      "amazonec2-ami=${ami}"%{ if docker_machine_options != "" },%{ endif ~}
+      "amazonec2-volume-type=${volume_type}",
+      "amazonec2-userdata=%{ if userdata != "" }/etc/gitlab-runner/runners_userdata.sh%{ endif ~}",
+      "amazonec2-ami=${ami}"%{ if machine_options != "" },%{ endif ~}
 %{ endif }
-${docker_machine_options}
+${machine_options}
     ]
 
-    ${off_peak_timezone}
-    ${off_peak_idle_count}
-    ${off_peak_idle_time}
-    ${off_peak_periods_string}
-${runners_machine_autoscaling}
+${machine_autoscaling}

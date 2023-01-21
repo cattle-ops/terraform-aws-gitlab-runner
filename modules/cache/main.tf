@@ -12,8 +12,10 @@ locals {
     var.tags,
   )
 
-  cache_bucket_string = var.cache_bucket_name_include_account_id ? format("%s%s-gitlab-runner-cache", var.cache_bucket_prefix, data.aws_caller_identity.current.account_id) : format("%s-gitlab-runner-cache", var.cache_bucket_prefix)
+  cache_bucket_string = var.cache_bucket_name_include_account_id ? format("%s-%s%s-gitlab-runner-cache", var.environment, var.cache_bucket_prefix, data.aws_caller_identity.current.account_id) : format("%s-%s-gitlab-runner-cache", var.environment, var.cache_bucket_prefix)
   cache_bucket_name   = var.cache_bucket_set_random_suffix ? format("%s-%s", local.cache_bucket_string, random_string.s3_suffix[0].result) : local.cache_bucket_string
+
+  name_iam_objects = var.name_iam_objects == "" ? local.tags["Name"] : var.name_iam_objects
 }
 
 resource "random_string" "s3_suffix" {
@@ -23,49 +25,67 @@ resource "random_string" "s3_suffix" {
   special = false
 }
 
+# ok as user can decide to enable the logging. See aws_s3_bucket_logging resource below.
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "build_cache" {
-  count = var.create_cache_bucket ? 1 : 0
-
   bucket = local.cache_bucket_name
-  acl    = "private"
 
   tags = local.tags
 
   force_destroy = true
+}
 
-  versioning {
-    enabled = var.cache_bucket_versioning
+resource "aws_s3_bucket_acl" "build_cache_acl" {
+  bucket = aws_s3_bucket.build_cache.id
+
+  acl = "private"
+}
+
+resource "aws_s3_bucket_versioning" "build_cache_versioning" {
+  bucket = aws_s3_bucket.build_cache.id
+
+  versioning_configuration {
+    # ok as decided by the user
+    # tfsec:ignore:aws-s3-enable-versioning
+    status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
+}
 
-  lifecycle_rule {
-    id      = "clear"
-    enabled = var.cache_lifecycle_clear
+resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
+  bucket = aws_s3_bucket.build_cache.id
 
-    prefix = var.cache_lifecycle_prefix
+  rule {
+    id     = "clear"
+    status = var.cache_lifecycle_clear ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = var.cache_lifecycle_prefix
+    }
 
     expiration {
       days = var.cache_expiration_days
     }
-
-    noncurrent_version_expiration {
-      days = var.cache_expiration_days
-    }
   }
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+# decision by user whether to use a customer managed key or not. Resource is encrypted either.
+# tfsec:ignore:aws-s3-encryption-customer-key
+resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encryption" {
+  bucket = aws_s3_bucket.build_cache.id
+
+  rule {
+    bucket_key_enabled = true
+
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.kms_key_id
     }
   }
 }
 
 # block public access to S3 cache bucket
 resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
-  count = var.create_cache_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.build_cache[0].id
+  bucket = aws_s3_bucket.build_cache.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -73,16 +93,24 @@ resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
   ignore_public_acls      = true
 }
 
-resource "aws_iam_policy" "docker_machine_cache" {
-  count = var.create_cache_bucket ? 1 : 0
+resource "aws_s3_bucket_logging" "build_cache" {
+  count = var.cache_logging_bucket != null ? 1 : 0
 
-  name        = "${var.environment}-docker-machine-cache"
+  bucket = aws_s3_bucket.build_cache.id
+
+  target_bucket = var.cache_logging_bucket
+  target_prefix = var.cache_logging_bucket_prefix
+}
+
+resource "aws_iam_policy" "docker_machine_cache" {
+  name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
+  tags        = local.tags
 
   policy = templatefile("${path.module}/policies/cache.json",
     {
-      s3_cache_arn = var.create_cache_bucket == false || length(aws_s3_bucket.build_cache) == 0 ? "${var.arn_format}:s3:::fake_bucket_doesnt_exist" : aws_s3_bucket.build_cache[0].arn
+      s3_cache_arn = aws_s3_bucket.build_cache.arn
     }
   )
 }
