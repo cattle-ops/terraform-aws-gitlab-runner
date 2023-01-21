@@ -45,7 +45,7 @@ locals {
       yum_update               = var.runner_yum_update ? local.file_yum_update : ""
       extra_config             = var.runner_extra_config
       extra_files_sync_command = module.config.extra_files_sync_command
-    })
+  })
 
   file_yum_update = file("${path.module}/template/yum_update.tpl")
 
@@ -58,7 +58,7 @@ locals {
       gitlab_runner_version                        = var.gitlab_runner_version
       docker_machine_version                       = var.docker_machine_version
       docker_machine_download_url                  = var.docker_machine_download_url
-      runners_config_s3_uri                   = module.config.config_uri
+      runners_config_s3_uri                        = module.config.config_uri
       runners_userdata                             = var.runners_userdata
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
@@ -78,13 +78,13 @@ locals {
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.sentry_dsn
-    })
+  })
 
   runners_defaults = {
     aws_region                = var.aws_region
     gitlab_url                = var.runners_gitlab_url
     gitlab_clone_url          = var.runners_clone_url
-    extra_hosts       = var.runners_extra_hosts
+    extra_hosts               = var.runners_extra_hosts
     vpc_id                    = var.vpc_id
     subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
     aws_zone                  = data.aws_availability_zone.runners.name_suffix
@@ -96,28 +96,28 @@ locals {
     ebs_optimized             = var.runners_ebs_optimized
     instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
     additional_volumes        = local.runners_additional_volumes
-    machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
+    machine_options           = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
     machine_name              = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
     machine_autoscaling       = local.runners_machine_autoscaling
     machine_driver            = var.docker_machine_driver
     name                      = var.runners_name
     tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
     token                     = var.runners_token
-    userdata          = var.runners_userdata
+    userdata                  = var.runners_userdata
     executor                  = var.runners_executor
     limit                     = var.runners_limit
     image                     = var.runners_image
     privileged                = var.runners_privileged
-    disable_cache     = var.runners_disable_cache
+    disable_cache             = var.runners_disable_cache
     docker_runtime            = var.runners_docker_runtime
     helper_image              = var.runners_helper_image
     shm_size                  = var.runners_shm_size
-    pull_policies     = local.runners_pull_policies
+    pull_policies             = local.runners_pull_policies
     idle_count                = var.runners_idle_count
     idle_time                 = var.runners_idle_time
     max_builds                = local.runners_max_builds_string
     root_size                 = var.runners_root_size
-    volume_type       = var.runners_volume_type
+    volume_type               = var.runners_volume_type
     iam_instance_profile_name = var.runners_iam_instance_profile_name
     use_private_address_only  = var.runners_use_private_address
     use_private_address       = !var.runners_use_private_address
@@ -130,22 +130,22 @@ locals {
     output_limit              = var.runners_output_limit
     volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
     services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-    docker_services   = local.runners_docker_services
+    docker_services           = local.runners_docker_services
     bucket_name               = local.bucket_name
     shared_cache              = var.cache_shared
     auth_type                 = var.auth_type_cache_sr
   }
 
   template_runner_config_header = templatefile("${path.module}/template/runner-config-header.tpl", {
-    concurrent        = var.runners_concurrent
-    check_interval    = var.runners_check_interval
-    sentry_dsn                                   = var.sentry_dsn
+    concurrent                = var.runners_concurrent
+    check_interval            = var.runners_check_interval
+    sentry_dsn                = var.sentry_dsn
     prometheus_listen_address = var.prometheus_listen_address
   })
 
   template_runner_config_runners = join("\n", [
-  for runner in var.runners :
-  templatefile("${path.module}/template/runner-config-runners.tpl", merge(local.runners_defaults, runner))
+    for runner in var.runners :
+    templatefile("${path.module}/template/runner-config-runners.tpl", merge(local.runners_defaults, runner))
   ])
 
   runner_config = <<-EOF
@@ -521,8 +521,8 @@ resource "aws_iam_policy" "service_linked_role" {
   path        = "/"
   description = "Policy for creation of service linked roles."
 
-policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { partition = data.aws_partition.current.partition })
-tags        = local.tags
+  policy = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { partition = data.aws_partition.current.partition })
+  tags   = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
