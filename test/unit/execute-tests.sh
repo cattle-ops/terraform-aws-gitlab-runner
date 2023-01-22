@@ -31,4 +31,4 @@ cp -dpr terraform/* builds/
 )
 
 # run the tests
-go test -v -run UnitTestRunner
+go test -v

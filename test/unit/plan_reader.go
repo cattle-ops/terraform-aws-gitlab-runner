@@ -3,19 +3,26 @@ package unittest
 import (
 	"encoding/json"
 	"github.com/hashicorp/terraform-json"
-	"github.com/stretchr/testify/require"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func readJsonPlan(t *testing.T, planFile string) *tfjson.Plan {
 	t.Helper()
 
-	planJson, err := ioutil.ReadFile(planFile)
-	require.NoError(t, err)
+	f, err := os.Open(planFile)
 
-	plan := tfjson.Plan{}
-	err = json.Unmarshal(planJson, &plan)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	return &plan
+	defer f.Close()
+
+	var plan *tfjson.Plan
+
+	if err := json.NewDecoder(f).Decode(&plan); err != nil {
+		t.Fatal(err)
+	}
+
+	return plan
 }
