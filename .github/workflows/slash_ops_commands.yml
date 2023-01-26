@@ -14,19 +14,17 @@ jobs:
       - name: Choose maintainer
         id: vars
         run: |
-          maintainers=("npalm" "kayman-mk")
-          
-          RANDOM=$(date +%s)
-          
-          maintainer=${maintainers[ $RANDOM % ${#maintainers[@]} ]}
-
-          echo "maintainer=$maintainer" >> $GITHUB_OUTPUT
+          maintainer=$(cat CODEOWNERS | grep -oE "@[a-zA-Z0-9_-]+" | shuf -n 1)
+          echo "maintainer=$maintainer" >> "$GITHUB_OUTPUT"
 
       - name: Create comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-          issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
-          body: |
-            Hey there @${{ steps.vars.outputs.maintainer }}, could you please help @${{ github.event.client_payload.github.payload.comment.user.login }} out?
+          script: |
+            // adds a comment to the PR (there is the issue API, which works work PRs too)
+            github.rest.issues.createComment({
+              issue_number: context.payload.client_payload.github.payload.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Hey there ${{ steps.vars.outputs.maintainer }}, could you please help @${{ github.event.client_payload.github.payload.comment.user.login }} out?'
+            })
