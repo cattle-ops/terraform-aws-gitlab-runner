@@ -5,7 +5,7 @@ go 1.12
 require (
 	cloud.google.com/go v0.102.0 // indirect
 	github.com/gruntwork-io/terratest v0.41.9
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.8.1
 	github.com/xanzy/go-gitlab v0.79.0
 	google.golang.org/api v0.84.0 // indirect
