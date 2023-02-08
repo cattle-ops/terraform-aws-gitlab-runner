@@ -7,7 +7,7 @@ require (
 	github.com/gruntwork-io/terratest v0.41.9
 	github.com/joho/godotenv v1.4.0
 	github.com/stretchr/testify v1.8.1
-	github.com/xanzy/go-gitlab v0.79.0
+	github.com/xanzy/go-gitlab v0.79.1
 	google.golang.org/api v0.84.0 // indirect
 	google.golang.org/genproto v0.0.0-20220616135557-88e70c0c3a90 // indirect
 )
