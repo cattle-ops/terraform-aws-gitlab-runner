@@ -1,4 +1,5 @@
 mkdir -p /etc/gitlab-runner
+mkdir -p /etc/docker
 cat > /etc/gitlab-runner/config.toml <<- EOF
 
 ${runners_config}
