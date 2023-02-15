@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.9.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.0...5.9.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* bump docker machine version due to bug ([#681](https://github.com/npalm/terraform-aws-gitlab-runner/issues/681)) ([08baab5](https://github.com/npalm/terraform-aws-gitlab-runner/commit/08baab5a8774ec85887995b49f73583e234ebb50))
+
 ## [5.9.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.1...5.9.0) (2023-01-12)
 
 
