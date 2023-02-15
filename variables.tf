@@ -110,13 +110,13 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_download_url" {
   description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
-  default     = ""
+  default     = "https://arr-cki-prod-docker-machine.s3.amazonaws.com/v0.16.2-gitlab.19-cki.2/docker-machine-Linux-x86_64"
 }
 
 variable "docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2-gitlab.15"
+  default     = ""
 }
 
 variable "runners_name" {
@@ -425,7 +425,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "15.3.0"
+  default     = "15.8.2"
 }
 
 variable "enable_ping" {
@@ -611,10 +611,10 @@ variable "enable_manage_gitlab_token" {
 
 variable "overrides" {
   description = <<-EOT
-    This map provides the possibility to override some defaults. 
-    The following attributes are supported: 
-      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. 
-      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. 
+    This map provides the possibility to override some defaults.
+    The following attributes are supported:
+      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
+      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
       * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
       * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
   EOT
