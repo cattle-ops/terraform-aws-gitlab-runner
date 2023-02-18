@@ -151,9 +151,14 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
 def handler(event, context):
     response = []
     event_detail = event['detail']
-    client = boto3.client("ec2", region_name=event['region'])
+
     if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
         exit()
+
+    client = boto3.client("ec2", region_name=event['region'])
+
+    # make sure that no new instances are created
+    cancel_active_spot_requests(ec2_client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
 
     _terminate_list = ec2_list(client=client,parent=event_detail['EC2InstanceId'])
     if len(_terminate_list) > 0:
@@ -178,8 +183,6 @@ def handler(event, context):
             "Level": "info",
             "Message": "No instances to terminate."
         }))
-
-    cancel_active_spot_requests(ec2_client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
 
 
 if __name__ == "__main__":
