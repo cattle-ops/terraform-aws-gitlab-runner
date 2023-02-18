@@ -163,6 +163,11 @@ def handler(event, context):
         }))
         try:
             client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
+
+            print(json.dumps({
+                "Level": "info",
+                "Message": "Instances terminated"
+            }))
         except Exception as e:
             print(json.dumps({
                 "Level": "exception",
