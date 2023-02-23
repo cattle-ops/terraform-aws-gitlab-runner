@@ -134,6 +134,11 @@ variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
   default     = "docker+machine"
+
+  validation {
+    condition = contains(["docker+machine", "docker"], var.runners_executor)
+    error_message = "The executor currently supports `docker+machine` or `docker`."
+  }
 }
 
 variable "runners_install_amazon_ecr_credential_helper" {
