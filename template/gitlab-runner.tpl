@@ -1,5 +1,3 @@
-# shellcheck disable=SC2154
-
 # Install jq if not exists
 if ! [ -x "$(command -v jq)" ]; then
   yum install jq -y
