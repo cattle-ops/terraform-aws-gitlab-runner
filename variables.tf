@@ -116,7 +116,7 @@ variable "docker_machine_download_url" {
 variable "docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2-gitlab.15"
+  default     = "0.16.2-gitlab.19"
 }
 
 variable "runners_name" {
@@ -134,6 +134,11 @@ variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
   default     = "docker+machine"
+
+  validation {
+    condition     = contains(["docker+machine", "docker"], var.runners_executor)
+    error_message = "The executor currently supports `docker+machine` or `docker`."
+  }
 }
 
 variable "runners_install_amazon_ecr_credential_helper" {
