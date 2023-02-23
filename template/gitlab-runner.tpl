@@ -5,7 +5,7 @@ fi
 
 # Provide the parent instance id in the spawned runner tags
 PARENT_INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId)
-PARENT_TAG="gitlab-runner-parent-id,$${PARENT_INSTANCE_ID}"
+PARENT_TAG="gitlab-runner-parent-id,$PARENT_INSTANCE_ID"
 
 mkdir -p /etc/gitlab-runner
 cat > /etc/gitlab-runner/config.toml <<- EOF
@@ -18,19 +18,19 @@ cat > /etc/gitlab-runner/runners_userdata.sh <<- EOF
 ${runners_userdata}
 EOF
 
-sed -i.bak s/__PARENT_TAG__/`echo $PARENT_TAG`/g /etc/gitlab-runner/config.toml
+sed -i.bak s/__PARENT_TAG__/$PARENT_TAG/g /etc/gitlab-runner/config.toml
 
 # fetch Runner token from SSM and validate it
 token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
 
 valid_token=true
-if [[ `echo $token` != "null" ]]
+if [[ "$token" != "null" ]]
 then
   valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
-  [[ `echo $valid_token_response` != "200" ]] && valid_token=false
+  [[ "$valid_token_response" != "200" ]] && valid_token=false
 fi
 
-if [[ `echo ${runners_token}` == "__REPLACED_BY_USER_DATA__" && `echo $token` == "null" ]] || [[ `echo $valid_token` == "false" ]]
+if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
 then
   token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
@@ -44,21 +44,21 @@ then
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
 fi
 
-sed -i.bak s/__REPLACED_BY_USER_DATA__/`echo $token`/g /etc/gitlab-runner/config.toml
+sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 
 ssm_sentry_dsn=$(aws ssm get-parameters --names "${secure_parameter_store_runner_sentry_dsn}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
-if [[ `echo ${sentry_dsn}` == "__SENTRY_DSN_REPLACED_BY_USER_DATA__" && `echo $ssm_sentry_dsn` == "null" ]]
+if [[ "${sentry_dsn}" == "__SENTRY_DSN_REPLACED_BY_USER_DATA__" && "$ssm_sentry_dsn" == "null" ]]
 then
   ssm_sentry_dsn=""
 fi
 
 # For those of you wondering why commas are used in the sed below instead of forward slashes, see https://stackoverflow.com/a/16778711/13169919
 # It is because the Sentry DSN contains forward slashes as it is an URL so it would break out of the sed command with forward slashes as delimiters :)
-sed -i.bak s,__SENTRY_DSN_REPLACED_BY_USER_DATA__,`echo $ssm_sentry_dsn`,g /etc/gitlab-runner/config.toml
+sed -i.bak s,__SENTRY_DSN_REPLACED_BY_USER_DATA__,"$ssm_sentry_dsn",g /etc/gitlab-runner/config.toml
 
 ${pre_install}
 
-if [[ `echo ${runners_executor}` == "docker" ]]
+if [[ "${runners_executor}" == "docker" ]]
 then
   echo 'installing docker'
   if grep -q ':2$' /etc/system-release-cpe  ; then
@@ -74,7 +74,7 @@ then
   fi
 fi
 
-if [[ `echo ${runners_install_amazon_ecr_credential_helper}` == "true" ]]
+if [[ "${runners_install_amazon_ecr_credential_helper}" == "true" ]]
 then
   yum install amazon-ecr-credential-helper -y
 fi
@@ -85,27 +85,33 @@ then
   yum install gitlab-runner-${gitlab_runner_version} -y
 fi
 
-if [[ `echo ${docker_machine_download_url}` == "" ]]
+if [[ "${runners_executor}" == "docker+machine" ]]
 then
-  curl --fail --retry 6 -L https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/releases/v${docker_machine_version}/downloads/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine
-else
-  curl --fail --retry 6 -L ${docker_machine_download_url} >/tmp/docker-machine
+  if [[ "${docker_machine_download_url}" == "" ]]
+  then
+    echo "Installing Docker Machine using preconfigured URL"
+    curl --fail --retry 6 -L https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/releases/v${docker_machine_version}/downloads/docker-machine-"$(uname -s)"-"$(uname -m)" >/tmp/docker-machine
+  else
+    echo "Installing Docker Machine using custom URL"
+    curl --fail --retry 6 -L ${docker_machine_download_url} >/tmp/docker-machine
+  fi
+
+  chmod +x /tmp/docker-machine && \
+    mv /tmp/docker-machine /usr/local/bin/docker-machine && \
+    ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
+  docker-machine --version
+
+  # Create a dummy machine so that the cert is generated properly
+  # See: https://gitlab.com/gitlab-org/gitlab-runner/issues/3676
+  # See: https://github.com/docker/machine/issues/3845#issuecomment-280389178
+  export USER=root
+  export HOME=/root
+  docker-machine create --driver none --url localhost dummy-machine
+  docker-machine rm -y dummy-machine
+  unset HOME
+  unset USER
+
 fi
-
-chmod +x /tmp/docker-machine && \
-  mv /tmp/docker-machine /usr/local/bin/docker-machine && \
-  ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
-docker-machine --version
-
-# Create a dummy machine so that the cert is generated properly
-# See: https://gitlab.com/gitlab-org/gitlab-runner/issues/3676
-# See: https://github.com/docker/machine/issues/3845#issuecomment-280389178
-export USER=root
-export HOME=/root
-docker-machine create --driver none --url localhost dummy-machine
-docker-machine rm -y dummy-machine
-unset HOME
-unset USER
 
 # A small script to remove this runner from being registered with Gitlab.
 cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
