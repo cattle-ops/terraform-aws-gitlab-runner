@@ -673,11 +673,13 @@ variable "schedule_config" {
     # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
     scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    scale_out_timezone   = "Etc/UTC"
     # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
 
     # Configure optional scale_in scheduled action
     scale_in_recurrence = "0 18 * * 1-5"
     scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    scale_in_timezone   = "Etc/UTC"
     # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
 }
