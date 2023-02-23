@@ -136,7 +136,7 @@ variable "runners_executor" {
   default     = "docker+machine"
 
   validation {
-    condition = contains(["docker+machine", "docker"], var.runners_executor)
+    condition     = contains(["docker+machine", "docker"], var.runners_executor)
     error_message = "The executor currently supports `docker+machine` or `docker`."
   }
 }
