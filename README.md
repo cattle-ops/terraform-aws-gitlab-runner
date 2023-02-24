@@ -181,19 +181,6 @@ For example:
   }
 ```
 
-#### Instance Termination
-
-The Auto Scaling Group may be configured with a
-[lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
-that executes a provided Lambda function when the runner is terminated to
-terminate additional instances that were spawned.
-
-The use of the termination lifecycle can be toggled using the
-`asg_termination_lifecycle_hook_create` variable.
-
-When using this feature, a `builds/` directory relative to the root module will
-persist that contains the packaged Lambda function.
-
 ### Access runner instance
 
 A few option are provided to access the runner instance:
@@ -279,7 +266,20 @@ module "runner" {
 
 ### Removing the module
 
-Remove the module from your Terraform code and deregister the runner manually from your Gitlab instance.
+As the module creates a number of resources during runtime (key pairs and spot instance requests), it needs a special procedure to
+remove them.
+
+1. Use the AWS Console to set the desired capacity of all auto scaling groups to 0. To find the correct ones use the
+   `var.environment` as search criteria. Setting the desired capacity to 0 prevents AWS from creating new instances which will
+   in turn create new resources.
+2. Kill all agent ec2 instances on the via AWS Console. This triggers a Lambda function in the background which removes all
+   resources created during runtime of the EC2 instances.
+3. Wait 3 minutes so the Lambda function has enough time to delete the key pairs and spot instance requests.
+4. Run a `terraform destroy` or `terraform apply` (depends on your setup) to remove the module.
+
+If you don't follow the above procedure key pairs and spot instance requests might survive the removal and might cause additional
+costs. But I have never seen that. You should also be fine by executing step 4 only.
+
 ### Scenario: Multi-region deployment
 
 Name clashes due to multi-region deployments for global AWS ressources create by this module (IAM, S3) can be avoided by including a distinguishing region specific prefix via the _cache_bucket_prefix_ string respectively via _name_iam_objects_ in the _overrides_ map. A simple example for this would be to set _region-specific-prefix_ to the AWS region the module is deployed to.
