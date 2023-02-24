@@ -331,7 +331,6 @@ module "cache" {
   cache_logging_bucket                 = var.cache_logging_bucket
   cache_logging_bucket_prefix          = var.cache_logging_bucket_prefix
 
-
   kms_key_id = local.kms_key
 
   name_iam_objects = local.name_iam_objects
