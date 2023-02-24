@@ -327,8 +327,10 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+  cache_lifecycle_prefix               = var.cache_shared ? "project/" : "runner/"
   cache_logging_bucket                 = var.cache_logging_bucket
   cache_logging_bucket_prefix          = var.cache_logging_bucket_prefix
+
 
   kms_key_id = local.kms_key
 
