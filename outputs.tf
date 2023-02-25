@@ -63,5 +63,11 @@ output "testing_autoscaling" {
 }
 
 variable "test_runners_machine_config" {
-  type = any
+  type = map
+
+  validation {
+    condition = length(setintersection(["MachineDriver", "MachineName", "MachineOptions"], keys(var.test_runners_machine_config))) == 0
+    error_message = "\"MachineDriver\", \"MachineName\" and \"MachineOptions\" are reserved keywords. See if a module variable defines your property instead."
+
+  }
 }

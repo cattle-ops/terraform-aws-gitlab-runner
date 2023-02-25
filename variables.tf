@@ -274,7 +274,7 @@ variable "runners_ebs_optimized" {
 
 variable "runners_machine_autoscaling" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
-  type = list(map(any))
+  type = list(any)
   default = []
 }
 
