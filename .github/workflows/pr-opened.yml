@@ -1,0 +1,27 @@
+---
+name: PR opened
+
+on:
+  pull_request_target:
+    # GITHUB_TOKEN is readonly and the action will fail for Dependabot
+    branches-ignore:
+      - 'dependabot/**'
+    types:
+      - opened
+
+jobs:
+  add-welcome-message:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            // adds a comment to the PR (there is the issue API only which works work PRs too)
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Hey @${{ github.event.pull_request.user.login }}! 👋\n\nThank you for your contribution to the project. Please refer to the [contribution rules](blob/main/CONTRIBUTING.md) for a quick overview of the process.\n\nMake sure that this PR clearly explains:\n\n- the problem being solved\n- the best way a reviewer and you can test your changes\n\nWith submitting this PR you confirm that you have the rights of the code added and agree that it will published under the [MIT license](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/LICENSE).\n\n_This message was generated automatically. You are welcome to [improve it](blob/main/.github/workflows/pr-opened.yml)._'
+            })

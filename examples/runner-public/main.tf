@@ -103,15 +103,3 @@ module "runner2" {
     bucket = "${module.cache.bucket}"
   }
 }
-
-resource "null_resource" "cancel_spot_requests" {
-  # Cancel active and open spot requests, terminate instances
-  triggers = {
-    environment = var.environment
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
-  }
-}
