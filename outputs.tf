@@ -57,3 +57,11 @@ output "runner_user_data" {
   description = "The user data of the Gitlab Runner Agent's launch template."
   value       = local.template_user_data
 }
+
+output "testing_autoscaling" {
+  value = local.template_runner_config
+}
+
+variable "test_runners_machine_config" {
+  type = any
+}

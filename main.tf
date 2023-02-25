@@ -79,6 +79,7 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
+      test_runners_machine_config = var.test_runners_machine_config
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
