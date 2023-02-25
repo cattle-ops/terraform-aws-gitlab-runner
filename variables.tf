@@ -110,13 +110,13 @@ variable "docker_machine_spot_price_bid" {
 variable "docker_machine_download_url" {
   description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
-  default     = "https://arr-cki-prod-docker-machine.s3.amazonaws.com/v0.16.2-gitlab.19-cki.2/docker-machine-Linux-x86_64"
+  default     = ""
 }
 
 variable "docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ignored once `docker_machine_download_url` is set."
   type        = string
-  default     = "0.16.2-gitlab.19"
+  default     = "0.16.2-gitlab.19-cki.2"
 }
 
 variable "runners_name" {
