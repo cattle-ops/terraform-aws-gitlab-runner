@@ -90,7 +90,7 @@ then
   if [[ "${docker_machine_download_url}" == "" ]]
   then
     echo "Installing Docker Machine using preconfigured URL"
-    curl --fail --retry 6 -L https://gitlab.com/gitlab-org/ci-cd/docker-machine/-/releases/v${docker_machine_version}/downloads/docker-machine-"$(uname -s)"-"$(uname -m)" >/tmp/docker-machine
+    curl --fail --retry 6 -L https://arr-cki-prod-docker-machine.s3.amazonaws.com/v${docker_machine_version}/docker-machine-$(uname -s)-$(uname -m) > /tmp/docker-machine
   else
     echo "Installing Docker Machine using custom URL"
     curl --fail --retry 6 -L ${docker_machine_download_url} >/tmp/docker-machine
