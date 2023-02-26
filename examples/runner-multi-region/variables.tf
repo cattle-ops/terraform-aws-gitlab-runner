@@ -29,4 +29,6 @@ variable "gitlab_url" {
 }
 
 variable "registration_token" {
+  description = "Registration token for the runner."
+  type        = string
 }

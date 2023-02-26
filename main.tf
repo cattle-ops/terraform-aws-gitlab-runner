@@ -48,7 +48,7 @@ locals {
   file_yum_update = file("${path.module}/template/yum_update.tpl")
 
   template_eip = templatefile("${path.module}/template/eip.tpl", {
-    eip = join(",", aws_eip.gitlab_runner.*.public_ip)
+    eip = join(",", [for eip in aws_eip.gitlab_runner : eip.public_ip])
   })
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
