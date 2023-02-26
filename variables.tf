@@ -124,6 +124,12 @@ variable "runners_name" {
   type        = string
 }
 
+variable "runners_userdata" {
+  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
+  type        = string
+  default     = ""
+}
+
 variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
@@ -496,6 +502,12 @@ variable "runner_tags" {
   default     = {}
 }
 
+variable "suppressed_tags" {
+  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
+  type        = list(string)
+  default     = []
+}
+
 variable "role_tags" {
   description = "Map of tags that will be added to the role created. Useful for tag based authorization."
   type        = map(string)
@@ -612,6 +624,11 @@ variable "overrides" {
   validation {
     condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
     error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
+  }
+
+  validation {
+    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
   }
 }
 
@@ -842,31 +859,41 @@ variable "asg_terminate_lifecycle_hook_name" {
 }
 
 variable "asg_terminate_lifecycle_hook_create" {
-  description = "Boolean toggling the creation of the ASG instance terminate lifecycle hook."
+  description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
   type        = bool
   default     = true
+
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_create
+    error_message = "The hook must be created. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
-  description = "The amount of time, in seconds, for the instances to remain in wait state."
+  description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
   type        = number
-  default     = 90
+  default     = null
+
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_heartbeat_timeout == null
+    error_message = "The timeout value is managed by the module. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_lambda_memory_size" {
-  description = "The memory size in MB to allocate to the terminate-instances Lambda function."
+  description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
 }
 
 variable "asg_terminate_lifecycle_lambda_runtime" {
-  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
+  description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
   type        = string
   default     = "python3.8"
 }
 
 variable "asg_terminate_lifecycle_lambda_timeout" {
-  description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
+  description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
   default     = 30
   type        = number
 }
