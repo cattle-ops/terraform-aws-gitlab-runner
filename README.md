@@ -18,9 +18,11 @@
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-> BREAKING CHANGE: The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+> 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances), the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine). For more details see [PR](https://github.com/npalm/terraform-aws-gitlab-runner/pull/697).
 
-> BREAKING CHANGE: By default AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
+
+> 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current GitHub links and Terraform registry links remain working. After release 6.0.0 we move the repository to [https://github.com/cattle-ops/terraform-aws-gitlab-runner](https://github.com/cattle-ops/terraform-aws-gitlab-runner).
+
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
 
