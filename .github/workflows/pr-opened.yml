@@ -1,6 +1,4 @@
----
 name: PR opened
-
 on:
   pull_request_target:
     # GITHUB_TOKEN is readonly and the action will fail for Dependabot
@@ -8,14 +6,13 @@ on:
       - 'dependabot/**'
     types:
       - opened
-
 jobs:
   add-welcome-message:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # ratchet:actions/github-script@v6
         with:
           script: |
             // adds a comment to the PR (there is the issue API only which works work PRs too)
