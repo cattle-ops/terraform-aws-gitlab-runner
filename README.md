@@ -336,7 +336,7 @@ terraform destroy
 | runners\_pull\_policy | pull\_policy for the runners, will be used in the runner config.toml | `string` | `"always"` | no |
 | runners\_request\_concurrency | Limit number of concurrent requests for new jobs from GitLab (default 1) | `number` | `1` | no |
 | runners\_request\_spot\_instance | Whether or not to request spot instances via docker-machine | `bool` | `false` | no |
-| runners\_root\_size | Runner instance root size in GB. | `number` | `16` | no |
+| runners\_root\_size | Runner instance root size in GB. | `number` | `32` | no |
 | runners\_services\_volumes\_tmpfs | n/a | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | runners\_shm\_size | shm\_size for the runners, will be used in the runner config.toml | `number` | `0` | no |
 | runners\_token | Token for the runner, will be used in the runner config.toml. | `string` | `"__REPLACED_BY_USER_DATA__"` | no |

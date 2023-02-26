@@ -216,7 +216,7 @@ variable "runners_off_peak_periods" {
 variable "runners_root_size" {
   description = "Runner instance root size in GB."
   type        = number
-  default     = 16
+  default     = 32
 }
 
 variable "runners_iam_instance_profile_name" {
