@@ -16,22 +16,21 @@ import os
 
 
 def ec2_list(client, **args):
-
     print(json.dumps({
         "Level": "info",
         "Message": f"Searching for children of GitLab runner instance {args['parent']}"
     }))
 
     ec2_instances = client.describe_instances(Filters=[
-            {
-                "Name": "instance-state-name",
-                "Values": ['running', 'pending'],
-            },
-            {
-                "Name": "tag:gitlab-runner-parent-id",
-                "Values": ["*"]
-            }
-        ]).get("Reservations")
+        {
+            "Name": "instance-state-name",
+            "Values": ['running', 'pending'],
+        },
+        {
+            "Name": "tag:gitlab-runner-parent-id",
+            "Values": ["*"]
+        }
+    ]).get("Reservations")
 
     _terminate_list = []
     for _instances in ec2_instances:
@@ -97,7 +96,9 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
         "Message": f"Removing unused SSH key pairs for agent {executor_name_part}"
     }))
 
-    reservations = client.describe_instances(Filters=[
+    # build list of SSH keys to keep
+    paginator = client.get_paginator('describe_instances')
+    reservations = paginator.paginate(Filters=[
         {
             "Name": "key-name",
             "Values": ['runner-*'],
@@ -106,7 +107,7 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
             "Name": "instance-state-name",
             "Values": ['pending', 'running'],
         },
-    ]).get("Reservations")
+    ]).build_full_result().get("Reservations")
 
     used_key_pairs = []
 
@@ -151,7 +152,7 @@ def handler(event, context):
         exit()
 
     # find the executors connected to this agent and terminate them as well
-    _terminate_list = ec2_list(client=client,parent=event_detail['EC2InstanceId'])
+    _terminate_list = ec2_list(client=client, parent=event_detail['EC2InstanceId'])
     if len(_terminate_list) > 0:
         print(json.dumps({
             "Level": "info",
