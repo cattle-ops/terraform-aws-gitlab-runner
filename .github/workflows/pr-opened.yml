@@ -6,6 +6,7 @@ on:
       - 'dependabot/**'
     types:
       - opened
+
 jobs:
   add-welcome-message:
     runs-on: ubuntu-latest

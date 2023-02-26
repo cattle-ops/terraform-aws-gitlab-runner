@@ -2,6 +2,7 @@ name: 'Close stale issues and PRs'
 on:
   schedule:
     - cron: '25 2 * * *'
+
 jobs:
   stale:
     runs-on: ubuntu-latest

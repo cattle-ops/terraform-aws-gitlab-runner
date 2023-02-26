@@ -3,6 +3,7 @@ on:
   issue_comment:
     types:
       - created
+
 jobs:
   slash-command-dispatch:
     runs-on: ubuntu-latest

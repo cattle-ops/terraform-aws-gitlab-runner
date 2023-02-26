@@ -3,6 +3,7 @@ on:
   repository_dispatch:
     types:
       - help-command
+
 jobs:
   help-command:
     name: "ChatOps: /help"
