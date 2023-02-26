@@ -79,12 +79,6 @@ then
   yum install amazon-ecr-credential-helper -y
 fi
 
-if ! ( rpm -q gitlab-runner >/dev/null )
-then
-  curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
-  yum install gitlab-runner-${gitlab_runner_version} -y
-fi
-
 if [[ "${runners_executor}" == "docker+machine" ]]
 then
   if [[ "${docker_machine_download_url}" == "" ]]
@@ -182,7 +176,12 @@ chkconfig --add remove_gitlab_registration
 # As noted above, this does nothing more than make the lockfile.
 service remove_gitlab_registration start
 
+if ! ( rpm -q gitlab-runner >/dev/null )
+then
+  curl --fail --retry 6 -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh | bash
+  yum install gitlab-runner-${gitlab_runner_version} -y
+fi
+
 ${post_install}
 
-service gitlab-runner restart
 chkconfig gitlab-runner on
