@@ -46,7 +46,7 @@ No output.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.52.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.55.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | 2.3.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.1 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.4.3 |
@@ -56,8 +56,7 @@ No output.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.52.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.55.0 |
 
 ## Modules
 
@@ -72,8 +71,7 @@ No output.
 
 | Name | Type |
 |------|------|
-| [null_resource.cancel_spot_requests](https://registry.terraform.io/providers/hashicorp/null/3.2.1/docs/resources/resource) | resource |
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/4.52.0/docs/data-sources/availability_zones) | data source |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/4.55.0/docs/data-sources/availability_zones) | data source |
 
 ## Inputs
 
