@@ -1,5 +1,27 @@
 # Changelog
 
+## [5.9.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.1...5.9.0) (2023-01-12)
+
+
+### Features
+
+* add `amazonec2 userdata` for docker machines ([#608](https://github.com/npalm/terraform-aws-gitlab-runner/issues/608)) ([be789ff](https://github.com/npalm/terraform-aws-gitlab-runner/commit/be789ff6475d5c1a9ae2309c6fee678e1d20914a))
+* suppress default tags from module ([#651](https://github.com/npalm/terraform-aws-gitlab-runner/issues/651)) ([0021915](https://github.com/npalm/terraform-aws-gitlab-runner/commit/002191506e1d34688856056856aeb853a5ec997c))
+
+## [5.8.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.0...5.8.1) (2023-01-10)
+
+
+### Bug Fixes
+
+* create the log group before creating the runner agent ([#633](https://github.com/npalm/terraform-aws-gitlab-runner/issues/633)) ([c58aaaa](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c58aaaa52f6387536794da8626f9033517a71e88))
+
+## [5.8.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.7.0...5.8.0) (2023-01-05)
+
+
+### Features
+
+* add validation rule for docker machine name ([#627](https://github.com/npalm/terraform-aws-gitlab-runner/issues/627)) ([77a22eb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/77a22eb0ab2f845356a6245662021e2a897598e5))
+
 ## [5.7.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.1...5.7.0) (2023-01-01)
 
 

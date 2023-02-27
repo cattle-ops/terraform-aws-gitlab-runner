@@ -66,6 +66,7 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
       "amazonec2-root-size=${runners_root_size}",
       "amazonec2-volume-type=${runners_volume_type}",
+      "amazonec2-userdata=%{ if runners_userdata != "" }/etc/gitlab-runner/runners_userdata.sh%{ endif ~}",
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]
