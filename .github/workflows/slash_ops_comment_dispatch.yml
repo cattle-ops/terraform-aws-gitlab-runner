@@ -1,0 +1,20 @@
+---
+name: PR commented
+
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  slash-command-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-type: pull-request
+          reactions: false
+          commands: |
+            help
