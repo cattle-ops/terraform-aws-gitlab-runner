@@ -1,11 +1,34 @@
 name: CI
 on:
-  push:
-    branches:
-      - main
   pull_request:
 
 jobs:
+  find-changes:
+    runs-on: ubuntu-latest
+    steps:
+      # yamllint disable-line rule:comments
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2.11.1
+        id: changes
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+    outputs:
+      python: ${{ steps.changes.outputs.python }}
+
+  lint-python:
+    needs: find-changes
+    if: needs.find-changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    name: Lint Python
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v3
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+
   verify_module:
     name: Verify module
     strategy:
