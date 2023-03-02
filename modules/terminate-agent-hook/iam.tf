@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "lambda" {
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "ec2:DescribeRegions",
-      "ec2:DescribeInstanceStatus"
+      "ec2:DescribeInstanceStatus",
     ]
     resources = ["*"]
     effect    = "Allow"
@@ -71,6 +71,7 @@ data "aws_iam_policy_document" "lambda" {
     ]
     resources = [var.asg_arn]
   }
+
   statement {
     sid = "GitLabRunnerLifecycleTerminateLogs"
     actions = [
@@ -84,6 +85,32 @@ data "aws_iam_policy_document" "lambda" {
       aws_cloudwatch_log_group.lambda.arn,
       "${aws_cloudwatch_log_group.lambda.arn}:log-stream:*"
     ]
+  }
+
+  statement {
+    sid = "SSHKeyHousekeepingList"
+
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeKeyPairs"
+    ]
+    resources = ["*"]
+  }
+
+  # separate statement due to the condition
+  statement {
+    sid = "SSHKeyHousekeepingDelete"
+
+    effect = "Allow"
+    actions = [
+      "ec2:DeleteKeyPair"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "ec2:KeyPairName"
+      values   = ["runner-*"]
+    }
   }
 }
 
@@ -105,7 +132,8 @@ resource "aws_iam_policy" "lambda" {
   name   = "${var.name_iam_objects}-${var.name}-lambda"
   path   = "/"
   policy = data.aws_iam_policy_document.lambda.json
-  tags   = var.tags
+
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "lambda" {

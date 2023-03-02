@@ -9,7 +9,7 @@ data "aws_security_group" "default" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.18.1"
+  version = "3.19.0"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -28,7 +28,7 @@ module "vpc" {
 
 module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "3.18.1"
+  version = "3.19.0"
 
   vpc_id = module.vpc.vpc_id
 
@@ -142,16 +142,11 @@ module "runner" {
   #   command    = ["--registry-mirror", "https://mirror.gcr.io"]
   #   entrypoint = ["dockerd-entrypoint.sh"]
   # }]
-}
 
-resource "null_resource" "cancel_spot_requests" {
-  # Cancel active and open spot requests, terminate instances
-  triggers = {
-    environment = var.environment
-  }
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
-  }
+  # Example how to configure runners, to utilize EC2 user-data feature
+  # example template, creates (configurable) swap file for the runner
+  # runners_userdata = templatefile("${path.module}/../../templates/swap.tpl", {
+  #   swap_size = "512"
+  # })
 }
