@@ -38,7 +38,9 @@ locals {
     host                         = var.runners_docker_options.host
     hostname                     = var.runners_docker_options.hostname
     image                        = var.runners_docker_options.image
+    isolation                    = var.runners_docker_options.isolation
     links                        = var.runners_docker_options.links == null ? null : join(", ", [for s in var.runners_docker_options.links : format("\"%s\"", s)])
+    mac_address                  = var.runners_docker_options.mac_address
     memory                       = var.runners_docker_options.memory
     memory_reservation           = var.runners_docker_options.memory_reservation
     memory_swap                  = var.runners_docker_options.memory_swap
@@ -53,6 +55,7 @@ locals {
     sysctls                      = var.runners_docker_options.sysctls == null ? null : join(", ", [for s in var.runners_docker_options.sysctls : format("\"%s\"", s)])
     tls_cert_path                = var.runners_docker_options.tls_cert_path
     tls_verify                   = var.runners_docker_options.tls_verify
+    user                         = var.runners_docker_options.user
     userns_mode                  = var.runners_docker_options.userns_mode
     volumes                      = jsonencode(concat(var.runners_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [], var.runners_docker_options.volumes))
     volume_driver                = var.runners_docker_options.volume_driver

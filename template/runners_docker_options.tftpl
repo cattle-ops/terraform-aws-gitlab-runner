@@ -44,7 +44,11 @@
 %{endif ~}
 %{ if image != null} image = "${image}"
 %{endif ~}
+%{ if isolation != null} isolation = "${isolation}"
+%{endif ~}
 %{ if links != null } links = [${links}]
+%{endif ~}
+%{ if mac_address != null } mac_address = "${mac_address}"
 %{endif ~}
 %{ if memory != null } memory = "${memory}"
 %{endif ~}
@@ -73,6 +77,8 @@
 %{ if tls_cert_path != null } tls_cert_path = "${tls_cert_path}"
 %{endif ~}
 %{ if tls_verify != null} tls_verify = ${tls_verify}
+%{endif ~}
+%{ if user != null} user = "${user}"
 %{endif ~}
 %{ if userns_mode != null } userns_mode = "${userns_mode}"
 %{endif ~}
