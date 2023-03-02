@@ -263,6 +263,7 @@ variable "runners_docker_options" {
 
   default = null
 }
+
 variable "runners_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   type        = bool

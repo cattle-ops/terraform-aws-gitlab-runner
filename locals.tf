@@ -27,7 +27,7 @@ locals {
     cpus                         = var.runners_docker_options.cpus
     devices                      = var.runners_docker_options.devices == null ? null : join(", ", [for s in var.runners_docker_options.devices : format("\"%s\"", s)])
     device_cgroup_rules          = var.runners_docker_options.device_cgroup_rules == null ? null : join(", ", [for s in var.runners_docker_options.device_cgroup_rules : format("\"%s\"", s)])
-    disable_cache = var.runners_docker_options.disable_cache
+    disable_cache                = var.runners_docker_options.disable_cache
     disable_entrypoint_overwrite = var.runners_docker_options.disable_entrypoint_overwrite
     dns                          = var.runners_docker_options.dns == null ? null : join(", ", [for s in var.runners_docker_options.dns : format("\"%s\"", s)])
     dns_search                   = var.runners_docker_options.dns_search == null ? null : join(", ", [for s in var.runners_docker_options.dns_search : format("\"%s\"", s)])
@@ -37,7 +37,7 @@ locals {
     helper_image_flavor          = var.runners_docker_options.helper_image_flavor
     host                         = var.runners_docker_options.host
     hostname                     = var.runners_docker_options.hostname
-    image         = var.runners_docker_options.image
+    image                        = var.runners_docker_options.image
     links                        = var.runners_docker_options.links == null ? null : join(", ", [for s in var.runners_docker_options.links : format("\"%s\"", s)])
     memory                       = var.runners_docker_options.memory
     memory_reservation           = var.runners_docker_options.memory_reservation
@@ -45,16 +45,16 @@ locals {
     network_mode                 = var.runners_docker_options.network_mode
     oom_kill_disable             = var.runners_docker_options.oom_kill_disable
     oom_score_adjust             = var.runners_docker_options.oom_score_adjust
-    privileged    = var.runners_docker_options.privileged
-    pull_policies   = join(", ", [for s in var.runners_docker_options.pull_policy : format("\"%s\"", s)])
+    privileged                   = var.runners_docker_options.privileged
+    pull_policies                = jsonencode(var.runners_docker_options.pull_policies)
     runtime                      = var.runners_docker_options.runtime
     security_opt                 = var.runners_docker_options.security_opt == null ? null : join(", ", [for s in var.runners_docker_options.security_opt : format("\"%s\"", s)])
-    shm_size      = var.runners_docker_options.shm_size
+    shm_size                     = var.runners_docker_options.shm_size
     sysctls                      = var.runners_docker_options.sysctls == null ? null : join(", ", [for s in var.runners_docker_options.sysctls : format("\"%s\"", s)])
     tls_cert_path                = var.runners_docker_options.tls_cert_path
-    tls_verify    = var.runners_docker_options.tls_verify
+    tls_verify                   = var.runners_docker_options.tls_verify
     userns_mode                  = var.runners_docker_options.userns_mode
-    volumes       = concat(var.runners_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [], var.runners_docker_options.volumes)
+    volumes                      = jsonencode(concat(var.runners_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [], var.runners_docker_options.volumes))
     volume_driver                = var.runners_docker_options.volume_driver
     volumes_from                 = var.runners_docker_options.volumes_from == null ? null : join(", ", [for s in var.runners_docker_options.volumes_from : format("\"%s\"", s)])
     wait_for_services_timeout    = var.runners_docker_options.wait_for_services_timeout

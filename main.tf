@@ -92,7 +92,6 @@ locals {
       runners_monitoring                = var.runners_monitoring
       runners_ebs_optimized             = var.runners_ebs_optimized
       runners_instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-      runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runners_name
