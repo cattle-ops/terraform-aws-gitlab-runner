@@ -545,6 +545,7 @@ module "terminate_agent_hook" {
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
   name_iam_objects                     = local.name_iam_objects
+  name_docker_machine_runners          = local.runner_tags_merged["Name"]
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   kms_key_id                           = local.kms_key
   arn_format                           = var.arn_format
