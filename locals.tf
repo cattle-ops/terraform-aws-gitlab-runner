@@ -14,7 +14,7 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
-  template_runners_docker_options = var.runners_docker_options == null ? "" : templatefile("${path.module}/template/runners_docker_options.tpl", {
+  template_runners_docker_options = var.runners_docker_options == null ? "" : templatefile("${path.module}/template/runners_docker_options.tftpl", {
     allowed_images               = var.runners_docker_options.allowed_images == null ? null : join(", ", [for s in var.runners_docker_options.allowed_images : format("\"%s\"", s)])
     allowed_pull_policies        = var.runners_docker_options.allowed_pull_policies == null ? null : join(", ", [for s in var.runners_docker_options.allowed_pull_policies : format("\"%s\"", s)])
     allowed_services             = var.runners_docker_options.allowed_services == null ? null : join(", ", [for s in var.runners_docker_options.allowed_services : format("\"%s\"", s)])
