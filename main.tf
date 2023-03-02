@@ -82,7 +82,6 @@ locals {
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
-      runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
@@ -103,13 +102,6 @@ locals {
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
       runners_concurrent                = var.runners_concurrent
-      runners_image                     = var.runners_image
-      runners_privileged                = var.runners_privileged
-      runners_disable_cache             = var.runners_disable_cache
-      runners_docker_runtime            = var.runners_docker_runtime
-      runners_helper_image              = var.runners_helper_image
-      runners_shm_size                  = var.runners_shm_size
-      runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
@@ -127,7 +119,7 @@ locals {
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
-      runners_docker_options            = local.runners_docker_options
+      runners_docker_options            = local.template_runners_docker_options
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services

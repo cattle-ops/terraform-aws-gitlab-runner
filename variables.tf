@@ -194,70 +194,10 @@ variable "runners_max_builds" {
   default     = 0
 }
 
-variable "runners_image" {
-  description = "(Deprecated, use image in runners_docker_options instead) Image to run builds, will be used in the runner config.toml"
-  type        = string
-  default     = "docker:18.03.1-ce"
-}
-
-variable "runners_privileged" {
-  description = "(Deprecated, use privileged in runners_docker_options instead) Runners will run in privileged mode, will be used in the runner config.toml"
-  type        = bool
-  default     = true
-}
-
-variable "runners_disable_cache" {
-  description = "(Deprecated, use disable_cache in runners_docker_options instead) Runners will not use local cache, will be used in the runner config.toml"
-  type        = bool
-  default     = false
-}
-
 variable "runners_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
   default     = false
-}
-
-variable "runners_additional_volumes" {
-  description = " (Deprecated, use volumes in runners_docker_options instead) Additional volumes that will be used in the runner config.toml, e.g Docker socket"
-  type        = list(any)
-  default     = []
-}
-
-variable "runners_extra_hosts" {
-  description = "Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1"
-  type        = list(any)
-  default     = []
-}
-
-variable "runners_shm_size" {
-  description = "(Deprecated, use shm_size in runners_docker_options instead) shm_size for the runners, will be used in the runner config.toml"
-  type        = number
-  default     = 0
-}
-
-variable "runners_docker_runtime" {
-  description = "(Deprecated, use runtime in runners_docker_options instead) docker runtime for runners, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-variable "runners_helper_image" {
-  description = "(Deprecated, use helper_image in runners_docker_options instead) Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-variable "runners_pull_policy" {
-  description = "(Deprecated, use pull_policy in runners_docker_options instead) pull_policy for the runners, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-variable "runners_pull_policies" {
-  description = "pull policies for the runners, will be used in the runner config.toml, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
-  type        = list(string)
-  default     = ["always"]
 }
 
 variable "runners_docker_options" {
@@ -307,7 +247,7 @@ variable "runners_docker_options" {
     oom_kill_disable             = optional(bool)
     oom_score_adjust             = optional(number)
     privileged                   = optional(bool, true)
-    pull_policy                  = optional(string, "always")
+    pull_policies                = optional(list(string), ["always"])
     runtime                      = optional(string)
     security_opt                 = optional(list(string))
     shm_size                     = optional(number, 0)
