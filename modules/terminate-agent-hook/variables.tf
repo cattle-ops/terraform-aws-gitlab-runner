@@ -45,6 +45,11 @@ variable "name_iam_objects" {
   default     = ""
 }
 
+variable "name_docker_machine_runners" {
+  description = "The `Name` tag of EC2 instances created by the runner agent."
+  type        = string
+}
+
 variable "kms_key_id" {
   description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
   type        = string
