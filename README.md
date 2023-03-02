@@ -304,7 +304,7 @@ module "runner" {
   runners_gitlab_url = "https://gitlab.com"
 
   gitlab_runner_registration_config = {
-    registration_token = "my-token
+    registration_token = "my-token"
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
