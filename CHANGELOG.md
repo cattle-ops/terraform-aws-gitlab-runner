@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.0.0...6.1.0) (2023-03-02)
+
+
+### Features
+
+* cancel spot requests ([#653](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/653)) ([f1b4f4a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/f1b4f4a227e9a02103225433aeb4a7b5ac261e4d)), closes [#493](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/493)
+* remove unused SSH keys ([#652](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/652)) ([3151807](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/31518079674cc6195e18a5bfe7641a1e50087a30)), closes [#592](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/592)
+* support self-signed certificates ([#584](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/584)) ([6c1180e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/6c1180e8645bc3685727e25f2a2e64ab8f65c2df))
+
+
+### Bug Fixes
+
+* always add policy to maintain SSM parameters ([#510](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/510)) ([59e2d6e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/59e2d6e1a168bd5077978de7afaca50b1c49b9bf))
+
 ## [6.0.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.1...6.0.0) (2023-02-26)
 
 
