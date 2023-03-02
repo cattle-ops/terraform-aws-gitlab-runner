@@ -108,15 +108,15 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
 
 variable "docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
   type        = string
-  default     = "0.16.2-gitlab.15"
+  default     = "0.16.2-gitlab.19-cki.2"
 }
 
 variable "runners_name" {
@@ -134,6 +134,11 @@ variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
   default     = "docker+machine"
+
+  validation {
+    condition     = contains(["docker+machine", "docker"], var.runners_executor)
+    error_message = "The executor currently supports `docker+machine` or `docker`."
+  }
 }
 
 variable "runners_install_amazon_ecr_credential_helper" {
@@ -488,7 +493,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "15.3.0"
+  default     = "15.8.2"
 }
 
 variable "enable_ping" {
@@ -731,11 +736,13 @@ variable "schedule_config" {
     # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
     scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    scale_out_time_zone  = "Etc/UTC"
     # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
 
     # Configure optional scale_in scheduled action
     scale_in_recurrence = "0 18 * * 1-5"
     scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    scale_in_time_zone  = "Etc/UTC"
     # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
 }
