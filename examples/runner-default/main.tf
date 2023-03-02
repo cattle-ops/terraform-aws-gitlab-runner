@@ -101,8 +101,8 @@ module "runner" {
   ]
 
   runners_docker_options = {
-    privileged         = "true"
-    volumes = ["/cache", "/certs/client"]
+    privileged = "true"
+    volumes    = ["/cache", "/certs/client"]
   }
 
   runners_pre_build_script = <<EOT

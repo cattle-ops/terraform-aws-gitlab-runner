@@ -37,8 +37,8 @@ module "runner_main_region" {
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   runners_docker_options = {
-    privileged         = "false"
-    volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+    privileged = "false"
+    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
   }
 
   gitlab_runner_registration_config = {
@@ -107,8 +107,8 @@ module "runner_alternate_region" {
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   runners_docker_options = {
-    privileged         = "false"
-    volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+    privileged = "false"
+    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
   }
 
   gitlab_runner_registration_config = {
