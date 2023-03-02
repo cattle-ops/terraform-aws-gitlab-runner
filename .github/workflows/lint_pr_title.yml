@@ -8,6 +8,7 @@ on:
     branches-ignore:
       - 'release-please--branches--*'
 
+
 jobs:
   main:
     name: Validate PR title
