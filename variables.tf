@@ -260,7 +260,7 @@ variable "runners_docker_options" {
     Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
     details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
-    Default values if the whole block is not used:
+    Default values if the option is not given:
       disable_cache = "false"
       image         = "docker:18.03.1-ce"
       privileged    = "true"
@@ -674,10 +674,10 @@ variable "enable_manage_gitlab_token" {
 
 variable "overrides" {
   description = <<-EOT
-    This map provides the possibility to override some defaults. 
-    The following attributes are supported: 
-      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. 
-      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. 
+    This map provides the possibility to override some defaults.
+    The following attributes are supported:
+      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
+      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
       * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
       * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
   EOT
