@@ -4,7 +4,7 @@ privileged    = %{if privileged != null} ${privileged} %{else} true %{endif}
 pull_policy   = %{if pull_policy != null} "${pull_policy}" %{else} "always" %{endif}
 shm_size      = %{if shm_size != null} ${shm_size} %{else} 0 %{endif}
 tls_verify    = %{if tls_verify != null} ${tls_verify} %{else} false %{endif}
-volumes       = %{if volumes != null} [${volumes}] %{else} ["/cache"] %{endif}
+volumes       = %{if volumes != null} [${volumes}] %{else} ["/cache"${runners_additional_volumes}] %{endif}
 
 %{ if allowed_images != null } allowed_images = [${allowed_images}] %{endif}
 %{ if allowed_pull_policies != null } allowed_pull_policies = [${allowed_pull_policies}] %{endif}

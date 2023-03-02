@@ -17,12 +17,18 @@ listen_address = "${prometheus_listen_address}"
   request_concurrency = ${runners_request_concurrency}
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
+
   [runners.docker]
     ${runners_docker_options}
+
+  ${runners_docker_services}
+
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
+
   [runners.docker.services_tmpfs]
     ${runners_services_volumes_tmpfs}
+
   [runners.cache]
     Type = "s3"
     Shared = ${shared_cache}
@@ -32,6 +38,7 @@ listen_address = "${prometheus_listen_address}"
       BucketName = "${bucket_name}"
       BucketLocation = "${aws_region}"
       Insecure = false
+
   [runners.machine]
     IdleCount = ${runners_idle_count}
     IdleTime = ${runners_idle_time}
@@ -54,6 +61,8 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-monitoring=${runners_monitoring}",
       "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
       "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-volume-type=${runners_volume_type}",
+      "amazonec2-userdata=%{ if runners_userdata != "" }/etc/gitlab-runner/runners_userdata.sh%{ endif ~}",
       "amazonec2-ami=${runners_ami}"
       ${docker_machine_options}
     ]

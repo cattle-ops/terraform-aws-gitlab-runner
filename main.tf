@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 data "aws_subnet" "runners" {
   id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
@@ -41,6 +42,7 @@ locals {
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
       yum_update          = var.runner_yum_update ? local.file_yum_update : ""
+      extra_config        = var.runner_extra_config
   })
 
   file_yum_update = file("${path.module}/template/yum_update.tpl")
@@ -55,6 +57,7 @@ locals {
       docker_machine_version                       = var.docker_machine_version
       docker_machine_download_url                  = var.docker_machine_download_url
       runners_config                               = local.template_runner_config
+      runners_userdata                             = var.runners_userdata
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
       pre_install                                  = var.userdata_pre_install
@@ -85,17 +88,18 @@ locals {
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" ? "" : var.docker_machine_spot_price_bid
-      runners_ami                       = data.aws_ami.docker_machine.id
-      runners_security_group_name       = aws_security_group.docker_machine.name
+      runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
       runners_monitoring                = var.runners_monitoring
       runners_ebs_optimized             = var.runners_ebs_optimized
-      runners_instance_profile          = aws_iam_instance_profile.docker_machine.name
+      runners_instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
       runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runners_name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
+      runners_userdata                  = var.runners_userdata
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
       runners_concurrent                = var.runners_concurrent
@@ -111,6 +115,7 @@ locals {
       runners_max_builds                = local.runners_max_builds_string
       runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
+      runners_volume_type               = var.runners_volume_type
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
       runners_use_private_address_only  = var.runners_use_private_address
       runners_use_private_address       = !var.runners_use_private_address
@@ -125,6 +130,7 @@ locals {
       runners_docker_options            = local.runners_docker_options
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_docker_services           = local.runners_docker_services
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
       sentry_dsn                        = var.sentry_dsn
@@ -134,7 +140,9 @@ locals {
   )
 }
 
-data "aws_ami" "docker_machine" {
+data "aws_ami" "docker-machine" {
+  count = var.runners_executor == "docker+machine" ? 1 : 0
+
   most_recent = "true"
 
   dynamic "filter" {
@@ -184,6 +192,9 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   timeouts {
     delete = var.asg_delete_timeout
   }
+  lifecycle {
+    ignore_changes = [min_size, max_size, desired_capacity]
+  }
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
@@ -191,9 +202,9 @@ resource "aws_autoscaling_schedule" "scale_in" {
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_in-${aws_autoscaling_group.gitlab_runner_instance.name}"
   recurrence             = var.schedule_config["scale_in_recurrence"]
-  min_size               = var.schedule_config["scale_in_count"]
-  desired_capacity       = var.schedule_config["scale_in_count"]
-  max_size               = var.schedule_config["scale_in_count"]
+  min_size               = try(var.schedule_config["scale_in_min_size"], var.schedule_config["scale_in_count"])
+  desired_capacity       = try(var.schedule_config["scale_in_desired_capacity"], var.schedule_config["scale_in_count"])
+  max_size               = try(var.schedule_config["scale_in_max_size"], var.schedule_config["scale_in_count"])
 }
 
 resource "aws_autoscaling_schedule" "scale_out" {
@@ -201,9 +212,9 @@ resource "aws_autoscaling_schedule" "scale_out" {
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_out-${aws_autoscaling_group.gitlab_runner_instance.name}"
   recurrence             = var.schedule_config["scale_out_recurrence"]
-  min_size               = var.schedule_config["scale_out_count"]
-  desired_capacity       = var.schedule_config["scale_out_count"]
-  max_size               = var.schedule_config["scale_out_count"]
+  min_size               = try(var.schedule_config["scale_out_min_size"], var.schedule_config["scale_out_count"])
+  desired_capacity       = try(var.schedule_config["scale_out_desired_capacity"], var.schedule_config["scale_out_count"])
+  max_size               = try(var.schedule_config["scale_out_max_size"], var.schedule_config["scale_out_count"])
 }
 
 data "aws_ami" "runner" {
@@ -223,7 +234,7 @@ data "aws_ami" "runner" {
 resource "aws_launch_template" "gitlab_runner_instance" {
   name_prefix            = local.name_runner_agent_instance
   image_id               = data.aws_ami.runner.id
-  user_data              = base64encode(local.template_user_data)
+  user_data              = base64gzip(local.template_user_data)
   instance_type          = var.instance_type
   update_default_version = true
   ebs_optimized          = var.runner_instance_ebs_optimized
@@ -243,7 +254,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
   iam_instance_profile {
-    name = aws_iam_instance_profile.instance.name
+    name = local.aws_iam_role_instance_name
   }
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
@@ -292,14 +303,17 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   lifecycle {
     create_before_destroy = true
   }
+
+  # otherwise the agent running on the EC2 instance tries to create the log group
+  depends_on = [aws_cloudwatch_log_group.environment]
 }
 
 ################################################################################
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = var.cache_bucket["create"] ? module.cache[0].bucket : lookup(var.cache_bucket, "bucket", "")
-  bucket_policy = var.cache_bucket["create"] ? module.cache[0].policy_arn : lookup(var.cache_bucket, "policy", "")
+  bucket_name   = var.cache_bucket["create"] ? module.cache[0].bucket : var.cache_bucket["bucket"]
+  bucket_policy = var.cache_bucket["create"] ? module.cache[0].policy_arn : var.cache_bucket["policy"]
 }
 
 module "cache" {
@@ -314,6 +328,10 @@ module "cache" {
   cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
   cache_bucket_versioning              = var.cache_bucket_versioning
   cache_expiration_days                = var.cache_expiration_days
+  cache_logging_bucket                 = var.cache_logging_bucket
+  cache_logging_bucket_prefix          = var.cache_logging_bucket_prefix
+
+  kms_key_id = local.kms_key
 
   name_iam_objects = local.name_iam_objects
 }
@@ -322,15 +340,19 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  name = "${local.name_iam_objects}-instance"
-  role = aws_iam_role.instance.name
+  count = var.create_runner_iam_role ? 1 : 0
+
+  name = local.aws_iam_role_instance_name
+  role = local.aws_iam_role_instance_name
   tags = local.tags
 }
 
 resource "aws_iam_role" "instance" {
-  name                 = "${local.name_iam_objects}-instance"
+  count = var.create_runner_iam_role ? 1 : 0
+
+  name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = merge(local.tags, var.role_tags)
 }
 
@@ -340,19 +362,23 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
+  count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
   description = "Policy for docker machine."
   policy = templatefile("${path.module}/policies/instance-docker-machine-policy.json",
     {
-      docker_machine_role_arn = aws_iam_role.docker_machine.arn
+      docker_machine_role_arn = aws_iam_role.docker_machine[0].arn
   })
   tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
-  role       = aws_iam_role.instance.name
-  policy_arn = aws_iam_policy.instance_docker_machine_policy.arn
+  count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+
+  role       = aws_iam_role.instance[0].name
+  policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
 }
 
 ################################################################################
@@ -371,23 +397,24 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
   count = var.enable_runner_ssm_access ? 1 : 0
 
-  role       = aws_iam_role.instance.name
+  role       = local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
   count = var.enable_runner_ssm_access ? 1 : 0
 
-  role       = aws_iam_role.instance.name
-  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = local.aws_iam_role_instance_name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 ################################################################################
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
-  count      = length(var.runner_iam_policy_arns)
-  role       = aws_iam_role.instance.name
+  count = length(var.runner_iam_policy_arns)
+
+  role       = local.aws_iam_role_instance_name
   policy_arn = var.runner_iam_policy_arns[count.index]
 }
 
@@ -395,9 +422,12 @@ resource "aws_iam_role_policy_attachment" "user_defined_policies" {
 ### Policy for the docker machine instance to access cache
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
-  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+  /* If the S3 cache adapter is configured to use an IAM instance profile, the
+     adapter uses the profile attached to the GitLab Runner machine. So do not
+     use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
+  count = var.runners_executor == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
 
-  role       = aws_iam_role.instance.name
+  role       = local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
 }
 
@@ -405,33 +435,36 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
+  count                = var.runners_executor == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
-  permissions_boundary = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   tags                 = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  name = "${local.name_iam_objects}-docker-machine"
-  role = aws_iam_role.docker_machine.name
-  tags = local.tags
+  count = var.runners_executor == "docker+machine" ? 1 : 0
+  name  = "${local.name_iam_objects}-docker-machine"
+  role  = aws_iam_role.docker_machine[0].name
+  tags  = local.tags
 }
 
 ################################################################################
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
-  count      = length(var.docker_machine_iam_policy_arns)
-  role       = aws_iam_role.docker_machine.name
+  count = var.runners_executor == "docker+machine" ? length(var.docker_machine_iam_policy_arns) : 0
+
+  role       = aws_iam_role.docker_machine[0].name
   policy_arn = var.docker_machine_iam_policy_arns[count.index]
 }
 
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
-  count = var.enable_docker_machine_ssm_access ? 1 : 0
+  count = (var.runners_executor == "docker+machine" && var.enable_docker_machine_ssm_access) ? 1 : 0
 
-  role       = aws_iam_role.docker_machine.name
-  policy_arn = "${var.arn_format}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.docker_machine[0].name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 ################################################################################
@@ -443,14 +476,14 @@ resource "aws_iam_policy" "service_linked_role" {
   name        = "${local.name_iam_objects}-service_linked_role"
   path        = "/"
   description = "Policy for creation of service linked roles."
-  policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { arn_format = var.arn_format })
+  policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { partition = data.aws_partition.current.partition })
   tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
   count = var.allow_iam_service_linked_role_creation ? 1 : 0
 
-  role       = aws_iam_role.instance.name
+  role       = local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.service_linked_role[0].arn
 }
 
@@ -467,14 +500,14 @@ resource "aws_iam_policy" "ssm" {
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
-  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { arn_format = var.arn_format })
+  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { partition = data.aws_partition.current.partition })
   tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
   count = var.enable_manage_gitlab_token ? 1 : 0
 
-  role       = aws_iam_role.instance.name
+  role       = local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.ssm[0].arn
 }
 
@@ -494,28 +527,24 @@ resource "aws_iam_policy" "eip" {
 resource "aws_iam_role_policy_attachment" "eip" {
   count = var.enable_eip ? 1 : 0
 
-  role       = aws_iam_role.instance.name
+  role       = local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.eip[0].arn
 }
 
 ################################################################################
-### Lambda function for ASG instance termination lifecycle hook
+### Lambda function triggered as soon as an agent is terminated.
 ################################################################################
-module "terminate_instances_lifecycle_function" {
-  source = "./modules/terminate-instances"
-
-  count = var.asg_terminate_lifecycle_hook_create ? 1 : 0
+module "terminate_agent_hook" {
+  source = "./modules/terminate-agent-hook"
 
   name                                 = var.asg_terminate_lifecycle_hook_name == null ? "terminate-instances" : var.asg_terminate_lifecycle_hook_name
   environment                          = var.environment
   asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
-  lambda_memory_size                   = var.asg_terminate_lifecycle_lambda_memory_size
-  lambda_runtime                       = var.asg_terminate_lifecycle_lambda_runtime
-  lifecycle_heartbeat_timeout          = var.asg_terminate_lifecycle_hook_heartbeat_timeout
   name_iam_objects                     = local.name_iam_objects
-  role_permissions_boundary            = var.permissions_boundary == "" ? null : "${var.arn_format}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  lambda_timeout                       = var.asg_terminate_lifecycle_lambda_timeout
+  role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
+  kms_key_id                           = local.kms_key
+  arn_format                           = var.arn_format
   tags                                 = local.tags
 }

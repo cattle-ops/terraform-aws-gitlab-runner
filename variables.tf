@@ -5,8 +5,8 @@ variable "aws_region" {
 
 variable "arn_format" {
   type        = string
-  default     = "arn:aws"
-  description = "ARN format to be used. May be changed to support deployment in GovCloud/China regions."
+  default     = null
+  description = "Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions."
 }
 
 variable "auth_type_cache_sr" {
@@ -122,6 +122,12 @@ variable "docker_machine_version" {
 variable "runners_name" {
   description = "Name of the runner, will be used in the runner config.toml."
   type        = string
+}
+
+variable "runners_userdata" {
+  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
+  type        = string
+  default     = ""
 }
 
 variable "runners_executor" {
@@ -341,6 +347,12 @@ variable "runners_root_size" {
   default     = 16
 }
 
+variable "runners_volume_type" {
+  description = "Runner instance volume type"
+  type        = string
+  default     = "gp2"
+}
+
 variable "runners_iam_instance_profile_name" {
   description = "IAM instance profile name of the runners, will be used in the runner config.toml"
   type        = string
@@ -423,6 +435,18 @@ variable "runners_check_interval" {
   description = "defines the interval length, in seconds, between new jobs check."
   type        = number
   default     = 3
+}
+
+variable "cache_logging_bucket" {
+  type        = string
+  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
+  default     = null
+}
+
+variable "cache_logging_bucket_prefix" {
+  type        = string
+  description = "Prefix within the `cache_logging_bucket`."
+  default     = null
 }
 
 variable "cache_bucket_prefix" {
@@ -539,6 +563,12 @@ variable "runner_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
   default     = {}
+}
+
+variable "suppressed_tags" {
+  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
+  type        = list(string)
+  default     = []
 }
 
 variable "role_tags" {
@@ -664,6 +694,11 @@ variable "overrides" {
     condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
     error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
   }
+
+  validation {
+    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
+  }
 }
 
 variable "cache_bucket" {
@@ -680,7 +715,7 @@ variable "cache_bucket" {
 variable "enable_runner_user_data_trace_log" {
   description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_schedule" {
@@ -690,13 +725,18 @@ variable "enable_schedule" {
 }
 
 variable "schedule_config" {
-  description = "Map containing the configuration of the ASG scale-in and scale-up for the runner instance. Will only be used if enable_schedule is set to true. "
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable_schedule is set to true. "
   type        = map(any)
   default = {
-    scale_in_recurrence  = "0 18 * * 1-5"
-    scale_in_count       = 0
+    # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
-    scale_out_count      = 1
+    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+    # Configure optional scale_in scheduled action
+    scale_in_recurrence = "0 18 * * 1-5"
+    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
 }
 
@@ -736,8 +776,19 @@ variable "runners_services_volumes_tmpfs" {
   default = []
 }
 
+variable "runners_docker_services" {
+  description = "adds `runners.docker.services` blocks to config.toml.  All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
+  type = list(object({
+    name       = string
+    alias      = string
+    entrypoint = list(string)
+    command    = list(string)
+  }))
+  default = []
+}
+
 variable "kms_key_id" {
-  description = "KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key."
+  description = "KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key."
   type        = string
   default     = ""
 }
@@ -794,6 +845,18 @@ variable "log_group_name" {
   description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
   default     = null
   type        = string
+}
+
+variable "runner_iam_role_name" {
+  type        = string
+  description = "IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used"
+  default     = ""
+}
+
+variable "create_runner_iam_role" {
+  type        = bool
+  description = "Whether to create the runner IAM role of the gitlab runner agent EC2 instance."
+  default     = true
 }
 
 variable "runner_iam_policy_arns" {
@@ -865,31 +928,41 @@ variable "asg_terminate_lifecycle_hook_name" {
 }
 
 variable "asg_terminate_lifecycle_hook_create" {
-  description = "Boolean toggling the creation of the ASG instance terminate lifecycle hook."
+  description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
   type        = bool
   default     = true
+
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_create
+    error_message = "The hook must be created. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
-  description = "The amount of time, in seconds, for the instances to remain in wait state."
+  description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
   type        = number
-  default     = 90
+  default     = null
+
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_heartbeat_timeout == null
+    error_message = "The timeout value is managed by the module. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_lambda_memory_size" {
-  description = "The memory size in MB to allocate to the terminate-instances Lambda function."
+  description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
 }
 
 variable "asg_terminate_lifecycle_lambda_runtime" {
-  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
+  description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
   type        = string
   default     = "python3.8"
 }
 
 variable "asg_terminate_lifecycle_lambda_timeout" {
-  description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
+  description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
   default     = 30
   type        = number
 }
@@ -898,4 +971,10 @@ variable "runner_yum_update" {
   description = "Run a yum update as part of starting the runner"
   type        = bool
   default     = true
+}
+
+variable "runner_extra_config" {
+  description = "Extra commands to run as part of starting the runner"
+  type        = string
+  default     = ""
 }
