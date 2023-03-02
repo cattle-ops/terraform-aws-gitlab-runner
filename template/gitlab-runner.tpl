@@ -28,13 +28,8 @@ token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_ke
 valid_token=true
 if [[ "$token" != "null" ]]
 then
-<<<<<<< HEAD
   valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
-  [[ `echo $valid_token_response` != "200" ]] && valid_token=false
-=======
-  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
   [[ "$valid_token_response" != "200" ]] && valid_token=false
->>>>>>> upstream/main
 fi
 
 if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
