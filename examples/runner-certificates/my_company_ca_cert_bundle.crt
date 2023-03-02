@@ -1,0 +1,15 @@
+-----BEGIN CERTIFICATE-----
+Put your various CA / intermediary public certificates and other general public certs in this file.
+-----END CERTIFICATE-----
+
+-----BEGIN CERTIFICATE-----
+My certificate authority public cert 1
+-----END CERTIFICATE-----
+
+-----BEGIN CERTIFICATE-----
+My intermediary public cert 1
+-----END CERTIFICATE-----
+
+-----BEGIN CERTIFICATE-----
+Some other instance I need to get to public cert, eg my own docker registry server
+-----END CERTIFICATE-----

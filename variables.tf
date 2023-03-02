@@ -917,6 +917,18 @@ variable "runner_yum_update" {
   default     = true
 }
 
+variable "runners_gitlab_certificate" {
+  description = "Certificate of the GitLab instance to connect to. Example: `file(\"$${path.module}/my-gitlab.crt\")`"
+  type        = string
+  default     = ""
+}
+
+variable "runners_ca_certificate" {
+  description = "Trusted CA certificate bundle. Example: `file(\"$${path.module}/ca.crt\")`"
+  type        = string
+  default     = ""
+}
+
 variable "runner_extra_config" {
   description = "Extra commands to run as part of starting the runner"
   type        = string

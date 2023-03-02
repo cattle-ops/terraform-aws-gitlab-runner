@@ -32,6 +32,7 @@ jobs:
             "runner-multi-region",
             "runner-pre-registered",
             "runner-public",
+            "runner-certificates"
           ]
     defaults:
       run:
