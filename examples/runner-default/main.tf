@@ -76,9 +76,6 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  runners_privileged         = "true"
-  runners_additional_volumes = ["/certs/client"]
-
   runners_volumes_tmpfs = [
     {
       volume  = "/var/opt/cache",
@@ -103,6 +100,11 @@ module "runner" {
     }
   ]
 
+  runners_docker_options = {
+    privileged         = "true"
+    volumes = ["/cache", "/certs/client"]
+  }
+
   runners_pre_build_script = <<EOT
   '''
   echo 'multiline 1'
@@ -122,7 +124,7 @@ module "runner" {
   # docker-mirror-check:
   #    image: docker:20.10.16
   #    stage: build
-  #    variables: 
+  #    variables:
   #        DOCKER_TLS_CERTDIR: ''
   #    script:
   #        - |
