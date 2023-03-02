@@ -108,15 +108,15 @@ variable "docker_machine_spot_price_bid" {
 }
 
 variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
 
 variable "docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set."
+  description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
   type        = string
-  default     = "0.16.2-gitlab.15"
+  default     = "0.16.2-gitlab.19-cki.2"
 }
 
 variable "runners_name" {
@@ -124,10 +124,21 @@ variable "runners_name" {
   type        = string
 }
 
+variable "runners_userdata" {
+  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
+  type        = string
+  default     = ""
+}
+
 variable "runners_executor" {
   description = "The executor to use. Currently supports `docker+machine` or `docker`."
   type        = string
   default     = "docker+machine"
+
+  validation {
+    condition     = contains(["docker+machine", "docker"], var.runners_executor)
+    error_message = "The executor currently supports `docker+machine` or `docker`."
+  }
 }
 
 variable "runners_install_amazon_ecr_credential_helper" {
@@ -419,7 +430,7 @@ variable "cache_shared" {
 variable "gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
-  default     = "15.3.0"
+  default     = "15.8.2"
 }
 
 variable "enable_ping" {
@@ -494,6 +505,12 @@ variable "runner_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
   default     = {}
+}
+
+variable "suppressed_tags" {
+  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
+  type        = list(string)
+  default     = []
 }
 
 variable "role_tags" {
@@ -604,10 +621,10 @@ variable "enable_manage_gitlab_token" {
 
 variable "overrides" {
   description = <<-EOT
-    This map provides the possibility to override some defaults. 
-    The following attributes are supported: 
-      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. 
-      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. 
+    This map provides the possibility to override some defaults.
+    The following attributes are supported:
+      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
+      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
       * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
       * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
   EOT
@@ -623,6 +640,11 @@ variable "overrides" {
   validation {
     condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
     error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
+  }
+
+  validation {
+    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
+    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
   }
 }
 
@@ -656,11 +678,13 @@ variable "schedule_config" {
     # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
     scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    scale_out_time_zone  = "Etc/UTC"
     # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
 
     # Configure optional scale_in scheduled action
     scale_in_recurrence = "0 18 * * 1-5"
     scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    scale_in_time_zone  = "Etc/UTC"
     # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
 }
@@ -853,31 +877,41 @@ variable "asg_terminate_lifecycle_hook_name" {
 }
 
 variable "asg_terminate_lifecycle_hook_create" {
-  description = "Boolean toggling the creation of the ASG instance terminate lifecycle hook."
+  description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
   type        = bool
   default     = true
+
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_create
+    error_message = "The hook must be created. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
-  description = "The amount of time, in seconds, for the instances to remain in wait state."
+  description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
   type        = number
-  default     = 90
+  default     = null
+
+  validation {
+    condition     = var.asg_terminate_lifecycle_hook_heartbeat_timeout == null
+    error_message = "The timeout value is managed by the module. Please remove the variable declaration."
+  }
 }
 
 variable "asg_terminate_lifecycle_lambda_memory_size" {
-  description = "The memory size in MB to allocate to the terminate-instances Lambda function."
+  description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
 }
 
 variable "asg_terminate_lifecycle_lambda_runtime" {
-  description = "Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
+  description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
   type        = string
   default     = "python3.8"
 }
 
 variable "asg_terminate_lifecycle_lambda_timeout" {
-  description = "Amount of time the terminate-instances Lambda Function has to run in seconds."
+  description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
   default     = 30
   type        = number
 }
@@ -886,4 +920,10 @@ variable "runner_yum_update" {
   description = "Run a yum update as part of starting the runner"
   type        = bool
   default     = true
+}
+
+variable "runner_extra_config" {
+  description = "Extra commands to run as part of starting the runner"
+  type        = string
+  default     = ""
 }

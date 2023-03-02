@@ -18,9 +18,11 @@
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/). The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-> BREAKING CHANGE: The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+> 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances), the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine). For more details see [PR](https://github.com/npalm/terraform-aws-gitlab-runner/pull/697).
 
-> BREAKING CHANGE: By default AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
+
+> 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current GitHub links and Terraform registry links remain working. After release 6.0.0 we move the repository to [https://github.com/cattle-ops/terraform-aws-gitlab-runner](https://github.com/cattle-ops/terraform-aws-gitlab-runner).
+
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
 
@@ -181,19 +183,6 @@ For example:
   }
 ```
 
-#### Instance Termination
-
-The Auto Scaling Group may be configured with a
-[lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
-that executes a provided Lambda function when the runner is terminated to
-terminate additional instances that were spawned.
-
-The use of the termination lifecycle can be toggled using the
-`asg_termination_lifecycle_hook_create` variable.
-
-When using this feature, a `builds/` directory relative to the root module will
-persist that contains the packaged Lambda function.
-
 ### Access runner instance
 
 A few option are provided to access the runner instance:
@@ -220,6 +209,17 @@ In case you enable the access logging for the S3 cache bucket, you have to add t
     "Resource": "<s3-arn>/*"
 }
 ```
+
+In case you manage the S3 cache bucket yourself it might be necessary to apply the cache before applying the runner module. A typical error message looks like:
+
+```text
+Error: Invalid count argument
+on .terraform/modules/gitlab_runner/main.tf line 400, in resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance":
+  count = var.cache_bucket["create"] || length(lookup(var.cache_bucket, "policy", "")) > 0 ? 1 : 0
+The "count" value depends on resource attributes that cannot be determined until apply, so Terraform cannot predict how many instances will be created. To work around this, use the -target argument to first apply only the resources that the count depends on.
+```
+
+The workaround is to use a `terraform apply -target=module.cache` followed by a `terraform apply` to apply everything else. This is a one time effort needed at the very beginning.
 
 ## Usage
 
@@ -268,7 +268,20 @@ module "runner" {
 
 ### Removing the module
 
-Remove the module from your Terraform code and deregister the runner manually from your Gitlab instance.
+As the module creates a number of resources during runtime (key pairs and spot instance requests), it needs a special procedure to
+remove them.
+
+1. Use the AWS Console to set the desired capacity of all auto scaling groups to 0. To find the correct ones use the
+   `var.environment` as search criteria. Setting the desired capacity to 0 prevents AWS from creating new instances which will
+   in turn create new resources.
+2. Kill all agent ec2 instances on the via AWS Console. This triggers a Lambda function in the background which removes all
+   resources created during runtime of the EC2 instances.
+3. Wait 3 minutes so the Lambda function has enough time to delete the key pairs and spot instance requests.
+4. Run a `terraform destroy` or `terraform apply` (depends on your setup) to remove the module.
+
+If you don't follow the above procedure key pairs and spot instance requests might survive the removal and might cause additional
+costs. But I have never seen that. You should also be fine by executing step 4 only.
+
 ### Scenario: Multi-region deployment
 
 Name clashes due to multi-region deployments for global AWS ressources create by this module (IAM, S3) can be avoided by including a distinguishing region specific prefix via the _cache_bucket_prefix_ string respectively via _name_iam_objects_ in the _overrides_ map. A simple example for this would be to set _region-specific-prefix_ to the AWS region the module is deployed to.
@@ -355,20 +368,20 @@ Made with [contributors-img](https://contrib.rocks).
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_cache"></a> [cache](#module\_cache) | ./modules/cache | n/a |
-| <a name="module_terminate_instances_lifecycle_function"></a> [terminate\_instances\_lifecycle\_function](#module\_terminate\_instances\_lifecycle\_function) | ./modules/terminate-instances | n/a |
+| <a name="module_terminate_agent_hook"></a> [terminate\_agent\_hook](#module\_terminate\_agent\_hook) | ./modules/terminate-agent-hook | n/a |
 
 ## Resources
 
@@ -413,7 +426,7 @@ Made with [contributors-img](https://contrib.rocks).
 | [aws_security_group_rule.runner_ping_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_ssm_parameter.runner_registration_token](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.runner_sentry_dsn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
-| [aws_ami.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ami.docker-machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_ami.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_availability_zone.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zone) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -431,12 +444,12 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `null` | no |
 | <a name="input_asg_delete_timeout"></a> [asg\_delete\_timeout](#input\_asg\_delete\_timeout) | Timeout when trying to delete the Runner ASG. | `string` | `"10m"` | no |
 | <a name="input_asg_max_instance_lifetime"></a> [asg\_max\_instance\_lifetime](#input\_asg\_max\_instance\_lifetime) | The seconds before an instance is refreshed in the ASG. | `number` | `null` | no |
-| <a name="input_asg_terminate_lifecycle_hook_create"></a> [asg\_terminate\_lifecycle\_hook\_create](#input\_asg\_terminate\_lifecycle\_hook\_create) | Boolean toggling the creation of the ASG instance terminate lifecycle hook. | `bool` | `true` | no |
-| <a name="input_asg_terminate_lifecycle_hook_heartbeat_timeout"></a> [asg\_terminate\_lifecycle\_hook\_heartbeat\_timeout](#input\_asg\_terminate\_lifecycle\_hook\_heartbeat\_timeout) | The amount of time, in seconds, for the instances to remain in wait state. | `number` | `90` | no |
+| <a name="input_asg_terminate_lifecycle_hook_create"></a> [asg\_terminate\_lifecycle\_hook\_create](#input\_asg\_terminate\_lifecycle\_hook\_create) | (Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook. | `bool` | `true` | no |
+| <a name="input_asg_terminate_lifecycle_hook_heartbeat_timeout"></a> [asg\_terminate\_lifecycle\_hook\_heartbeat\_timeout](#input\_asg\_terminate\_lifecycle\_hook\_heartbeat\_timeout) | (Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state. | `number` | `null` | no |
 | <a name="input_asg_terminate_lifecycle_hook_name"></a> [asg\_terminate\_lifecycle\_hook\_name](#input\_asg\_terminate\_lifecycle\_hook\_name) | Specifies a custom name for the ASG terminate lifecycle hook and related resources. | `string` | `null` | no |
-| <a name="input_asg_terminate_lifecycle_lambda_memory_size"></a> [asg\_terminate\_lifecycle\_lambda\_memory\_size](#input\_asg\_terminate\_lifecycle\_lambda\_memory\_size) | The memory size in MB to allocate to the terminate-instances Lambda function. | `number` | `128` | no |
-| <a name="input_asg_terminate_lifecycle_lambda_runtime"></a> [asg\_terminate\_lifecycle\_lambda\_runtime](#input\_asg\_terminate\_lifecycle\_lambda\_runtime) | Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information. | `string` | `"python3.8"` | no |
-| <a name="input_asg_terminate_lifecycle_lambda_timeout"></a> [asg\_terminate\_lifecycle\_lambda\_timeout](#input\_asg\_terminate\_lifecycle\_lambda\_timeout) | Amount of time the terminate-instances Lambda Function has to run in seconds. | `number` | `30` | no |
+| <a name="input_asg_terminate_lifecycle_lambda_memory_size"></a> [asg\_terminate\_lifecycle\_lambda\_memory\_size](#input\_asg\_terminate\_lifecycle\_lambda\_memory\_size) | (Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function. | `number` | `128` | no |
+| <a name="input_asg_terminate_lifecycle_lambda_runtime"></a> [asg\_terminate\_lifecycle\_lambda\_runtime](#input\_asg\_terminate\_lifecycle\_lambda\_runtime) | (Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information. | `string` | `"python3.8"` | no |
+| <a name="input_asg_terminate_lifecycle_lambda_timeout"></a> [asg\_terminate\_lifecycle\_lambda\_timeout](#input\_asg\_terminate\_lifecycle\_lambda\_timeout) | (Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds. | `number` | `30` | no |
 | <a name="input_auth_type_cache_sr"></a> [auth\_type\_cache\_sr](#input\_auth\_type\_cache\_sr) | A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials' | `string` | `"iam"` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region. | `string` | n/a | yes |
 | <a name="input_cache_bucket"></a> [cache\_bucket](#input\_cache\_bucket) | Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details. | `map(any)` | <pre>{<br>  "bucket": "",<br>  "create": true,<br>  "policy": ""<br>}</pre> | no |
@@ -450,7 +463,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_cache_shared"></a> [cache\_shared](#input\_cache\_shared) | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
 | <a name="input_cloudwatch_logging_retention_in_days"></a> [cloudwatch\_logging\_retention\_in\_days](#input\_cloudwatch\_logging\_retention\_in\_days) | Retention for cloudwatch logs. Defaults to unlimited | `number` | `0` | no |
 | <a name="input_create_runner_iam_role"></a> [create\_runner\_iam\_role](#input\_create\_runner\_iam\_role) | Whether to create the runner IAM role of the gitlab runner agent EC2 instance. | `bool` | `true` | no |
-| <a name="input_docker_machine_download_url"></a> [docker\_machine\_download\_url](#input\_docker\_machine\_download\_url) | (Optional) By default the module will use `docker_machine_version` to download the GitLab mantained version of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install | `string` | `""` | no |
+| <a name="input_docker_machine_download_url"></a> [docker\_machine\_download\_url](#input\_docker\_machine\_download\_url) | (Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install | `string` | `""` | no |
 | <a name="input_docker_machine_egress_rules"></a> [docker\_machine\_egress\_rules](#input\_docker\_machine\_egress\_rules) | List of egress rules for the docker-machine instance(s). | <pre>list(object({<br>    cidr_blocks      = list(string)<br>    ipv6_cidr_blocks = list(string)<br>    prefix_list_ids  = list(string)<br>    from_port        = number<br>    protocol         = string<br>    security_groups  = list(string)<br>    self             = bool<br>    to_port          = number<br>    description      = string<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "description": "Allow all egress traffic for docker machine build runners",<br>    "from_port": 0,<br>    "ipv6_cidr_blocks": [<br>      "::/0"<br>    ],<br>    "prefix_list_ids": null,<br>    "protocol": "-1",<br>    "security_groups": null,<br>    "self": null,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | <a name="input_docker_machine_iam_policy_arns"></a> [docker\_machine\_iam\_policy\_arns](#input\_docker\_machine\_iam\_policy\_arns) | List of policy ARNs to be added to the instance profile of the docker machine runners. | `list(string)` | `[]` | no |
 | <a name="input_docker_machine_instance_metadata_options"></a> [docker\_machine\_instance\_metadata\_options](#input\_docker\_machine\_instance\_metadata\_options) | Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines. | <pre>object({<br>    http_tokens                 = string<br>    http_put_response_hop_limit = number<br>  })</pre> | <pre>{<br>  "http_put_response_hop_limit": 2,<br>  "http_tokens": "required"<br>}</pre> | no |
@@ -459,7 +472,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_docker_machine_role_json"></a> [docker\_machine\_role\_json](#input\_docker\_machine\_role\_json) | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | <a name="input_docker_machine_security_group_description"></a> [docker\_machine\_security\_group\_description](#input\_docker\_machine\_security\_group\_description) | A description for the docker-machine security group | `string` | `"A security group containing docker-machine instances"` | no |
 | <a name="input_docker_machine_spot_price_bid"></a> [docker\_machine\_spot\_price\_bid](#input\_docker\_machine\_spot\_price\_bid) | Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen. | `string` | `"on-demand-price"` | no |
-| <a name="input_docker_machine_version"></a> [docker\_machine\_version](#input\_docker\_machine\_version) | By default docker\_machine\_download\_url is used to set the docker machine version. Version of docker-machine. The version will be ingored once `docker_machine_download_url` is set. | `string` | `"0.16.2-gitlab.15"` | no |
+| <a name="input_docker_machine_version"></a> [docker\_machine\_version](#input\_docker\_machine\_version) | By default docker\_machine\_download\_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases | `string` | `"0.16.2-gitlab.19-cki.2"` | no |
 | <a name="input_enable_asg_recreation"></a> [enable\_asg\_recreation](#input\_enable\_asg\_recreation) | Enable automatic redeployment of the Runner ASG when the Launch Configs change. | `bool` | `true` | no |
 | <a name="input_enable_cloudwatch_logging"></a> [enable\_cloudwatch\_logging](#input\_enable\_cloudwatch\_logging) | Boolean used to enable or disable the CloudWatch logging. | `bool` | `true` | no |
 | <a name="input_enable_docker_machine_ssm_access"></a> [enable\_docker\_machine\_ssm\_access](#input\_enable\_docker\_machine\_ssm\_access) | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
@@ -476,7 +489,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_gitlab_runner_registration_config"></a> [gitlab\_runner\_registration\_config](#input\_gitlab\_runner\_registration\_config) | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
 | <a name="input_gitlab_runner_security_group_description"></a> [gitlab\_runner\_security\_group\_description](#input\_gitlab\_runner\_security\_group\_description) | A description for the gitlab-runner security group | `string` | `"A security group containing gitlab-runner agent instances"` | no |
 | <a name="input_gitlab_runner_security_group_ids"></a> [gitlab\_runner\_security\_group\_ids](#input\_gitlab\_runner\_security\_group\_ids) | A list of security group ids that are allowed to access the gitlab runner agent | `list(string)` | `[]` | no |
-| <a name="input_gitlab_runner_version"></a> [gitlab\_runner\_version](#input\_gitlab\_runner\_version) | Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases). | `string` | `"15.3.0"` | no |
+| <a name="input_gitlab_runner_version"></a> [gitlab\_runner\_version](#input\_gitlab\_runner\_version) | Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases). | `string` | `"15.8.2"` | no |
 | <a name="input_instance_role_json"></a> [instance\_role\_json](#input\_instance\_role\_json) | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
 | <a name="input_kms_alias_name"></a> [kms\_alias\_name](#input\_kms\_alias\_name) | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
@@ -484,13 +497,14 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key. | `string` | `""` | no |
 | <a name="input_log_group_name"></a> [log\_group\_name](#input\_log\_group\_name) | Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`. | `string` | `null` | no |
 | <a name="input_metrics_autoscaling"></a> [metrics\_autoscaling](#input\_metrics\_autoscaling) | A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances. | `list(string)` | `null` | no |
-| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults. <br>The following attributes are supported: <br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module. <br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration. <br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
+| <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults.<br>The following attributes are supported:<br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.<br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.<br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
 | <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | <a name="input_prometheus_listen_address"></a> [prometheus\_listen\_address](#input\_prometheus\_listen\_address) | Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on. | `string` | `""` | no |
 | <a name="input_role_tags"></a> [role\_tags](#input\_role\_tags) | Map of tags that will be added to the role created. Useful for tag based authorization. | `map(string)` | `{}` | no |
 | <a name="input_runner_agent_uses_private_address"></a> [runner\_agent\_uses\_private\_address](#input\_runner\_agent\_uses\_private\_address) | Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent. | `bool` | `true` | no |
 | <a name="input_runner_ami_filter"></a> [runner\_ami\_filter](#input\_runner\_ami\_filter) | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"<br>  ]<br>}</pre> | no |
 | <a name="input_runner_ami_owners"></a> [runner\_ami\_owners](#input\_runner\_ami\_owners) | The list of owners used to select the AMI of Gitlab runner docker-machine instances. | `list(string)` | <pre>[<br>  "099720109477"<br>]</pre> | no |
+| <a name="input_runner_extra_config"></a> [runner\_extra\_config](#input\_runner\_extra\_config) | Extra commands to run as part of starting the runner | `string` | `""` | no |
 | <a name="input_runner_iam_policy_arns"></a> [runner\_iam\_policy\_arns](#input\_runner\_iam\_policy\_arns) | List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance. | `list(string)` | `[]` | no |
 | <a name="input_runner_iam_role_name"></a> [runner\_iam\_role\_name](#input\_runner\_iam\_role\_name) | IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used | `string` | `""` | no |
 | <a name="input_runner_instance_ebs_optimized"></a> [runner\_instance\_ebs\_optimized](#input\_runner\_instance\_ebs\_optimized) | Enable the GitLab runner instance to be EBS-optimized. | `bool` | `true` | no |
@@ -539,15 +553,17 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_shm_size"></a> [runners\_shm\_size](#input\_runners\_shm\_size) | shm\_size for the runners, will be used in the runner config.toml | `number` | `0` | no |
 | <a name="input_runners_token"></a> [runners\_token](#input\_runners\_token) | Token for the runner, will be used in the runner config.toml. | `string` | `"__REPLACED_BY_USER_DATA__"` | no |
 | <a name="input_runners_use_private_address"></a> [runners\_use\_private\_address](#input\_runners\_use\_private\_address) | Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent. | `bool` | `true` | no |
+| <a name="input_runners_userdata"></a> [runners\_userdata](#input\_runners\_userdata) | Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted. | `string` | `""` | no |
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
-| <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5"<br>}</pre> | no |
+| <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_in_time_zone": "Etc/UTC",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5",<br>  "scale_out_time_zone": "Etc/UTC"<br>}</pre> | no |
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |
 | <a name="input_secure_parameter_store_runner_token_key"></a> [secure\_parameter\_store\_runner\_token\_key](#input\_secure\_parameter\_store\_runner\_token\_key) | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | <a name="input_sentry_dsn"></a> [sentry\_dsn](#input\_sentry\_dsn) | Sentry DSN of the project for the runner to use (uses legacy DSN format) | `string` | `"__SENTRY_DSN_REPLACED_BY_USER_DATA__"` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet id used for the runner and executors. Must belong to the VPC specified above. | `string` | `""` | no |
 | <a name="input_subnet_id_runners"></a> [subnet\_id\_runners](#input\_subnet\_id\_runners) | Deprecated! Use subnet\_id instead. List of subnets used for hosting the gitlab-runners. | `string` | `""` | no |
 | <a name="input_subnet_ids_gitlab_runner"></a> [subnet\_ids\_gitlab\_runner](#input\_subnet\_ids\_gitlab\_runner) | Deprecated! Use subnet\_id instead. Subnet used for hosting the GitLab runner. | `list(string)` | `[]` | no |
+| <a name="input_suppressed_tags"></a> [suppressed\_tags](#input\_suppressed\_tags) | List of tag keys which are removed from tags, agent\_tags and runner\_tags and never added as default tag by the module. | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |
 | <a name="input_userdata_post_install"></a> [userdata\_post\_install](#input\_userdata\_post\_install) | User-data script snippet to insert after GitLab runner install | `string` | `""` | no |
 | <a name="input_userdata_pre_install"></a> [userdata\_pre\_install](#input\_userdata\_pre\_install) | User-data script snippet to insert before GitLab runner install | `string` | `""` | no |

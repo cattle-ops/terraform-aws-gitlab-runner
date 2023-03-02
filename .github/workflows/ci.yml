@@ -10,7 +10,7 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.1.9]
+        terraform: [1.3.9]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform: [1.0.11, latest]
+        terraform: [1.0.11, 1.3.9, latest]
         example:
           [
             "runner-default",
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: terraform init -get -backend=false -input=false
-      - if: contains(matrix.terraform, '1.0.')
+      - if: contains(matrix.terraform, '1.3.')
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 

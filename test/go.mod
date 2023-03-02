@@ -3,14 +3,11 @@ module github.com/npalm/terraform-aws-gitlab-runner/test
 go 1.12
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang/protobuf v1.3.2 // indirect
-	github.com/gruntwork-io/terratest v0.18.3
-	github.com/joho/godotenv v1.3.0
-	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/stretchr/testify v1.5.1
-	github.com/xanzy/go-gitlab v0.19.0
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45 // indirect
-	google.golang.org/appengine v1.6.1 // indirect
+	cloud.google.com/go v0.102.0 // indirect
+	github.com/gruntwork-io/terratest v0.41.11
+	github.com/joho/godotenv v1.5.1
+	github.com/stretchr/testify v1.8.2
+	github.com/xanzy/go-gitlab v0.80.2
+	google.golang.org/api v0.84.0 // indirect
+	google.golang.org/genproto v0.0.0-20220616135557-88e70c0c3a90 // indirect
 )

@@ -1,5 +1,53 @@
 # Changelog
 
+## [6.0.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.1...6.0.0) (2023-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* switch to docker+machine from CKI project ([#697](https://github.com/npalm/terraform-aws-gitlab-runner/issues/697))
+
+### Features
+
+* add support for timezone in AWS autoscaling config ([#706](https://github.com/npalm/terraform-aws-gitlab-runner/issues/706)) ([cf91ffb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/cf91ffbf6c2c1d6af5d43912663e6845e49d8112))
+
+
+### Bug Fixes
+
+* error IAM role attachement when applying the module the first ti… ([#659](https://github.com/npalm/terraform-aws-gitlab-runner/issues/659)) ([e5eeb10](https://github.com/npalm/terraform-aws-gitlab-runner/commit/e5eeb1016e0bab2d38329f5bd7c285187b5d67ea))
+* install gitlab-runner after docker+machine driver ([#704](https://github.com/npalm/terraform-aws-gitlab-runner/issues/704)) ([d5b17d0](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d5b17d060d2bc5c3187063813f081a75d6fa4e32)), closes [#703](https://github.com/npalm/terraform-aws-gitlab-runner/issues/703)
+* set correct lifecycle prefix for shared cache ([#707](https://github.com/npalm/terraform-aws-gitlab-runner/issues/707)) ([d966c72](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d966c72d7bdf5907baeea49f1912d1e236ab3366))
+* switch to docker+machine from CKI project ([#697](https://github.com/npalm/terraform-aws-gitlab-runner/issues/697)) ([8c0e6b3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/8c0e6b3b62fa72abe0f48862c055b448213bcab5))
+
+## [5.9.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.0...5.9.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* bump docker machine version due to bug ([#681](https://github.com/npalm/terraform-aws-gitlab-runner/issues/681)) ([08baab5](https://github.com/npalm/terraform-aws-gitlab-runner/commit/08baab5a8774ec85887995b49f73583e234ebb50))
+
+## [5.9.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.1...5.9.0) (2023-01-12)
+
+
+### Features
+
+* add `amazonec2 userdata` for docker machines ([#608](https://github.com/npalm/terraform-aws-gitlab-runner/issues/608)) ([be789ff](https://github.com/npalm/terraform-aws-gitlab-runner/commit/be789ff6475d5c1a9ae2309c6fee678e1d20914a))
+* suppress default tags from module ([#651](https://github.com/npalm/terraform-aws-gitlab-runner/issues/651)) ([0021915](https://github.com/npalm/terraform-aws-gitlab-runner/commit/002191506e1d34688856056856aeb853a5ec997c))
+
+## [5.8.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.0...5.8.1) (2023-01-10)
+
+
+### Bug Fixes
+
+* create the log group before creating the runner agent ([#633](https://github.com/npalm/terraform-aws-gitlab-runner/issues/633)) ([c58aaaa](https://github.com/npalm/terraform-aws-gitlab-runner/commit/c58aaaa52f6387536794da8626f9033517a71e88))
+
+## [5.8.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.7.0...5.8.0) (2023-01-05)
+
+
+### Features
+
+* add validation rule for docker machine name ([#627](https://github.com/npalm/terraform-aws-gitlab-runner/issues/627)) ([77a22eb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/77a22eb0ab2f845356a6245662021e2a897598e5))
+
 ## [5.7.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.6.1...5.7.0) (2023-01-01)
 
 

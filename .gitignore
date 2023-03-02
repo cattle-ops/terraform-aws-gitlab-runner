@@ -32,3 +32,6 @@ builds/
 # exceptions for semantic release
 !.release/package*
 !.release/*.lock
+
+# Python
+venv/

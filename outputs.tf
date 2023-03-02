@@ -5,12 +5,12 @@ output "runner_as_group_name" {
 
 output "runner_cache_bucket_arn" {
   description = "ARN of the S3 for the build cache."
-  value       = element(concat(module.cache.*.arn, [""]), 0)
+  value       = length(module.cache) > 0 ? module.cache[0].arn : null
 }
 
 output "runner_cache_bucket_name" {
   description = "Name of the S3 for the build cache."
-  value       = element(concat(module.cache.*.bucket, [""]), 0)
+  value       = length(module.cache) > 0 ? module.cache[0].bucket : null
 }
 
 output "runner_agent_role_arn" {
@@ -25,12 +25,12 @@ output "runner_agent_role_name" {
 
 output "runner_role_arn" {
   description = "ARN of the role used for the docker machine runners."
-  value       = aws_iam_role.docker_machine.arn
+  value       = length(aws_iam_role.docker_machine) > 0 ? aws_iam_role.docker_machine[0].arn : null
 }
 
 output "runner_role_name" {
   description = "Name of the role used for the docker machine runners."
-  value       = aws_iam_role.docker_machine.name
+  value       = length(aws_iam_role.docker_machine) > 0 ? aws_iam_role.docker_machine[0].name : null
 }
 
 output "runner_agent_sg_id" {
@@ -40,12 +40,12 @@ output "runner_agent_sg_id" {
 
 output "runner_sg_id" {
   description = "ID of the security group attached to the docker machine runners."
-  value       = aws_security_group.docker_machine.id
+  value       = length(aws_security_group.docker_machine) > 0 ? aws_security_group.docker_machine[0].id : null
 }
 
 output "runner_eip" {
   description = "EIP of the Gitlab Runner"
-  value       = element(concat(aws_eip.gitlab_runner.*.public_ip, [""]), 0)
+  value       = length(aws_eip.gitlab_runner) > 0 ? aws_eip.gitlab_runner[0].public_ip : null
 }
 
 output "runner_launch_template_name" {
