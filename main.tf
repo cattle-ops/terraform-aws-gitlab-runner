@@ -508,8 +508,6 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-
   role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.ssm.arn
 }
