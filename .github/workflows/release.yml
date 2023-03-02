@@ -12,8 +12,8 @@ jobs:
         uses: npalm/action-app-token@dd4bb16d91ced5659bc618705c96b822c5a42136 # ratchet:npalm/action-app-token@v1.1.0
         id: token
         with:
-          appId: ${{ secrets.APP_ID }}
-          appPrivateKeyBase64: ${{ secrets.APP_PRIVATE_KEY_BASE64 }}
+          appId: ${{ secrets.RELEASER_APP_ID }}
+          appPrivateKeyBase64: ${{ secrets.RELEASER_APP_PRIVATE_KEY_BASE64 }}
           appInstallationType: repo
           appInstallationValue: ${{ github.repository }}
       # bootstrap-sha and release-as needs to be removed after first release
