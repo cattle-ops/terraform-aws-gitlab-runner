@@ -13,7 +13,7 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read
+      pull-requests: write
       contents: read
       statuses: write
     steps:
