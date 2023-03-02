@@ -17,6 +17,12 @@ instances with no running parent runner.
 See [issue #214](https://github.com/npalm/terraform-aws-gitlab-runner/issues/214) for
 discussion on the scenario this module addresses.
 
+Furthermore, all spot requests which are still open are cancelled. Otherwise they might be fulfilled later but
+without the creating instance running, these spot request are never terminated and costs incur. The problem here
+is, that no tags are added to the spot request by the docker+machine driver and we can only guess which ones belong
+to our module. The rule is, that parts of the Executor's name become part of the related SSH key which is in turn part
+of the spot request.
+
 ## Usage
 
 ### Default Behavior - Package With the Module

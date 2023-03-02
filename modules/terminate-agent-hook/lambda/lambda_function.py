@@ -15,6 +15,7 @@ import json
 import os
 
 
+
 def ec2_list(client, **args):
     print(json.dumps({
         "Level": "info",
@@ -90,6 +91,63 @@ def ec2_list(client, **args):
     return _terminate_list
 
 
+def cancel_active_spot_requests(ec2_client, executor_name_part):
+    print(json.dumps({
+        "Level": "info",
+        "Message": f"Removing open spot requests for environment {executor_name_part}"
+    }))
+
+    spot_requests_to_cancel = []
+
+    next_token = ''
+    has_more_spot_requests = True
+
+    while has_more_spot_requests:
+        response = ec2_client.describe_spot_instance_requests(Filters=[
+            {
+                "Name": "state",
+                "Values": ['active', 'open']
+            },
+            {
+                "Name": "launch.key-name",
+                "Values": ["runner-*"]
+            }
+        ], MaxResults=1000, NextToken=next_token)
+
+        for spot_request in response["SpotInstanceRequests"]:
+            if executor_name_part in spot_request["LaunchSpecification"]["KeyName"]:
+                spot_requests_to_cancel.append(spot_request["SpotInstanceRequestId"])
+
+                print(json.dumps({
+                    "Level": "info",
+                    "Message": f"Identified spot request {spot_request['SpotInstanceRequestId']}"
+                }))
+
+        if 'NextToken' in response and response['NextToken']:
+            next_token = response['NextToken']
+        else:
+            has_more_spot_requests = False
+
+    if spot_requests_to_cancel:
+        try:
+            ec2_client.cancel_spot_instance_requests(SpotInstanceRequestIds=spot_requests_to_cancel)
+
+            print(json.dumps({
+                "Level": "info",
+                "Message": "Spot requests deleted"
+            }))
+        except Exception as e:
+            print(json.dumps({
+                "Level": "exception",
+                "Message": "Bulk cancelling spot requests failed",
+                "Exception": str(e)
+            }))
+    else:
+        print(json.dumps({
+            "Level": "info",
+            "Message": "No spot requests to cancel"
+        }))
+
 def remove_unused_ssh_key_pairs(client, executor_name_part):
     print(json.dumps({
         "Level": "info",
@@ -147,12 +205,18 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
 def handler(event, context):
     response = []
     event_detail = event['detail']
-    client = boto3.client("ec2", region_name=event['region'])
+
     if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
         exit()
 
+    client = boto3.client("ec2", region_name=event['region'])
+
+    # make sure that no new instances are created
+    cancel_active_spot_requests(ec2_client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
+
     # find the executors connected to this agent and terminate them as well
     _terminate_list = ec2_list(client=client, parent=event_detail['EC2InstanceId'])
+
     if len(_terminate_list) > 0:
         print(json.dumps({
             "Level": "info",
@@ -160,6 +224,12 @@ def handler(event, context):
         }))
         try:
             client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
+
+            print(json.dumps({
+                "Level": "info",
+                "Message": "Instances terminated"
+            }))
+
         except Exception as e:
             print(json.dumps({
                 "Level": "exception",
