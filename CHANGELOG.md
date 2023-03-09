@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.1...6.1.2) (2023-03-09)
+
+
+### Bug Fixes
+
+* correctly format prefix ([#735](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/735)) ([76f2770](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/76f2770267f90fb91682d6f25b3801601ef8ff42))
+
 ## [6.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.0...6.1.1) (2023-03-02)
 
 
