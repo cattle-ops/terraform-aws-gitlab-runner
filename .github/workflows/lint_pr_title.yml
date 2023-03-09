@@ -1,5 +1,6 @@
 name: "Lint PR title"
-on:
+
+on: # yamllint disable-line rule:truthy
   pull_request_target:
     types:
       - opened
@@ -7,6 +8,8 @@ on:
       - synchronize
     branches-ignore:
       - 'release-please--branches--*'
+
+permissions: none
 
 jobs:
   main:
