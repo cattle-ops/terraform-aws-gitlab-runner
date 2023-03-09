@@ -239,9 +239,10 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
-  # checkov:skip=CKV_AWS_88:User can decided to add a public IP.
-  # checkov:skip=CKV_AWS_79:User can decided to enable Metadata service V2. V2 is the default.
-  name_prefix            = local.name_runner_agent_instance
+  # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
+  # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
+  name_prefix            = "${local.name_runner_agent_instance}-"
+
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)
   instance_type          = var.instance_type
@@ -524,8 +525,6 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-
   role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.ssm.arn
 }

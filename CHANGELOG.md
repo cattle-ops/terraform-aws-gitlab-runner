@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.0...6.1.1) (2023-03-02)
+
+
+### Bug Fixes
+
+* null condition for enable_manage_gitlab_token in release v6.1.0 ([#729](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/729)) ([90a05cc](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/90a05cce95716dae73e3100b01de8cf55ce4885c))
+
 ## [6.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.0.0...6.1.0) (2023-03-02)
 
 
