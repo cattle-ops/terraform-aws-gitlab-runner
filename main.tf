@@ -241,7 +241,7 @@ data "aws_ami" "runner" {
 resource "aws_launch_template" "gitlab_runner_instance" {
   # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
   # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
-  name_prefix            = "${local.name_runner_agent_instance}-"
+  name_prefix = "${local.name_runner_agent_instance}-"
 
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)

@@ -26,7 +26,8 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 > 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances),
 > the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine).
 > For more details see [PR](https://github.com/npalm/terraform-aws-gitlab-runner/pull/697).
-
+<!-- there is no blank line in between. These are two separate quotes! -->
+<!-- markdownlint-disable MD028 -->
 > 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current
 > GitHub links and Terraform registry links remain working. After release 6.0.0 we move the repository to
 > [https://github.com/cattle-ops/terraform-aws-gitlab-runner](https://github.com/cattle-ops/terraform-aws-gitlab-runner).
