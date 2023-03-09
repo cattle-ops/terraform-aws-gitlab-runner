@@ -51,7 +51,7 @@ variable "name_docker_machine_runners" {
 }
 
 variable "kms_key_id" {
-  description = "KMS key id to encrypt the resources, e.g. logs, lmabda environment variables, ..."
+  description = "KMS key id to encrypt the resources, e.g. logs, lambda environment variables, ..."
   type        = string
 }
 
