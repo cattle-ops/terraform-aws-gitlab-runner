@@ -1,3 +1,4 @@
+---
 name: Execute ChatOps command
 
 on: # yamllint disable-line rule:truthy
@@ -5,7 +6,7 @@ on: # yamllint disable-line rule:truthy
     types:
       - help-command
 
-permissions: none
+permissions: read-all
 
 jobs:
   help-command:

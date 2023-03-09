@@ -1,3 +1,4 @@
+---
 name: "Lint PR title"
 
 on: # yamllint disable-line rule:truthy
@@ -9,7 +10,7 @@ on: # yamllint disable-line rule:truthy
     branches-ignore:
       - 'release-please--branches--*'
 
-permissions: none
+permissions: read-all
 
 jobs:
   main:

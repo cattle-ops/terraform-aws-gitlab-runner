@@ -1,3 +1,4 @@
+---
 name: Update docs
 
 on: # yamllint disable-line rule:truthy
@@ -5,7 +6,7 @@ on: # yamllint disable-line rule:truthy
     branches:
       - release-please--branches--main
 
-permissions: none
+permissions: read-all
 
 jobs:
   docs:

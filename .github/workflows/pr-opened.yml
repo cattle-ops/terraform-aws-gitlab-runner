@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # ratchet:actions/github-script@v6
         with:
+          # no idea how to break this long line
+          # yamllint disable rule:line-length
           script: |
             // adds a comment to the PR (there is the issue API only which works work PRs too)
             github.rest.issues.createComment({
@@ -27,3 +29,4 @@ jobs:
               repo: context.repo.repo,
               body: 'Hey @${{ github.event.pull_request.user.login }}! 👋\n\nThank you for your contribution to the project. Please refer to the [contribution rules](${{ github.server_url }}/${{ github.repository }}/blob/main/CONTRIBUTING.md) for a quick overview of the process.\n\nMake sure that this PR clearly explains:\n\n- the problem being solved\n- the best way a reviewer and you can test your changes\n\nWith submitting this PR you confirm that you have the rights of the code added and agree that it will published under the [MIT license](${{ github.server_url }}/${{ github.repository }}/blob/main/LICENSE).\n\n_This message was generated automatically. You are welcome to [improve it](${{ github.server_url }}/${{ github.repository }}/blob/main/.github/workflows/pr-opened.yml)._'
             })
+          # yamllint enable rule:line-length

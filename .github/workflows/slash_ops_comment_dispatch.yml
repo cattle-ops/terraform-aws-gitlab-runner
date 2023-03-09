@@ -1,3 +1,4 @@
+---
 name: PR commented
 
 on: # yamllint disable-line rule:truthy
@@ -5,7 +6,7 @@ on: # yamllint disable-line rule:truthy
     types:
       - created
 
-permissions: none
+permissions: read-all
 
 jobs:
   slash-command-dispatch:
