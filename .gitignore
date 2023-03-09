@@ -35,3 +35,6 @@ builds/
 
 # VS Code
 .vscode/
+
+# Python
+venv/

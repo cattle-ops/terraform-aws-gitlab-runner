@@ -1,25 +1,19 @@
-variable "aws_main_region" {
-  description = "Main AWS region to deploy to."
+variable "aws_region" {
+  description = "AWS region."
   type        = string
   default     = "eu-west-1"
 }
 
-variable "aws_alternate_region" {
-  description = "Alternate AWS region to deploy to."
-  type        = string
-  default     = "eu-central-1"
-}
-
 variable "environment" {
   description = "A name that identifies the environment, will used as prefix and for tagging."
-  default     = "runner-public"
+  default     = "runners-docker"
   type        = string
 }
 
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = string
-  default     = "public-auto"
+  default     = "docker"
 }
 
 variable "gitlab_url" {
@@ -29,6 +23,7 @@ variable "gitlab_url" {
 }
 
 variable "registration_token" {
-  description = "Registration token for the runner."
+  description = "Gitlab runner registration token"
   type        = string
+  default     = "something"
 }

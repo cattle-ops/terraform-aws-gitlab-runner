@@ -41,6 +41,12 @@ resource "aws_lambda_function" "terminate_runner_instances" {
 
   tags = var.tags
 
+  environment {
+    variables = {
+      NAME_EXECUTOR_INSTANCE = var.name_docker_machine_runners
+    }
+  }
+
   dynamic "tracing_config" {
     for_each = var.enable_xray_tracing ? [1] : []
 
