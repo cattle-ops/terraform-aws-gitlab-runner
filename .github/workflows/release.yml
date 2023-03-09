@@ -1,12 +1,19 @@
+---
 name: Release
-on:
+
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - main
-      
+
+permissions: read-all
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Get app installation token
         uses: npalm/action-app-token@dd4bb16d91ced5659bc618705c96b822c5a42136 # ratchet:npalm/action-app-token@v1.1.0
