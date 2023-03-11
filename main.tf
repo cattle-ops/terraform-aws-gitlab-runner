@@ -35,7 +35,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  template_user_data = templatefile("${path.module}/template/user-data.tpl",
+  template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
