@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -euo pipefail
+set -eu
 
 #
 # Precondition: The module call has been extracted to a separate file given in "$1". The code is well-formatted.
