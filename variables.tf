@@ -615,6 +615,8 @@ variable "enable_manage_gitlab_token" {
   default     = null
 
   validation {
+    # false positive. There is no secret!
+    # kics-scan ignore-line
     condition     = anytrue([var.enable_manage_gitlab_token == null])
     error_message = "Deprecated, this variable is no longer in use and can be removed."
   }
