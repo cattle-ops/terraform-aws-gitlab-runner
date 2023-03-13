@@ -18,8 +18,7 @@ listen_address = "${prometheus_listen_address}"
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
 
-  [runners.docker]
-    ${runners_docker_options}
+  ${runners_docker_options}
 
   ${runners_docker_services}
 
