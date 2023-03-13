@@ -16,7 +16,7 @@ locals {
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = {
-      for key, value in var.runners_docker_options: key => value if value != null
+      for key, value in var.runners_docker_options : key => value if value != null
     }
   })
 
