@@ -61,13 +61,3 @@ output "runner_user_data" {
 output "testing_autoscaling" {
   value = local.template_runner_config
 }
-
-variable "test_runners_machine_config" {
-  type = map
-
-  validation {
-    condition = length(setintersection(["MachineDriver", "MachineName", "MachineOptions"], keys(var.test_runners_machine_config))) == 0
-    error_message = "\"MachineDriver\", \"MachineName\" and \"MachineOptions\" are reserved keywords. See if a module variable defines your property instead."
-
-  }
-}
