@@ -87,7 +87,7 @@ locals {
           ) if value != null
         }
       ]
-      
+
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
