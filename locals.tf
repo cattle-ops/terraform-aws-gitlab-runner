@@ -15,7 +15,9 @@ locals {
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
-    options = var.runners_docker_options
+    options = {
+      for key, value in var.runners_docker_options: key => value if value != null
+    }
   })
 
 
