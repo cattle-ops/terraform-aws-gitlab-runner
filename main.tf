@@ -118,7 +118,7 @@ locals {
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
-      runners_docker_options            = local.template_runners_docker_options
+      runners_docker_options            = local.runners_docker_options_toml
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
