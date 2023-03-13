@@ -43,9 +43,9 @@ listen_address = "${prometheus_listen_address}"
       BucketLocation = "${aws_region}"
       Insecure = false
   [runners.machine]
-  %{ for option, value in test_runners_machine_config ~}
-  ${option} = ${value}
-  %{ endfor }
+    IdleCount = ${runners_idle_count}
+    IdleTime = ${runners_idle_time}
+    ${runners_max_builds}
     MachineDriver = "amazonec2"
     MachineName = "${docker_machine_name}"
     MachineOptions = [
@@ -70,4 +70,10 @@ listen_address = "${prometheus_listen_address}"
       ${docker_machine_options}
     ]
 
-${runners_machine_autoscaling}
+%{~ for config in runners_machine_autoscaling ~}
+    [[runners.machine.autoscaling]]
+    %{~ for key, value in config ~}
+      ${key} = ${value}
+      %{~ endfor ~}
+%{~ endfor ~}
+
