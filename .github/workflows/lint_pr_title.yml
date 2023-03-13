@@ -63,7 +63,7 @@ jobs:
           # will suggest using that commit message instead of the PR title for the
           # merge commit, and it's easy to commit this by mistake. Enable this option
           # to also validate the commit message for one commit PRs.
-          validateSingleCommit: true
+          validateSingleCommit: false
           # Related to `validateSingleCommit` you can opt-in to validate that the PR
           # title matches a single commit to avoid confusion.
           validateSingleCommitMatchesPrTitle: false
