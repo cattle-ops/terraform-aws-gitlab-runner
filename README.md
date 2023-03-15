@@ -1,7 +1,6 @@
-<!-- markdownlint-disable MD041 -->
-[![Terraform registry](https://img.shields.io/github/v/release/npalm/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/npalm/gitlab-runner/aws/)
+[![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Actions](https://github.com/npalm/terraform-aws-gitlab-runner/workflows/Release/badge.svg)](https://github.com/npalm/terraform-aws-gitlab-runner/actions)
+[![Actions](https://github.com/cattle-ops/terraform-aws-gitlab-runner/workflows/CI/badge.svg)](https://github.com/cattle-ops/terraform-aws-gitlab-runner/actions)
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances <!-- omit in toc -->
 

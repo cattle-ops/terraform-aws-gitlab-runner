@@ -35,7 +35,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  template_user_data = templatefile("${path.module}/template/user-data.tpl",
+  template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
@@ -45,13 +45,13 @@ locals {
       extra_config        = var.runner_extra_config
   })
 
-  file_yum_update = file("${path.module}/template/yum_update.tpl")
+  file_yum_update = file("${path.module}/template/yum_update.tftpl")
 
-  template_eip = templatefile("${path.module}/template/eip.tpl", {
+  template_eip = templatefile("${path.module}/template/eip.tftpl", {
     eip = join(",", [for eip in aws_eip.gitlab_runner : eip.public_ip])
   })
 
-  template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
+  template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
       gitlab_runner_version                        = var.gitlab_runner_version
       docker_machine_version                       = var.docker_machine_version
@@ -79,7 +79,7 @@ locals {
       sentry_dsn                                   = var.sentry_dsn
   })
 
-  template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
+  template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url

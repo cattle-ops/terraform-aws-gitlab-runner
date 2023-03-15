@@ -6,7 +6,7 @@ resource "aws_iam_role_policy" "instance" {
 }
 
 locals {
-  logging_user_data = templatefile("${path.module}/template/logging.tpl",
+  logging_user_data = templatefile("${path.module}/template/logging.tftpl",
     {
       log_group_name = var.log_group_name != null ? var.log_group_name : var.environment
   })
