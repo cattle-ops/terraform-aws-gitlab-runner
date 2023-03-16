@@ -269,12 +269,12 @@ variable "runners_ebs_optimized" {
 variable "runners_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
-    Periods         = list(string)
-    IdleCount       = optional(number)
-    IdleScaleFactor = optional(number)
-    IdleCountMin    = optional(number)
-    IdleTime        = optional(number)
-    Timezone        = optional(string, "UTC")
+    periods           = list(string)
+    idle_count        = optional(number)
+    idle_scale_factor = optional(number)
+    idle_count_min    = optional(number)
+    idle_time         = optional(number)
+    timezone          = optional(string, "UTC")
   }))
   default = []
 }

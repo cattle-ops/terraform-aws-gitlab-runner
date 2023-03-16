@@ -79,14 +79,11 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
     {
-      runners_machine_autoscaling = [for entry in var.runners_machine_autoscaling_options :
-        { for option, value in entry : option => (
-          can(distinct(value)) ?                                                     # distinct can only be used on lists. In combination with 'can' we determine whether the current value is a list or other.
-          "[${replace(format("\"%s\"", join("\",\"", value)), "/\"{2,}/", "\"")}]" : # Wrap and convert to TOML array
-          can(tonumber(value)) ? value : format("\"%s\"", value)                     # Leftover value is either a number or string. If string, we wrap with qoutes.
-          ) if value != null
-        }
-      ]
+      runners_machine_autoscaling = [for config in var.runners_machine_autoscaling_options : {
+        for key, value in config :
+        # Convert key from snake_case to PascalCase which is the casing for this section.
+        join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
+      }]
 
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
