@@ -51,11 +51,11 @@ module "runner" {
   # Or similar OS-dependent commands. The above are an example for Ubuntu.
   runners_docker_options = {
     volumes = [
-    "/cache",
+      "/cache",
       "/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"
     ]
   }
-  
+
   ###############################################
   # Registration
   ###############################################
