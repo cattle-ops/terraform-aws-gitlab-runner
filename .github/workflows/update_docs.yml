@@ -1,8 +1,12 @@
+---
 name: Update docs
-on:
+
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - release-please--branches--main
+
+permissions: read-all
 
 jobs:
   docs:

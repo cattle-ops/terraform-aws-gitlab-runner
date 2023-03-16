@@ -36,5 +36,8 @@ builds/
 # tests
 *.tfplan.json
 
+# VS Code
+.vscode/
+
 # Python
 venv/
