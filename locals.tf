@@ -53,10 +53,13 @@ locals {
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
-    options = {
-      for key, value in var.runners_docker_options : key => value if value != null
+    options = merge({
+      for key, value in var.runners_docker_options : key => value if value != null && key != "volumes"
+      }, {
+      volumes = local.runners_volumes
+    })
     }
-  })
+  )
 
 
   # Ensure max builds is optional
@@ -71,9 +74,7 @@ locals {
   name_sg                    = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
   name_iam_objects           = lookup(var.overrides, "name_iam_objects", "") == "" ? local.tags["Name"] : var.overrides["name_iam_objects"]
 
-  runners_additional_volumes = <<-EOT
-  %{~if var.runners_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}
-  EOT
+  runners_volumes = concat(var.docker_machine_options.volumes, var.runners_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [])
 
   runners_machine_autoscaling = templatefile("${path.module}/template/runners_machine_autoscaling.tftpl", {
     runners_machine_autoscaling = var.runners_machine_autoscaling
