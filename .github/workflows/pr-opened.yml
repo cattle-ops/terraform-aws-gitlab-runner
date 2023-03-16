@@ -2,14 +2,12 @@
 name: PR opened
 
 on: # yamllint disable-line rule:truthy
-  pull_request:
-    # GITHUB_TOKEN is readonly and the action will fail for Dependabot
+  pull_request_target:
+    # makes no sense to show a welcome message in Dependabot PRs
     branches-ignore:
-      - 'dependabot/**'
+      - 'dependabot/*'
     types:
       - opened
-      - locked
-      - unlocked
 
 permissions: read-all
 
