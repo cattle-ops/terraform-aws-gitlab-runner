@@ -9,8 +9,6 @@ on: # yamllint disable-line rule:truthy
     types:
       - opened
 
-permissions: read-all
-
 jobs:
   add-welcome-message:
     runs-on: ubuntu-latest
