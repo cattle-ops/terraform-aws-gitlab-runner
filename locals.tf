@@ -71,6 +71,10 @@ locals {
   name_sg                    = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
   name_iam_objects           = lookup(var.overrides, "name_iam_objects", "") == "" ? local.tags["Name"] : var.overrides["name_iam_objects"]
 
+  runners_additional_volumes = <<-EOT
+  %{~if var.runners_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}
+  EOT
+
   runners_machine_autoscaling = templatefile("${path.module}/template/runners_machine_autoscaling.tftpl", {
     runners_machine_autoscaling = var.runners_machine_autoscaling
     }

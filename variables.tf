@@ -200,6 +200,12 @@ variable "runners_add_dind_volumes" {
   default     = false
 }
 
+variable "runners_additional_volumes" {
+  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
+  type        = list(any)
+  default     = []
+}
+
 variable "runners_docker_options" {
   description = <<EOT
     Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
