@@ -11,11 +11,12 @@ on: # yamllint disable-line rule:truthy
       - locked
       - unlocked
 
+permissions: read-all
+
 jobs:
   add-welcome-message:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
       pull-requests: write
     steps:
       - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # ratchet:actions/github-script@v6
