@@ -1,0 +1,4 @@
+-----BEGIN CERTIFICATE-----
+Put your Gitlab instance public certificate in this file.
+Intermediary and CA public certificates are not required.
+-----END CERTIFICATE-----

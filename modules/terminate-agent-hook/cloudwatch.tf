@@ -4,6 +4,7 @@
 # This deploys an event rule and target for triggering the provided Lambda
 # function from the ASG lifecycle hook.
 # ----------------------------------------------------------------------------
+
 resource "aws_cloudwatch_event_rule" "terminate_instances" {
   name        = "${var.environment}-${var.name}"
   description = "Trigger GitLab runner instance lifecycle hook on termination."
@@ -33,6 +34,7 @@ resource "aws_cloudwatch_log_group" "lambda" {
 
   # ok as encryption can be activated by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  # checkov:skip=CKV_AWS_158:Encryption can be activated by the user
   kms_key_id = var.kms_key_id
 
   tags = var.tags

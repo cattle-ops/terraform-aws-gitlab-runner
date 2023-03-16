@@ -1,0 +1,10 @@
+[allowlist]
+description = "Ignore these commits. Secrets were committed by accident and are no longer valid. They are part of the examples."
+commits = [
+    "0a356f066b32d34eb228a631ec34c5986aa3053f",
+    "5e06ce2ea127c5309aebda5e640947d4b83ed19c",
+    "bba513056e96d12da60c5498c9d7a0c6af89a8c6",
+    "d43b5933cc5c9a3c231a507521a5fe569d40d87e",
+    "f42a055f92d05224c26848049123e24b89161c16",
+    "f66d70a175f7f2a7787e66dae797e6a097b77939",
+]

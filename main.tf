@@ -35,7 +35,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 }
 
 locals {
-  template_user_data = templatefile("${path.module}/template/user-data.tpl",
+  template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
       eip                 = var.enable_eip ? local.template_eip : ""
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
@@ -45,13 +45,13 @@ locals {
       extra_config        = var.runner_extra_config
   })
 
-  file_yum_update = file("${path.module}/template/yum_update.tpl")
+  file_yum_update = file("${path.module}/template/yum_update.tftpl")
 
-  template_eip = templatefile("${path.module}/template/eip.tpl", {
+  template_eip = templatefile("${path.module}/template/eip.tftpl", {
     eip = join(",", [for eip in aws_eip.gitlab_runner : eip.public_ip])
   })
 
-  template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tpl",
+  template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
       gitlab_runner_version                        = var.gitlab_runner_version
       docker_machine_version                       = var.docker_machine_version
@@ -60,6 +60,8 @@ locals {
       runners_userdata                             = var.runners_userdata
       runners_executor                             = var.runners_executor
       runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
+      curl_cacert                                  = length(var.runners_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
+      pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.userdata_pre_install
       post_install                                 = var.userdata_post_install
       runners_gitlab_url                           = var.runners_gitlab_url
@@ -68,7 +70,7 @@ locals {
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
-      giltab_runner_description                    = var.gitlab_runner_registration_config["description"]
+      gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
       gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
@@ -77,11 +79,12 @@ locals {
       sentry_dsn                                   = var.sentry_dsn
   })
 
-  template_runner_config = templatefile("${path.module}/template/runner-config.tpl",
+  template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
+      tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = var.subnet_id
@@ -155,6 +158,9 @@ data "aws_ami" "docker-machine" {
   owners = var.runner_ami_owners
 }
 
+# ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
+# ignores: Auto Scaling Group With No Associated ELB --> that's simply not true, as the EC2 instance contacts GitLab. So no ELB needed here.
+# kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = [var.subnet_id]
@@ -233,7 +239,10 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
-  name_prefix            = local.name_runner_agent_instance
+  # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
+  # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
+  name_prefix = "${local.name_runner_agent_instance}-"
+
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)
   instance_type          = var.instance_type
@@ -260,6 +269,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   dynamic "block_device_mappings" {
     for_each = [var.runner_root_block_device]
     content {
+      # cSpell:ignore xvda
       device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
       ebs {
         delete_on_termination = lookup(block_device_mappings.value, "delete_on_termination", true)
@@ -346,6 +356,7 @@ resource "aws_iam_instance_profile" "instance" {
 
   name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
+
   tags = local.tags
 }
 
@@ -355,7 +366,8 @@ resource "aws_iam_role" "instance" {
   name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  tags                 = merge(local.tags, var.role_tags)
+
+  tags = merge(local.tags, var.role_tags)
 }
 
 ################################################################################
@@ -373,6 +385,7 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
     {
       docker_machine_role_arn = aws_iam_role.docker_machine[0].arn
   })
+
   tags = local.tags
 }
 
@@ -393,7 +406,8 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
   path        = "/"
   description = "Policy session manager."
   policy      = templatefile("${path.module}/policies/instance-session-manager-policy.json", {})
-  tags        = local.tags
+
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
@@ -441,7 +455,8 @@ resource "aws_iam_role" "docker_machine" {
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
-  tags                 = local.tags
+
+  tags = local.tags
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
@@ -479,7 +494,8 @@ resource "aws_iam_policy" "service_linked_role" {
   path        = "/"
   description = "Policy for creation of service linked roles."
   policy      = templatefile("${path.module}/policies/service-linked-role-create-policy.json", { partition = data.aws_partition.current.partition })
-  tags        = local.tags
+
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
@@ -490,27 +506,27 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 }
 
 resource "aws_eip" "gitlab_runner" {
+  # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
   count = var.enable_eip ? 1 : 0
+
+  tags = local.tags
 }
 
 ################################################################################
 ### AWS Systems Manager access to store runner token once registered
 ################################################################################
 resource "aws_iam_policy" "ssm" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
   policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { partition = data.aws_partition.current.partition })
-  tags        = local.tags
+
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  count = var.enable_manage_gitlab_token ? 1 : 0
-
   role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
-  policy_arn = aws_iam_policy.ssm[0].arn
+  policy_arn = aws_iam_policy.ssm.arn
 }
 
 ################################################################################
@@ -523,7 +539,8 @@ resource "aws_iam_policy" "eip" {
   path        = "/"
   description = "Policy for runner to assign EIP"
   policy      = templatefile("${path.module}/policies/instance-eip.json", {})
-  tags        = local.tags
+
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "eip" {
@@ -545,7 +562,9 @@ module "terminate_agent_hook" {
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
   cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
   name_iam_objects                     = local.name_iam_objects
+  name_docker_machine_runners          = local.runner_tags_merged["Name"]
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   kms_key_id                           = local.kms_key
+  
   tags                                 = local.tags
 }

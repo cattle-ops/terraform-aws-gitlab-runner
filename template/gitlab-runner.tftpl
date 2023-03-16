@@ -20,22 +20,24 @@ EOF
 
 sed -i.bak s/__PARENT_TAG__/$PARENT_TAG/g /etc/gitlab-runner/config.toml
 
+${pre_install_certificates}
+
 # fetch Runner token from SSM and validate it
 token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
 
 valid_token=true
 if [[ "$token" != "null" ]]
 then
-  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
+  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
   [[ "$valid_token_response" != "200" ]] && valid_token=false
 fi
 
 if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
 then
-  token=$(curl --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+  token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=${gitlab_runner_registration_token}" \
     --form "tag_list=${gitlab_runner_tag_list}" \
-    --form "description=${giltab_runner_description}" \
+    --form "description=${gitlab_runner_description}" \
     --form "locked=${gitlab_runner_locked_to_project}" \
     --form "run_untagged=${gitlab_runner_run_untagged}" \
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
@@ -126,7 +128,7 @@ start() {
 stop() {
     logger "Removing Gitlab Runner Token"
     aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" 2>&1 | logger &
-    curl -sS --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
+    curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
     retval=\$?
     rm -f \$lockfile
     return \$retval

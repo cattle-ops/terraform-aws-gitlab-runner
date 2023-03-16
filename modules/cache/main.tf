@@ -28,6 +28,8 @@ resource "random_string" "s3_suffix" {
 # ok as user can decide to enable the logging. See aws_s3_bucket_logging resource below.
 # tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "build_cache" {
+  # checkov:skip=CKV_AWS_21:Versioning can be decided by user
+  # checkov:skip=CKV_AWS_144:It's a cache only. Replication not needed.
   bucket = local.cache_bucket_name
 
   tags = local.tags
@@ -47,6 +49,7 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
   versioning_configuration {
     # ok as decided by the user
     # tfsec:ignore:aws-s3-enable-versioning
+    # kics-scan ignore-line
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }
 }
@@ -77,6 +80,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encry
     bucket_key_enabled = true
 
     apply_server_side_encryption_by_default {
+      # ignores a false positive: S3 Bucket SSE Disabled
+      # kics-scan ignore-line
       sse_algorithm     = "aws:kms"
       kms_master_key_id = var.kms_key_id
     }
@@ -106,7 +111,8 @@ resource "aws_iam_policy" "docker_machine_cache" {
   name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
-  tags        = local.tags
+
+  tags = local.tags
 
   policy = templatefile("${path.module}/policies/cache.json",
     {
