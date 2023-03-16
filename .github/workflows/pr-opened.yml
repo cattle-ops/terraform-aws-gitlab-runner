@@ -11,8 +11,6 @@ on: # yamllint disable-line rule:truthy
       - locked
       - unlocked
 
-permissions: write-all
-
 jobs:
   add-welcome-message:
     runs-on: ubuntu-latest
