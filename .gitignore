@@ -35,3 +35,6 @@ builds/
 
 # tests
 *.tfplan.json
+
+# Python
+venv/

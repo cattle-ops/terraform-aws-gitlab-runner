@@ -7,6 +7,7 @@ listen_address = "${prometheus_listen_address}"
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"
+  ${tls_ca_file}
   clone_url = "${gitlab_clone_url}"
   token = "${runners_token}"
   executor = "${runners_executor}"
@@ -57,7 +58,7 @@ listen_address = "${prometheus_listen_address}"
       "amazonec2-private-address-only=${runners_use_private_address_only}",
       "amazonec2-use-private-address=${runners_use_private_address}",
       "amazonec2-request-spot-instance=${runners_request_spot_instance}",
-      "amazonec2-spot-price=${runners_spot_price_bid}",
+      %{ if runners_spot_price_bid != ""}"amazonec2-spot-price=${runners_spot_price_bid}",%{ endif ~}
       "amazonec2-security-group=${runners_security_group_name}",
       "amazonec2-tags=${runners_tags},__PARENT_TAG__",
       "amazonec2-use-ebs-optimized-instance=${runners_ebs_optimized}",

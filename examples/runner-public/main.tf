@@ -4,7 +4,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.18.1"
+  version = "3.19.0"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -64,8 +64,8 @@ module "runner" {
 
   cache_bucket = {
     create = false
-    policy = "${module.cache.policy_arn}"
-    bucket = "${module.cache.bucket}"
+    policy = module.cache.policy_arn
+    bucket = module.cache.bucket
   }
 }
 
@@ -99,19 +99,7 @@ module "runner2" {
 
   cache_bucket = {
     create = false
-    policy = "${module.cache.policy_arn}"
-    bucket = "${module.cache.bucket}"
-  }
-}
-
-resource "null_resource" "cancel_spot_requests" {
-  # Cancel active and open spot requests, terminate instances
-  triggers = {
-    environment = var.environment
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "../../bin/cancel-spot-instances.sh ${self.triggers.environment}"
+    policy = module.cache.policy_arn
+    bucket = module.cache.bucket
   }
 }
