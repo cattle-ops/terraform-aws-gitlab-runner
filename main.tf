@@ -565,6 +565,6 @@ module "terminate_agent_hook" {
   name_docker_machine_runners          = local.runner_tags_merged["Name"]
   role_permissions_boundary            = var.permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.permissions_boundary}"
   kms_key_id                           = local.kms_key
-  
-  tags                                 = local.tags
+
+  tags = local.tags
 }

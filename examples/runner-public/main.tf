@@ -2,6 +2,8 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Every VPC resource should have an associated Flow Log: This is an example only. No flow logs are created.
+# kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
