@@ -15,12 +15,15 @@ locals {
 }
 
 resource "aws_cloudwatch_log_group" "environment" {
-  count             = var.enable_cloudwatch_logging ? 1 : 0
-  name              = var.log_group_name != null ? var.log_group_name : var.environment
+  count = var.enable_cloudwatch_logging ? 1 : 0
+  name  = var.log_group_name != null ? var.log_group_name : var.environment
+  # ignores a false positive: retention_in_days not set
+  # kics-scan ignore-line
   retention_in_days = var.cloudwatch_logging_retention_in_days
   tags              = local.tags
 
   # ignored as decided by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
+  # checkov:skip=CKV_AWS_158:Encryption can be enabled by user
   kms_key_id = local.kms_key
 }

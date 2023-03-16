@@ -526,6 +526,7 @@ variable "allow_iam_service_linked_role_creation" {
 }
 
 variable "docker_machine_options" {
+  # cspell:ignore amazonec
   description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
   type        = list(string)
   default     = []
@@ -614,6 +615,8 @@ variable "enable_manage_gitlab_token" {
   default     = null
 
   validation {
+    # false positive. There is no secret!
+    # kics-scan ignore-line
     condition     = anytrue([var.enable_manage_gitlab_token == null])
     error_message = "Deprecated, this variable is no longer in use and can be removed."
   }
@@ -660,7 +663,7 @@ variable "cache_bucket" {
 }
 
 variable "enable_runner_user_data_trace_log" {
-  description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
+  description = "Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
   default     = true
 }
@@ -898,18 +901,24 @@ variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
   }
 }
 
+# to be removed in future release
+# tflint-ignore: terraform_unused_declarations
 variable "asg_terminate_lifecycle_lambda_memory_size" {
   description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
   type        = number
   default     = 128
 }
 
+# to be removed in future release
+# tflint-ignore: terraform_unused_declarations
 variable "asg_terminate_lifecycle_lambda_runtime" {
   description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
   type        = string
   default     = "python3.8"
 }
 
+# to be removed in future release
+# tflint-ignore: terraform_unused_declarations
 variable "asg_terminate_lifecycle_lambda_timeout" {
   description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
   default     = 30

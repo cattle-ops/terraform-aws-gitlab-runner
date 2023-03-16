@@ -33,6 +33,8 @@ resource "aws_iam_role" "lambda" {
 
 # This IAM policy is used by the Lambda function.
 data "aws_iam_policy_document" "lambda" {
+  # checkov:skip=CKV_AWS_111:Write access is limited to the resources needed
+
   # Permit the function to get a list of instances
   statement {
     sid = "GitLabRunnerLifecycleGetInstances"
@@ -115,6 +117,7 @@ data "aws_iam_policy_document" "lambda" {
 }
 
 data "aws_iam_policy_document" "spot_request_housekeeping" {
+  # checkov:skip=CKV_AWS_111:I didn't found any condition to limit the access.
   statement {
     sid = "SpotRequestHousekeepingList"
 

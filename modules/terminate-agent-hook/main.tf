@@ -5,6 +5,7 @@
 # terminating orphaned runner instances.
 # ----------------------------------------------------------------------------
 locals {
+  # cSpell:ignore filesha
   source_sha256 = filesha256("${path.module}/lambda/lambda_function.py")
 }
 
@@ -16,7 +17,15 @@ data "archive_file" "terminate_runner_instances_lambda" {
 
 # tracing functions can be activated by the user
 # tfsec:ignore:aws-lambda-enable-tracing
+# kics-scan ignore-line
 resource "aws_lambda_function" "terminate_runner_instances" {
+  #ts:skip=AC_AWS_0485:Tracing functions can be activated by the user
+  #ts:skip=AC_AWS_0486 There is no need to run this lambda in our VPC
+  # checkov:skip=CKV_AWS_50:Tracing functions can be activated by the user
+  # checkov:skip=CKV_AWS_115:We do not assign a reserved concurrency as this function can't be called by users
+  # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
+  # checkov:skip=CKV_AWS_117:There is no need to run this lambda in our VPC
+  # checkov:skip=CKV_AWS_272:Code signing would be a nice enhancement, but I guess we can live without it here
   architectures    = ["x86_64"]
   description      = "Lifecycle hook for terminating GitLab runner agent instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
@@ -29,7 +38,9 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.8"
   timeout          = local.lambda_timeout
-  tags             = var.tags
+  kms_key_arn      = var.kms_key_id
+
+  tags = var.tags
 
   environment {
     variables = {
