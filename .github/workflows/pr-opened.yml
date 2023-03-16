@@ -11,7 +11,7 @@ on: # yamllint disable-line rule:truthy
       - locked
       - unlocked
 
-permissions: read-all
+permissions: write-all
 
 jobs:
   add-welcome-message:
