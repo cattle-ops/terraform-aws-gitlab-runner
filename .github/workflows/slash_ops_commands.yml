@@ -1,18 +1,24 @@
+---
 name: Execute ChatOps command
-on:
+
+on: # yamllint disable-line rule:truthy
   repository_dispatch:
     types:
       - help-command
+
+permissions: read-all
 
 jobs:
   help-command:
     name: "ChatOps: /help"
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Choose maintainer
         id: vars
         run: |
-          maintainer=$(cat CODEOWNERS | grep -oE "@[a-zA-Z0-9_-]+" | shuf -n 1)
+          maintainer=$(grep -oE "@[a-zA-Z0-9_-]+" CODEOWNERS | shuf -n 1)
           echo "maintainer=$maintainer" >> "$GITHUB_OUTPUT"
       - name: Create comment
         uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # ratchet:actions/github-script@v6

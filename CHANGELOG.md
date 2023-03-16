@@ -1,5 +1,33 @@
 # Changelog
 
+## [6.1.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.1...6.1.2) (2023-03-09)
+
+
+### Bug Fixes
+
+* correctly format prefix ([#735](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/735)) ([76f2770](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/76f2770267f90fb91682d6f25b3801601ef8ff42))
+
+## [6.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.0...6.1.1) (2023-03-02)
+
+
+### Bug Fixes
+
+* null condition for enable_manage_gitlab_token in release v6.1.0 ([#729](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/729)) ([90a05cc](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/90a05cce95716dae73e3100b01de8cf55ce4885c))
+
+## [6.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.0.0...6.1.0) (2023-03-02)
+
+
+### Features
+
+* cancel spot requests ([#653](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/653)) ([f1b4f4a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/f1b4f4a227e9a02103225433aeb4a7b5ac261e4d)), closes [#493](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/493)
+* remove unused SSH keys ([#652](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/652)) ([3151807](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/31518079674cc6195e18a5bfe7641a1e50087a30)), closes [#592](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/592)
+* support self-signed certificates ([#584](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/584)) ([6c1180e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/6c1180e8645bc3685727e25f2a2e64ab8f65c2df))
+
+
+### Bug Fixes
+
+* always add policy to maintain SSM parameters ([#510](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/510)) ([59e2d6e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/59e2d6e1a168bd5077978de7afaca50b1c49b9bf))
+
 ## [6.0.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.1...6.0.0) (2023-02-26)
 
 
@@ -181,7 +209,7 @@
 
 ### ⚠ BREAKING CHANGES
 
-* The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+* The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintenance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
 * By default, AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
 
 

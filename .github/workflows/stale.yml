@@ -1,11 +1,18 @@
+---
 name: 'Close stale issues and PRs'
-on:
+
+on: # yamllint disable-line rule:truthy
   schedule:
     - cron: '25 2 * * *'
+
+permissions: read-all
 
 jobs:
   stale:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - uses: actions/stale@6f05e4244c9a0b2ed3401882b05d701dd0a7289b # ratchet:actions/stale@v7
         with:

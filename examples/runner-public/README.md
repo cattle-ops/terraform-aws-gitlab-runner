@@ -46,7 +46,7 @@ No output.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.55.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.57.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | 2.3.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.1 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.4.3 |
@@ -56,7 +56,7 @@ No output.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.55.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.57.0 |
 
 ## Modules
 
@@ -71,7 +71,7 @@ No output.
 
 | Name | Type |
 |------|------|
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/4.55.0/docs/data-sources/availability_zones) | data source |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/4.57.0/docs/data-sources/availability_zones) | data source |
 
 ## Inputs
 
@@ -80,7 +80,7 @@ No output.
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region. | `string` | `"eu-west-1"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, will used as prefix and for tagging. | `string` | `"runner-public"` | no |
 | <a name="input_gitlab_url"></a> [gitlab\_url](#input\_gitlab\_url) | URL of the gitlab instance to connect to. | `string` | `"https://gitlab.com"` | no |
-| <a name="input_registration_token"></a> [registration\_token](#input\_registration\_token) | n/a | `any` | n/a | yes |
+| <a name="input_registration_token"></a> [registration\_token](#input\_registration\_token) | Registration token for the runner. | `string` | n/a | yes |
 | <a name="input_runner_name"></a> [runner\_name](#input\_runner\_name) | Name of the runner, will be used in the runner config.toml | `string` | `"public-auto"` | no |
 
 ## Outputs
