@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "arn_format" {
-  type        = string
-  default     = null
-  description = "Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions."
-}
-
 variable "auth_type_cache_sr" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
   type        = string
@@ -522,6 +516,7 @@ variable "allow_iam_service_linked_role_creation" {
 }
 
 variable "docker_machine_options" {
+  # cspell:ignore amazonec
   description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
   type        = list(string)
   default     = []
@@ -605,9 +600,16 @@ variable "secure_parameter_store_runner_sentry_dsn" {
 }
 
 variable "enable_manage_gitlab_token" {
-  description = "Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
+  description = "(Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
   type        = bool
-  default     = true
+  default     = null
+
+  validation {
+    # false positive. There is no secret!
+    # kics-scan ignore-line
+    condition     = anytrue([var.enable_manage_gitlab_token == null])
+    error_message = "Deprecated, this variable is no longer in use and can be removed."
+  }
 }
 
 variable "overrides" {
@@ -651,7 +653,7 @@ variable "cache_bucket" {
 }
 
 variable "enable_runner_user_data_trace_log" {
-  description = "Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
+  description = "Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
   default     = true
 }
@@ -849,68 +851,28 @@ variable "docker_machine_egress_rules" {
   }]
 }
 
-variable "subnet_id_runners" {
-  description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
-  type        = string
-  default     = ""
-}
-
-variable "subnet_ids_gitlab_runner" {
-  description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
-  type        = list(string)
-  default     = []
-}
-
 variable "asg_terminate_lifecycle_hook_name" {
   description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
   type        = string
   default     = null
 }
 
-variable "asg_terminate_lifecycle_hook_create" {
-  description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
-  type        = bool
-  default     = true
-
-  validation {
-    condition     = var.asg_terminate_lifecycle_hook_create
-    error_message = "The hook must be created. Please remove the variable declaration."
-  }
-}
-
-variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
-  description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
-  type        = number
-  default     = null
-
-  validation {
-    condition     = var.asg_terminate_lifecycle_hook_heartbeat_timeout == null
-    error_message = "The timeout value is managed by the module. Please remove the variable declaration."
-  }
-}
-
-variable "asg_terminate_lifecycle_lambda_memory_size" {
-  description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
-  type        = number
-  default     = 128
-}
-
-variable "asg_terminate_lifecycle_lambda_runtime" {
-  description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
-  type        = string
-  default     = "python3.8"
-}
-
-variable "asg_terminate_lifecycle_lambda_timeout" {
-  description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
-  default     = 30
-  type        = number
-}
-
 variable "runner_yum_update" {
   description = "Run a yum update as part of starting the runner"
   type        = bool
   default     = true
+}
+
+variable "runners_gitlab_certificate" {
+  description = "Certificate of the GitLab instance to connect to. Example: `file(\"$${path.module}/my-gitlab.crt\")`"
+  type        = string
+  default     = ""
+}
+
+variable "runners_ca_certificate" {
+  description = "Trusted CA certificate bundle. Example: `file(\"$${path.module}/ca.crt\")`"
+  type        = string
+  default     = ""
 }
 
 variable "runner_extra_config" {

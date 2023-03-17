@@ -1,16 +1,23 @@
+---
 name: CI
-on:
-  push:
-    branches:
-      - main
+
+on: # yamllint disable-line rule:truthy
   pull_request:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   verify_module:
     name: Verify module
     strategy:
       matrix:
-        terraform: [1.3.9]
+        terraform: [ 1.3.9 ]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
@@ -32,6 +39,7 @@ jobs:
             "runner-multi-region",
             "runner-pre-registered",
             "runner-public",
+            "runner-certificates"
           ]
     defaults:
       run:
@@ -46,13 +54,89 @@ jobs:
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
+  linter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    steps:
+      # Git Checkout
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to improve performances
+
+      # MegaLinter
+      - name: MegaLinter
+        id: ml
+        # You can override MegaLinter flavor used to have faster performances
+        # More info at https://megalinter.io/flavors/
+        uses: oxsecurity/megalinter@v6
+        env:
+          # All available variables are described in documentation
+          # https://megalinter.io/configuration/
+          VALIDATE_ALL_CODEBASE: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
+          SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.gitignore|.tflint.hcl|CHANGELOG.md)
+          # needed to avoid multiple error messages
+          TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
+          # format issues fail the build
+          TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
+          # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
+          TERRAFORM_KICS_ARGUMENTS: "--exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12"
+          # it's an auto-generated file
+          MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
+          PAT: ${{ secrets.GITHUB_TOKEN }}
+          # automatically commit fixes to the feature branch
+          APPLY_FIXES: all
+          APPLY_FIXES_EVENT: pull_request
+          APPLY_FIXES_MODE: commit
+
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: ${{ success() }} || ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
+
+  tflint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout source code
+
+      - uses: actions/cache@v2
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-${{ hashFiles('.tflint.hcl') }}
+
+      - uses: terraform-linters/setup-tflint@v2
+        name: Setup TFLint
+        with:
+          tflint_version: latest
+
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint
+
   tfsec:
     name: tfsec PR commenter
     runs-on: ubuntu-latest
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
+
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
         with:
