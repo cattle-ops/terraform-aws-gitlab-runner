@@ -948,3 +948,9 @@ variable "runner_extra_config" {
   type        = string
   default     = ""
 }
+
+variable "enable_user_data_diffing" {
+  description = "When enabled, outputs the configuration files to the root module"
+  type        = bool
+  default     = false
+}
