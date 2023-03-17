@@ -270,6 +270,17 @@ variable "runners_machine_autoscaling_options" {
     idle_time         = optional(number)
     timezone          = optional(string, "UTC")
   }))
+
+  validation {
+    condition = alltrue([
+      for options in var.runners_machine_autoscaling_options :
+      length(
+        setsubtract([for key, value in options : key if value != null], ["periods", "timezone"])
+      ) > 0
+    ])
+
+    error_message = "Please specify an attribute that affects Autoscaling."
+  }
   default = []
 }
 
