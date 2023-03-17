@@ -96,10 +96,10 @@ module "runner" {
   # working 9 to 5 :)
   runners_machine_autoscaling_options = [
     {
-      Periods   = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
-      IdleCount = 0
-      IdleTime  = 60
-      Timezone  = var.timezone
+      periods    = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
+      idle_count = 0
+      idle_time  = 60
+      timezone   = var.timezone
     }
   ]
 
