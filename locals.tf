@@ -93,12 +93,12 @@ locals {
 }
 
 resource "local_file" "config_toml" {
-  content         = local.template_runner_config
-  filename        = "${path.module}/debug/runner_config.toml"
+  content  = local.template_runner_config
+  filename = "${path.module}/debug/runner_config.toml"
 }
 
 resource "local_file" "user_data" {
-  count           = var.enable_user_data_diffing ? 1 : 0
-  content         = nonsensitive(local.template_user_data)
-  filename        = "${path.module}/debug/user_data.sh"
+  count    = var.enable_user_data_diffing ? 1 : 0
+  content  = nonsensitive(local.template_user_data)
+  filename = "${path.module}/debug/user_data.sh"
 }
