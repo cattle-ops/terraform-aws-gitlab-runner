@@ -2,6 +2,8 @@
 DISABLE_LINTERS:
   # Has some problems reading referenced policy files. I created a separate workflow for TfLint as it creates valuable output.
   - TERRAFORM_TFLINT
+  # Seems very, very slow compared to other linters.
+  - TERRAFORM_KICS
   # Nice linter to report CVEs and other cool stuff. But it reports problems with the Terraform code which can't be disabled by
   # configuration.
   - REPOSITORY_TRIVY
