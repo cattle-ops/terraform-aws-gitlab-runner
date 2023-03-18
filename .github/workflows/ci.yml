@@ -102,6 +102,15 @@ jobs:
             megalinter-reports
             mega-linter.log
 
+  kics:
+    runs-on: ubuntu-latest
+    container:
+      image: hashicorp/terraform:${{ matrix.terraform }}
+    steps:
+      - uses: actions/checkout@v3
+      - run kics --help
+      - run kics scan -p . -o .
+
   tflint:
     runs-on: ubuntu-latest
 
