@@ -8,6 +8,7 @@
     "awscli",
     "backports",
     "blockquotes",
+    "checkmarx",
     "codeowners",
     "concat",
     "devskim",
