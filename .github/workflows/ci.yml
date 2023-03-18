@@ -105,7 +105,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:1.6.12
+      image: checkmarx/kics:1.6.12-debian
     steps:
       - uses: actions/checkout@v3
       - run: kics --help
