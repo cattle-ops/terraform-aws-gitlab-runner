@@ -108,8 +108,9 @@ jobs:
       image: checkmarx/kics:1.6.12
     steps:
       - uses: actions/checkout@v3
-      - run kics --help
-      - run kics scan -p . -o .
+      - run: |
+        kics --help
+        kics scan -p . -o .
 
   tflint:
     runs-on: ubuntu-latest
