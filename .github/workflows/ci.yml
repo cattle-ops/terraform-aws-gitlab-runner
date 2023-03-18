@@ -105,7 +105,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: hashicorp/terraform:${{ matrix.terraform }}
+      image: checkmarx/kics:1.6.12
     steps:
       - uses: actions/checkout@v3
       - run kics --help
