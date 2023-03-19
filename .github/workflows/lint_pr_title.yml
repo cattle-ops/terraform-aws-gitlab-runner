@@ -10,6 +10,8 @@ on:
     branches-ignore:
       - 'release-please--branches--*'
 
+permissions: read-all
+
 jobs:
   main:
     name: Validate PR title
