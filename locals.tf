@@ -98,7 +98,7 @@ resource "local_file" "config_toml" {
 }
 
 resource "local_file" "user_data" {
-  count    = var.enable_user_data_diffing ? 1 : 0
+  count    = var.show_user_data_in_plan ? 1 : 0
   content  = nonsensitive(local.template_user_data)
   filename = "${path.module}/debug/user_data.sh"
 }
