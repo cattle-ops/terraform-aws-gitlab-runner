@@ -949,8 +949,8 @@ variable "runner_extra_config" {
   default     = ""
 }
 
-variable "enable_user_data_diffing" {
-  description = "When enabled, outputs the configuration files to the root module"
+variable "show_user_data_in_plan" {
+  description = "When enabled, shows the diff userdata.sh in Terraform plan"
   type        = bool
   default     = false
 }
