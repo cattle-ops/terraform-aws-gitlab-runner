@@ -3,9 +3,9 @@ name: PR opened
 
 on: # yamllint disable-line rule:truthy
   pull_request_target:
-    # GITHUB_TOKEN is readonly and the action will fail for Dependabot
+    # makes no sense to show a welcome message in Dependabot PRs
     branches-ignore:
-      - 'dependabot/**'
+      - 'dependabot/*'
     types:
       - opened
 
@@ -19,24 +19,13 @@ jobs:
     steps:
       - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # ratchet:actions/github-script@v6
         with:
+          # yamllint disable rule:line-length
           script: |
             // adds a comment to the PR (there is the issue API only which works work PRs too)
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Hey @${{ github.event.pull_request.user.login }}! \
-              \n\n \
-              👋Thank you for your contribution to the project. Please refer to the
-              [contribution rules](..//blob/main/CONTRIBUTION.md) for a quick overview of the process. \
-              \n\n \
-              Make sure that this PR clearly explains: \n \
-              - the problem being solved \n \
-              - the best way a reviewer and you can test your changes \n \
-              \n \
-              With submitting this PR you confirm that you hold the rights of the code added and agree \
-              that it will published under the [Apache 2.0 license](/blob/main/LICENSE). \
-              \n\n \
-              This message was generated automatically. You are welcome to \
-              [improve it](/blob/main/.github/workflows/new-pr-opened.yml)._'
+              body: 'Hey @${{ github.event.pull_request.user.login }}! 👋\n\nThank you for your contribution to the project. Please refer to the [contribution rules](../blob/main/CONTRIBUTING.md) for a quick overview of the process.\n\nMake sure that this PR clearly explains:\n\n- the problem being solved\n- the best way a reviewer and you can test your changes\n\nWith submitting this PR you confirm that you hold the rights of the code added and agree that it will published under this [LICENSE](../blob/main/LICENSE).\n\nThe following ChatOps commands are supported:\n- `/help`: notifies a maintainer to help you out\n\nSimply add a comment with the command in the first line. If you need to pass more information, separate it with a blank line from the command.\n\n_This message was generated automatically. You are welcome to [improve it](../blob/main/.github/workflows/welcome-message.yml)._'
             })
+          # yamllint enable rule:line-length
