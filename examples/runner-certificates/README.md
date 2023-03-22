@@ -28,7 +28,7 @@ Create a PEM-encoded `.crt` file containing the public certificate of your Gitla
 module {
   ...
   # Public cert of my companys gitlab instance
-  runners_gitlab_certificate = file("${path.module}/my_gitlab_instance_cert.crt")
+  agent_gitlab_certificate = file("${path.module}/my_gitlab_instance_cert.crt")
   ...
 }
 ```
@@ -38,7 +38,7 @@ Add your CA and intermediary certs to a second PEM-encoded `.crt` file.
 module {
   ...
   # Other public certs relating to my company.
-  runners_ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
+  agent_gitlab_ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
   ...
 }
 ```

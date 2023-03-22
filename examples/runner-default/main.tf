@@ -55,7 +55,7 @@ module "runner" {
 
   runners_name             = var.runner_name
   agent_gitlab_url       = var.gitlab_url
-  enable_runner_ssm_access = true
+  agent_enable_ssm_access = true
 
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
 

@@ -1,21 +1,21 @@
 locals {
   # Manage certificates
   pre_install_gitlab_certificate = (
-    length(var.runners_gitlab_certificate) > 0
+    length(var.agent_gitlab_certificate) > 0
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
-      ${var.runners_gitlab_certificate}
+      ${var.agent_gitlab_certificate}
       EOF
     EOT
     : ""
   )
   pre_install_ca_certificate = (
-    length(var.runners_ca_certificate) > 0
+    length(var.agent_gitlab_ca_certificate) > 0
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/ca.crt
-      ${var.runners_ca_certificate}
+      ${var.agent_gitlab_ca_certificate}
       EOF
     EOT
     : ""
@@ -28,7 +28,7 @@ locals {
   EOT
   pre_install_certificates = (
     # If either (or both) _certificate variables are specified
-    length(var.runners_gitlab_certificate) + length(var.runners_ca_certificate) > 0
+    length(var.agent_gitlab_certificate) + length(var.agent_gitlab_ca_certificate) > 0
     ? join("\n", [
       local.pre_install_gitlab_certificate,
       local.pre_install_ca_certificate,
@@ -39,7 +39,7 @@ locals {
 
   # Determine IAM role for runner instance
   aws_iam_role_instance_name = coalesce(
-    var.runner_iam_role_name,
+    var.agent_iam_role_profile_name,
     "${local.name_iam_objects}-instance"
   )
   aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"

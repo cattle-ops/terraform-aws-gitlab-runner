@@ -38,12 +38,12 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 locals {
   template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
-      eip                 = var.enable_eip ? local.template_eip : ""
+      eip                 = var.agent_enable_eip ? local.template_eip : ""
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.enable_runner_user_data_trace_log
-      yum_update          = var.runner_yum_update ? local.file_yum_update : ""
-      extra_config        = var.runner_extra_config
+      yum_update          = var.agent_yum_update ? local.file_yum_update : ""
+      extra_config        = var.agent_user_data_extra
   })
 
   file_yum_update = file("${path.module}/template/yum_update.tftpl")
@@ -61,7 +61,7 @@ locals {
       runners_userdata                             = var.executor_docker_machine_userdata
       runners_executor                             = var.executor_type
       runners_install_amazon_ecr_credential_helper = var.agent_install_amazon_ecr_credential_helper
-      curl_cacert                                  = length(var.runners_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
+      curl_cacert                                  = length(var.agent_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.userdata_pre_install
       post_install                                 = var.userdata_post_install
@@ -85,7 +85,7 @@ locals {
       aws_region                        = data.aws_region.current.name
       gitlab_url                        = var.agent_gitlab_url
       gitlab_clone_url                  = var.agent_gitlab_clone_url
-      tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
+      tls_ca_file                       = length(var.agent_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = var.subnet_id
@@ -250,7 +250,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   update_default_version = true
   ebs_optimized          = var.agent_ebs_optimized
   monitoring {
-    enabled = var.runner_instance_enable_monitoring
+    enabled = var.agent_enable_monitoring
   }
   dynamic "instance_market_options" {
     for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
@@ -353,7 +353,7 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  count = var.create_runner_iam_role ? 1 : 0
+  count = var.agent_create_runner_iam_role_profile ? 1 : 0
 
   name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
@@ -362,7 +362,7 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 resource "aws_iam_role" "instance" {
-  count = var.create_runner_iam_role ? 1 : 0
+  count = var.agent_create_runner_iam_role_profile ? 1 : 0
 
   name                 = local.aws_iam_role_instance_name
   assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
@@ -377,7 +377,7 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  count = var.executor_type == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+  count = var.executor_type == "docker+machine" && var.agent_create_runner_iam_role_profile ? 1 : 0
 
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
@@ -391,7 +391,7 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
-  count = var.executor_type == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+  count = var.executor_type == "docker+machine" && var.agent_create_runner_iam_role_profile ? 1 : 0
 
   role       = aws_iam_role.instance[0].name
   policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
@@ -401,7 +401,7 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 ### Policies for runner agent instance to allow connection via Session Manager
 ################################################################################
 resource "aws_iam_policy" "instance_session_manager_policy" {
-  count = var.enable_runner_ssm_access ? 1 : 0
+  count = var.agent_enable_ssm_access ? 1 : 0
 
   name        = "${local.name_iam_objects}-session-manager"
   path        = "/"
@@ -412,16 +412,16 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
-  count = var.enable_runner_ssm_access ? 1 : 0
+  count = var.agent_enable_ssm_access ? 1 : 0
 
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
-  count = var.enable_runner_ssm_access ? 1 : 0
+  count = var.agent_enable_ssm_access ? 1 : 0
 
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
@@ -429,10 +429,10 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
-  count = length(var.runner_iam_policy_arns)
+  count = length(var.agent_extra_iam_policy_arns)
 
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
-  policy_arn = var.runner_iam_policy_arns[count.index]
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  policy_arn = var.agent_extra_iam_policy_arns[count.index]
 }
 
 ################################################################################
@@ -444,7 +444,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
   count = var.executor_type == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
 
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
 }
 
@@ -502,13 +502,13 @@ resource "aws_iam_policy" "service_linked_role" {
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
   count = var.allow_iam_service_linked_role_creation ? 1 : 0
 
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.service_linked_role[0].arn
 }
 
 resource "aws_eip" "gitlab_runner" {
   # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
-  count = var.enable_eip ? 1 : 0
+  count = var.agent_enable_eip ? 1 : 0
 
   tags = local.tags
 }
@@ -526,7 +526,7 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.ssm.arn
 }
 
@@ -534,7 +534,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 ### AWS assign EIP
 ################################################################################
 resource "aws_iam_policy" "eip" {
-  count = var.enable_eip ? 1 : 0
+  count = var.agent_enable_eip ? 1 : 0
 
   name        = "${local.name_iam_objects}-eip"
   path        = "/"
@@ -545,9 +545,9 @@ resource "aws_iam_policy" "eip" {
 }
 
 resource "aws_iam_role_policy_attachment" "eip" {
-  count = var.enable_eip ? 1 : 0
+  count = var.agent_enable_eip ? 1 : 0
 
-  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.eip[0].arn
 }
 
@@ -557,7 +557,7 @@ resource "aws_iam_role_policy_attachment" "eip" {
 module "terminate_agent_hook" {
   source = "./modules/terminate-agent-hook"
 
-  name                                 = var.asg_terminate_lifecycle_hook_name == null ? "terminate-instances" : var.asg_terminate_lifecycle_hook_name
+  name                                 = var.agent_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.agent_terminate_ec2_lifecycle_hook_name
   environment                          = var.environment
   asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name

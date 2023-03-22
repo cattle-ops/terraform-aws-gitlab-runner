@@ -42,7 +42,7 @@ module "runner" {
   environment = var.environment
 
   runners_use_private_address = false
-  enable_eip                  = true
+  agent_enable_eip                  = true
 
   docker_machine_security_group_description = "Custom description for docker-machine"
   gitlab_runner_security_group_description  = "Custom description for gitlab-runner"

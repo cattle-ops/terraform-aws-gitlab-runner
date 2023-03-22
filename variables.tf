@@ -103,6 +103,36 @@ variable "agent_extra_security_group_ids" {
   default     = []
 }
 
+variable "agent_create_runner_iam_role_profile" {
+  description = "Whether to create the IAM role/profile for the Agent. If you provide your own role, make sure that it has the required permissions."
+  type        = bool
+  default     = true
+}
+
+variable "agent_iam_role_profile_name" {
+  description = "IAM role/profile name for the Agent. If unspecified then `$${var.iam_object_prefix}-instance` is used."
+  type        = string
+  default     = ""
+}
+
+variable "agent_extra_iam_policy_arns" {
+  description = "List of policy ARNs to be added to the instance profile of the Agent."
+  type        = list(string)
+  default     = []
+}
+
+variable "agent_enable_eip" {
+  description = "Assigns an EIP to the Agent."
+  type        = bool
+  default     = false
+}
+
+variable "agent_enable_ssm_access" {
+  description = "Allows to connect to the Agent via SSM."
+  type        = bool
+  default     = false
+}
+
 variable "agent_metadata_options" {
   description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
   type = object({
@@ -125,7 +155,30 @@ variable "agent_install_amazon_ecr_credential_helper" {
   default     = false
 }
 
-# agent
+variable "agent_yum_update" {
+  description = "Run a `yum` update as part of starting the Agent"
+  type        = bool
+  default     = true
+}
+
+variable "agent_user_data_extra" {
+  description = "Extra commands to run as part of starting the Agent"
+  type        = string
+  default     = ""
+}
+
+variable "agent_gitlab_ca_certificate" {
+  description = "Trusted CA certificate bundle (PEM format). Example: `file(\"$${path.module}/ca.crt\")`"
+  type        = string
+  default     = ""
+}
+
+variable "agent_gitlab_certificate" {
+  description = "Certificate of the GitLab instance to connect to (PEM format). Example: `file(\"$${path.module}/my-gitlab.crt\")`"
+  type        = string
+  default     = ""
+}
+
 variable "agent_gitlab_check_interval" {
   description = "Number of seconds between checking for available jobs."
   type        = number
@@ -159,6 +212,12 @@ variable "agent_prometheus_listen_address" {
   description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
   type        = string
   default     = ""
+}
+
+variable "agent_terminate_ec2_lifecycle_hook_name" {
+  description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
+  type        = string
+  default     = null
 }
 
 /*
@@ -829,12 +888,7 @@ variable "runner_root_block_device" {
   default     = {}
 }
 
-# agent
-variable "enable_runner_ssm_access" {
-  description = "Add IAM policies to the runner agent instance to connect via the Session Manager."
-  type        = bool
-  default     = false
-}
+
 
 # executor
 variable "enable_docker_machine_ssm_access" {
@@ -876,13 +930,6 @@ variable "runners_docker_services" {
 }
 
 # agent
-variable "enable_eip" {
-  description = "Enable the assignment of an EIP to the gitlab runner instance"
-  default     = false
-  type        = bool
-}
-
-# agent
 variable "enable_asg_recreation" {
   description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
   default     = true
@@ -910,26 +957,7 @@ variable "log_group_name" {
   type        = string
 }
 
-# agent
-variable "runner_iam_role_name" {
-  type        = string
-  description = "IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used"
-  default     = ""
-}
 
-# agent
-variable "create_runner_iam_role" {
-  type        = bool
-  description = "Whether to create the runner IAM role of the gitlab runner agent EC2 instance."
-  default     = true
-}
-
-# agent
-variable "runner_iam_policy_arns" {
-  type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
-  default     = []
-}
 
 # executor
 variable "docker_machine_iam_policy_arns" {
@@ -964,39 +992,4 @@ variable "docker_machine_egress_rules" {
     to_port          = 0
     description      = "Allow all egress traffic for docker machine build runners"
   }]
-}
-
-# agent
-variable "asg_terminate_lifecycle_hook_name" {
-  description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
-  type        = string
-  default     = null
-}
-
-# agent
-variable "runner_yum_update" {
-  description = "Run a yum update as part of starting the runner"
-  type        = bool
-  default     = true
-}
-
-# agent
-variable "runners_gitlab_certificate" {
-  description = "Certificate of the GitLab instance to connect to. Example: `file(\"$${path.module}/my-gitlab.crt\")`"
-  type        = string
-  default     = ""
-}
-
-# agent
-variable "runners_ca_certificate" {
-  description = "Trusted CA certificate bundle. Example: `file(\"$${path.module}/ca.crt\")`"
-  type        = string
-  default     = ""
-}
-
-# agent
-variable "runner_extra_config" {
-  description = "Extra commands to run as part of starting the runner"
-  type        = string
-  default     = ""
 }
