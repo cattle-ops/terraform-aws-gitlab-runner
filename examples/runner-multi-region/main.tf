@@ -38,7 +38,7 @@ module "runner_main_region" {
   runners_privileged         = "false"
   runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
-  gitlab_runner_registration_config = {
+  agent_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"
@@ -103,7 +103,7 @@ module "runner_alternate_region" {
   runners_privileged         = "false"
   runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
-  gitlab_runner_registration_config = {
+  agent_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"

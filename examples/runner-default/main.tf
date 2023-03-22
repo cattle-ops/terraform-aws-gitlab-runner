@@ -61,7 +61,7 @@ module "runner" {
 
   docker_machine_spot_price_bid = "on-demand-price"
 
-  gitlab_runner_registration_config = {
+  agent_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner default - auto"

@@ -91,6 +91,27 @@ variable "agent_ebs_optimized" {
   default     = true
 }
 
+variable "agent_root_block_device" {
+  description = "The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
+  type        = map(string)
+  default     = {}
+}
+
+variable "agent_ami_filter" {
+  description = "List of maps used to create the AMI filter for the Agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
+  type        = map(list(string))
+
+  default = {
+    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
+  }
+}
+
+variable "agent_ami_owners" {
+  description = "The list of owners used to select the AMI of the Agent instance."
+  type        = list(string)
+  default     = ["amazon"]
+}
+
 variable "agent_enable_monitoring" {
   description = "Enable the detailed monitoring on the Agent instance."
   type        = bool
@@ -149,6 +170,30 @@ variable "agent_metadata_options" {
   }
 }
 
+variable "agent_schedule_enable" {
+  description = "Set to `true` to enable the auto scaling group schedule for the Agent."
+  type        = bool
+  default     = false
+}
+
+variable "agent_schedule_config" {
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the Agent. Will only be used if `agent_schedule_enable` is set to `true`. "
+  type        = map(any)
+  default = {
+    # Configure optional scale_out scheduled action
+    scale_out_recurrence = "0 8 * * 1-5"
+    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    scale_out_time_zone  = "Etc/UTC"
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+    # Configure optional scale_in scheduled action
+    scale_in_recurrence = "0 18 * * 1-5"
+    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    scale_in_time_zone  = "Etc/UTC"
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+  }
+}
+
 variable "agent_install_amazon_ecr_credential_helper" {
   description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
   type        = bool
@@ -165,6 +210,27 @@ variable "agent_user_data_extra" {
   description = "Extra commands to run as part of starting the Agent"
   type        = string
   default     = ""
+}
+
+variable "agent_user_data_enable_trace_log" {
+  description = "Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token."
+  type        = bool
+  default     = true
+}
+
+variable "agent_gitlab_registration_config" {
+  description = "Configuration used to register the Agent. See the README for an example, or reference the examples in the examples directory of this repo."
+  type        = map(string)
+
+  default = {
+    registration_token = ""
+    tag_list           = ""
+    description        = ""
+    locked_to_project  = ""
+    run_untagged       = ""
+    maximum_timeout    = ""
+    access_level       = ""
+  }
 }
 
 variable "agent_gitlab_ca_certificate" {
@@ -261,6 +327,23 @@ variable "executor_idle_count" {
 /*
  * docker+machine Executor variables. The executor is the actual machine that runs the job.
  */
+variable "executor_docker_machine_ami_filter" {
+  description = "List of maps used to create the AMI filter for the docker+machine Executor."
+  type        = map(list(string))
+
+  default = {
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+}
+
+variable "executor_docker_machine_ami_owners" {
+  description = "The list of owners used to select the AMI of the docker+machine Executor."
+  type        = list(string)
+
+  # Canonical
+  default = ["099720109477"]
+}
+
 variable "executor_docker_machine_instance_prefix" {
   description = "Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances."
   type        = string
@@ -755,57 +838,11 @@ variable "docker_machine_security_group_description" {
   default     = "A security group containing docker-machine instances"
 }
 
-# agent
-variable "ami_filter" {
-  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
-  type        = map(list(string))
 
-  default = {
-    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
-  }
-}
 
-# agent
-variable "ami_owners" {
-  description = "The list of owners used to select the AMI of Gitlab runner agent instances."
-  type        = list(string)
-  default     = ["amazon"]
-}
 
-# executor
-variable "runner_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI."
-  type        = map(list(string))
 
-  default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
-}
 
-# executor
-variable "runner_ami_owners" {
-  description = "The list of owners used to select the AMI of Gitlab runner docker-machine instances."
-  type        = list(string)
-
-  # Canonical
-  default = ["099720109477"]
-}
-
-# agent
-variable "gitlab_runner_registration_config" {
-  description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
-  type        = map(string)
-
-  default = {
-    registration_token = ""
-    tag_list           = ""
-    description        = ""
-    locked_to_project  = ""
-    run_untagged       = ""
-    maximum_timeout    = ""
-    access_level       = ""
-  }
-}
 
 # agent
 variable "secure_parameter_store_runner_token_key" {
@@ -848,45 +885,9 @@ variable "cache_bucket" {
   }
 }
 
-# agent
-variable "enable_runner_user_data_trace_log" {
-  description = "Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
-  type        = bool
-  default     = true
-}
 
-# agent
-variable "enable_schedule" {
-  description = "Flag used to enable/disable auto scaling group schedule for the runner instance. "
-  type        = bool
-  default     = false
-}
 
-# agent
-variable "schedule_config" {
-  description = "Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable_schedule is set to true. "
-  type        = map(any)
-  default = {
-    # Configure optional scale_out scheduled action
-    scale_out_recurrence = "0 8 * * 1-5"
-    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
-    scale_out_time_zone  = "Etc/UTC"
-    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
 
-    # Configure optional scale_in scheduled action
-    scale_in_recurrence = "0 18 * * 1-5"
-    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
-    scale_in_time_zone  = "Etc/UTC"
-    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
-  }
-}
-
-# agent
-variable "runner_root_block_device" {
-  description = "The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
-  type        = map(string)
-  default     = {}
-}
 
 
 

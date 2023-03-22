@@ -45,7 +45,7 @@ module "runner" {
   runners_privileged         = "false"
   runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
-  gitlab_runner_registration_config = {
+  agent_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"
@@ -83,7 +83,7 @@ module "runner2" {
   runners_name       = var.runner_name
   agent_gitlab_url = var.gitlab_url
 
-  gitlab_runner_registration_config = {
+  agent_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner_2"
     description        = "runner public - auto"

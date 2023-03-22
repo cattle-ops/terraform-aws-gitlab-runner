@@ -54,7 +54,7 @@ module "runner" {
   # Registration
   ###############################################
 
-  gitlab_runner_registration_config = {
+  agent_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_runner"
     description        = "runner docker - auto"

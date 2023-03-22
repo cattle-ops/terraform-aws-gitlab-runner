@@ -41,7 +41,7 @@ locals {
       eip                 = var.agent_enable_eip ? local.template_eip : ""
       logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
-      user_data_trace_log = var.enable_runner_user_data_trace_log
+      user_data_trace_log = var.agent_user_data_enable_trace_log
       yum_update          = var.agent_yum_update ? local.file_yum_update : ""
       extra_config        = var.agent_user_data_extra
   })
@@ -70,13 +70,13 @@ locals {
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = data.aws_region.current.name
-      gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
-      gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
-      gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
-      gitlab_runner_locked_to_project              = var.gitlab_runner_registration_config["locked_to_project"]
-      gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
-      gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
-      gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
+      gitlab_runner_registration_token             = var.agent_gitlab_registration_config["registration_token"]
+      gitlab_runner_description                    = var.agent_gitlab_registration_config["description"]
+      gitlab_runner_tag_list                       = var.agent_gitlab_registration_config["tag_list"]
+      gitlab_runner_locked_to_project              = var.agent_gitlab_registration_config["locked_to_project"]
+      gitlab_runner_run_untagged                   = var.agent_gitlab_registration_config["run_untagged"]
+      gitlab_runner_maximum_timeout                = var.agent_gitlab_registration_config["maximum_timeout"]
+      gitlab_runner_access_level                   = lookup(var.agent_gitlab_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.agent_sentry_dsn
   })
 
@@ -149,14 +149,14 @@ data "aws_ami" "docker-machine" {
   most_recent = "true"
 
   dynamic "filter" {
-    for_each = var.runner_ami_filter
+    for_each = var.executor_docker_machine_ami_filter
     content {
       name   = filter.key
       values = filter.value
     }
   }
 
-  owners = var.runner_ami_owners
+  owners = var.executor_docker_machine_ami_owners
 }
 
 # ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
@@ -204,39 +204,39 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
 }
 
 resource "aws_autoscaling_schedule" "scale_in" {
-  count                  = var.enable_schedule ? 1 : 0
+  count                  = var.agent_schedule_enable ? 1 : 0
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_in-${aws_autoscaling_group.gitlab_runner_instance.name}"
-  recurrence             = var.schedule_config["scale_in_recurrence"]
-  time_zone              = try(var.schedule_config["scale_in_time_zone"], "Etc/UTC")
-  min_size               = try(var.schedule_config["scale_in_min_size"], var.schedule_config["scale_in_count"])
-  desired_capacity       = try(var.schedule_config["scale_in_desired_capacity"], var.schedule_config["scale_in_count"])
-  max_size               = try(var.schedule_config["scale_in_max_size"], var.schedule_config["scale_in_count"])
+  recurrence             = var.agent_schedule_config["scale_in_recurrence"]
+  time_zone              = try(var.agent_schedule_config["scale_in_time_zone"], "Etc/UTC")
+  min_size               = try(var.agent_schedule_config["scale_in_min_size"], var.agent_schedule_config["scale_in_count"])
+  desired_capacity       = try(var.agent_schedule_config["scale_in_desired_capacity"], var.agent_schedule_config["scale_in_count"])
+  max_size               = try(var.agent_schedule_config["scale_in_max_size"], var.agent_schedule_config["scale_in_count"])
 }
 
 resource "aws_autoscaling_schedule" "scale_out" {
-  count                  = var.enable_schedule ? 1 : 0
+  count                  = var.agent_schedule_enable ? 1 : 0
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
   scheduled_action_name  = "scale_out-${aws_autoscaling_group.gitlab_runner_instance.name}"
-  recurrence             = var.schedule_config["scale_out_recurrence"]
-  time_zone              = try(var.schedule_config["scale_out_time_zone"], "Etc/UTC")
-  min_size               = try(var.schedule_config["scale_out_min_size"], var.schedule_config["scale_out_count"])
-  desired_capacity       = try(var.schedule_config["scale_out_desired_capacity"], var.schedule_config["scale_out_count"])
-  max_size               = try(var.schedule_config["scale_out_max_size"], var.schedule_config["scale_out_count"])
+  recurrence             = var.agent_schedule_config["scale_out_recurrence"]
+  time_zone              = try(var.agent_schedule_config["scale_out_time_zone"], "Etc/UTC")
+  min_size               = try(var.agent_schedule_config["scale_out_min_size"], var.agent_schedule_config["scale_out_count"])
+  desired_capacity       = try(var.agent_schedule_config["scale_out_desired_capacity"], var.agent_schedule_config["scale_out_count"])
+  max_size               = try(var.agent_schedule_config["scale_out_max_size"], var.agent_schedule_config["scale_out_count"])
 }
 
 data "aws_ami" "runner" {
   most_recent = "true"
 
   dynamic "filter" {
-    for_each = var.ami_filter
+    for_each = var.agent_ami_filter
     content {
       name   = filter.key
       values = filter.value
     }
   }
 
-  owners = var.ami_owners
+  owners = var.agent_ami_owners
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
@@ -268,7 +268,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     name = local.aws_iam_role_instance_name
   }
   dynamic "block_device_mappings" {
-    for_each = [var.runner_root_block_device]
+    for_each = [var.agent_root_block_device]
     content {
       # cSpell:ignore xvda
       device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
