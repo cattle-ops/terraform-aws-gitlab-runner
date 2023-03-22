@@ -50,9 +50,9 @@ module "runner" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
 
-  runners_executor   = "docker"
+  executor_type   = "docker"
   runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
+  agent_gitlab_url = var.gitlab_url
 
   gitlab_runner_registration_config = {
     registration_token = var.registration_token

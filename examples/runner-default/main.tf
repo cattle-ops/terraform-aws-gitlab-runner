@@ -54,7 +54,7 @@ module "runner" {
   metrics_autoscaling = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
   runners_name             = var.runner_name
-  runners_gitlab_url       = var.gitlab_url
+  agent_gitlab_url       = var.gitlab_url
   enable_runner_ssm_access = true
 
   gitlab_runner_security_group_ids = [data.aws_security_group.default.id]

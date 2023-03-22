@@ -32,7 +32,7 @@ module "runner" {
   subnet_id = element(module.vpc.private_subnets, 0)
 
   runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
+  agent_gitlab_url = var.gitlab_url
   runners_token      = var.runner_token
 
   # working 9 to 5 :)

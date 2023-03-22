@@ -58,14 +58,14 @@ locals {
       docker_machine_version                       = var.docker_machine_version
       docker_machine_download_url                  = var.docker_machine_download_url
       runners_config                               = local.template_runner_config
-      runners_userdata                             = var.runners_userdata
-      runners_executor                             = var.runners_executor
-      runners_install_amazon_ecr_credential_helper = var.runners_install_amazon_ecr_credential_helper
+      runners_userdata                             = var.executor_docker_machine_userdata
+      runners_executor                             = var.executor_type
+      runners_install_amazon_ecr_credential_helper = var.agent_install_amazon_ecr_credential_helper
       curl_cacert                                  = length(var.runners_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.userdata_pre_install
       post_install                                 = var.userdata_post_install
-      runners_gitlab_url                           = var.runners_gitlab_url
+      runners_gitlab_url                           = var.agent_gitlab_url
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
@@ -77,14 +77,14 @@ locals {
       gitlab_runner_run_untagged                   = var.gitlab_runner_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
-      sentry_dsn                                   = var.sentry_dsn
+      sentry_dsn                                   = var.agent_sentry_dsn
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
       aws_region                        = data.aws_region.current.name
-      gitlab_url                        = var.runners_gitlab_url
-      gitlab_clone_url                  = var.runners_clone_url
+      gitlab_url                        = var.agent_gitlab_url
+      gitlab_clone_url                  = var.agent_gitlab_clone_url
       tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
@@ -92,21 +92,21 @@ locals {
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" || var.docker_machine_spot_price_bid == null ? "" : var.docker_machine_spot_price_bid
-      runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
-      runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+      runners_ami                       = var.executor_type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      runners_security_group_name       = var.executor_type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
       runners_monitoring                = var.runners_monitoring
       runners_ebs_optimized             = var.runners_ebs_optimized
-      runners_instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+      runners_instance_profile          = var.executor_type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
       runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runners_name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runners_token
-      runners_userdata                  = var.runners_userdata
-      runners_executor                  = var.runners_executor
-      runners_limit                     = var.runners_limit
-      runners_concurrent                = var.runners_concurrent
+      runners_userdata                  = var.executor_docker_machine_userdata
+      runners_executor                  = var.executor_type
+      runners_limit                     = var.executor_max_jobs
+      runners_concurrent                = var.agent_maximum_concurrent_jobs
       runners_image                     = var.runners_image
       runners_privileged                = var.runners_privileged
       runners_disable_cache             = var.runners_disable_cache
@@ -114,8 +114,8 @@ locals {
       runners_helper_image              = var.runners_helper_image
       runners_shm_size                  = var.runners_shm_size
       runners_pull_policies             = local.runners_pull_policies
-      runners_idle_count                = var.runners_idle_count
-      runners_idle_time                 = var.runners_idle_time
+      runners_idle_count                = var.executor_idle_count
+      runners_idle_time                 = var.executor_idle_time
       runners_max_builds                = local.runners_max_builds_string
       runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
@@ -130,21 +130,21 @@ locals {
       runners_pre_clone_script          = var.runners_pre_clone_script
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
-      runners_check_interval            = var.runners_check_interval
+      runners_check_interval            = var.agent_gitlab_check_interval
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
       bucket_name                       = local.bucket_name
       shared_cache                      = var.cache_shared
-      sentry_dsn                        = var.sentry_dsn
-      prometheus_listen_address         = var.prometheus_listen_address
+      sentry_dsn                        = var.agent_sentry_dsn
+      prometheus_listen_address         = var.agent_prometheus_listen_address
       auth_type                         = var.auth_type_cache_sr
     }
   )
 }
 
 data "aws_ami" "docker-machine" {
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
 
   most_recent = "true"
 
@@ -246,9 +246,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)
-  instance_type          = var.instance_type
+  instance_type          = var.agent_instance_type
   update_default_version = true
-  ebs_optimized          = var.runner_instance_ebs_optimized
+  ebs_optimized          = var.agent_ebs_optimized
   monitoring {
     enabled = var.runner_instance_enable_monitoring
   }
@@ -284,7 +284,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
   network_interfaces {
-    security_groups             = concat([aws_security_group.runner.id], var.extra_security_group_ids_runner_agent)
+    security_groups             = concat([aws_security_group.runner.id], var.agent_extra_security_group_ids)
     associate_public_ip_address = false == (var.runner_agent_uses_private_address == false ? var.runner_agent_uses_private_address : var.runners_use_private_address)
   }
   tag_specifications {
@@ -306,10 +306,10 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   tags = local.tags
 
   metadata_options {
-    http_endpoint               = var.runner_instance_metadata_options.http_endpoint
-    http_tokens                 = var.runner_instance_metadata_options.http_tokens
-    http_put_response_hop_limit = var.runner_instance_metadata_options.http_put_response_hop_limit
-    instance_metadata_tags      = var.runner_instance_metadata_options.instance_metadata_tags
+    http_endpoint               = var.agent_metadata_options.http_endpoint
+    http_tokens                 = var.agent_metadata_options.http_tokens
+    http_put_response_hop_limit = var.agent_metadata_options.http_put_response_hop_limit
+    instance_metadata_tags      = var.agent_metadata_options.instance_metadata_tags
   }
 
   lifecycle {
@@ -377,7 +377,7 @@ resource "aws_iam_role" "instance" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+  count = var.executor_type == "docker+machine" && var.create_runner_iam_role ? 1 : 0
 
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
@@ -391,7 +391,7 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
-  count = var.runners_executor == "docker+machine" && var.create_runner_iam_role ? 1 : 0
+  count = var.executor_type == "docker+machine" && var.create_runner_iam_role ? 1 : 0
 
   role       = aws_iam_role.instance[0].name
   policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
@@ -442,7 +442,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
-  count = var.runners_executor == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
+  count = var.executor_type == "docker+machine" ? (var.cache_bucket["create"] || lookup(var.cache_bucket, "policy", "") != "" ? 1 : 0) : 0
 
   role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
@@ -452,7 +452,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
-  count                = var.runners_executor == "docker+machine" ? 1 : 0
+  count                = var.executor_type == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
@@ -461,7 +461,7 @@ resource "aws_iam_role" "docker_machine" {
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
   name  = "${local.name_iam_objects}-docker-machine"
   role  = aws_iam_role.docker_machine[0].name
   tags  = local.tags
@@ -471,7 +471,7 @@ resource "aws_iam_instance_profile" "docker_machine" {
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
-  count = var.runners_executor == "docker+machine" ? length(var.docker_machine_iam_policy_arns) : 0
+  count = var.executor_type == "docker+machine" ? length(var.docker_machine_iam_policy_arns) : 0
 
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = var.docker_machine_iam_policy_arns[count.index]
@@ -479,7 +479,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies"
 
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
-  count = (var.runners_executor == "docker+machine" && var.enable_docker_machine_ssm_access) ? 1 : 0
+  count = (var.executor_type == "docker+machine" && var.enable_docker_machine_ssm_access) ? 1 : 0
 
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"

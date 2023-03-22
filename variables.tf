@@ -74,9 +74,129 @@ variable "iam_object_prefix" {
  * Agent variables. The agent runs the GitLab Runner software and is responsible for starting the executors.
  */
 variable "agent_instance_prefix" {
-  description = "Set the name prefix and override the `Name` tag for the EC2 GitLab Runner Agent instance."
+  description = "Set the name prefix and override the `Name` tag for the Agent instance."
   type        = string
   default     = ""
+}
+
+variable "agent_instance_type" {
+  description = "Agent instance type used."
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "agent_ebs_optimized" {
+  description = "Enable the Agent instance to be EBS-optimized."
+  type        = bool
+  default     = true
+}
+
+variable "agent_enable_monitoring" {
+  description = "Enable the detailed monitoring on the Agent instance."
+  type        = bool
+  default     = true
+}
+
+variable "agent_extra_security_group_ids" {
+  description = "IDs of security groups to add to the Agent."
+  type        = list(string)
+  default     = []
+}
+
+variable "agent_metadata_options" {
+  description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
+  type = object({
+    http_endpoint               = string
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+    instance_metadata_tags      = string
+  })
+  default = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "disabled"
+  }
+}
+
+variable "agent_install_amazon_ecr_credential_helper" {
+  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
+  type        = bool
+  default     = false
+}
+
+# agent
+variable "agent_gitlab_check_interval" {
+  description = "Number of seconds between checking for available jobs."
+  type        = number
+  default     = 3
+}
+
+variable "agent_gitlab_url" {
+  description = "URL of the GitLab instance to connect to."
+  type        = string
+}
+
+variable "agent_gitlab_clone_url" {
+  description = "Overwrites the URL for the GitLab instance. Use only if the agent can’t connect to the GitLab URL."
+  type        = string
+  default     = ""
+}
+
+variable "agent_maximum_concurrent_jobs" {
+  description = "The maximum number of jobs which can be processed by all executors at the same time."
+  type        = number
+  default     = 10
+}
+
+variable "agent_sentry_dsn" {
+  description = "Sentry DSN of the project for the Agent to use (uses legacy DSN format)"
+  type        = string
+  default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
+}
+
+variable "agent_prometheus_listen_address" {
+  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
+  type        = string
+  default     = ""
+}
+
+/*
+ * Executor variables valid for all executors.
+ */
+variable "executor_type" {
+  description = "The executor type to use. Currently supports `docker+machine` or `docker`."
+  type        = string
+  default     = "docker+machine"
+
+  validation {
+    condition     = contains(["docker+machine", "docker"], var.executor_type)
+    error_message = "The executor currently supports `docker+machine` or `docker`."
+  }
+}
+
+variable "executor_max_builds" {
+  description = "Destroys the executor after processing this many jobs. Set to `0` to disable this feature."
+  type        = number
+  default     = 0
+}
+
+variable "executor_max_jobs" {
+  description = "Number of jobs which can be processed in parallel by the executor."
+  type        = number
+  default     = 0
+}
+
+variable "executor_idle_time" {
+  description = "Idle time of the runners before they are destroyed."
+  type        = number
+  default     = 600
+}
+
+variable "executor_idle_count" {
+  description = "Number of idle Executor instances."
+  type        = number
+  default     = 0
 }
 
 /*
@@ -98,6 +218,18 @@ variable "executor_docker_machine_instance_prefix" {
   }
 }
 
+variable "executor_docker_machine_userdata" {
+  description = "Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted."
+  type        = string
+  default     = ""
+}
+
+
+
+
+
+
+
 # agent
 variable "auth_type_cache_sr" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
@@ -105,12 +237,6 @@ variable "auth_type_cache_sr" {
   default     = "iam"
 }
 
-# agent
-variable "extra_security_group_ids_runner_agent" {
-  description = "Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default."
-  type        = list(string)
-  default     = []
-}
 
 # agent
 variable "metrics_autoscaling" {
@@ -120,49 +246,12 @@ variable "metrics_autoscaling" {
 }
 
 # agent
-variable "instance_type" {
-  description = "Instance type used for the GitLab runner."
-  type        = string
-  default     = "t3.micro"
-}
-
-# agent
-variable "runner_instance_ebs_optimized" {
-  description = "Enable the GitLab runner instance to be EBS-optimized."
-  type        = bool
-  default     = true
-}
-
-# agent
-variable "runner_instance_enable_monitoring" {
-  description = "Enable the GitLab runner instance to have detailed monitoring."
-  type        = bool
-  default     = true
-}
-
-# agent
 variable "runner_instance_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
   type        = string
   default     = null
 }
 
-# agent
-variable "runner_instance_metadata_options" {
-  description = "Enable the Gitlab runner agent instance metadata service."
-  type = object({
-    http_endpoint               = string
-    http_tokens                 = string
-    http_put_response_hop_limit = number
-    instance_metadata_tags      = string
-  })
-  default = {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 2
-    instance_metadata_tags      = "disabled"
-  }
-}
 
 # executor
 variable "docker_machine_instance_metadata_options" {
@@ -211,44 +300,10 @@ variable "runners_name" {
   type        = string
 }
 
-# agent
-variable "runners_userdata" {
-  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
-  type        = string
-  default     = ""
-}
 
-# agent
-variable "runners_executor" {
-  description = "The executor to use. Currently supports `docker+machine` or `docker`."
-  type        = string
-  default     = "docker+machine"
 
-  validation {
-    condition     = contains(["docker+machine", "docker"], var.runners_executor)
-    error_message = "The executor currently supports `docker+machine` or `docker`."
-  }
-}
 
-# agent
-variable "runners_install_amazon_ecr_credential_helper" {
-  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
-  type        = bool
-  default     = false
-}
 
-# agent
-variable "runners_gitlab_url" {
-  description = "URL of the GitLab instance to connect to."
-  type        = string
-}
-
-# agent
-variable "runners_clone_url" {
-  description = "Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL."
-  type        = string
-  default     = ""
-}
 
 # agent
 variable "runners_token" {
@@ -257,40 +312,6 @@ variable "runners_token" {
   default     = "__REPLACED_BY_USER_DATA__"
 }
 
-# agent
-variable "runners_limit" {
-  description = "Limit for the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
-}
-
-# agent
-variable "runners_concurrent" {
-  description = "Concurrent value for the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 10
-}
-
-# agent
-variable "runners_idle_time" {
-  description = "Idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 600
-}
-
-# agent
-variable "runners_idle_count" {
-  description = "Idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
-}
-
-# agent
-variable "runners_max_builds" {
-  description = "Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration."
-  type        = number
-  default     = 0
-}
 
 # executor
 variable "runners_image" {
@@ -491,13 +512,6 @@ variable "runners_request_spot_instance" {
   description = "Whether or not to request spot instances via docker-machine"
   type        = bool
   default     = true
-}
-
-# agent
-variable "runners_check_interval" {
-  description = "defines the interval length, in seconds, between new jobs check."
-  type        = number
-  default     = 3
 }
 
 # executor
@@ -924,19 +938,6 @@ variable "docker_machine_iam_policy_arns" {
   default     = []
 }
 
-# agent
-variable "sentry_dsn" {
-  default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
-  description = "Sentry DSN of the project for the runner to use (uses legacy DSN format)"
-  type        = string
-}
-
-# agent
-variable "prometheus_listen_address" {
-  default     = ""
-  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
-  type        = string
-}
 
 # executor
 variable "docker_machine_egress_rules" {

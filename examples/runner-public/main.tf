@@ -39,7 +39,7 @@ module "runner" {
   docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name             = var.runner_name
-  runners_gitlab_url       = var.gitlab_url
+  agent_gitlab_url       = var.gitlab_url
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   runners_privileged         = "false"
@@ -81,7 +81,7 @@ module "runner2" {
   docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
+  agent_gitlab_url = var.gitlab_url
 
   gitlab_runner_registration_config = {
     registration_token = var.registration_token

@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "runner_ping_group" {
 
 resource "aws_security_group" "docker_machine" {
   # checkov:skip=CKV2_AWS_5:Security group is used within an template and assigned to the docker machines
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
 
   name_prefix = "${local.name_sg}-docker-machine"
   vpc_id      = var.vpc_id
@@ -107,7 +107,7 @@ resource "aws_security_group" "docker_machine" {
 
 # Allow docker-machine traffic from gitlab-runner agent instances to docker-machine instances
 resource "aws_security_group_rule" "docker_machine_docker_runner" {
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
 
   type      = "ingress"
   from_port = 2376
@@ -136,7 +136,7 @@ locals {
 
 # Allow SSH traffic from gitlab-runner agent instances and security group IDs to docker-machine instances
 resource "aws_security_group_rule" "docker_machine_ssh_runner" {
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
 
   type      = "ingress"
   from_port = 22
@@ -155,7 +155,7 @@ resource "aws_security_group_rule" "docker_machine_ssh_runner" {
 
 # Allow ICMP traffic from gitlab-runner agent instances and security group IDs to docker-machine instances
 resource "aws_security_group_rule" "docker_machine_ping_runner" {
-  count = var.runners_executor == "docker+machine" ? length(local.security_groups_ping) : 0
+  count = var.executor_type == "docker+machine" ? length(local.security_groups_ping) : 0
 
   type      = "ingress"
   from_port = -1
@@ -178,7 +178,7 @@ resource "aws_security_group_rule" "docker_machine_ping_runner" {
 
 # Allow docker-machine traffic from docker-machine instances to docker-machine instances on port 2376
 resource "aws_security_group_rule" "docker_machine_docker_self" {
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
 
   type      = "ingress"
   from_port = 2376
@@ -196,7 +196,7 @@ resource "aws_security_group_rule" "docker_machine_docker_self" {
 
 # Allow SSH traffic from docker-machine instances to docker-machine instances on port 22
 resource "aws_security_group_rule" "docker_machine_ssh_self" {
-  count = var.runners_executor == "docker+machine" ? 1 : 0
+  count = var.executor_type == "docker+machine" ? 1 : 0
 
   type      = "ingress"
   from_port = 22
@@ -214,7 +214,7 @@ resource "aws_security_group_rule" "docker_machine_ssh_self" {
 
 # Allow ICMP traffic from docker-machine instances to docker-machine instances
 resource "aws_security_group_rule" "docker_machine_ping_self" {
-  count = (var.runners_executor == "docker+machine" && var.enable_ping) ? 1 : 0
+  count = (var.executor_type == "docker+machine" && var.enable_ping) ? 1 : 0
 
   type      = "ingress"
   from_port = -1

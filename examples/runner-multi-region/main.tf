@@ -32,7 +32,7 @@ module "runner_main_region" {
   docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name             = var.runner_name
-  runners_gitlab_url       = var.gitlab_url
+  agent_gitlab_url       = var.gitlab_url
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   runners_privileged         = "false"
@@ -97,7 +97,7 @@ module "runner_alternate_region" {
   docker_machine_spot_price_bid = "on-demand-price"
 
   runners_name             = var.runner_name
-  runners_gitlab_url       = var.gitlab_url
+  agent_gitlab_url       = var.gitlab_url
   runners_environment_vars = ["KEY=Value", "FOO=bar"]
 
   runners_privileged         = "false"
