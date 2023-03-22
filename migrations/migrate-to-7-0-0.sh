@@ -23,3 +23,10 @@ sed -i '/asg_terminate_lifecycle_hook_heartbeat_timeout/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_memory_size/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_runtime/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_timeout/d' "$converted_file"
+
+#
+# PT #757 refactor!: rename variables and prefix with agent, executor and global scope
+#
+sed -i '/aws_region/d' "$converted_file"
+
+

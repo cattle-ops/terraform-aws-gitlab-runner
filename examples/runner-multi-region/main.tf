@@ -22,7 +22,6 @@ module "vpc_main_region" {
 module "runner_main_region" {
   source = "../../"
 
-  aws_region  = var.aws_main_region
   environment = var.environment
 
   runners_use_private_address = false
@@ -90,7 +89,6 @@ module "runner_alternate_region" {
 
   source = "../../"
 
-  aws_region  = var.aws_alternate_region
   environment = var.environment
 
   runners_use_private_address = false

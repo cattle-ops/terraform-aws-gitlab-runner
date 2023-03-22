@@ -47,7 +47,6 @@ module "vpc_endpoints" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
   environment = var.environment
 
   vpc_id              = module.vpc.vpc_id
@@ -122,7 +121,7 @@ module "runner" {
   # docker-mirror-check:
   #    image: docker:20.10.16
   #    stage: build
-  #    variables: 
+  #    variables:
   #        DOCKER_TLS_CERTDIR: ''
   #    script:
   #        - |

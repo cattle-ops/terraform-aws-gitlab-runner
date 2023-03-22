@@ -29,7 +29,6 @@ module "cache" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
   environment = var.environment
 
   runners_use_private_address = false
@@ -74,7 +73,6 @@ module "runner" {
 module "runner2" {
   source = "../../"
 
-  aws_region  = var.aws_region
   environment = "${var.environment}-2"
 
   runners_use_private_address = false

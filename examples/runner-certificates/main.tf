@@ -31,7 +31,6 @@ module "runner" {
 
   runners_executor = "docker"
 
-  aws_region  = var.aws_region
   environment = var.environment
 
   ###############################################

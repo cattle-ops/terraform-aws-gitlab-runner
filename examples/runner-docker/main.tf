@@ -39,7 +39,6 @@ module "vpc_endpoints" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
   environment = var.environment
 
   runners_use_private_address = false

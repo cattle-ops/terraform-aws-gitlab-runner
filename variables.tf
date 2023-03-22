@@ -1,9 +1,4 @@
-# remove variable
-variable "aws_region" {
-  description = "AWS region."
-  type        = string
-}
-
+# agent
 variable "auth_type_cache_sr" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
   type        = string

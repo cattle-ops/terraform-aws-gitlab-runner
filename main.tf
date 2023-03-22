@@ -1,5 +1,6 @@
 data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
+data "aws_region" "current" {}
 
 data "aws_subnet" "runners" {
   id = var.subnet_id
@@ -68,7 +69,7 @@ locals {
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
-      secure_parameter_store_region                = var.aws_region
+      secure_parameter_store_region                = data.aws_region.current.name
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
       gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                       = var.gitlab_runner_registration_config["tag_list"]
@@ -81,7 +82,7 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
-      aws_region                        = var.aws_region
+      aws_region                        = data.aws_region.current.name
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
       tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
