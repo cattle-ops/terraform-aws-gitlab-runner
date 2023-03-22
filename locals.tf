@@ -60,9 +60,9 @@ locals {
   secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.secure_parameter_store_runner_sentry_dsn}"
 
   # Custom names for runner agent instance, security groups, and IAM objects
-  name_runner_agent_instance = var.overrides["name_runner_agent_instance"] == "" ? local.tags["Name"] : var.overrides["name_runner_agent_instance"]
-  name_sg                    = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
-  name_iam_objects           = lookup(var.overrides, "name_iam_objects", "") == "" ? local.tags["Name"] : var.overrides["name_iam_objects"]
+  name_runner_agent_instance = var.agent_instance_prefix == "" ? local.tags["Name"] : var.agent_instance_prefix
+  name_sg                    = var.security_group_prefix == "" ? local.tags["Name"] : var.security_group_prefix
+  name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 
   runners_additional_volumes = <<-EOT
   %{~if var.runners_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}

@@ -11,7 +11,7 @@ locals {
       log_group_name = var.log_group_name != null ? var.log_group_name : var.environment
   })
   provided_kms_key = var.kms_key_id != "" ? var.kms_key_id : ""
-  kms_key          = local.provided_kms_key == "" && var.enable_kms ? aws_kms_key.default[0].arn : local.provided_kms_key
+  kms_key          = local.provided_kms_key == "" && var.enable_managed_kms_key ? aws_kms_key.default[0].arn : local.provided_kms_key
 }
 
 resource "aws_cloudwatch_log_group" "environment" {

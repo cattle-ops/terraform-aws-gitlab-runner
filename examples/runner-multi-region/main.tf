@@ -47,12 +47,10 @@ module "runner_main_region" {
     maximum_timeout    = "3600"
   }
 
-  overrides = {
-    name_sg                     = "my-security-group"
-    name_runner_agent_instance  = "my-runner-agent"
-    name_docker_machine_runners = "my-runners-dm"
-    name_iam_objects            = local.name_iam_objects_main_region
-  }
+  security_group_prefix                   = "my-security-group"
+  agent_instance_prefix                   = "my-runner-agent"
+  executor_docker_machine_instance_prefix = "my-runners-dm"
+  iam_object_prefix                       = local.name_iam_objects_main_region
 
   cache_shared = "true"
 
@@ -115,12 +113,10 @@ module "runner_alternate_region" {
     access_level       = "ref_protected"
   }
 
-  overrides = {
-    name_sg                     = "my-security-group"
-    name_runner_agent_instance  = "my-runner-agent"
-    name_docker_machine_runners = "my-runners-dm"
-    name_iam_objects            = local.name_iam_objects_alternate_region
-  }
+  security_group_prefix                   = "my-security-group"
+  agent_instance_prefix                   = "my-runner-agent"
+  executor_docker_machine_instance_prefix = "my-runners-dm"
+  iam_object_prefix                       = local.name_iam_objects_main_region # <--
 
   cache_shared = "true"
 

@@ -1,27 +1,108 @@
-# agent
-variable "auth_type_cache_sr" {
-  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
+/*
+ * Global variables
+ */
+variable "vpc_id" {
+  description = "The target VPC for the agent and executors (e.g. docker-machine) instances."
   type        = string
-  default     = "iam"
 }
 
-# global
+variable "subnet_id" {
+  description = "Subnet id used for the agent and executors. Must belong to the `vpc_id`."
+  type        = string
+}
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypt the resources. Ensure CloudWatch and Agent/Executors have access to the provided KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "enable_managed_kms_key" {
+  description = "Let the module manage a KMS key. Be-aware of the costs of an custom key. Do not specify a `kms_key_id` when `enable_kms` is set to `true`."
+  type        = bool
+  default     = false
+}
+
+variable "kms_managed_alias_name" {
+  description = "Alias added to the created KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "kms_managed_deletion_rotation_window_in_days" {
+  description = "Key deletion/rotation window for the created KMS key. Set to 0 for no rotation/deletion window."
+  type        = number
+  default     = 7
+}
+
+variable "iam_permissions_boundary" {
+  description = "Name of permissions boundary policy to attach to AWS IAM roles"
+  default     = ""
+  type        = string
+}
+
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string
 }
 
-# global
-variable "vpc_id" {
-  description = "The target VPC for the docker-machine and runner instances."
-  type        = string
+variable "tags" {
+  description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
+  type        = map(string)
+  default     = {}
 }
 
-# global
-variable "subnet_id" {
-  description = "Subnet id used for the runner and executors. Must belong to the VPC specified above."
+variable "suppressed_tags" {
+  description = "List of tag keys which are removed from `tags`, `agent_tags`  and `executor_tags` and never added as default tag by the module."
+  type        = list(string)
+  default     = []
+}
+
+variable "security_group_prefix" {
+  description = "Set the name prefix and overwrite the `Name` tag for all security groups."
   type        = string
-  default     = "" # TODO remove as soon as subnet_id_runners and subnet_ids_gitlab_runner are gone. Variable is mandatory now.
+  default     = ""
+}
+
+variable "iam_object_prefix" {
+  description = "Set the name prefix of all AWS IAM resources."
+  type        = string
+  default     = ""
+}
+
+/*
+ * Agent variables. The agent runs the GitLab Runner software and is responsible for starting the executors.
+ */
+variable "agent_instance_prefix" {
+  description = "Set the name prefix and override the `Name` tag for the EC2 GitLab Runner Agent instance."
+  type        = string
+  default     = ""
+}
+
+/*
+ * docker+machine Executor variables. The executor is the actual machine that runs the job.
+ */
+variable "executor_docker_machine_instance_prefix" {
+  description = "Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = length(var.executor_docker_machine_instance_prefix) <= 28
+    error_message = "Maximum length for docker+machine executor name is 28 characters!"
+  }
+
+  validation {
+    condition     = var.executor_docker_machine_instance_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.executor_docker_machine_instance_prefix))
+    error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
+  }
+}
+
+# agent
+variable "auth_type_cache_sr" {
+  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
+  type        = string
+  default     = "iam"
 }
 
 # agent
@@ -544,13 +625,6 @@ variable "cloudwatch_logging_retention_in_days" {
   default     = 0
 }
 
-# global
-variable "tags" {
-  description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
-  type        = map(string)
-  default     = {}
-}
-
 # agent
 variable "agent_tags" {
   description = "Map of tags that will be added to agent EC2 instances."
@@ -563,13 +637,6 @@ variable "runner_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
   default     = {}
-}
-
-# global
-variable "suppressed_tags" {
-  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
-  type        = list(string)
-  default     = []
 }
 
 # agent
@@ -695,35 +762,6 @@ variable "enable_manage_gitlab_token" {
   }
 }
 
-# global
-variable "overrides" {
-  description = <<-EOT
-    This map provides the possibility to override some defaults.
-    The following attributes are supported:
-      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
-      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
-      * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
-      * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
-  EOT
-  type        = map(string)
-
-  default = {
-    name_sg                     = ""
-    name_iam_objects            = ""
-    name_runner_agent_instance  = ""
-    name_docker_machine_runners = ""
-  }
-
-  validation {
-    condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
-    error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
-  }
-
-  validation {
-    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
-    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
-  }
-}
 
 # executor
 variable "cache_bucket" {
@@ -823,34 +861,6 @@ variable "runners_docker_services" {
   default = []
 }
 
-# global
-variable "kms_key_id" {
-  description = "KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key."
-  type        = string
-  default     = ""
-}
-
-# global
-variable "enable_kms" {
-  description = "Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key."
-  type        = bool
-  default     = false
-}
-
-# global
-variable "kms_alias_name" {
-  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
-  type        = string
-  default     = ""
-}
-
-# global
-variable "kms_deletion_window_in_days" {
-  description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
-  type        = number
-  default     = 7
-}
-
 # agent
 variable "enable_eip" {
   description = "Enable the assignment of an EIP to the gitlab runner instance"
@@ -877,13 +887,6 @@ variable "asg_max_instance_lifetime" {
   description = "The seconds before an instance is refreshed in the ASG."
   default     = null
   type        = number
-}
-
-# global
-variable "permissions_boundary" {
-  description = "Name of permissions boundary policy to attach to AWS IAM roles"
-  default     = ""
-  type        = string
 }
 
 # agent

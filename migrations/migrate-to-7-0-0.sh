@@ -29,4 +29,37 @@ sed -i '/asg_terminate_lifecycle_lambda_timeout/d' "$converted_file"
 #
 sed -i '/aws_region/d' "$converted_file"
 
+sed 's/enable_kms/enable_managed_kms_key/g' "$converted_file" | \
+sed 's/kms_alias_name/kms_managed_alias_name/g' | \
+sed 's/kms_deletion_window_in_days/kms_managed_deletion_rotation_window_in_days/g' | \
+sed 's/permission_boundary/iam_permission_boundary/g' | \
+sed 's///g' | \
+sed 's///g' | \
+sed 's///g' | \
+sed 's///g' | \
+sed 's///g' | \
+sed 's///g' | \
+sed 's///g' | \
+sed 's///g' | \
+> "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
 
+# overrides block
+extracted_variables=$(grep -E '(name_sg|name_iam_objects|name_runner_agent_instance|name_docker_machine_runners)' "$converted_file")
+
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/name_sg/security_group_prefix/g' | \
+                      sed 's/name_iam_objects/iam_object_prefix/g' | \
+                      sed 's/name_runner_agent_instance/agent_instance_prefix/g' | \
+                      sed 's/name_docker_machine_runners/executor_docker_machine_instance_prefix/g'
+                    )
+
+sed '/name_sg/d' "$converted_file" | \
+sed '/name_iam_objects/d' | \
+sed '/name_runner_agent_instance/d' | \
+sed '/name_docker_machine_runners/d' | \
+sed '/overrides = {/d' \
+> "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
+
+echo "$(head -n -1 "$converted_file")
+  $extracted_variables
+}" > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"

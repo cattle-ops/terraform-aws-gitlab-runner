@@ -55,11 +55,9 @@ module "runner" {
     access_level       = "ref_protected"
   }
 
-  overrides = {
-    name_sg                     = "my-security-group"
-    name_runner_agent_instance  = "my-runner-agent"
-    name_docker_machine_runners = "my-runners-dm"
-  }
+  security_group_prefix                   = "my-security-group"
+  agent_instance_prefix                   = "my-runner-agent"
+  executor_docker_machine_instance_prefix = "my-runners-dm"
 
   cache_shared = "true"
 
