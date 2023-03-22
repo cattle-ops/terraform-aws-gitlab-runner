@@ -950,7 +950,7 @@ variable "runner_extra_config" {
 }
 
 variable "show_user_data_in_plan" {
-  description = "When enabled, shows the diff userdata.sh in Terraform plan"
+  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
   type        = bool
   default     = false
 }
