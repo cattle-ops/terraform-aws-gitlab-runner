@@ -31,11 +31,11 @@ module "runner_main_region" {
 
   executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  agent_gitlab_runner_name                         = var.runner_name
+  agent_gitlab_runner_name             = var.runner_name
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  executor_docker_privileged                 = "false"
+  executor_docker_privileged         = "false"
   executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   agent_gitlab_registration_config = {
@@ -96,11 +96,11 @@ module "runner_alternate_region" {
 
   executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  agent_gitlab_runner_name                         = var.runner_name
+  agent_gitlab_runner_name             = var.runner_name
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  executor_docker_privileged                 = "false"
+  executor_docker_privileged         = "false"
   executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   agent_gitlab_registration_config = {

@@ -49,13 +49,13 @@ module "runner" {
 
   environment = var.environment
 
-  vpc_id              = module.vpc.vpc_id
-  subnet_id           = element(module.vpc.private_subnets, 0)
+  vpc_id                            = module.vpc.vpc_id
+  subnet_id                         = element(module.vpc.private_subnets, 0)
   agent_collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
-  agent_gitlab_runner_name            = var.runner_name
-  agent_gitlab_url        = var.gitlab_url
-  agent_enable_ssm_access = true
+  agent_gitlab_runner_name = var.runner_name
+  agent_gitlab_url         = var.gitlab_url
+  agent_enable_ssm_access  = true
 
   agent_ping_allow_from_security_groups = [data.aws_security_group.default.id]
 
@@ -75,7 +75,7 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  executor_docker_privileged                 = "true"
+  executor_docker_privileged         = "true"
   executor_docker_additional_volumes = ["/certs/client"]
 
   executor_docker_volumes_tmpfs = [
