@@ -31,7 +31,7 @@ module "runner" {
 
   environment = var.environment
 
-  runners_use_private_address = false
+  executor_docker_machine_use_private_address = false
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
@@ -40,7 +40,7 @@ module "runner" {
 
   runners_name             = var.runner_name
   agent_gitlab_url       = var.gitlab_url
-  runners_environment_vars = ["KEY=Value", "FOO=bar"]
+  executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
   runners_privileged         = "false"
   runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
@@ -59,7 +59,7 @@ module "runner" {
   agent_instance_prefix                   = "my-runner-agent"
   executor_docker_machine_instance_prefix = "my-runners-dm"
 
-  cache_shared = "true"
+  executor_cache_shared = "true"
 
   cache_bucket = {
     create = false
@@ -73,7 +73,7 @@ module "runner2" {
 
   environment = "${var.environment}-2"
 
-  runners_use_private_address = false
+  executor_docker_machine_use_private_address = false
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
@@ -92,7 +92,7 @@ module "runner2" {
     maximum_timeout    = "3600"
   }
 
-  cache_shared = "true"
+  executor_cache_shared = "true"
 
   cache_bucket = {
     create = false

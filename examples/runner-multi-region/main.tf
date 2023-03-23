@@ -24,7 +24,7 @@ module "runner_main_region" {
 
   environment = var.environment
 
-  runners_use_private_address = false
+  executor_docker_machine_use_private_address = false
 
   vpc_id    = module.vpc_main_region.vpc_id
   subnet_id = element(module.vpc_main_region.public_subnets, 0)
@@ -33,7 +33,7 @@ module "runner_main_region" {
 
   runners_name             = var.runner_name
   agent_gitlab_url       = var.gitlab_url
-  runners_environment_vars = ["KEY=Value", "FOO=bar"]
+  executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
   runners_privileged         = "false"
   runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
@@ -52,10 +52,10 @@ module "runner_main_region" {
   executor_docker_machine_instance_prefix = "my-runners-dm"
   iam_object_prefix                       = local.name_iam_objects_main_region
 
-  cache_shared = "true"
+  executor_cache_shared = "true"
 
-  cache_bucket_prefix                  = local.cache_bucket_prefix_main_region
-  cache_bucket_name_include_account_id = false
+  executor_cache_bucket_prefix                  = local.cache_bucket_prefix_main_region
+  executor_cache_bucket_name_include_account_id = false
 }
 
 module "vpc_alternate_region" {
@@ -89,7 +89,7 @@ module "runner_alternate_region" {
 
   environment = var.environment
 
-  runners_use_private_address = false
+  executor_docker_machine_use_private_address = false
 
   vpc_id    = module.vpc_alternate_region.vpc_id
   subnet_id = element(module.vpc_alternate_region.public_subnets, 0)
@@ -98,7 +98,7 @@ module "runner_alternate_region" {
 
   runners_name             = var.runner_name
   agent_gitlab_url       = var.gitlab_url
-  runners_environment_vars = ["KEY=Value", "FOO=bar"]
+  executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
   runners_privileged         = "false"
   runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
@@ -118,8 +118,8 @@ module "runner_alternate_region" {
   executor_docker_machine_instance_prefix = "my-runners-dm"
   iam_object_prefix                       = local.name_iam_objects_main_region # <--
 
-  cache_shared = "true"
+  executor_cache_shared = "true"
 
-  cache_bucket_prefix                  = local.cache_bucket_prefix_alternate_region
-  cache_bucket_name_include_account_id = false
+  executor_cache_bucket_prefix                  = local.cache_bucket_prefix_alternate_region
+  executor_cache_bucket_name_include_account_id = false
 }

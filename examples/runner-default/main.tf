@@ -57,7 +57,7 @@ module "runner" {
   agent_gitlab_url       = var.gitlab_url
   agent_enable_ssm_access = true
 
-  gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
+  agent_ping_allow_from_security_groups = [data.aws_security_group.default.id]
 
   docker_machine_spot_price_bid = "on-demand-price"
 
@@ -102,14 +102,14 @@ module "runner" {
     }
   ]
 
-  runners_pre_build_script = <<EOT
+  executor_pre_build_script = <<EOT
   '''
   echo 'multiline 1'
   echo 'multiline 2'
   '''
   EOT
 
-  runners_post_build_script = "\"echo 'single line'\""
+  executor_post_build_script = "\"echo 'single line'\""
 
   # Uncomment the HCL code below to configure a docker service so that registry mirror is used in auto-devops jobs
   # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27171 and https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#the-service-in-the-gitlab-runner-configuration-file

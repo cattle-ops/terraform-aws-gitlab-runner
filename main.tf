@@ -39,7 +39,7 @@ locals {
   template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
       eip                 = var.agent_enable_eip ? local.template_eip : ""
-      logging             = var.enable_cloudwatch_logging ? local.logging_user_data : ""
+      logging             = var.agent_cloudwatch_enable ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.agent_user_data_enable_trace_log
       yum_update          = var.agent_yum_update ? local.file_yum_update : ""
@@ -54,7 +54,7 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
-      gitlab_runner_version                        = var.gitlab_runner_version
+      gitlab_runner_version                        = var.agent_gitlab_runner_version
       docker_machine_version                       = var.docker_machine_version
       docker_machine_download_url                  = var.docker_machine_download_url
       runners_config                               = local.template_runner_config
@@ -63,8 +63,8 @@ locals {
       runners_install_amazon_ecr_credential_helper = var.agent_install_amazon_ecr_credential_helper
       curl_cacert                                  = length(var.agent_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
-      pre_install                                  = var.userdata_pre_install
-      post_install                                 = var.userdata_post_install
+      pre_install                                  = var.agent_userdata_pre_install
+      post_install                                 = var.agent_userdata_post_install
       runners_gitlab_url                           = var.agent_gitlab_url
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
@@ -121,21 +121,21 @@ locals {
       runners_root_size                 = var.runners_root_size
       runners_volume_type               = var.runners_volume_type
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
-      runners_use_private_address_only  = var.runners_use_private_address
-      runners_use_private_address       = !var.runners_use_private_address
-      runners_request_spot_instance     = var.runners_request_spot_instance
-      runners_environment_vars          = jsonencode(var.runners_environment_vars)
-      runners_pre_build_script          = var.runners_pre_build_script
-      runners_post_build_script         = var.runners_post_build_script
-      runners_pre_clone_script          = var.runners_pre_clone_script
-      runners_request_concurrency       = var.runners_request_concurrency
-      runners_output_limit              = var.runners_output_limit
+      runners_use_private_address_only  = var.executor_docker_machine_use_private_address
+      runners_use_private_address       = !var.executor_docker_machine_use_private_address
+      runners_request_spot_instance     = var.executor_docker_machine_request_spot_instances
+      runners_environment_vars          = jsonencode(var.executor_extra_environment_variables)
+      runners_pre_build_script          = var.executor_pre_build_script
+      runners_post_build_script         = var.executor_post_build_script
+      runners_pre_clone_script          = var.executor_pre_clone_script
+      runners_request_concurrency       = var.executor_request_concurrency
+      runners_output_limit              = var.executor_output_limit
       runners_check_interval            = var.agent_gitlab_check_interval
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
       bucket_name                       = local.bucket_name
-      shared_cache                      = var.cache_shared
+      shared_cache                      = var.executor_cache_shared
       sentry_dsn                        = var.agent_sentry_dsn
       prometheus_listen_address         = var.agent_prometheus_listen_address
       auth_type                         = var.auth_type_cache_sr
@@ -163,13 +163,14 @@ data "aws_ami" "docker-machine" {
 # ignores: Auto Scaling Group With No Associated ELB --> that's simply not true, as the EC2 instance contacts GitLab. So no ELB needed here.
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
+  # TODO Please explain how `enable_asg_recreation` works
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = [var.subnet_id]
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  max_instance_lifetime     = var.asg_max_instance_lifetime
+  max_instance_lifetime     = var.agent_max_instance_lifetime_seconds
   enabled_metrics           = var.metrics_autoscaling
 
   dynamic "tag" {
@@ -196,7 +197,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   }
 
   timeouts {
-    delete = var.asg_delete_timeout
+    delete = var.agent_terraform_timeout_delete_asg
   }
   lifecycle {
     ignore_changes = [min_size, max_size, desired_capacity]
@@ -285,7 +286,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   }
   network_interfaces {
     security_groups             = concat([aws_security_group.runner.id], var.agent_extra_security_group_ids)
-    associate_public_ip_address = false == (var.runner_agent_uses_private_address == false ? var.runner_agent_uses_private_address : var.runners_use_private_address)
+    associate_public_ip_address = false == (var.agent_use_private_address == false ? var.agent_use_private_address : var.executor_docker_machine_use_private_address)
   }
   tag_specifications {
     resource_type = "instance"
@@ -335,14 +336,14 @@ module "cache" {
   environment = var.environment
   tags        = local.tags
 
-  cache_bucket_prefix                  = var.cache_bucket_prefix
-  cache_bucket_name_include_account_id = var.cache_bucket_name_include_account_id
-  cache_bucket_set_random_suffix       = var.cache_bucket_set_random_suffix
-  cache_bucket_versioning              = var.cache_bucket_versioning
-  cache_expiration_days                = var.cache_expiration_days
-  cache_lifecycle_prefix               = var.cache_shared ? "project/" : "runner/"
-  cache_logging_bucket                 = var.cache_logging_bucket
-  cache_logging_bucket_prefix          = var.cache_logging_bucket_prefix
+  cache_bucket_prefix                  = var.executor_cache_bucket_prefix
+  cache_bucket_name_include_account_id = var.executor_cache_bucket_name_include_account_id
+  cache_bucket_set_random_suffix       = var.executor_cache_bucket_enable_random_suffix
+  cache_bucket_versioning              = var.executor_cache_enable_versioning
+  cache_expiration_days                = var.executor_cache_expiration_days
+  cache_lifecycle_prefix               = var.executor_cache_shared ? "project/" : "runner/"
+  cache_logging_bucket                 = var.executor_cache_logging_bucket_id
+  cache_logging_bucket_prefix          = var.executor_cache_logging_bucket_prefix
 
   kms_key_id = local.kms_key
 
@@ -365,10 +366,10 @@ resource "aws_iam_role" "instance" {
   count = var.agent_create_runner_iam_role_profile ? 1 : 0
 
   name                 = local.aws_iam_role_instance_name
-  assume_role_policy   = length(var.instance_role_json) > 0 ? var.instance_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
+  assume_role_policy   = length(var.agent_assume_role_json) > 0 ? var.agent_assume_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
-  tags = merge(local.tags, var.role_tags)
+  tags = merge(local.tags, var.agent_extra_role_tags)
 }
 
 ################################################################################
@@ -454,7 +455,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 resource "aws_iam_role" "docker_machine" {
   count                = var.executor_type == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
-  assume_role_policy   = length(var.docker_machine_role_json) > 0 ? var.docker_machine_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
+  assume_role_policy   = length(var.executor_docker_machine_assume_role_json) > 0 ? var.executor_docker_machine_assume_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
   tags = local.tags
@@ -471,10 +472,10 @@ resource "aws_iam_instance_profile" "docker_machine" {
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
-  count = var.executor_type == "docker+machine" ? length(var.docker_machine_iam_policy_arns) : 0
+  count = var.executor_type == "docker+machine" ? length(var.executor_docker_machine_extra_iam_policy_arns) : 0
 
   role       = aws_iam_role.docker_machine[0].name
-  policy_arn = var.docker_machine_iam_policy_arns[count.index]
+  policy_arn = var.executor_docker_machine_extra_iam_policy_arns[count.index]
 }
 
 ################################################################################
@@ -561,7 +562,7 @@ module "terminate_agent_hook" {
   environment                          = var.environment
   asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
-  cloudwatch_logging_retention_in_days = var.cloudwatch_logging_retention_in_days
+  cloudwatch_logging_retention_in_days = var.agent_cloudwatch_retention_days
   name_iam_objects                     = local.name_iam_objects
   name_docker_machine_runners          = local.runner_tags_merged["Name"]
   role_permissions_boundary            = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"

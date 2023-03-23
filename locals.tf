@@ -50,7 +50,7 @@ locals {
     join(",", formatlist("%q", concat(var.docker_machine_options, local.runners_docker_registry_mirror_option))),
   )
 
-  runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
+  runners_docker_registry_mirror_option = var.executor_docker_machine_docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.executor_docker_machine_docker_registry_mirror_url}"]
 
   # Ensure max builds is optional
   runners_max_builds_string = var.executor_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_max_builds)

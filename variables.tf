@@ -85,6 +85,12 @@ variable "agent_instance_type" {
   default     = "t3.micro"
 }
 
+variable "agent_extra_instance_tags" {
+  description = "Map of tags that will be added to Agent EC2 instance."
+  type        = map(string)
+  default     = {}
+}
+
 variable "agent_ebs_optimized" {
   description = "Enable the Agent instance to be EBS-optimized."
   type        = bool
@@ -118,10 +124,54 @@ variable "agent_enable_monitoring" {
   default     = true
 }
 
+variable "agent_ping_enable" {
+  description = "Allow ICMP Ping to the Agent. Specify `agent_ping_allowed_from_security_groups` too!"
+  type        = bool
+  default     = false
+}
+
+variable "agent_ping_allow_from_security_groups" {
+  description = "A list of security group ids that are allowed to access the gitlab runner agent"
+  type        = list(string)
+  default     = []
+}
+
+variable "agent_security_group_description" {
+  description = "A description for the Agents security group"
+  type        = string
+  default     = "A security group containing gitlab-runner agent instances"
+}
+
 variable "agent_extra_security_group_ids" {
   description = "IDs of security groups to add to the Agent."
   type        = list(string)
   default     = []
+}
+
+variable "agent_extra_egress_rules" {
+  description = "List of egress rules for the Agent."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [{
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    prefix_list_ids  = null
+    from_port        = 0
+    protocol         = "-1"
+    security_groups  = null
+    self             = null
+    to_port          = 0
+    description      = null
+  }]
 }
 
 variable "agent_create_runner_iam_role_profile" {
@@ -136,6 +186,18 @@ variable "agent_iam_role_profile_name" {
   default     = ""
 }
 
+variable "agent_extra_role_tags" {
+  description = "Map of tags that will be added to the role created. Useful for tag based authorization."
+  type        = map(string)
+  default     = {}
+}
+
+variable "agent_assume_role_json" {
+  description = "The assume role policy for the Agent."
+  type        = string
+  default     = ""
+}
+
 variable "agent_extra_iam_policy_arns" {
   description = "List of policy ARNs to be added to the instance profile of the Agent."
   type        = list(string)
@@ -146,6 +208,12 @@ variable "agent_enable_eip" {
   description = "Assigns an EIP to the Agent."
   type        = bool
   default     = false
+}
+
+variable "agent_use_private_address" {
+  description = "Restrict the Agent to the use of a private IP address. If this is set to `false` it will override the `runners_use_private_address` for the agent."
+  type        = bool
+  default     = true
 }
 
 variable "agent_enable_ssm_access" {
@@ -174,6 +242,12 @@ variable "agent_schedule_enable" {
   description = "Set to `true` to enable the auto scaling group schedule for the Agent."
   type        = bool
   default     = false
+}
+
+variable "agent_max_instance_lifetime_seconds" {
+  description = "The maximum time an Agent should live before it is killed."
+  default     = null
+  type        = number
 }
 
 variable "agent_schedule_config" {
@@ -206,6 +280,18 @@ variable "agent_yum_update" {
   default     = true
 }
 
+variable "agent_userdata_pre_install" {
+  description = "User-data script snippet to insert before GitLab Runner install"
+  type        = string
+  default     = ""
+}
+
+variable "agent_userdata_post_install" {
+  description = "User-data script snippet to insert after GitLab Runner install"
+  type        = string
+  default     = ""
+}
+
 variable "agent_user_data_extra" {
   description = "Extra commands to run as part of starting the Agent"
   type        = string
@@ -216,6 +302,30 @@ variable "agent_user_data_enable_trace_log" {
   description = "Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
   default     = true
+}
+
+variable "agent_cloudwatch_enable" {
+  description = "Boolean used to enable or disable the CloudWatch logging."
+  type        = bool
+  default     = true
+}
+
+variable "agent_cloudwatch_retention_days" {
+  description = "Retention for cloudwatch logs. Defaults to unlimited. Requires `agent_cloudwatch_enable = true`."
+  type        = number
+  default     = 0
+}
+
+variable "agent_cloudwatch_log_group_name" {
+  description = "Option to override the default name (`environment`) of the log group. Requires `agent_cloudwatch_enable = true`."
+  default     = null
+  type        = string
+}
+
+variable "agent_gitlab_runner_version" {
+  description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
+  type        = string
+  default     = "15.8.2"
 }
 
 variable "agent_gitlab_registration_config" {
@@ -286,6 +396,12 @@ variable "agent_terminate_ec2_lifecycle_hook_name" {
   default     = null
 }
 
+variable "agent_terraform_timeout_delete_asg" {
+  description = "Timeout when trying to delete the Agent ASG."
+  default     = "10m"
+  type        = string
+}
+
 /*
  * Executor variables valid for all executors.
  */
@@ -324,9 +440,139 @@ variable "executor_idle_count" {
   default     = 0
 }
 
+variable "executor_request_concurrency" {
+  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
+  type        = number
+  default     = 1
+}
+
+variable "executor_output_limit" {
+  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
+  type        = number
+  default     = 4096
+}
+
+variable "executor_extra_environment_variables" {
+  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example."
+  type        = list(string)
+  default     = []
+}
+
+variable "executor_cache_shared" {
+  description = "Enables cache sharing between runners. `false` by default."
+  type        = bool
+  default     = false
+}
+
+variable "executor_cache_expiration_days" {
+  description = "Number of days before cache objects expire."
+  type        = number
+  default     = 1
+}
+
+variable "executor_cache_enable_versioning" {
+  description = "Boolean used to enable versioning on the cache bucket, false by default."
+  type        = bool
+  default     = false
+}
+
+variable "executor_cache_bucket_prefix" {
+  description = "Prefix for s3 cache bucket name."
+  type        = string
+  default     = ""
+}
+
+variable "executor_cache_bucket_name_include_account_id" {
+  description = "Boolean to add current account ID to cache bucket name."
+  type        = bool
+  default     = true
+}
+
+variable "executor_cache_bucket_enable_random_suffix" {
+  description = "Append the cache bucket name with a random string suffix"
+  type        = bool
+  default     = false
+}
+
+variable "executor_cache_logging_bucket_id" {
+  type        = string
+  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
+  default     = null
+}
+
+variable "executor_cache_logging_bucket_prefix" {
+  type        = string
+  description = "Prefix within the `executor_cache_logging_bucket_name`."
+  default     = null
+}
+
+variable "executor_pre_clone_script" {
+  description = "Script to execute in the pipeline before cloning the Git repository. this can be used to adjust the Git client configuration first, for example."
+  type        = string
+  default     = "\"\""
+}
+
+variable "executor_pre_build_script" {
+  description = "Script to execute in the pipeline just before the build."
+  type        = string
+  default     = "\"\""
+}
+
+variable "executor_post_build_script" {
+  description = "Script to execute in the pipeline just after the build, but before executing after_script."
+  type        = string
+  default     = "\"\""
+}
+
+
 /*
  * docker+machine Executor variables. The executor is the actual machine that runs the job.
  */
+variable "executor_docker_machine_extra_role_tags" {
+  description = "Map of tags that will be added to runner EC2 instances."
+  type        = map(string)
+  default     = {}
+}
+
+variable "executor_docker_machine_extra_egress_rules" {
+  description = "List of egress rules for the docker-machine instance(s)."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [{
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    prefix_list_ids  = null
+    from_port        = 0
+    protocol         = "-1"
+    security_groups  = null
+    self             = null
+    to_port          = 0
+    description      = "Allow all egress traffic for docker machine build runners"
+  }]
+}
+
+variable "executor_docker_machine_assume_role_json" {
+  description = "Assume role policy for the docker+machine Executor."
+  type        = string
+  default     = ""
+}
+
+# executor
+variable "executor_docker_machine_extra_iam_policy_arns" {
+  type        = list(string)
+  description = "List of policy ARNs to be added to the instance profile of the docker+machine Executor."
+  default     = []
+}
+
 variable "executor_docker_machine_ami_filter" {
   description = "List of maps used to create the AMI filter for the docker+machine Executor."
   type        = map(list(string))
@@ -342,6 +588,12 @@ variable "executor_docker_machine_ami_owners" {
 
   # Canonical
   default = ["099720109477"]
+}
+
+variable "executor_docker_machine_use_private_address" {
+  description = "Restrict Executors to the use of a private IP address. If `agent_use_private_address` is set to `true` (default), `executor_docker_machine_use_private_address` will also apply for the agent."
+  type        = bool
+  default     = true
 }
 
 variable "executor_docker_machine_instance_prefix" {
@@ -360,12 +612,23 @@ variable "executor_docker_machine_instance_prefix" {
   }
 }
 
+variable "executor_docker_machine_request_spot_instances" {
+  description = "Whether or not to request spot instances via docker-machine"
+  type        = bool
+  default     = true
+}
+
 variable "executor_docker_machine_userdata" {
   description = "Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted."
   type        = string
   default     = ""
 }
 
+variable "executor_docker_machine_docker_registry_mirror_url" {
+  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
+  type        = string
+  default     = ""
+}
 
 
 
@@ -572,236 +835,6 @@ variable "runners_iam_instance_profile_name" {
   default     = ""
 }
 
-# executor
-variable "runners_docker_registry_mirror" {
-  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
-  type        = string
-  default     = ""
-}
-
-# executor
-variable "runners_environment_vars" {
-  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml"
-  type        = list(string)
-  default     = []
-}
-
-# executor
-variable "runners_pre_build_script" {
-  description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
-  type        = string
-  default     = "\"\""
-}
-
-# executor
-variable "runners_post_build_script" {
-  description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
-  type        = string
-  default     = "\"\""
-}
-
-# executor
-variable "runners_pre_clone_script" {
-  description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
-  type        = string
-  default     = "\"\""
-}
-
-# executor
-variable "runners_request_concurrency" {
-  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
-  type        = number
-  default     = 1
-}
-
-# executor
-variable "runners_output_limit" {
-  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
-  type        = number
-  default     = 4096
-}
-
-# agent
-variable "userdata_pre_install" {
-  description = "User-data script snippet to insert before GitLab runner install"
-  type        = string
-  default     = ""
-}
-
-# agent
-variable "userdata_post_install" {
-  description = "User-data script snippet to insert after GitLab runner install"
-  type        = string
-  default     = ""
-}
-
-# agent
-variable "runners_use_private_address" {
-  description = "Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent."
-  type        = bool
-  default     = true
-}
-
-# agent
-variable "runner_agent_uses_private_address" {
-  description = "Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent."
-  type        = bool
-  default     = true
-}
-
-# executor
-variable "runners_request_spot_instance" {
-  description = "Whether or not to request spot instances via docker-machine"
-  type        = bool
-  default     = true
-}
-
-# executor
-variable "cache_logging_bucket" {
-  type        = string
-  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
-  default     = null
-}
-
-# executor
-variable "cache_logging_bucket_prefix" {
-  type        = string
-  description = "Prefix within the `cache_logging_bucket`."
-  default     = null
-}
-
-# executor
-variable "cache_bucket_prefix" {
-  description = "Prefix for s3 cache bucket name."
-  type        = string
-  default     = ""
-}
-
-# executor
-variable "cache_bucket_name_include_account_id" {
-  description = "Boolean to add current account ID to cache bucket name."
-  type        = bool
-  default     = true
-}
-
-# executor
-variable "cache_bucket_set_random_suffix" {
-  description = "Append the cache bucket name with a random string suffix"
-  type        = bool
-  default     = false
-}
-
-# executor
-variable "cache_bucket_versioning" {
-  description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = bool
-  default     = false
-}
-
-# executor
-variable "cache_expiration_days" {
-  description = "Number of days before cache objects expires."
-  type        = number
-  default     = 1
-}
-
-# executor
-variable "cache_shared" {
-  description = "Enables cache sharing between runners, false by default."
-  type        = bool
-  default     = false
-}
-
-# agent
-variable "gitlab_runner_version" {
-  description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
-  type        = string
-  default     = "15.8.2"
-}
-
-# agent
-variable "enable_ping" {
-  description = "Allow ICMP Ping to the ec2 instances."
-  type        = bool
-  default     = false
-}
-
-# agent
-variable "gitlab_runner_egress_rules" {
-  description = "List of egress rules for the gitlab runner instance."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
-  }))
-  default = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    prefix_list_ids  = null
-    from_port        = 0
-    protocol         = "-1"
-    security_groups  = null
-    self             = null
-    to_port          = 0
-    description      = null
-  }]
-}
-
-# agent
-variable "gitlab_runner_security_group_ids" {
-  description = "A list of security group ids that are allowed to access the gitlab runner agent"
-  type        = list(string)
-  default     = []
-}
-
-# agent
-variable "gitlab_runner_security_group_description" {
-  description = "A description for the gitlab-runner security group"
-  type        = string
-  default     = "A security group containing gitlab-runner agent instances"
-}
-
-# agent
-variable "enable_cloudwatch_logging" {
-  description = "Boolean used to enable or disable the CloudWatch logging."
-  type        = bool
-  default     = true
-}
-
-# agent
-variable "cloudwatch_logging_retention_in_days" {
-  description = "Retention for cloudwatch logs. Defaults to unlimited"
-  type        = number
-  default     = 0
-}
-
-# agent
-variable "agent_tags" {
-  description = "Map of tags that will be added to agent EC2 instances."
-  type        = map(string)
-  default     = {}
-}
-
-# executor
-variable "runner_tags" {
-  description = "Map of tags that will be added to runner EC2 instances."
-  type        = map(string)
-  default     = {}
-}
-
-# agent
-variable "role_tags" {
-  description = "Map of tags that will be added to the role created. Useful for tag based authorization."
-  type        = map(string)
-  default     = {}
-}
-
 # agent
 variable "allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
@@ -817,32 +850,12 @@ variable "docker_machine_options" {
   default     = []
 }
 
-# agent
-variable "instance_role_json" {
-  description = "Default runner instance override policy, expected to be in JSON format."
-  type        = string
-  default     = ""
-}
-
-# executor
-variable "docker_machine_role_json" {
-  description = "Docker machine runner instance override policy, expected to be in JSON format."
-  type        = string
-  default     = ""
-}
-
 # executor
 variable "docker_machine_security_group_description" {
   description = "A description for the docker-machine security group"
   type        = string
   default     = "A security group containing docker-machine instances"
 }
-
-
-
-
-
-
 
 # agent
 variable "secure_parameter_store_runner_token_key" {
@@ -885,12 +898,6 @@ variable "cache_bucket" {
   }
 }
 
-
-
-
-
-
-
 # executor
 variable "enable_docker_machine_ssm_access" {
   description = "Add IAM policies to the docker-machine instances to connect via the Session Manager."
@@ -928,69 +935,4 @@ variable "runners_docker_services" {
     command    = list(string)
   }))
   default = []
-}
-
-# agent
-variable "enable_asg_recreation" {
-  description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = true
-  type        = bool
-}
-
-# agent
-variable "asg_delete_timeout" {
-  description = "Timeout when trying to delete the Runner ASG."
-  default     = "10m"
-  type        = string
-}
-
-# agent
-variable "asg_max_instance_lifetime" {
-  description = "The seconds before an instance is refreshed in the ASG."
-  default     = null
-  type        = number
-}
-
-# agent
-variable "log_group_name" {
-  description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
-  default     = null
-  type        = string
-}
-
-
-
-# executor
-variable "docker_machine_iam_policy_arns" {
-  type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
-  default     = []
-}
-
-
-# executor
-variable "docker_machine_egress_rules" {
-  description = "List of egress rules for the docker-machine instance(s)."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
-  }))
-  default = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    prefix_list_ids  = null
-    from_port        = 0
-    protocol         = "-1"
-    security_groups  = null
-    self             = null
-    to_port          = 0
-    description      = "Allow all egress traffic for docker machine build runners"
-  }]
 }

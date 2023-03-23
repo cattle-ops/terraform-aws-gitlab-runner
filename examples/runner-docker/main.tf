@@ -41,11 +41,11 @@ module "runner" {
 
   environment = var.environment
 
-  runners_use_private_address = false
+  executor_docker_machine_use_private_address = false
   agent_enable_eip                  = true
 
   docker_machine_security_group_description = "Custom description for docker-machine"
-  gitlab_runner_security_group_description  = "Custom description for gitlab-runner"
+  agent_security_group_description  = "Custom description for gitlab-runner"
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)

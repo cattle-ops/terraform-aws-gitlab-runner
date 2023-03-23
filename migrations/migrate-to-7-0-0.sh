@@ -70,6 +70,43 @@ sed 's/[^_]ami_filter/agent_ami_filter/g' | \
 sed 's/[^_]ami_owners/agent_ami_owners/g' | \
 sed 's/runner_ami_filter/executor_docker_machine_ami_filter/g' | \
 sed 's/runner_ami_owners/executor_docker_machine_ami_owners/g' | \
+sed 's/instance_role_json/agent_assume_role_json/g' | \
+sed 's/docker_machine_role_json/executor_docker_machine_assume_role_json/g' | \
+sed 's/role_tags/agent_extra_role_tags/g' | \
+sed 's/runner_tags/executor_docker_machine_extra_role_tags/g' | \
+sed 's/agent_tags/agent_extra_instance_tags/g' | \
+sed 's/enable_ping/agent_ping_enable/g' | \
+sed 's/gitlab_runner_version/agent_gitlab_runner_version/g' | \
+sed 's/gitlab_runner_egress_rules/agent_extra_egress_rules/g' | \
+sed 's/gitlab_runner_security_group_ids/agent_ping_allow_from_security_groups/g' | \
+sed 's/gitlab_runner_security_group_description/agent_security_group_description/g' | \
+sed 's/cache_shared/executor_cache_shared/g' | \
+sed 's/cache_expiration_days/executor_cache_expiration_days/g' | \
+sed 's/cache_bucket_versioning/executor_cache_enable_versioning/g' | \
+sed 's/cache_logging_bucket_prefix/executor_cache_logging_bucket_prefix/g' | \
+sed 's/cache_logging_bucket/executor_cache_logging_bucket_id/g' | \
+sed 's/cache_bucket_set_random_suffix/executor_cache_bucket_enable_random_suffix/g' | \
+sed 's/cache_bucket_name_include_account_id/executor_cache_bucket_name_include_account_id/g' | \
+sed 's/cache_bucket_prefix/executor_cache_bucket_prefix/g' | \
+sed 's/runner_agent_uses_private_address/agent_use_private_address/g' | \
+sed 's/runners_use_private_address/executor_docker_machine_use_private_address/g' | \
+sed 's/runners_request_spot_instance/executor_docker_machine_request_spot_instances/g' | \
+sed 's/userdata_pre_install/agent_userdata_pre_install/g' | \
+sed 's/userdata_post_install/agent_userdata_post_install/g' | \
+sed 's/runners_pre_build_script/executor_pre_build_script/g' | \
+sed 's/runners_post_build_script/executor_post_build_script/g' | \
+sed 's/runners_pre_clone_script/executor_pre_clone_script/g' | \
+sed 's/runners_request_concurrency/executor_request_concurrency/g' | \
+sed 's/runners_output_limit/executor_output_limit/g' | \
+sed 's/runners_environment_vars/executor_extra_environment_variables/g' | \
+sed 's/runners_docker_registry_mirror/executor_docker_machine_docker_registry_mirror_url/g' | \
+sed 's/docker_machine_egress_rules/executor_docker_machine_extra_egress_rules/g' | \
+sed 's/docker_machine_iam_policy_arns/executor_docker_machine_extra_iam_policy_arns/g' | \
+sed 's/enable_cloudwatch_logging/agent_cloudwatch_enable/g' | \
+sed 's/cloudwatch_logging_retention_in_days/agent_cloudwatch_retention_days/g' | \
+sed 's/log_group_name/agent_cloudwatch_log_group_name/g' | \
+sed 's/asg_max_instance_lifetime/agent_max_instance_lifetime_seconds/g' | \
+sed 's/asg_delete_timeout/agent_terraform_timeout_delete_asg/g' | \
 sed 's///g' | \
 sed 's///g' | \
 sed 's///g' | \
@@ -88,10 +125,7 @@ sed 's///g' | \
 sed 's///g' | \
 sed 's///g' | \
 sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
+
 > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
 
 # overrides block

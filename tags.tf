@@ -19,14 +19,14 @@ locals {
       "Environment" = format("%s", var.environment)
     },
     var.tags,
-    var.agent_tags
+    var.agent_extra_instance_tags
   )
 
   agent_tags = { for k, v in local.agent_tags_merged : k => v if !contains(var.suppressed_tags, k) }
 
   runner_tags_merged = merge(
     local.tags,
-    var.runner_tags,
+    var.executor_docker_machine_extra_role_tags,
     # overwrites the `Name` key from `local.tags`
     var.executor_docker_machine_instance_prefix == "" ? { Name = substr(format("%s", var.environment), 0, 16) } : { Name = var.executor_docker_machine_instance_prefix },
   )
