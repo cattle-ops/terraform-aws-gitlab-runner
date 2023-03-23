@@ -174,6 +174,13 @@ variable "agent_extra_egress_rules" {
   }]
 }
 
+# agent
+variable "agent_allow_iam_service_linked_role_creation" {
+  description = "Boolean used to control attaching the policy to the Agent to create service linked roles."
+  type        = bool
+  default     = true
+}
+
 variable "agent_create_runner_iam_role_profile" {
   description = "Whether to create the IAM role/profile for the Agent. If you provide your own role, make sure that it has the required permissions."
   type        = bool
@@ -248,6 +255,12 @@ variable "agent_max_instance_lifetime_seconds" {
   description = "The maximum time an Agent should live before it is killed."
   default     = null
   type        = number
+}
+
+variable "agent_enable_asg_recreation" {
+  description = "Enable automatic redeployment of the Agent ASG when the Launch Configs change."
+  default     = true
+  type        = bool
 }
 
 variable "agent_schedule_config" {
@@ -343,6 +356,12 @@ variable "agent_gitlab_registration_config" {
   }
 }
 
+variable "agent_gitlab_token_secure_parameter_store" {
+  description = "Name of the Secure Parameter Store entry to hold the GitLab Runner token."
+  type        = string
+  default     = "runner-token"
+}
+
 variable "agent_gitlab_ca_certificate" {
   description = "Trusted CA certificate bundle (PEM format). Example: `file(\"$${path.module}/ca.crt\")`"
   type        = string
@@ -384,6 +403,12 @@ variable "agent_sentry_dsn" {
   default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
 }
 
+variable "agent_sentry_secure_parameter_store_name" {
+  description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
+  type        = string
+  default     = "sentry-dsn"
+}
+
 variable "agent_prometheus_listen_address" {
   description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
   type        = string
@@ -416,10 +441,10 @@ variable "executor_type" {
   }
 }
 
-variable "executor_max_builds" {
-  description = "Destroys the executor after processing this many jobs. Set to `0` to disable this feature."
-  type        = number
-  default     = 0
+variable "executor_enable_ssm_access" {
+  description = "Allows to connect to the Executor via SSM."
+  type        = bool
+  default     = false
 }
 
 variable "executor_max_jobs" {
@@ -456,6 +481,20 @@ variable "executor_extra_environment_variables" {
   description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example."
   type        = list(string)
   default     = []
+}
+
+variable "executor_cache_bucket" {
+  description = <<-EOT
+    Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
+    cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and
+    bucket name. See the public runner example for more details."
+  EOT
+  type        = map({ create = bool, policy = string, bucket = string })
+  default = {
+    create = true
+    policy = ""
+    bucket = ""
+  }
 }
 
 variable "executor_cache_shared" {
@@ -524,9 +563,83 @@ variable "executor_post_build_script" {
   default     = "\"\""
 }
 
+/*
+ * Docker Executor variables.
+ */
+variable "executor_docker_volumes_tmpfs" {
+  description = "Mount a tmpfs in Executor container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = []
+}
+
+variable "executor_docker_services" {
+  description = "Starts additional services with the Docker container. All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
+  type = list(object({
+    name       = string
+    alias      = string
+    entrypoint = list(string)
+    command    = list(string)
+  }))
+  default = []
+}
+
+variable "executor_docker_services_volumes_tmpfs" {
+  description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = []
+}
+
+variable "executor_docker_extra_hosts" {
+  description = "Extra hosts to be passed to the container, e.g other-host:127.0.0.1"
+  type        = list(any)
+  default     = []
+}
+
+variable "executor_docker_shm_size" {
+  description = "shm_size for the runners, will be used in the runner config.toml"
+  type        = number
+  default     = 0
+}
+
+variable "executor_docker_runtime" {
+  description = "Docker runtime for Executors"
+  type        = string
+  default     = ""
+}
+
+variable "executor_docker_helper_image" {
+  description = "Overrides the default helper image used to clone repos and upload artifacts"
+  type        = string
+  default     = ""
+}
+
+variable "executor_docker_pull_policies" {
+  description = "Pull policies for the Executor, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
+  type        = list(string)
+  default     = ["always"]
+}
+
+variable "executor_docker_additional_volumes" {
+  description = "Additional volumes that will be used in the Executor, e.g Docker socket"
+  type        = list(any)
+  default     = []
+}
+
+variable "executor_docker_add_dind_volumes" {
+  description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
+  type        = bool
+  default     = false
+}
 
 /*
- * docker+machine Executor variables. The executor is the actual machine that runs the job.
+ * docker+machine Executor variables. The executor is the actual machine that runs the job. Please specify the
+ * `executor_docker_*` variables as well as Docker is used on the docker+machine executor.
  */
 variable "executor_docker_machine_extra_role_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
@@ -560,6 +673,12 @@ variable "executor_docker_machine_extra_egress_rules" {
   }]
 }
 
+variable "executor_docker_machine_iam_instance_profile_name" {
+  description = "IAM instance profile name of the Executors."
+  type        = string
+  default     = ""
+}
+
 variable "executor_docker_machine_assume_role_json" {
   description = "Assume role policy for the docker+machine Executor."
   type        = string
@@ -571,6 +690,12 @@ variable "executor_docker_machine_extra_iam_policy_arns" {
   type        = list(string)
   description = "List of policy ARNs to be added to the instance profile of the docker+machine Executor."
   default     = []
+}
+
+variable "executor_docker_machine_security_group_description" {
+  description = "A description for the docker+machine Executor security group"
+  type        = string
+  default     = "A security group containing docker-machine instances"
 }
 
 variable "executor_docker_machine_ami_filter" {
@@ -612,6 +737,12 @@ variable "executor_docker_machine_instance_prefix" {
   }
 }
 
+variable "executor_docker_machine_enable_monitoring" {
+  description = "Enable detailed cloudwatch monitoring for spot instances."
+  type        = bool
+  default     = false
+}
+
 variable "executor_docker_machine_request_spot_instances" {
   description = "Whether or not to request spot instances via docker-machine"
   type        = bool
@@ -622,6 +753,48 @@ variable "executor_docker_machine_userdata" {
   description = "Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted."
   type        = string
   default     = ""
+}
+
+variable "executor_docker_machine_ec2_volume_type" {
+  description = "Executor volume type"
+  type        = string
+  default     = "gp2"
+}
+
+variable "executor_docker_machine_ec2_root_size" {
+  description = "Executor root size in GB."
+  type        = number
+  default     = 16
+}
+
+variable "executor_docker_machine_ec2_ebs_optimized" {
+  description = "Enable Executors to be EBS-optimized."
+  type        = bool
+  default     = true
+}
+
+variable "executor_docker_machine_ec2_options" {
+  # cspell:ignore amazonec
+  description = "List of additional options for the docker+machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
+  type        = list(string)
+  default     = []
+}
+
+variable "executor_docker_machine_autoscaling" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
+  type = list(object({
+    periods    = list(string)
+    idle_count = number
+    idle_time  = number
+    timezone   = string
+  }))
+  default = []
+}
+
+variable "executor_docker_machine_max_builds" {
+  description = "Destroys the executor after processing this many jobs. Set to `0` to disable this feature."
+  type        = number
+  default     = 0
 }
 
 variable "executor_docker_machine_docker_registry_mirror_url" {
@@ -739,200 +912,4 @@ variable "runners_disable_cache" {
   default     = false
 }
 
-# executor
-variable "runners_add_dind_volumes" {
-  description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
-  type        = bool
-  default     = false
-}
 
-# executor
-variable "runners_additional_volumes" {
-  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
-  type        = list(any)
-  default     = []
-}
-
-# executor
-variable "runners_extra_hosts" {
-  description = "Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1"
-  type        = list(any)
-  default     = []
-}
-
-# executor
-variable "runners_shm_size" {
-  description = "shm_size for the runners, will be used in the runner config.toml"
-  type        = number
-  default     = 0
-}
-
-# executor
-variable "runners_docker_runtime" {
-  description = "docker runtime for runners, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-# executor
-variable "runners_helper_image" {
-  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-# executor
-variable "runners_pull_policies" {
-  description = "pull policies for the runners, will be used in the runner config.toml, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
-  type        = list(string)
-  default     = ["always"]
-}
-
-# executor
-variable "runners_monitoring" {
-  description = "Enable detailed cloudwatch monitoring for spot instances."
-  type        = bool
-  default     = false
-}
-
-# executor
-variable "runners_ebs_optimized" {
-  description = "Enable runners to be EBS-optimized."
-  type        = bool
-  default     = true
-}
-
-# executor
-variable "runners_machine_autoscaling" {
-  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
-  type = list(object({
-    periods    = list(string)
-    idle_count = number
-    idle_time  = number
-    timezone   = string
-  }))
-  default = []
-}
-
-# executor
-variable "runners_root_size" {
-  description = "Runner instance root size in GB."
-  type        = number
-  default     = 16
-}
-
-# executor
-variable "runners_volume_type" {
-  description = "Runner instance volume type"
-  type        = string
-  default     = "gp2"
-}
-
-# executor
-variable "runners_iam_instance_profile_name" {
-  description = "IAM instance profile name of the runners, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-# agent
-variable "allow_iam_service_linked_role_creation" {
-  description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
-  type        = bool
-  default     = true
-}
-
-# executor
-variable "docker_machine_options" {
-  # cspell:ignore amazonec
-  description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
-  type        = list(string)
-  default     = []
-}
-
-# executor
-variable "docker_machine_security_group_description" {
-  description = "A description for the docker-machine security group"
-  type        = string
-  default     = "A security group containing docker-machine instances"
-}
-
-# agent
-variable "secure_parameter_store_runner_token_key" {
-  description = "The key name used store the Gitlab runner token in Secure Parameter Store"
-  type        = string
-  default     = "runner-token"
-}
-
-# agent
-variable "secure_parameter_store_runner_sentry_dsn" {
-  description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
-  type        = string
-  default     = "sentry-dsn"
-}
-
-# agent
-variable "enable_manage_gitlab_token" {
-  description = "(Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
-  type        = bool
-  default     = null
-
-  validation {
-    # false positive. There is no secret!
-    # kics-scan ignore-line
-    condition     = anytrue([var.enable_manage_gitlab_token == null])
-    error_message = "Deprecated, this variable is no longer in use and can be removed."
-  }
-}
-
-
-# executor
-variable "cache_bucket" {
-  description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details."
-  type        = map(any)
-
-  default = {
-    create = true
-    policy = ""
-    bucket = ""
-  }
-}
-
-# executor
-variable "enable_docker_machine_ssm_access" {
-  description = "Add IAM policies to the docker-machine instances to connect via the Session Manager."
-  type        = bool
-  default     = false
-}
-
-# executor
-variable "runners_volumes_tmpfs" {
-  description = "Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type = list(object({
-    volume  = string
-    options = string
-  }))
-  default = []
-}
-
-# executor
-variable "runners_services_volumes_tmpfs" {
-  description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type = list(object({
-    volume  = string
-    options = string
-  }))
-  default = []
-}
-
-# executor
-variable "runners_docker_services" {
-  description = "adds `runners.docker.services` blocks to config.toml.  All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
-  type = list(object({
-    name       = string
-    alias      = string
-    entrypoint = list(string)
-    command    = list(string)
-  }))
-  default = []
-}

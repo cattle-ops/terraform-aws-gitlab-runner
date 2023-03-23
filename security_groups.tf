@@ -70,7 +70,7 @@ resource "aws_security_group" "docker_machine" {
 
   name_prefix = "${local.name_sg}-docker-machine"
   vpc_id      = var.vpc_id
-  description = var.docker_machine_security_group_description
+  description = var.executor_docker_machine_security_group_description
 
   dynamic "egress" {
     for_each = var.executor_docker_machine_extra_egress_rules

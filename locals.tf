@@ -47,17 +47,17 @@ locals {
   # Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
     ",\"amazonec2-metadata-token=${var.docker_machine_instance_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.docker_machine_instance_metadata_options.http_put_response_hop_limit}\",%s",
-    join(",", formatlist("%q", concat(var.docker_machine_options, local.runners_docker_registry_mirror_option))),
+    join(",", formatlist("%q", concat(var.executor_docker_machine_ec2_options, local.runners_docker_registry_mirror_option))),
   )
 
   runners_docker_registry_mirror_option = var.executor_docker_machine_docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.executor_docker_machine_docker_registry_mirror_url}"]
 
   # Ensure max builds is optional
-  runners_max_builds_string = var.executor_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_max_builds)
+  runners_max_builds_string = var.executor_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_docker_machine_max_builds)
 
   # Define key for runner token for SSM
-  secure_parameter_store_runner_token_key  = "${var.environment}-${var.secure_parameter_store_runner_token_key}"
-  secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.secure_parameter_store_runner_sentry_dsn}"
+  secure_parameter_store_runner_token_key  = "${var.environment}-${var.agent_gitlab_token_secure_parameter_store}"
+  secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.agent_sentry_secure_parameter_store_name}"
 
   # Custom names for runner agent instance, security groups, and IAM objects
   name_runner_agent_instance = var.agent_instance_prefix == "" ? local.tags["Name"] : var.agent_instance_prefix
@@ -65,20 +65,20 @@ locals {
   name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 
   runners_additional_volumes = <<-EOT
-  %{~if var.runners_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}
+  %{~if var.executor_docker_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.executor_docker_additional_volumes~},"${volume}"%{endfor~}
   EOT
 
   runners_machine_autoscaling = templatefile("${path.module}/template/runners_machine_autoscaling.tftpl", {
-    runners_machine_autoscaling = var.runners_machine_autoscaling
+    runners_machine_autoscaling = var.executor_docker_machine_autoscaling
     }
   )
 
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
-    runners_docker_services = var.runners_docker_services
+    runners_docker_services = var.executor_docker_services
     }
   )
 
-  runners_pull_policies = "[\"${join("\",\"", var.runners_pull_policies)}\"]"
+  runners_pull_policies = "[\"${join("\",\"", var.executor_docker_pull_policies)}\"]"
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"

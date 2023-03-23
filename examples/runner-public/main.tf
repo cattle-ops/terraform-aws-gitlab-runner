@@ -38,12 +38,12 @@ module "runner" {
 
   docker_machine_spot_price_bid = "on-demand-price"
 
-  runners_name             = var.runner_name
-  agent_gitlab_url       = var.gitlab_url
+  runners_name                         = var.runner_name
+  agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  runners_privileged         = "false"
-  runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+  runners_privileged                 = "false"
+  executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   agent_gitlab_registration_config = {
     registration_token = var.registration_token
@@ -61,7 +61,7 @@ module "runner" {
 
   executor_cache_shared = "true"
 
-  cache_bucket = {
+  executor_cache_bucket = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
@@ -80,7 +80,7 @@ module "runner2" {
 
   docker_machine_spot_price_bid = "on-demand-price"
 
-  runners_name       = var.runner_name
+  runners_name     = var.runner_name
   agent_gitlab_url = var.gitlab_url
 
   agent_gitlab_registration_config = {
@@ -94,7 +94,7 @@ module "runner2" {
 
   executor_cache_shared = "true"
 
-  cache_bucket = {
+  executor_cache_bucket = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket

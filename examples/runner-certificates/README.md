@@ -56,7 +56,7 @@ module {
   # ...
   
   # Mount EC2 host certs in docker so all user docker images can reference them.
-  runners_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
+  executor_docker_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
   
   # ...
 }

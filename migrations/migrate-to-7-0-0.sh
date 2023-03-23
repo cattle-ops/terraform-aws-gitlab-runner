@@ -28,6 +28,7 @@ sed -i '/asg_terminate_lifecycle_lambda_timeout/d' "$converted_file"
 # PT #757 refactor!: rename variables and prefix with agent, executor and global scope
 #
 sed -i '/aws_region/d' "$converted_file"
+sed -i '/enable_manage_gitlab_token/d' "$converted_file"
 
 sed 's/enable_kms/enable_managed_kms_key/g' "$converted_file" | \
 sed 's/kms_alias_name/kms_managed_alias_name/g' | \
@@ -43,7 +44,7 @@ sed 's/runners_executor/executor_type/g' | \
 sed 's/runners_install_amazon_ecr_credential_helper/agent_install_amazon_ecr_credential_helper/g' | \
 sed 's/runners_clone_url/agent_gitlab_clone_url/g' | \
 sed 's/runners_gitlab_url/agent_gitlab_url/g' | \
-sed 's/runners_max_builds/executor_max_builds/g' | \
+sed 's/runners_max_builds/executor_docker_machine_max_builds/g' | \
 sed 's/runners_idle_count/executor_idle_count/g' | \
 sed 's/runners_idle_time/executor_idle_time/g' | \
 sed 's/runners_concurrent/agent_maximum_concurrent_jobs/g' | \
@@ -107,15 +108,30 @@ sed 's/cloudwatch_logging_retention_in_days/agent_cloudwatch_retention_days/g' |
 sed 's/log_group_name/agent_cloudwatch_log_group_name/g' | \
 sed 's/asg_max_instance_lifetime/agent_max_instance_lifetime_seconds/g' | \
 sed 's/asg_delete_timeout/agent_terraform_timeout_delete_asg/g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
+sed 's/enable_docker_machine_ssm_access/executor_enable_ssm_access/g' | \
+sed 's/cache_bucket/executor_cache_bucket/g' | \
+sed 's/docker_machine_security_group_description//g' | \
+sed 's/docker_machine_options/executor_docker_machine_ec2_options/g' | \
+sed 's/runners_iam_instance_profile_name/executor_docker_machine_iam_instance_profile_name/g' | \
+sed 's/runners_volume_type/executor_docker_machine_ec2_volume_type/g' | \
+sed 's/runners_ebs_optimized/executor_docker_machine_ec2_ebs_optimized/g' | \
+sed 's/runners_monitoring/executor_docker_machine_enable_monitoring/g' | \
+sed 's/runners_machine_autoscaling/executor_docker_machine_autoscaling/g' | \
+sed 's/runners_docker_services/executor_docker_services/g' | \
+sed 's/runners_services_volumes_tmpfs/executor_docker_services_volumes_tmpfs/g' | \
+sed 's/runners_volumes_tmpfs/executor_docker_volumes_tmpfs/g' | \
+sed 's/runners_root_size/executor_docker_machine_ec2_root_size/g' | \
+sed 's/enable_asg_recreation/agent_enable_asg_recreation/g' | \
+sed 's/secure_parameter_store_runner_sentry_dsn/agent_sentry_secure_parameter_store_name/g' | \
+sed 's/secure_parameter_store_runner_token_key/agent_gitlab_token_secure_parameter_store/g' | \
+sed 's/allow_iam_service_linked_role_creation/agent_allow_iam_service_linked_role_creation/g' | \
+sed 's/runners_pull_policies/executor_docker_pull_policies/g' | \
+sed 's/runners_helper_image/executor_docker_helper_image/g' | \
+sed 's/runners_docker_runtime/executor_docker_runtime/g' | \
+sed 's/runners_shm_size/executor_docker_shm_size/g' | \
+sed 's/runners_extra_hosts/executor_docker_extra_hosts/g' | \
+sed 's/runners_additional_volumes/executor_docker_additional_volumes/g' | \
+sed 's/runners_add_dind_volumes/executor_docker_add_dind_volumes/g' | \
 sed 's///g' | \
 sed 's///g' | \
 sed 's///g' | \

@@ -31,12 +31,12 @@ module "runner" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.private_subnets, 0)
 
-  runners_name       = var.runner_name
+  runners_name     = var.runner_name
   agent_gitlab_url = var.gitlab_url
-  runners_token      = var.runner_token
+  runners_token    = var.runner_token
 
   # working 9 to 5 :)
-  runners_machine_autoscaling = [
+  executor_docker_machine_autoscaling = [
     {
       periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
       idle_count = 0

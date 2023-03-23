@@ -26,7 +26,7 @@ module "runner" {
   # General
   ###############################################
 
-  runners_name       = var.runner_name
+  runners_name     = var.runner_name
   agent_gitlab_url = var.gitlab_url
 
   executor_type = "docker"
@@ -48,7 +48,7 @@ module "runner" {
   # cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
   # update-ca-certificates
   # Or similar OS-dependent commands. The above are an example for Ubuntu.
-  runners_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
+  executor_docker_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
 
   ###############################################
   # Registration

@@ -53,8 +53,8 @@ module "runner" {
   subnet_id           = element(module.vpc.private_subnets, 0)
   metrics_autoscaling = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
-  runners_name             = var.runner_name
-  agent_gitlab_url       = var.gitlab_url
+  runners_name            = var.runner_name
+  agent_gitlab_url        = var.gitlab_url
   agent_enable_ssm_access = true
 
   agent_ping_allow_from_security_groups = [data.aws_security_group.default.id]
@@ -75,17 +75,17 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  runners_privileged         = "true"
-  runners_additional_volumes = ["/certs/client"]
+  runners_privileged                 = "true"
+  executor_docker_additional_volumes = ["/certs/client"]
 
-  runners_volumes_tmpfs = [
+  executor_docker_volumes_tmpfs = [
     {
       volume  = "/var/opt/cache",
       options = "rw,noexec"
     }
   ]
 
-  runners_services_volumes_tmpfs = [
+  executor_docker_services_volumes_tmpfs = [
     {
       volume  = "/var/lib/mysql",
       options = "rw,noexec"
@@ -93,7 +93,7 @@ module "runner" {
   ]
 
   # working 9 to 5 :)
-  runners_machine_autoscaling = [
+  executor_docker_machine_autoscaling = [
     {
       periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
       idle_count = 0
