@@ -885,3 +885,9 @@ variable "executor_docker_machine_docker_registry_mirror_url" {
   type        = string
   default     = ""
 }
+
+variable "show_user_data_in_plan" {
+  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
+  type        = bool
+  default     = false
+}

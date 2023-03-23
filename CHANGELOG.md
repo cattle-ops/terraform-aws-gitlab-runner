@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.2...6.2.0) (2023-03-22)
+
+
+### Features
+
+* show `config.toml` and user data in Terraform plan ([#754](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/754)) ([5b5c335](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/5b5c3354d56971786e9afe50e493fa2bde1bdbb4))
+
 ## [6.1.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.1...6.1.2) (2023-03-09)
 
 

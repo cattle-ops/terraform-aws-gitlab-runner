@@ -109,14 +109,16 @@ jobs:
       - uses: actions/checkout@v3
         name: Checkout source code
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@v2
+      - uses: terraform-linters/setup-tflint@v3
         name: Setup TFLint
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tflint_version: latest
 
