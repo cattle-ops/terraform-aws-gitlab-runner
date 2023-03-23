@@ -51,15 +51,15 @@ module "runner" {
 
   vpc_id              = module.vpc.vpc_id
   subnet_id           = element(module.vpc.private_subnets, 0)
-  metrics_autoscaling = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
+  agent_collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
-  runners_name            = var.runner_name
+  agent_gitlab_runner_name            = var.runner_name
   agent_gitlab_url        = var.gitlab_url
   agent_enable_ssm_access = true
 
   agent_ping_allow_from_security_groups = [data.aws_security_group.default.id]
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
   agent_gitlab_registration_config = {
     registration_token = var.registration_token
@@ -75,7 +75,7 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  runners_privileged                 = "true"
+  executor_docker_privileged                 = "true"
   executor_docker_additional_volumes = ["/certs/client"]
 
   executor_docker_volumes_tmpfs = [

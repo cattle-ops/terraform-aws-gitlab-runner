@@ -55,8 +55,8 @@ locals {
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
       gitlab_runner_version                        = var.agent_gitlab_runner_version
-      docker_machine_version                       = var.docker_machine_version
-      docker_machine_download_url                  = var.docker_machine_download_url
+      docker_machine_version                       = var.agent_docker_machine_version
+      docker_machine_download_url                  = var.agent_docker_machine_download_url
       runners_config                               = local.template_runner_config
       runners_userdata                             = var.executor_docker_machine_userdata
       runners_executor                             = var.executor_type
@@ -66,7 +66,7 @@ locals {
       pre_install                                  = var.agent_userdata_pre_install
       post_install                                 = var.agent_userdata_post_install
       runners_gitlab_url                           = var.agent_gitlab_url
-      runners_token                                = var.runners_token
+      runners_token                                = var.agent_gitlab_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = data.aws_region.current.name
@@ -90,8 +90,8 @@ locals {
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = var.subnet_id
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
-      runners_instance_type             = var.docker_machine_instance_type
-      runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" || var.docker_machine_spot_price_bid == null ? "" : var.docker_machine_spot_price_bid
+      runners_instance_type             = var.executor_docker_machine_instance_type
+      runners_spot_price_bid            = var.executor_docker_machine_ec2_spot_price_bid == "on-demand-price" || var.executor_docker_machine_ec2_spot_price_bid == null ? "" : var.executor_docker_machine_ec2_spot_price_bid
       runners_ami                       = var.executor_type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.executor_type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
       runners_monitoring                = var.executor_docker_machine_enable_monitoring
@@ -100,16 +100,16 @@ locals {
       runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
-      runners_name                      = var.runners_name
+      runners_name                      = var.agent_gitlab_runner_name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
-      runners_token                     = var.runners_token
+      runners_token                     = var.agent_gitlab_token
       runners_userdata                  = var.executor_docker_machine_userdata
       runners_executor                  = var.executor_type
       runners_limit                     = var.executor_max_jobs
       runners_concurrent                = var.agent_maximum_concurrent_jobs
-      runners_image                     = var.runners_image
-      runners_privileged                = var.runners_privileged
-      runners_disable_cache             = var.runners_disable_cache
+      runners_image                     = var.executor_docker_image
+      runners_privileged                = var.executor_docker_privileged
+      runners_disable_cache             = var.executor_docker_disable_local_cache
       runners_docker_runtime            = var.executor_docker_runtime
       runners_helper_image              = var.executor_docker_helper_image
       runners_shm_size                  = var.executor_docker_shm_size
@@ -138,7 +138,7 @@ locals {
       shared_cache                      = var.executor_cache_shared
       sentry_dsn                        = var.agent_sentry_dsn
       prometheus_listen_address         = var.agent_prometheus_listen_address
-      auth_type                         = var.auth_type_cache_sr
+      auth_type                         = var.executor_cache_s3_authentication_type
     }
   )
 }
@@ -171,7 +171,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   desired_capacity          = "1"
   health_check_grace_period = 0
   max_instance_lifetime     = var.agent_max_instance_lifetime_seconds
-  enabled_metrics           = var.metrics_autoscaling
+  enabled_metrics           = var.agent_collect_autoscaling_metrics
 
   dynamic "tag" {
     for_each = local.agent_tags
@@ -254,13 +254,13 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     enabled = var.agent_enable_monitoring
   }
   dynamic "instance_market_options" {
-    for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
+    for_each = var.agent_spot_price == null || var.agent_spot_price == "" ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
       dynamic "spot_options" {
-        for_each = var.runner_instance_spot_price == "on-demand-price" ? [] : [0]
+        for_each = var.agent_spot_price == "on-demand-price" ? [] : [0]
         content {
-          max_price = var.runner_instance_spot_price
+          max_price = var.agent_spot_price
         }
       }
     }
@@ -297,7 +297,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     tags          = local.tags
   }
   dynamic "tag_specifications" {
-    for_each = var.runner_instance_spot_price == null || var.runner_instance_spot_price == "" ? [] : ["spot"]
+    for_each = var.agent_spot_price == null || var.agent_spot_price == "" ? [] : ["spot"]
     content {
       resource_type = "spot-instances-request"
       tags          = local.tags
@@ -325,25 +325,25 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = var.executor_cache_bucket["create"] ? module.cache[0].bucket : var.executor_cache_bucket["bucket"]
-  bucket_policy = var.executor_cache_bucket["create"] ? module.cache[0].policy_arn : var.executor_cache_bucket["policy"]
+  bucket_name   = var.executor_cache_s3_bucket["create"] ? module.cache[0].bucket : var.executor_cache_s3_bucket["bucket"]
+  bucket_policy = var.executor_cache_s3_bucket["create"] ? module.cache[0].policy_arn : var.executor_cache_s3_bucket["policy"]
 }
 
 module "cache" {
-  count  = var.executor_cache_bucket["create"] ? 1 : 0
+  count  = var.executor_cache_s3_bucket["create"] ? 1 : 0
   source = "./modules/cache"
 
   environment = var.environment
   tags        = local.tags
 
-  cache_bucket_prefix                  = var.executor_cache_bucket_prefix
-  cache_bucket_name_include_account_id = var.executor_cache_bucket_name_include_account_id
-  cache_bucket_set_random_suffix       = var.executor_cache_bucket_enable_random_suffix
-  cache_bucket_versioning              = var.executor_cache_enable_versioning
-  cache_expiration_days                = var.executor_cache_expiration_days
+  cache_bucket_prefix                  = var.executor_cache_s3_bucket_prefix
+  cache_bucket_name_include_account_id = var.executor_cache_s3_bucket_name_include_account_id
+  cache_bucket_set_random_suffix       = var.executor_cache_s3_bucket_enable_random_suffix
+  cache_bucket_versioning              = var.executor_cache_s3_enable_versioning
+  cache_expiration_days                = var.executor_cache_s3_expiration_days
   cache_lifecycle_prefix               = var.executor_cache_shared ? "project/" : "runner/"
-  cache_logging_bucket                 = var.executor_cache_logging_bucket_id
-  cache_logging_bucket_prefix          = var.executor_cache_logging_bucket_prefix
+  cache_logging_bucket                 = var.executor_cache_s3_logging_bucket_id
+  cache_logging_bucket_prefix          = var.executor_cache_s3_logging_bucket_prefix
 
   kms_key_id = local.kms_key
 
@@ -443,7 +443,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
-  count = var.executor_type == "docker+machine" ? (var.executor_cache_bucket["create"] || lookup(var.executor_cache_bucket, "policy", "") != "" ? 1 : 0) : 0
+  count = var.executor_type == "docker+machine" ? (var.executor_cache_s3_bucket["create"] || lookup(var.executor_cache_s3_bucket, "policy", "") != "" ? 1 : 0) : 0
 
   role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy

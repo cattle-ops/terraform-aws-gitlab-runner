@@ -36,13 +36,13 @@ module "runner" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  runners_name                         = var.runner_name
+  agent_gitlab_runner_name                         = var.runner_name
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  runners_privileged                 = "false"
+  executor_docker_privileged                 = "false"
   executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   agent_gitlab_registration_config = {
@@ -61,7 +61,7 @@ module "runner" {
 
   executor_cache_shared = "true"
 
-  executor_cache_bucket = {
+  executor_cache_s3_bucket = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
@@ -78,9 +78,9 @@ module "runner2" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  runners_name     = var.runner_name
+  agent_gitlab_runner_name     = var.runner_name
   agent_gitlab_url = var.gitlab_url
 
   agent_gitlab_registration_config = {
@@ -94,7 +94,7 @@ module "runner2" {
 
   executor_cache_shared = "true"
 
-  executor_cache_bucket = {
+  executor_cache_s3_bucket = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket

@@ -91,6 +91,12 @@ variable "agent_extra_instance_tags" {
   default     = {}
 }
 
+variable "agent_spot_price" {
+  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
+  type        = string
+  default     = null
+}
+
 variable "agent_ebs_optimized" {
   description = "Enable the Agent instance to be EBS-optimized."
   type        = bool
@@ -122,6 +128,12 @@ variable "agent_enable_monitoring" {
   description = "Enable the detailed monitoring on the Agent instance."
   type        = bool
   default     = true
+}
+
+variable "agent_collect_autoscaling_metrics" {
+  description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
+  type        = list(string)
+  default     = null
 }
 
 variable "agent_ping_enable" {
@@ -287,6 +299,18 @@ variable "agent_install_amazon_ecr_credential_helper" {
   default     = false
 }
 
+variable "agent_docker_machine_version" {
+  description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
+  type        = string
+  default     = "0.16.2-gitlab.19-cki.2"
+}
+
+variable "agent_docker_machine_download_url" {
+  description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
+  type        = string
+  default     = ""
+}
+
 variable "agent_yum_update" {
   description = "Run a `yum` update as part of starting the Agent"
   type        = bool
@@ -332,6 +356,11 @@ variable "agent_cloudwatch_retention_days" {
 variable "agent_cloudwatch_log_group_name" {
   description = "Option to override the default name (`environment`) of the log group. Requires `agent_cloudwatch_enable = true`."
   default     = null
+  type        = string
+}
+
+variable "agent_gitlab_runner_name" {
+  description = "Name of the Gitlab Runner."
   type        = string
 }
 
@@ -389,6 +418,12 @@ variable "agent_gitlab_clone_url" {
   description = "Overwrites the URL for the GitLab instance. Use only if the agent can’t connect to the GitLab URL."
   type        = string
   default     = ""
+}
+
+variable "agent_gitlab_token" {
+  description = "Token for the Agent to connect to GitLab"
+  type        = string
+  default     = "__REPLACED_BY_USER_DATA__"
 }
 
 variable "agent_maximum_concurrent_jobs" {
@@ -483,7 +518,13 @@ variable "executor_extra_environment_variables" {
   default     = []
 }
 
-variable "executor_cache_bucket" {
+variable "executor_cache_shared" {
+  description = "Enables cache sharing between runners. `false` by default."
+  type        = bool
+  default     = false
+}
+
+variable "executor_cache_s3_bucket" {
   description = <<-EOT
     Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
     cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and
@@ -497,49 +538,49 @@ variable "executor_cache_bucket" {
   }
 }
 
-variable "executor_cache_shared" {
-  description = "Enables cache sharing between runners. `false` by default."
-  type        = bool
-  default     = false
+variable "executor_cache_s3_authentication_type" {
+  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
+  type        = string
+  default     = "iam"
 }
 
-variable "executor_cache_expiration_days" {
+variable "executor_cache_s3_expiration_days" {
   description = "Number of days before cache objects expire."
   type        = number
   default     = 1
 }
 
-variable "executor_cache_enable_versioning" {
+variable "executor_cache_s3_enable_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = bool
   default     = false
 }
 
-variable "executor_cache_bucket_prefix" {
+variable "executor_cache_s3_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
   default     = ""
 }
 
-variable "executor_cache_bucket_name_include_account_id" {
+variable "executor_cache_s3_bucket_name_include_account_id" {
   description = "Boolean to add current account ID to cache bucket name."
   type        = bool
   default     = true
 }
 
-variable "executor_cache_bucket_enable_random_suffix" {
+variable "executor_cache_s3_bucket_enable_random_suffix" {
   description = "Append the cache bucket name with a random string suffix"
   type        = bool
   default     = false
 }
 
-variable "executor_cache_logging_bucket_id" {
+variable "executor_cache_s3_logging_bucket_id" {
   type        = string
   description = "S3 Bucket ID where the access logs to the cache bucket are stored."
   default     = null
 }
 
-variable "executor_cache_logging_bucket_prefix" {
+variable "executor_cache_s3_logging_bucket_prefix" {
   type        = string
   description = "Prefix within the `executor_cache_logging_bucket_name`."
   default     = null
@@ -613,6 +654,18 @@ variable "executor_docker_runtime" {
   default     = ""
 }
 
+variable "executor_docker_privileged" {
+  description = "Executor will run in privileged mode"
+  type        = bool
+  default     = true
+}
+
+variable "executor_docker_image" {
+  description = "Image to run builds"
+  type        = string
+  default     = "docker:18.03.1-ce"
+}
+
 variable "executor_docker_helper_image" {
   description = "Overrides the default helper image used to clone repos and upload artifacts"
   type        = string
@@ -623,6 +676,12 @@ variable "executor_docker_pull_policies" {
   description = "Pull policies for the Executor, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
   type        = list(string)
   default     = ["always"]
+}
+
+variable "executor_docker_disable_local_cache" {
+  description = "Runners will not use local cache"
+  type        = bool
+  default     = false
 }
 
 variable "executor_docker_additional_volumes" {
@@ -641,6 +700,12 @@ variable "executor_docker_add_dind_volumes" {
  * docker+machine Executor variables. The executor is the actual machine that runs the job. Please specify the
  * `executor_docker_*` variables as well as Docker is used on the docker+machine executor.
  */
+variable "executor_docker_machine_instance_type" {
+  description = "Instance type used for the instances hosting docker-machine."
+  type        = string
+  default     = "m5.large"
+}
+
 variable "executor_docker_machine_extra_role_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
@@ -773,11 +838,29 @@ variable "executor_docker_machine_ec2_ebs_optimized" {
   default     = true
 }
 
+variable "executor_docker_machine_ec2_spot_price_bid" {
+  description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
+  type        = string
+  default     = "on-demand-price"
+}
+
 variable "executor_docker_machine_ec2_options" {
   # cspell:ignore amazonec
   description = "List of additional options for the docker+machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
   type        = list(string)
   default     = []
+}
+
+variable "executor_docker_machine_ec2_metadata_options" {
+  description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
+  type = object({
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+  })
+  default = {
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
 }
 
 variable "executor_docker_machine_autoscaling" {
@@ -802,114 +885,3 @@ variable "executor_docker_machine_docker_registry_mirror_url" {
   type        = string
   default     = ""
 }
-
-
-
-
-
-
-# agent
-variable "auth_type_cache_sr" {
-  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
-  type        = string
-  default     = "iam"
-}
-
-
-# agent
-variable "metrics_autoscaling" {
-  description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
-  type        = list(string)
-  default     = null
-}
-
-# agent
-variable "runner_instance_spot_price" {
-  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
-  type        = string
-  default     = null
-}
-
-
-# executor
-variable "docker_machine_instance_metadata_options" {
-  description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
-  type = object({
-    http_tokens                 = string
-    http_put_response_hop_limit = number
-  })
-  default = {
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 2
-  }
-}
-
-# executor
-variable "docker_machine_instance_type" {
-  description = "Instance type used for the instances hosting docker-machine."
-  type        = string
-  default     = "m5.large"
-}
-
-# executor
-variable "docker_machine_spot_price_bid" {
-  description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
-  type        = string
-  default     = "on-demand-price"
-}
-
-# executor
-variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
-  type        = string
-  default     = ""
-}
-
-# executor
-variable "docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
-  type        = string
-  default     = "0.16.2-gitlab.19-cki.2"
-}
-
-# agent
-variable "runners_name" {
-  description = "Name of the runner, will be used in the runner config.toml."
-  type        = string
-}
-
-
-
-
-
-
-# agent
-variable "runners_token" {
-  description = "Token for the runner, will be used in the runner config.toml."
-  type        = string
-  default     = "__REPLACED_BY_USER_DATA__"
-}
-
-
-# executor
-variable "runners_image" {
-  description = "Image to run builds, will be used in the runner config.toml"
-  type        = string
-  default     = "docker:18.03.1-ce"
-}
-
-# executor
-variable "runners_privileged" {
-  description = "Runners will run in privileged mode, will be used in the runner config.toml"
-  type        = bool
-  default     = true
-}
-
-# executor
-variable "runners_disable_cache" {
-  description = "Runners will not use local cache, will be used in the runner config.toml"
-  type        = bool
-  default     = false
-}
-
-

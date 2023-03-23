@@ -82,13 +82,13 @@ sed 's/gitlab_runner_egress_rules/agent_extra_egress_rules/g' | \
 sed 's/gitlab_runner_security_group_ids/agent_ping_allow_from_security_groups/g' | \
 sed 's/gitlab_runner_security_group_description/agent_security_group_description/g' | \
 sed 's/cache_shared/executor_cache_shared/g' | \
-sed 's/cache_expiration_days/executor_cache_expiration_days/g' | \
-sed 's/cache_bucket_versioning/executor_cache_enable_versioning/g' | \
-sed 's/cache_logging_bucket_prefix/executor_cache_logging_bucket_prefix/g' | \
-sed 's/cache_logging_bucket/executor_cache_logging_bucket_id/g' | \
-sed 's/cache_bucket_set_random_suffix/executor_cache_bucket_enable_random_suffix/g' | \
-sed 's/cache_bucket_name_include_account_id/executor_cache_bucket_name_include_account_id/g' | \
-sed 's/cache_bucket_prefix/executor_cache_bucket_prefix/g' | \
+sed 's/cache_expiration_days/executor_cache_s3_expiration_days/g' | \
+sed 's/cache_bucket_versioning/executor_cache_s3_enable_versioning/g' | \
+sed 's/cache_logging_bucket_prefix/executor_cache_s3_logging_bucket_prefix/g' | \
+sed 's/cache_logging_bucket/executor_cache_s3_logging_bucket_id/g' | \
+sed 's/cache_bucket_set_random_suffix/executor_cache_s3_bucket_enable_random_suffix/g' | \
+sed 's/cache_bucket_name_include_account_id/executor_cache_s3_bucket_name_include_account_id/g' | \
+sed 's/cache_bucket_prefix/executor_cache_s3_bucket_prefix/g' | \
 sed 's/runner_agent_uses_private_address/agent_use_private_address/g' | \
 sed 's/runners_use_private_address/executor_docker_machine_use_private_address/g' | \
 sed 's/runners_request_spot_instance/executor_docker_machine_request_spot_instances/g' | \
@@ -109,7 +109,7 @@ sed 's/log_group_name/agent_cloudwatch_log_group_name/g' | \
 sed 's/asg_max_instance_lifetime/agent_max_instance_lifetime_seconds/g' | \
 sed 's/asg_delete_timeout/agent_terraform_timeout_delete_asg/g' | \
 sed 's/enable_docker_machine_ssm_access/executor_enable_ssm_access/g' | \
-sed 's/cache_bucket/executor_cache_bucket/g' | \
+sed 's/cache_bucket/executor_cache_s3_bucket/g' | \
 sed 's/docker_machine_security_group_description//g' | \
 sed 's/docker_machine_options/executor_docker_machine_ec2_options/g' | \
 sed 's/runners_iam_instance_profile_name/executor_docker_machine_iam_instance_profile_name/g' | \
@@ -132,16 +132,19 @@ sed 's/runners_shm_size/executor_docker_shm_size/g' | \
 sed 's/runners_extra_hosts/executor_docker_extra_hosts/g' | \
 sed 's/runners_additional_volumes/executor_docker_additional_volumes/g' | \
 sed 's/runners_add_dind_volumes/executor_docker_add_dind_volumes/g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-sed 's///g' | \
-
+sed 's/runners_disable_cache/executor_docker_disable_local_cache/g' | \
+sed 's/runners_privileged/executor_docker_privileged/g' | \
+sed 's/runners_image/executor_docker_image/g' | \
+sed 's/runners_token/agent_gitlab_token/g' | \
+sed 's/runners_name/agent_gitlab_runner_name/g' | \
+sed 's/docker_machine_version/agent_docker_machine_version/g' | \
+sed 's/docker_machine_download_url/agent_docker_machine_download_url/g' | \
+sed 's/docker_machine_spot_price_bid/executor_docker_machine_ec2_spot_price_bid/g' | \
+sed 's/docker_machine_instance_type/executor_docker_machine_instance_type/g' | \
+sed 's/docker_machine_instance_metadata_options/executor_docker_machine_ec2_metadata_options/g' | \
+sed 's/runner_instance_spot_price/agent_spot_price/g' | \
+sed 's/metrics_autoscaling/agent_collect_autoscaling_metrics/g' | \
+sed 's/auth_type_cache_sr/executor_cache_s3_authentication_type/g' \
 > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
 
 # overrides block

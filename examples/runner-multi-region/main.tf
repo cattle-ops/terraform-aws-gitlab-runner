@@ -29,13 +29,13 @@ module "runner_main_region" {
   vpc_id    = module.vpc_main_region.vpc_id
   subnet_id = element(module.vpc_main_region.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  runners_name                         = var.runner_name
+  agent_gitlab_runner_name                         = var.runner_name
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  runners_privileged                 = "false"
+  executor_docker_privileged                 = "false"
   executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   agent_gitlab_registration_config = {
@@ -54,8 +54,8 @@ module "runner_main_region" {
 
   executor_cache_shared = "true"
 
-  executor_cache_bucket_prefix                  = local.cache_bucket_prefix_main_region
-  executor_cache_bucket_name_include_account_id = false
+  executor_cache_s3_bucket_prefix                  = local.cache_bucket_prefix_main_region
+  executor_cache_s3_bucket_name_include_account_id = false
 }
 
 module "vpc_alternate_region" {
@@ -94,13 +94,13 @@ module "runner_alternate_region" {
   vpc_id    = module.vpc_alternate_region.vpc_id
   subnet_id = element(module.vpc_alternate_region.public_subnets, 0)
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  runners_name                         = var.runner_name
+  agent_gitlab_runner_name                         = var.runner_name
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  runners_privileged                 = "false"
+  executor_docker_privileged                 = "false"
   executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
 
   agent_gitlab_registration_config = {
@@ -120,6 +120,6 @@ module "runner_alternate_region" {
 
   executor_cache_shared = "true"
 
-  executor_cache_bucket_prefix                  = local.cache_bucket_prefix_alternate_region
-  executor_cache_bucket_name_include_account_id = false
+  executor_cache_s3_bucket_prefix                  = local.cache_bucket_prefix_alternate_region
+  executor_cache_s3_bucket_name_include_account_id = false
 }

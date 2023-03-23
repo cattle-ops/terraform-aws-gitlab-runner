@@ -26,7 +26,7 @@ module "runner" {
   # General
   ###############################################
 
-  runners_name     = var.runner_name
+  agent_gitlab_runner_name     = var.runner_name
   agent_gitlab_url = var.gitlab_url
 
   executor_type = "docker"

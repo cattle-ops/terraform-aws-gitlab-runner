@@ -46,7 +46,7 @@ locals {
 
   # Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
-    ",\"amazonec2-metadata-token=${var.docker_machine_instance_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.docker_machine_instance_metadata_options.http_put_response_hop_limit}\",%s",
+    ",\"amazonec2-metadata-token=${var.executor_docker_machine_ec2_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.executor_docker_machine_ec2_metadata_options.http_put_response_hop_limit}\",%s",
     join(",", formatlist("%q", concat(var.executor_docker_machine_ec2_options, local.runners_docker_registry_mirror_option))),
   )
 
@@ -82,7 +82,7 @@ locals {
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
-  docker_machine_version_used          = split(".", split("-", var.docker_machine_version)[0])
+  docker_machine_version_used          = split(".", split("-", var.agent_docker_machine_version)[0])
   docker_machine_version_with_name_tag = split(".", "0.16.2")
   docker_machine_version_test = [
     for i, j in reverse(range(length(local.docker_machine_version_used)))
