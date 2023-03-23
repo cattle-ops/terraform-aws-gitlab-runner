@@ -530,7 +530,7 @@ variable "executor_cache_s3_bucket" {
     cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and
     bucket name. See the public runner example for more details."
   EOT
-  type        = map({ create = bool, policy = string, bucket = string })
+  type        = map(any)
   default = {
     create = true
     policy = ""
