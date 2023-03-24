@@ -38,6 +38,3 @@ builds/
 
 # Python
 venv/
-
-# Terraform rendered templates
-debug/
