@@ -949,8 +949,14 @@ variable "runner_extra_config" {
   default     = ""
 }
 
-variable "show_user_data_in_plan" {
-  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
+variable "output_runner_config_to_file" {
+  description = "When enabled, outputs the rendered config.toml file in the root module. This can then also be used by Terraform to show changes in plan. Note that enabling this can potentially expose sensitive information."
+  type        = bool
+  default     = false
+}
+
+variable "output_user_data_to_file" {
+  description = "When enabled, outputs the rendered userdata.sh file in the root module. This can then also be used by Terraform to show changes in plan. Note that enabling this can potentially expose sensitive information."
   type        = bool
   default     = false
 }
