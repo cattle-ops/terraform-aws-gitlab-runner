@@ -56,7 +56,7 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
-  # checkov:skip=CKV2_AWS_62:False positive. Can be removed when https://github.com/bridgecrewio/checkov/issues/4733 is fixed.
+  # checkov:skip=CKV_AWS_300:False positive. Can be removed when https://github.com/bridgecrewio/checkov/issues/4733 is fixed.
   bucket = aws_s3_bucket.build_cache.id
 
   rule {
