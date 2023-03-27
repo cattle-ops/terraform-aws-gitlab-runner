@@ -1,4 +1,3 @@
-x
 # Changelog
 
 ## [6.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.2...6.2.0) (2023-03-22)
