@@ -30,6 +30,7 @@ resource "random_string" "s3_suffix" {
 resource "aws_s3_bucket" "build_cache" {
   # checkov:skip=CKV_AWS_21:Versioning can be decided by user
   # checkov:skip=CKV_AWS_144:It's a cache only. Replication not needed.
+  # checkov:skip=CKV2_AWS_62:It's a simple cache. We don't want to notify anyone.
   bucket = local.cache_bucket_name
 
   tags = local.tags
@@ -56,6 +57,15 @@ resource "aws_s3_bucket_versioning" "build_cache_versioning" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
   bucket = aws_s3_bucket.build_cache.id
+
+  rule {
+    id     = "Abort incomplete multipart uploads"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
 
   rule {
     id     = "clear"
