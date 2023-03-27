@@ -59,7 +59,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "build_cache_versioning" {
   bucket = aws_s3_bucket.build_cache.id
 
   rule {
-    id     = "Abort incomplete multipart uploads"
+    id     = "AbortIncompleteMultipartUploads"
     status = "Enabled"
 
     abort_incomplete_multipart_upload {
