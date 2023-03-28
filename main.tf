@@ -2,7 +2,7 @@ data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
 data "aws_subnet" "runners" {
-  id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
+  id = length(var.subnet_ids) > 0 ? var.subnet_ids[0] : (length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners)
 }
 
 data "aws_availability_zone" "runners" {
@@ -68,6 +68,7 @@ locals {
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
+      secure_parameter_store_runner_private_key    = var.secure_parameter_store_runner_private_key
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
       gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
@@ -77,6 +78,9 @@ locals {
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.sentry_dsn
+      public_key                                   = var.public_key
+      private_key                                  = var.private_key
+      use_fleet                                    = var.use_fleet
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -88,8 +92,10 @@ locals {
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
+      runners_subnet_ids                = var.subnet_ids
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
+      runners_instance_types            = var.docker_machine_instance_types
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" || var.docker_machine_spot_price_bid == null ? "" : var.docker_machine_spot_price_bid
       runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
@@ -138,6 +144,8 @@ locals {
       sentry_dsn                        = var.sentry_dsn
       prometheus_listen_address         = var.prometheus_listen_address
       auth_type                         = var.auth_type_cache_sr
+      use_fleet                         = var.use_fleet
+      launch_template                   = var.use_fleet == true ? aws_launch_template.gitlab_runners[0].name : ""
     }
   )
 }
@@ -163,7 +171,7 @@ data "aws_ami" "docker-machine" {
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
+  vpc_zone_identifier       = length(var.subnet_ids) > 0 ? var.subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -310,6 +318,52 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     http_put_response_hop_limit = var.runner_instance_metadata_options.http_put_response_hop_limit
     instance_metadata_tags      = var.runner_instance_metadata_options.instance_metadata_tags
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  # otherwise the agent running on the EC2 instance tries to create the log group
+  depends_on = [aws_cloudwatch_log_group.environment]
+}
+
+resource "aws_key_pair" "fleet_key" {
+  key_name   = var.key_pair_name
+  public_key = var.public_key
+}
+
+resource "aws_launch_template" "gitlab_runners" {
+  # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
+  # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
+  count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+  name_prefix = "${local.name_docker_machine_runners}-agent-"
+
+  key_name               = aws_key_pair.fleet_key.key_name
+  image_id               = data.aws_ami.docker-machine[0].id
+  instance_type          = var.docker_machine_instance_types[0] # it will be overrided by the fleet
+  update_default_version = true
+  monitoring {
+    enabled = var.runner_instance_enable_monitoring
+  }
+
+  iam_instance_profile {
+    name = local.aws_iam_role_instance_name
+  }
+
+  network_interfaces {
+    security_groups             = concat([aws_security_group.docker_machine[0].id], var.extra_security_group_ids_runner_agent)
+    associate_public_ip_address = false == (var.runner_agent_uses_private_address == false ? var.runner_agent_uses_private_address : var.runners_use_private_address)
+  }
+  tag_specifications {
+    resource_type = "instance"
+    tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "volume"
+    tags          = local.tags
+  }
+
+  tags = local.tags
 
   lifecycle {
     create_before_destroy = true

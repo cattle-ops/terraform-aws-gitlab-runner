@@ -31,6 +31,12 @@ variable "subnet_id" {
   default     = "" # TODO remove as soon as subnet_id_runners and subnet_ids_gitlab_runner are gone. Variable is mandatory now.
 }
 
+variable "subnet_ids" {
+  description = "Subnet ids used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
+  type        = list(string)
+  default     = []
+}
+
 variable "extra_security_group_ids_runner_agent" {
   description = "Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default."
   type        = list(string)
@@ -41,6 +47,12 @@ variable "metrics_autoscaling" {
   description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
   type        = list(string)
   default     = null
+}
+
+variable "key_pair_name" {
+  description = "The name of the key pair to use for the runner agent instance. This variable is only supported when use_fleet is set to true."
+  type        = string
+  default     = "fleet-key"
 }
 
 variable "instance_type" {
@@ -99,6 +111,12 @@ variable "docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
   type        = string
   default     = "m5.large"
+}
+
+variable "docker_machine_instance_types" {
+  description = "Instance types used for the instances hosting docker-machine. This variable is only supported when use_fleet is set to true."
+  type        = list(string)
+  default     = []
 }
 
 variable "docker_machine_spot_price_bid" {
@@ -597,6 +615,20 @@ variable "gitlab_runner_registration_config" {
   }
 }
 
+variable "public_key" {
+  description = "The SSH public key used to access the Gitlab runner agent instances. This variable is supported only when use_fleet is set to true."
+  type        = string
+  default     = ""
+}
+
+variable "private_key" {
+  description = "The SSH priate key used to access the Gitlab runner agent instances. This variable is supported only when use_fleet is set to true and secure_parameter_store_private_key is unset."
+  type        = string
+  #sensitive   = true
+  default     = ""
+}
+
+
 variable "secure_parameter_store_runner_token_key" {
   description = "The key name used store the Gitlab runner token in Secure Parameter Store"
   type        = string
@@ -607,6 +639,12 @@ variable "secure_parameter_store_runner_sentry_dsn" {
   description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
   type        = string
   default     = "sentry-dsn"
+}
+
+variable "secure_parameter_store_runner_private_key" {
+  description = "The key name used to store the Gitlab runner private key in Secure Parameter Store"
+  type        = string
+  default     = ""
 }
 
 variable "enable_manage_gitlab_token" {
@@ -761,6 +799,12 @@ variable "kms_deletion_window_in_days" {
   description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
   type        = number
   default     = 7
+}
+
+variable "use_fleet" {
+  description = "Use the fleet mode for agents. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode"
+  type        = bool
+  default     = false
 }
 
 variable "enable_eip" {
