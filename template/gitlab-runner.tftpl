@@ -48,18 +48,12 @@ fi
 
 sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 
-if [[ "${use_fleet} == "true ]]
+if [[ "${use_fleet}" == "true" ]]
 then
-  if [[ "${secure_parameter_store_runner_private_key}" != "" ]]
-  then
-    echo "$(aws ssm get-parameters --names "${secure_parameter_store_runner_private_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")" > /root/.ssh/id_rsa
-  else
-    echo "${private_key}" > /root/.ssh/id_rsa
-  fi
-
+  echo "$(aws ssm get-parameters --names "${secure_parameter_store_runner_private_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")" > /root/.ssh/id_rsa
   echo "${public_key}" > /root/.ssh/id_rsa.pub
+
   chmod 600 /root/.ssh/id_rsa
-  chmod 600 /root/.ssh/id_rsa.pub
 fi
 
 ssm_sentry_dsn=$(aws ssm get-parameters --names "${secure_parameter_store_runner_sentry_dsn}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")

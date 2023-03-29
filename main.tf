@@ -79,7 +79,6 @@ locals {
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.sentry_dsn
       public_key                                   = var.public_key
-      private_key                                  = var.private_key
       use_fleet                                    = var.use_fleet
   })
 
@@ -92,10 +91,10 @@ locals {
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
-      runners_subnet_ids                = var.subnet_ids
+      runners_subnet_ids                = length(var.subnet_ids) > 0 ? var.subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : [var.subnet_id_runners]
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
-      runners_instance_types            = var.docker_machine_instance_types
+      runners_instance_types            = length(var.docker_machine_instance_types) > 0 ? var.docker_machine_instance_types : [var.docker_machine_instance_type]
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" || var.docker_machine_spot_price_bid == null ? "" : var.docker_machine_spot_price_bid
       runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
@@ -328,6 +327,8 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 }
 
 resource "aws_key_pair" "fleet_key" {
+  count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+
   key_name   = var.key_pair_name
   public_key = var.public_key
 }
@@ -335,24 +336,16 @@ resource "aws_key_pair" "fleet_key" {
 resource "aws_launch_template" "gitlab_runners" {
   # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
   # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
-  count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
-  name_prefix = "${local.name_docker_machine_runners}-agent-"
+  count       = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+  name_prefix = "${local.name_runner_agent_instance}-worker-"
 
-  key_name               = aws_key_pair.fleet_key.key_name
+  key_name               = aws_key_pair.fleet_key[0].key_name
   image_id               = data.aws_ami.docker-machine[0].id
   instance_type          = var.docker_machine_instance_types[0] # it will be overrided by the fleet
   update_default_version = true
-  monitoring {
-    enabled = var.runner_instance_enable_monitoring
-  }
-
-  iam_instance_profile {
-    name = local.aws_iam_role_instance_name
-  }
 
   network_interfaces {
-    security_groups             = concat([aws_security_group.docker_machine[0].id], var.extra_security_group_ids_runner_agent)
-    associate_public_ip_address = false == (var.runner_agent_uses_private_address == false ? var.runner_agent_uses_private_address : var.runners_use_private_address)
+    security_groups = concat([aws_security_group.docker_machine[0].id])
   }
   tag_specifications {
     resource_type = "instance"
@@ -368,9 +361,6 @@ resource "aws_launch_template" "gitlab_runners" {
   lifecycle {
     create_before_destroy = true
   }
-
-  # otherwise the agent running on the EC2 instance tries to create the log group
-  depends_on = [aws_cloudwatch_log_group.environment]
 }
 
 ################################################################################
