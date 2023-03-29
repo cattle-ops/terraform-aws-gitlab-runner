@@ -32,7 +32,7 @@ variable "subnet_id" {
 }
 
 variable "subnet_ids" {
-  description = "Subnet ids used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
+  description = "First subnet in the list is used for the runner. Complete list is used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
   type        = list(string)
   default     = []
 }
@@ -50,7 +50,7 @@ variable "metrics_autoscaling" {
 }
 
 variable "key_pair_name" {
-  description = "The name of the key pair to use for the runner agent instance. This variable is only supported when use_fleet is set to true."
+  description = "The name of the key pair used by the runner to connect to the docker-machine executors."
   type        = string
   default     = "fleet-key"
 }
@@ -616,18 +616,10 @@ variable "gitlab_runner_registration_config" {
 }
 
 variable "public_key" {
-  description = "The SSH public key used to access the Gitlab runner agent instances. This variable is supported only when use_fleet is set to true."
+  description = "The SSH public key used by the runner to connect to the docker-machine executors. This variable is supported only when use_fleet is set to true."
   type        = string
   default     = ""
 }
-
-variable "private_key" {
-  description = "The SSH priate key used to access the Gitlab runner agent instances. This variable is supported only when use_fleet is set to true and secure_parameter_store_private_key is unset."
-  type        = string
-  #sensitive   = true
-  default     = ""
-}
-
 
 variable "secure_parameter_store_runner_token_key" {
   description = "The key name used store the Gitlab runner token in Secure Parameter Store"
