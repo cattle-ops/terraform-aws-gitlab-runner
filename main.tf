@@ -366,10 +366,6 @@ resource "aws_launch_template" "gitlab_runners" {
     associate_public_ip_address = !var.runners_use_private_address
   }
 
-  placement {
-    availability_zone = data.aws_availability_zone.runners.name
-  }
-
   tag_specifications {
     resource_type = "instance"
     tags          = local.tags
@@ -382,7 +378,6 @@ resource "aws_launch_template" "gitlab_runners" {
   tags = local.tags
 
   metadata_options {
-    http_endpoint               = "enabled"
     http_tokens                 = var.docker_machine_instance_metadata_options.http_tokens
     http_put_response_hop_limit = var.docker_machine_instance_metadata_options.http_put_response_hop_limit
     instance_metadata_tags      = "enabled"
