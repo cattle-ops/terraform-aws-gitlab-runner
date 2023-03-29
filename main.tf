@@ -344,6 +344,10 @@ resource "aws_launch_template" "gitlab_runners" {
   instance_type          = var.docker_machine_instance_types[0] # it will be overrided by the fleet
   update_default_version = true
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.docker_machine[0].name
+  }
+
   network_interfaces {
     security_groups = concat([aws_security_group.docker_machine[0].id])
   }
