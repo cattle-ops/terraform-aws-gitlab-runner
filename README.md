@@ -369,6 +369,46 @@ module "runner" {
 }
 ```
 
+### Scenario: Use of Spot Fleet
+
+Since spot instances can be taken over by AWS depending on the instance type and AZ you are using, you may want multiple instances types in multiple AZs. This is where spot fleets come in, when there is no capacity on one instance type and one AZ, AWS will take the next instance type and so on. This update has been possible since the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine supports spot fleets.
+
+#### Configuration example
+```hcl
+module "runner" {
+  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
+  source  = "npalm/gitlab-runner/aws"
+
+  aws_region  = "eu-west-3"
+  environment = "spot-runners"
+
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids               = module.vpc.private_subnets
+
+  docker_machine_instance_types             = ["t3a.medium", "t3.medium", "t2.medium"]
+  use_fleet                                 = true
+  public_key                                = "<ssh-public-key>"
+  secure_parameter_store_runner_private_key = "<parameter-store-key-name>"
+  key_pair_name                             = "<key_pair_name>
+
+  runners_name       = "docker-machine"
+  runners_gitlab_url = "https://gitlab.com"
+
+  gitlab_runner_registration_config = {
+    registration_token = "my-token"
+    tag_list           = "docker"
+    description        = "runner default"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+
+  overrides = {
+    name_iam_objects = "<region-specific-prefix>-gitlab-runner-iam"
+  }
+}
+```
+
 ## Examples
 
 A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
@@ -438,7 +478,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4 |
 | <a name="provider_local"></a> [local](#provider\_local) | >= 2.4.0 |
 
 ## Modules
@@ -477,9 +517,11 @@ Made with [contributors-img](https://contrib.rocks).
 | [aws_iam_role_policy_attachment.service_linked_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.user_defined_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_key_pair.fleet_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_kms_alias.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_launch_template.gitlab_runner_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
+| [aws_launch_template.gitlab_runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
 | [aws_security_group.docker_machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group_rule.docker_machine_docker_runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
@@ -535,6 +577,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_docker_machine_iam_policy_arns"></a> [docker\_machine\_iam\_policy\_arns](#input\_docker\_machine\_iam\_policy\_arns) | List of policy ARNs to be added to the instance profile of the docker machine runners. | `list(string)` | `[]` | no |
 | <a name="input_docker_machine_instance_metadata_options"></a> [docker\_machine\_instance\_metadata\_options](#input\_docker\_machine\_instance\_metadata\_options) | Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines. | <pre>object({<br>    http_tokens                 = string<br>    http_put_response_hop_limit = number<br>  })</pre> | <pre>{<br>  "http_put_response_hop_limit": 2,<br>  "http_tokens": "required"<br>}</pre> | no |
 | <a name="input_docker_machine_instance_type"></a> [docker\_machine\_instance\_type](#input\_docker\_machine\_instance\_type) | Instance type used for the instances hosting docker-machine. | `string` | `"m5.large"` | no |
+| <a name="input_docker_machine_instance_types"></a> [docker\_machine\_instance\_types](#input\_docker\_machine\_instance\_types) | Instance types used for the instances hosting docker-machine. This variable is only supported when use\_fleet is set to true. | `list(string)` | `[]` | no |
 | <a name="input_docker_machine_options"></a> [docker\_machine\_options](#input\_docker\_machine\_options) | List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '["amazonec2-zone=a"]' | `list(string)` | `[]` | no |
 | <a name="input_docker_machine_role_json"></a> [docker\_machine\_role\_json](#input\_docker\_machine\_role\_json) | Docker machine runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | <a name="input_docker_machine_security_group_description"></a> [docker\_machine\_security\_group\_description](#input\_docker\_machine\_security\_group\_description) | A description for the docker-machine security group | `string` | `"A security group containing docker-machine instances"` | no |
@@ -559,6 +602,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_gitlab_runner_version"></a> [gitlab\_runner\_version](#input\_gitlab\_runner\_version) | Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases). | `string` | `"15.8.2"` | no |
 | <a name="input_instance_role_json"></a> [instance\_role\_json](#input\_instance\_role\_json) | Default runner instance override policy, expected to be in JSON format. | `string` | `""` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance type used for the GitLab runner. | `string` | `"t3.micro"` | no |
+| <a name="input_key_pair_name"></a> [key\_pair\_name](#input\_key\_pair\_name) | The name of the key pair used by the runner to connect to the docker-machine executors. | `string` | `"fleet-key"` | no |
 | <a name="input_kms_alias_name"></a> [kms\_alias\_name](#input\_kms\_alias\_name) | Alias added to the kms\_key (if created and not provided by kms\_key\_id) | `string` | `""` | no |
 | <a name="input_kms_deletion_window_in_days"></a> [kms\_deletion\_window\_in\_days](#input\_kms\_deletion\_window\_in\_days) | Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`. | `number` | `7` | no |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key. | `string` | `""` | no |
@@ -567,6 +611,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_overrides"></a> [overrides](#input\_overrides) | This map provides the possibility to override some defaults.<br>The following attributes are supported:<br>  * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.<br>  * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.<br>  * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).<br>  * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module. | `map(string)` | <pre>{<br>  "name_docker_machine_runners": "",<br>  "name_iam_objects": "",<br>  "name_runner_agent_instance": "",<br>  "name_sg": ""<br>}</pre> | no |
 | <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | Name of permissions boundary policy to attach to AWS IAM roles | `string` | `""` | no |
 | <a name="input_prometheus_listen_address"></a> [prometheus\_listen\_address](#input\_prometheus\_listen\_address) | Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on. | `string` | `""` | no |
+| <a name="input_public_key"></a> [public\_key](#input\_public\_key) | The SSH public key used by the runner to connect to the docker-machine executors. This variable is supported only when use\_fleet is set to true. | `string` | `""` | no |
 | <a name="input_role_tags"></a> [role\_tags](#input\_role\_tags) | Map of tags that will be added to the role created. Useful for tag based authorization. | `map(string)` | `{}` | no |
 | <a name="input_runner_agent_uses_private_address"></a> [runner\_agent\_uses\_private\_address](#input\_runner\_agent\_uses\_private\_address) | Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent. | `bool` | `true` | no |
 | <a name="input_runner_ami_filter"></a> [runner\_ami\_filter](#input\_runner\_ami\_filter) | List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI. | `map(list(string))` | <pre>{<br>  "name": [<br>    "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"<br>  ]<br>}</pre> | no |
@@ -626,15 +671,18 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_in_time_zone": "Etc/UTC",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5",<br>  "scale_out_time_zone": "Etc/UTC"<br>}</pre> | no |
+| <a name="input_secure_parameter_store_runner_private_key"></a> [secure\_parameter\_store\_runner\_private\_key](#input\_secure\_parameter\_store\_runner\_private\_key) | The key name used to store the Gitlab runner private key in Secure Parameter Store | `string` | `""` | no |
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |
 | <a name="input_secure_parameter_store_runner_token_key"></a> [secure\_parameter\_store\_runner\_token\_key](#input\_secure\_parameter\_store\_runner\_token\_key) | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | <a name="input_sentry_dsn"></a> [sentry\_dsn](#input\_sentry\_dsn) | Sentry DSN of the project for the runner to use (uses legacy DSN format) | `string` | `"__SENTRY_DSN_REPLACED_BY_USER_DATA__"` | no |
 | <a name="input_show_user_data_in_plan"></a> [show\_user\_data\_in\_plan](#input\_show\_user\_data\_in\_plan) | When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script | `bool` | `false` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet id used for the runner and executors. Must belong to the VPC specified above. | `string` | `""` | no |
 | <a name="input_subnet_id_runners"></a> [subnet\_id\_runners](#input\_subnet\_id\_runners) | Deprecated! Use subnet\_id instead. List of subnets used for hosting the gitlab-runners. | `string` | `""` | no |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | First subnet in the list is used for the runner. Complete list is used for executors when the fleet mode is enabled. Must belong to the VPC specified above. | `list(string)` | `[]` | no |
 | <a name="input_subnet_ids_gitlab_runner"></a> [subnet\_ids\_gitlab\_runner](#input\_subnet\_ids\_gitlab\_runner) | Deprecated! Use subnet\_id instead. Subnet used for hosting the GitLab runner. | `list(string)` | `[]` | no |
 | <a name="input_suppressed_tags"></a> [suppressed\_tags](#input\_suppressed\_tags) | List of tag keys which are removed from tags, agent\_tags and runner\_tags and never added as default tag by the module. | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |
+| <a name="input_use_fleet"></a> [use\_fleet](#input\_use\_fleet) | Use the fleet mode for agents. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode | `bool` | `false` | no |
 | <a name="input_userdata_post_install"></a> [userdata\_post\_install](#input\_userdata\_post\_install) | User-data script snippet to insert after GitLab runner install | `string` | `""` | no |
 | <a name="input_userdata_pre_install"></a> [userdata\_pre\_install](#input\_userdata\_pre\_install) | User-data script snippet to insert before GitLab runner install | `string` | `""` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The target VPC for the docker-machine and runner instances. | `string` | n/a | yes |
