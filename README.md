@@ -478,7 +478,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | >= 2.4.0 |
 
 ## Modules
