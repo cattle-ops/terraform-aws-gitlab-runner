@@ -3,11 +3,8 @@
     "Statement": [
         {
             "Action": [
-                "kms:Encrypt*",
-                "kms:Decrypt*",
-                "kms:ReEncrypt*",
-                "kms:GenerateDataKey*",
-                "kms:Describe*"
+                "kms:Decrypt",
+                "kms:GenerateDataKey"
             ],
             "Effect": "Allow",
             "Resource": [
