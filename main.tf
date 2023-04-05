@@ -342,7 +342,7 @@ resource "aws_launch_template" "gitlab_runners" {
   key_name               = aws_key_pair.fleet_key[0].key_name
   image_id               = data.aws_ami.docker-machine[0].id
   user_data              = base64gzip(var.runners_userdata)
-  instance_type          = var.docker_machine_instance_types[0] # it will be overrided by the fleet
+  instance_type          = var.docker_machine_instance_types[0] # it will be override by the fleet
   update_default_version = true
   ebs_optimized          = var.runners_ebs_optimized
   monitoring {
@@ -362,7 +362,7 @@ resource "aws_launch_template" "gitlab_runners" {
   }
 
   network_interfaces {
-    security_groups = [aws_security_group.docker_machine[0].id]
+    security_groups             = [aws_security_group.docker_machine[0].id]
     associate_public_ip_address = !var.runners_use_private_address
   }
 
