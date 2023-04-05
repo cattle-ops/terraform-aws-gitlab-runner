@@ -70,7 +70,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@v6
+        uses: oxsecurity/megalinter@v6.22.2
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -84,6 +84,8 @@ jobs:
           TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
           # it's an auto-generated file
           MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
+          # it's an auto-generated file
+          MARKDOWN_MARKDOWN_LINK_CHECK_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
           PAT: ${{ secrets.GITHUB_TOKEN }}
           # automatically commit fixes to the feature branch
           APPLY_FIXES: all
