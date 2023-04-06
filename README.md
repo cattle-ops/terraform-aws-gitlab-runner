@@ -387,8 +387,6 @@ module "runner" {
 
   docker_machine_instance_types             = ["t3a.medium", "t3.medium", "t2.medium"]
   use_fleet                                 = true
-  public_key                                = "<ssh-public-key>"
-  secure_parameter_store_runner_private_key = "<parameter-store-key-name>"
   key_pair_name                             = "<key_pair_name>
 
   runners_name       = "docker-machine"
