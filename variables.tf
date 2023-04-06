@@ -615,12 +615,6 @@ variable "gitlab_runner_registration_config" {
   }
 }
 
-variable "public_key" {
-  description = "The SSH public key used by the runner to connect to the docker-machine executors. This variable is supported only when use_fleet is set to true."
-  type        = string
-  default     = ""
-}
-
 variable "secure_parameter_store_runner_token_key" {
   description = "The key name used store the Gitlab runner token in Secure Parameter Store"
   type        = string
