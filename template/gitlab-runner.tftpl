@@ -50,8 +50,8 @@ sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 
 if [[ "${use_fleet}" == "true" ]]
 then
-  echo "$(aws ssm get-parameters --names "${secure_parameter_store_runner_private_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")" > /root/.ssh/id_rsa
   echo "${public_key}" > /root/.ssh/id_rsa.pub
+  echo "${private_key}" > /root/.ssh/id_rsa
 
   chmod 600 /root/.ssh/id_rsa
 fi

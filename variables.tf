@@ -633,12 +633,6 @@ variable "secure_parameter_store_runner_sentry_dsn" {
   default     = "sentry-dsn"
 }
 
-variable "secure_parameter_store_runner_private_key" {
-  description = "The key name used to store the Gitlab runner private key in Secure Parameter Store"
-  type        = string
-  default     = ""
-}
-
 variable "enable_manage_gitlab_token" {
   description = "(Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
   type        = bool

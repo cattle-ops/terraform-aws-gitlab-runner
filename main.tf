@@ -68,7 +68,6 @@ locals {
       runners_token                                = var.runners_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
-      secure_parameter_store_runner_private_key    = var.secure_parameter_store_runner_private_key
       secure_parameter_store_region                = var.aws_region
       gitlab_runner_registration_token             = var.gitlab_runner_registration_config["registration_token"]
       gitlab_runner_description                    = var.gitlab_runner_registration_config["description"]
@@ -78,8 +77,9 @@ locals {
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.sentry_dsn
-      public_key                                   = var.public_key
+      public_key                                   = var.use_fleet == true ? tls_private_key.runner[0].public_key_openssh : ""
       use_fleet                                    = var.use_fleet
+      private_key                                  = var.use_fleet == true ? tls_private_key.runner[0].private_key_pem : ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -326,11 +326,18 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   depends_on = [aws_cloudwatch_log_group.environment]
 }
 
+resource "tls_private_key" "runner" {
+  count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 resource "aws_key_pair" "fleet_key" {
   count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
 
   key_name   = var.key_pair_name
-  public_key = var.public_key
+  public_key = tls_private_key.runner[0].public_key_openssh
 }
 
 resource "aws_launch_template" "gitlab_runners" {
