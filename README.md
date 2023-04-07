@@ -390,7 +390,7 @@ module "runner" {
 
   docker_machine_instance_types             = ["t3a.medium", "t3.medium", "t2.medium"]
   use_fleet                                 = true
-  key_pair_name                             = "<key_pair_name>
+  key_pair_name                             = "<key_pair_name>"
 
   runners_name       = "docker-machine"
   runners_gitlab_url = "https://gitlab.com"
