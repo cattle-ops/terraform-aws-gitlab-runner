@@ -381,7 +381,7 @@ resource "aws_iam_policy" "instance_kms_policy" {
   description = "Allow runner instance the ability to use the KMS key."
   policy = templatefile("${path.module}/policies/instance-kms-policy.json",
     {
-      kms_key_arn = var.enable_kms && var.kms_key_id == "" ? aws_kms_key.default[0].arn : "arn:aws:kms:${var.aws_region}:${data.aws_caller_identity.current.account_id}:key/${var.kms_key_id}"
+      kms_key_arn = var.enable_kms && var.kms_key_id == "" ? aws_kms_key.default[0].arn : var.kms_key_id
     }
   )
 
