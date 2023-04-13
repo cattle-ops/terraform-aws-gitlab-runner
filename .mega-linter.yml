@@ -12,3 +12,8 @@ DISABLE_LINTERS:
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER
   # CSpell does a great job. No need for a second linter.
   - SPELL_MISSPELL
+
+PRE_COMMANDS:
+  # find all Python requirements and install them
+  - command: find . -name "requirements.txt" -exec pip install -r {} \;
+    cwd: root
