@@ -15,11 +15,6 @@ DISABLE_LINTERS:
   # DevSkim as it has issues ignoring files/directories, e.g. .mypy_cache
   - REPOSITORY_DEVSKIM
 
-GO_GOLANGCI_LINT_PRE_COMMANDS:
-  # install all Go requirements
-  - command: cd test && go mod download
-    cwd: root
-
 PYTHON_PYLINT_PRE_COMMANDS:
   # find all Python requirements and install them
   - command: find . -name requirements.txt -exec pip install -r {} \;
