@@ -10,7 +10,7 @@ https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some di
 This is rudimentary and doesn't check if a build runner has a current job.
 """
 import boto3
-from botocore.exceptions import {ClientError}
+import {ClientError} from botocore.exceptions
 import json
 import os
 
