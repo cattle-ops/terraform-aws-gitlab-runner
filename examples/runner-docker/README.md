@@ -1,10 +1,11 @@
-# Example - Spot Runner - Private subnet
+# Examples
+1. Spot Runner - Private subnet
 
-In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html)
-using spot instances. Runners will scale automatically based on configuration. The module creates by default a S3 cache
-that is shared cross runners (spot instances).
+  In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html)
+  using spot instances. Runners will scale automatically based on configuration. The module creates by default a S3 cache
+  that is shared cross runners (spot instances).
 
-![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
+  ![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
 This examples shows:
 
@@ -13,12 +14,12 @@ This examples shows:
   - Registration via GitLab token.
   - Auto scaling using `docker+machine` executor. ➜ tmp cat terraform-aws-gitlab-runner/examples/runner-docker/\_docs/README.md
 
-# Example - Runner - Docker runner
+2. Runner - Docker runner
 
-In this scenario the docker executor is used to schedule the builds. Builds will run on the same EC2 instance as the
-agent. No auto scaling is supported.
+  In this scenario the docker executor is used to schedule the builds. Builds will run on the same EC2 instance as the
+  agent. No auto scaling is supported.
 
-![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
+  ![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
 
 ## Prerequisite
 

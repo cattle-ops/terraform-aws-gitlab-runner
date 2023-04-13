@@ -1,3 +1,5 @@
+<!-- First line should be a H1: Badges on top please! -->
+<!-- markdownlint-disable MD041 -->
 [![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Actions](https://github.com/cattle-ops/terraform-aws-gitlab-runner/workflows/CI/badge.svg)](https://github.com/cattle-ops/terraform-aws-gitlab-runner/actions)
@@ -233,8 +235,8 @@ policy on the bucket.
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple
 runners. For this purpose the cache is implemented as a sub module. For more details see the
-[cache module](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of this use
-case can be found in the [runner-public](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
+[cache module](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of
+this use case can be found in the [runner-public](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
 example.
 
 In case you enable the access logging for the S3 cache bucket, you have to add the following statement to your S3 logging bucket

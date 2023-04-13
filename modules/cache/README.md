@@ -1,11 +1,11 @@
 # Cache module
 
-This sub module creates an S3 bucket for build caches. The cache will have by default a life cycle policy the module will create a policy that can be used to access the cache.
+This sub module creates an S3 bucket for build caches. The cache will have by default a life cycle policy the module
+will create a policy that can be used to access the cache.
 
 ## Usages
 
-```
-
+```hcl
 module "cache" {
   source      = "https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/move-cache-to-moudle/cache"
   environment = "cache"
@@ -24,6 +24,7 @@ module "runner" {
 
 }
 ```
+
 <!-- markdownlint-disable -->
 <!-- cSpell:disable -->
 <!-- markdown-link-check-disable -->
