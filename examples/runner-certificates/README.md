@@ -2,21 +2,28 @@
 
 In this scenario the runner agent is running on a single EC2 node.
 
-The example is intended to show how the runner can be configured for self-hosted Gitlab environments with certificates signed by a custom CA.
+The example is intended to show how the runner can be configured for self-hosted Gitlab environments with certificates
+signed by a custom CA.
 
-> This currently only works with the `docker` executor. Support for the `docker+machine` executor is not yet implemented. Contributions are welcome.
+> This currently only works with the `docker` executor. Support for the `docker+machine` executor is not yet
+> implemented. Contributions are welcome.
 
 ## Prerequisites
 
-The terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv). If you are not using `tfenv` please check `.terraform-version` for the tested version.
+The terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv). If you are not using `tfenv` please
+check `.terraform-version` for the tested version.
 
 Before configuring certificates, it is important to review the [Gitlab documentation](https://docs.gitlab.com/runner/configuration/tls-self-signed.html).
 
 In particular, note the following docker images are involved:
 
-> - The **Runner helper image**, which is used to handle Git, artifacts, and cache operations. In this scenario, the user only needs to make a certificate file available at a specific location (for example, /etc/gitlab-runner/certs/ca.crt), and the Docker container will automatically install it for the user.
+> The **Runner helper image**, which is used to handle Git, artifacts, and cache operations. In this scenario, the
+> user only needs to make a certificate file available at a specific location (for example,
+> /etc/gitlab-runner/certs/ca.crt), and the Docker container will automatically install it for the user.
 
-> - The **user image**, which is used to run the user script. In this scenario, the user must take ownership regarding how to install a certificate, since this is highly dependent on the image itself, and the Runner has no way of knowing how to install a certificate in each possible scenario.
+> The **user image**, which is used to run the user script. In this scenario, the user must take ownership regarding
+> how to install a certificate, since this is highly dependent on the image itself, and the Runner has no way of
+> knowing how to install a certificate in each possible scenario.
 
 ### Certificates for the runner-helper image
 

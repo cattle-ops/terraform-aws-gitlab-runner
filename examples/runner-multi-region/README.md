@@ -1,6 +1,8 @@
 # Example - Spot Runner - Multi-region
 
-In this scenario, we create multiple runner agents similarly to the _runner-public_ example but in different regions. Runners can be created with different configuration by instantiating the module multiple times. Runners will scale automatically based on configuration. The S3 cache can be shared cross runners by managing the cache outside the module.
+In this scenario, we create multiple runner agents similarly to the _runner-public_ example but in different regions.
+Runners can be created with different configuration by instantiating the module multiple times. Runners will scale
+automatically based on configuration. The S3 cache can be shared cross runners by managing the cache outside the module.
 
 ![runners-cache](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-cache.png)
 
@@ -14,7 +16,9 @@ This examples shows:
   - Auto scaling using `docker+machine` executor.
 
 Note that global AWS resources like IAM policies and S3 buckets must be unique across regions.
-To duplicate the Gitlab runner deployment to multiple regions, we therefore have to use the name overrides for the IAM resources (_overrides.name_iam_objects_) respectively for the S3 cache bucket (_cache_bucket_prefix_) in the modules _runner_main_region_ and _runner_alternate_region_.
+To duplicate the Gitlab runner deployment to multiple regions, we therefore have to use the name overrides for the IAM
+resources (_overrides.name_iam_objects_) respectively for the S3 cache bucket (_cache_bucket_prefix_) in the modules
+_runner_main_region_ and _runner_alternate_region_.
 
 ```hcl
 # examples/runner-multi-region/main.tf
