@@ -22,6 +22,7 @@
     "formatlist",
     "gitter",
     "godotenv",
+    "golangci",
     "gruntwork",
     "instancelifecycle",
     "kics",
