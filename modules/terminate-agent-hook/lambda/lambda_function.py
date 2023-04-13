@@ -16,6 +16,8 @@ import os
 
 
 def ec2_list(client, **args):
+    # to be refactored in #631
+    # pylint: disable=too-many-branches, too-many-nested-blocks
     """
     List EC2 instances created by the parent GitLab Runner.
     :param client: the boto3 client
@@ -72,8 +74,8 @@ def ec2_list(client, **args):
                             else:
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
-                        except ClientError as er:
-                            if 'InvalidInstanceID.NotFound' in str(er):
+                        except ClientError as error:
+                            if 'InvalidInstanceID.NotFound' in str(error):
                                 # The specified parent does not exist
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
@@ -81,7 +83,7 @@ def ec2_list(client, **args):
                                 # Handle any other exception and move on, skipping this instance.
                                 print(json.dumps({
                                     "Level": "exception",
-                                    "Exception": str(er)
+                                    "Exception": str(error)
                                 }))
                                 continue
 
@@ -148,17 +150,18 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
                 "Level": "info",
                 "Message": "Spot requests deleted"
             }))
-        except ClientError as er:
+        except ClientError as error:
             print(json.dumps({
                 "Level": "exception",
                 "Message": "Bulk cancelling spot requests failed",
-                "Exception": str(er)
+                "Exception": str(error)
             }))
     else:
         print(json.dumps({
             "Level": "info",
             "Message": "No spot requests to cancel"
         }))
+
 
 def remove_unused_ssh_key_pairs(client, executor_name_part):
     """
@@ -219,6 +222,8 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
                     }))
 
 
+# context not used: this is the interface for a AWS Lambda function defined by AWS
+# pylint: disable=unused-argument
 def handler(event, context):
     """
     Main entry point for the lambda function to clean up the resources if an Agent instance is terminated.
@@ -229,7 +234,7 @@ def handler(event, context):
     event_detail = event['detail']
 
     if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
-        exit()
+        sys.exit()
 
     client = boto3.client("ec2", region_name=event['region'])
 
@@ -251,7 +256,8 @@ def handler(event, context):
                 "Level": "info",
                 "Message": "Instances terminated"
             }))
-
+        # catch everything here and log it
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             print(json.dumps({
                 "Level": "exception",
