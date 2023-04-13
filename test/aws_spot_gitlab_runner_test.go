@@ -56,7 +56,10 @@ func TestRunnerDefault(t *testing.T) {
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
 
-	git = gitlab.NewClient(nil, conf.GitlabConfig.GitlabAccessToken)
+	git, err := gitlab.NewClient(conf.GitlabConfig.GitlabAccessToken, gitlab.WithBaseURL(conf.GitlabConfig.GitlabURL))
+	if err != nil {
+      log.Fatal("Failed to create client", err)
+    }
 
 	p, _, err := git.Projects.ForkProject(conf.GitlabConfig.GitlabSampleProject, &gitlab.ForkProjectOptions{
 		Namespace: &conf.GitlabConfig.GitlabNamespace,
