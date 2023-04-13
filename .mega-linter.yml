@@ -18,7 +18,7 @@ DISABLE_LINTERS:
 PYTHON_PYLINT_PRE_COMMANDS:
   # find all Python requirements and install them
   - command: find . -name requirements.txt -exec pip install -r {} \;
-    venv: pylint
+    cwd: root
 
 PYTHON_PYRIGHT_PRE_COMMANDS:
   # find all Python requirements and install them
