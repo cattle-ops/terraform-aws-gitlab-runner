@@ -99,7 +99,7 @@ resource "local_file" "config_toml" {
 }
 
 resource "local_file" "user_data" {
-  count    = var.debug.output_user_data_to_file ? 1 : 0
+  count    = var.debug.output_runner_user_data_to_file ? 1 : 0
   content  = local.template_user_data
   filename = "${path.root}/debug/${local.name_runner_agent_instance}/user_data.sh"
 }
