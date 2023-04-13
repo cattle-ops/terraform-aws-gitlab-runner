@@ -1,8 +1,8 @@
 """
 AWS Lambda function to terminate orphaned GitLab runners and remove unused resources.
 
-- This checks for running GitLab runner instances and terminates them, intended to be triggered by an ASG life cycle hook at
-  instance termination.
+- This checks for running GitLab runner instances and terminates them, intended to be triggered by an ASG life cycle
+  hook at instance termination.
 - Removes all unused SSH keys
 
 https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some discussion about this scenario.
@@ -85,7 +85,8 @@ def ec2_list(client, **args):
                             "InstanceId": instance['InstanceId'],
                             "Name": _name,
                             "LaunchTime": str(instance['LaunchTime']),
-                            "Message": f"{instance['InstanceId']} appears to be orphaned. Parent runner {args['parent']} {_msg_suffix}"
+                            "Message": f"{instance['InstanceId']} appears to be orphaned. Parent runner"
+                                       f" {args['parent']} {_msg_suffix}"
                         }))
 
     return _terminate_list
