@@ -100,7 +100,8 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
 
     spot_requests_to_cancel = []
 
-    next_token = ''
+    # bandit: there is no hardcoded_password_string issue here
+    next_token = ''  # nosec B105
     has_more_spot_requests = True
 
     while has_more_spot_requests:
