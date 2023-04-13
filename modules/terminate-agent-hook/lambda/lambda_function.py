@@ -73,7 +73,7 @@ def ec2_list(client, **args):
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
                             else:
-                                # Handle any other excpetion and move on, skipping this instance.
+                                # Handle any other exception and move on, skipping this instance.
                                 print(json.dumps({
                                     "Level": "exception",
                                     "Exception": str(e)

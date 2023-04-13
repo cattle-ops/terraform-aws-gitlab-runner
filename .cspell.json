@@ -9,6 +9,8 @@
     "awscli",
     "backports",
     "blockquotes",
+    "boto",
+    "botocore",
     "certdir",
     "checkmarx",
     "codeowners",
@@ -19,8 +21,11 @@
     "endfor",
     "formatlist",
     "gitter",
+    "godotenv",
+    "gruntwork",
     "instancelifecycle",
     "kics",
+    "joho",
     "jsonencode",
     "markdownlint",
     "Niek",
@@ -30,9 +35,11 @@
     "shuf",
     "signoff",
     "signum",
+    "stretchr",
     "substr",
     "templatefile",
     "terrascan",
+    "terratest",
     "tfenv",
     "tflint",
     "tftpl",
@@ -40,7 +47,8 @@
     "tfvars",
     "tmpfs",
     "trivy",
-    "userdata"
+    "userdata",
+    "xanzy"
   ],
   "flagWords": []
 }

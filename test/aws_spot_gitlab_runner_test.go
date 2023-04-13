@@ -69,7 +69,7 @@ func TestRunnerDefault(t *testing.T) {
 	// wait a few seconds to ensure project is forked
 	time.Sleep(5 * time.Second)
 
-	// trigger pipelins
+	// trigger pipelines
 	pipeline, _, err = git.Pipelines.CreatePipeline(project.ID, &gitlab.CreatePipelineOptions{
 		Ref: &conf.GitlabConfig.GitlabSampleProjectRef,
 	})

@@ -56,8 +56,8 @@ module "runner" {
   source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region                    = "eu-west-1"
-  environment                   = "glrunners-dev"
-  runners_name                  = "glrunners-foo"
+  environment                   = "runners-test"
+  runners_name                  = "runners-test"
   runners_gitlab_url            = "https://code.foo.org/"
   docker_machine_instance_type	= "t3.large"
   runners_request_spot_instance = false
