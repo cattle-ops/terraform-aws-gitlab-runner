@@ -339,8 +339,8 @@ map. A simple example for this would be to set _region-specific-prefix_ to the A
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
-  source  = "npalm/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
