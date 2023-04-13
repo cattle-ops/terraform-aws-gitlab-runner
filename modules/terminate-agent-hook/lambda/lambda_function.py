@@ -10,10 +10,9 @@ https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some di
 This is rudimentary and doesn't check if a build runner has a current job.
 """
 import boto3
-import botocore
+import {ClientError} from botocore.exceptions
 import json
 import os
-
 
 
 def ec2_list(client, **args):
@@ -73,8 +72,8 @@ def ec2_list(client, **args):
                             else:
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
-                        except Exception as ex:
-                            if 'InvalidInstanceID.NotFound' in str(ex):
+                        except ClientError as er:
+                            if 'InvalidInstanceID.NotFound' in str(er):
                                 # The specified parent does not exist
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
@@ -82,7 +81,7 @@ def ec2_list(client, **args):
                                 # Handle any other exception and move on, skipping this instance.
                                 print(json.dumps({
                                     "Level": "exception",
-                                    "Exception": str(ex)
+                                    "Exception": str(er)
                                 }))
                                 continue
 
@@ -149,11 +148,11 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
                 "Level": "info",
                 "Message": "Spot requests deleted"
             }))
-        except Exception as ex:
+        except ClientError as er:
             print(json.dumps({
                 "Level": "exception",
                 "Message": "Bulk cancelling spot requests failed",
-                "Exception": str(ex)
+                "Exception": str(er)
             }))
     else:
         print(json.dumps({
@@ -212,7 +211,7 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
                         "Level": "info",
                         "Message": f"Key pair deleted: {key_name}"
                     }))
-                except botocore.exceptions.ClientError as error:
+                except ClientError as error:
                     print(json.dumps({
                         "Level": "error",
                         "Message": f"Unable to delete key pair: {key_name}",
@@ -253,10 +252,10 @@ def handler(event, context):
                 "Message": "Instances terminated"
             }))
 
-        except Exception as e:
+        except Exception as ex:
             print(json.dumps({
                 "Level": "exception",
-                "Exception": str(e)
+                "Exception": str(ex)
             }))
     else:
         print(json.dumps({
