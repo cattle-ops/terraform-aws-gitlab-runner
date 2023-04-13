@@ -13,9 +13,6 @@ DISABLE_LINTERS:
   # CSpell does a great job. No need for a second linter.
   - SPELL_MISSPELL
 
-PRE_COMMANDS:
-
-
 PYTHON_PYLINT_PRE_COMMANDS:
   # find all Python requirements and install them
   - command: "python -m venv venv && source venv/bin/activate && find . -name requirements.txt -exec pip install -r {} \;"
