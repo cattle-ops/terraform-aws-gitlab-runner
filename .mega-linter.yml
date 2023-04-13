@@ -15,5 +15,5 @@ DISABLE_LINTERS:
 
 PRE_COMMANDS:
   # find all Python requirements and install them
-  - command: find . -name "requirements.txt" -exec pip install -r {} \;
+  - command: "python -m venv venv && source venv/bin/activate && find . -name requirements.txt -exec pip install -r {} \;"
     cwd: root
