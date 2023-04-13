@@ -55,73 +55,73 @@ For **user images**, you must:
 
 1. Mount the certificates from the EC2 host into all user images.
 
-  The runner module can be configured to do this step. Configure the module like so:
-  
-  ```terraform
-  module {
-    # ...
+    The runner module can be configured to do this step. Configure the module like so:
     
-    # Mount EC2 host certs in docker so all user docker images can reference them.
-    runners_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
-    
-    # ...
-  }
-  ```
-  
+    ```terraform
+    module {
+      # ...
+      
+      # Mount EC2 host certs in docker so all user docker images can reference them.
+      runners_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
+      
+        # ...
+      }
+      ```
+      
 2. Trust the certificates from within the user image.
-
-  Each user image will need to execute commands to copy the certificates into the correct place and trust them.
   
-  The below examples some ways to do this, assuming user images with the Ubuntu OS or similar.
-  For Alpine OS user images, the specific commands may differ.
+    Each user image will need to execute commands to copy the certificates into the correct place and trust them.
+    
+    The below examples some ways to do this, assuming user images with the Ubuntu OS or similar.
+    For Alpine OS user images, the specific commands may differ.
+    
+    **Option 1:** Build a custom user image and update your `Dockerfile`:
+    ```docker
+      FROM python:3 # Some base image
+    
+      RUN apt-get -y update
+      RUN apt-get -y upgrade
+    
+      RUN apt-get install -y ca-certificates
+      RUN cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
+      RUN update-ca-certificates
+      ...
+    ```
+    
+    **Option 2:** Add a section to each pipeline using `before_script`:
+    
+    This change would need to be added to every pipeline file which requires certificates.
+    It could be customized depending on the OS of the pipeline user image.
+    
+    ```yaml
+    default:
+      before_script:
+        # Install certificates into user image
+        - apt-get install -y ca-certificates
+        - cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
+        - update-ca-certificates
+    ```
+    
+    **Option 3:** Add the script from Option 2 into `runners_pre_build_script` variable:
+    
+    This avoids maintaining the script in each pipeline file, but expects that all user images use the same OS.
+    
+    ```terraform
+    module {
+      # ...
+    
+      runners_pre_build_script = <<EOT
+      '''
+      apt-get install -y ca-certificates
+      cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
+      update-ca-certificates
+      '''
+      EOT
+    
+      # ...
+    }
+    ```
   
-  **Option 1:** Build a custom user image and update your `Dockerfile`:
-  ```docker
-    FROM python:3 # Some base image
-  
-    RUN apt-get -y update
-    RUN apt-get -y upgrade
-  
-    RUN apt-get install -y ca-certificates
-    RUN cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
-    RUN update-ca-certificates
-    ...
-  ```
-  
-  **Option 2:** Add a section to each pipeline using `before_script`:
-  
-  This change would need to be added to every pipeline file which requires certificates.
-  It could be customized depending on the OS of the pipeline user image.
-  
-  ```yaml
-  default:
-    before_script:
-      # Install certificates into user image
-      - apt-get install -y ca-certificates
-      - cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
-      - update-ca-certificates
-  ```
-  
-  **Option 3:** Add the script from Option 2 into `runners_pre_build_script` variable:
-  
-  This avoids maintaining the script in each pipeline file, but expects that all user images use the same OS.
-  
-  ```terraform
-  module {
-    # ...
-  
-    runners_pre_build_script = <<EOT
-    '''
-    apt-get install -y ca-certificates
-    cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
-    update-ca-certificates
-    '''
-    EOT
-  
-    # ...
-  }
-  ```
-
 <!-- markdownlint-disable -->
 <!-- cSpell:disable -->
 <!-- markdown-link-check-disable -->
