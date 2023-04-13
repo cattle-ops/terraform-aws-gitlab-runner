@@ -12,6 +12,8 @@ DISABLE_LINTERS:
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER
   # CSpell does a great job. No need for a second linter.
   - SPELL_MISSPELL
+  # DevSkim as it has issues ignoring files/directories, e.g. .mypy_cache
+  - REPOSITORY_DEVSKIM
 
 PYTHON_PYLINT_PRE_COMMANDS:
   # find all Python requirements and install them

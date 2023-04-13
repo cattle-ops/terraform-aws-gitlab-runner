@@ -1,2 +1,5 @@
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
+
+[FORMAT]
+max-line-length=132
