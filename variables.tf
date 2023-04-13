@@ -949,6 +949,16 @@ variable "runner_extra_config" {
   default     = ""
 }
 
+variable "show_user_data_in_plan" {
+  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.show_user_data_in_plan
+    error_message = "The variable is deprecated. Please use the 'debug' variable instead."
+  }
+}
+
 variable "debug" {
   description = <<EOT
     Enable debug settings for development
