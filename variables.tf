@@ -960,11 +960,11 @@ variable "debug" {
                               also be used by Terraform to show changes in plan. Note that enabling this can
                               potentially expose sensitive information.
   EOT
-  type        = object({
+  type = object({
     output_runner_config_to_file    = bool
     output_runner_user_data_to_file = bool
   })
-  default        = {
+  default = {
     output_runner_config_to_file    = false
     output_runner_user_data_to_file = false
   }
