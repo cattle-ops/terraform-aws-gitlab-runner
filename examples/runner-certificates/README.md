@@ -85,7 +85,7 @@ For Alpine OS user images, the specific commands may differ.
 **Option 2:** Add a section to each pipeline using `before_script`:
 
 This change would need to be added to every pipeline file which requires certificates.
-It could be customised depending on the OS of the pipeline user image.
+It could be customized depending on the OS of the pipeline user image.
 
 ```yaml
 default:
