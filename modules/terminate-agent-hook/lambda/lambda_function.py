@@ -5,7 +5,7 @@ AWS Lambda function to terminate orphaned GitLab runners and remove unused resou
   instance termination.
 - Removes all unused SSH keys
 
-https://github.com/npalm/terraform-aws-gitlab-runner/issues/317 has some discussion about this scenario.
+https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some discussion about this scenario.
 
 This is rudimentary and doesn't check if a build runner has a current job.
 """

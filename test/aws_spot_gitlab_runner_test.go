@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/joho/godotenv"
-	"github.com/npalm/terraform-aws-gitlab-runner/test/config"
+	"github.com/cattle-ops/terraform-aws-gitlab-runner/test/config"
 	"github.com/xanzy/go-gitlab"
 )
 

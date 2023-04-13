@@ -11,7 +11,7 @@ This examples shows:
   - Additional security groups that are allowed access to the runner agent
   - Use of `runners.docker.services` to configure docker registry mirror (commented out - uncomment to apply)
 
-![runners-default](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-default.png)
+![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
 ## Prerequisite
 

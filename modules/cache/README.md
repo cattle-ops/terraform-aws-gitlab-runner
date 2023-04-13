@@ -7,12 +7,12 @@ This sub module creates an S3 bucket for build caches. The cache will have by de
 ```
 
 module "cache" {
-  source      = "https://github.com/npalm/terraform-aws-gitlab-runner/tree/move-cache-to-moudle/cache"
+  source      = "https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/move-cache-to-moudle/cache"
   environment = "cache"
 }
 
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   ...
 

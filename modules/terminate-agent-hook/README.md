@@ -14,7 +14,7 @@ in the ASG is terminated, the lifecycle hook triggers the Lambda to
 terminate spawned runner instances with the matching parent tag and/or any "orphaned"
 instances with no running parent runner.
 
-See [issue #214](https://github.com/npalm/terraform-aws-gitlab-runner/issues/214) for
+See [issue #214](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/214) for
 discussion on the scenario this module addresses.
 
 Furthermore, all spot requests which are still open are cancelled. Otherwise they might be fulfilled later but
@@ -38,7 +38,7 @@ input variables:
 
 ```terraform
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   asg_terminate_lifecycle_hook_create         = true
 
@@ -53,7 +53,7 @@ Note the `asg_terminate_lifecycle_hook_*` variables:
 
 ```terraform
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region                    = "eu-west-1"
   environment                   = "glrunners-dev"
@@ -91,7 +91,7 @@ module "runner" {
   # for 'docker_machine_options' settings with the AWS driver
   docker_machine_options = var.docker_machine_options
 
-  # See https://github.com/npalm/terraform-aws-gitlab-runner/issues/160
+  # See https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/160
   runners_additional_volumes = ["/certs/client"]
 
   tags = local.common_tags
