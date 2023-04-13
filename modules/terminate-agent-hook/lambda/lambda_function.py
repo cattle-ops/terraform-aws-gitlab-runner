@@ -17,6 +17,12 @@ import os
 
 
 def ec2_list(client, **args):
+    """
+    List EC2 instances created by the parent GitLab Runner.
+    :param client: the boto3 client
+    :param args: specify the 'parent' to filter instances created by this Runner
+    :return: a list of EC2 instance IDs created by the parent Runner
+    """
     print(json.dumps({
         "Level": "info",
         "Message": f"Searching for children of GitLab runner instance {args['parent']}"
@@ -67,8 +73,8 @@ def ec2_list(client, **args):
                             else:
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
-                        except Exception as e:
-                            if 'InvalidInstanceID.NotFound' in str(e):
+                        except Exception as ex:
+                            if 'InvalidInstanceID.NotFound' in str(ex):
                                 # The specified parent does not exist
                                 _terminate_list.append(instance['InstanceId'])
                                 _msg_suffix = "does not exist."
@@ -76,7 +82,7 @@ def ec2_list(client, **args):
                                 # Handle any other exception and move on, skipping this instance.
                                 print(json.dumps({
                                     "Level": "exception",
-                                    "Exception": str(e)
+                                    "Exception": str(ex)
                                 }))
                                 continue
 
@@ -93,6 +99,11 @@ def ec2_list(client, **args):
 
 
 def cancel_active_spot_requests(ec2_client, executor_name_part):
+    """
+    Cancel all active spot requests for the given executor name part.
+    :param ec2_client: the boto3 EC2 client
+    :param executor_name_part: used to filter the spot instance requests by SSH key name to contain this value
+    """
     print(json.dumps({
         "Level": "info",
         "Message": f"Removing open spot requests for environment {executor_name_part}"
@@ -138,11 +149,11 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
                 "Level": "info",
                 "Message": "Spot requests deleted"
             }))
-        except Exception as e:
+        except Exception as ex:
             print(json.dumps({
                 "Level": "exception",
                 "Message": "Bulk cancelling spot requests failed",
-                "Exception": str(e)
+                "Exception": str(ex)
             }))
     else:
         print(json.dumps({
@@ -151,6 +162,11 @@ def cancel_active_spot_requests(ec2_client, executor_name_part):
         }))
 
 def remove_unused_ssh_key_pairs(client, executor_name_part):
+    """
+    Remove all SSH key pairs that are not used by any active Executor EC2 instance.
+    :param client: boto3 EC2 client
+    :param executor_name_part: used to filter the spot instance requests by SSH key name to contain this value
+    """
     print(json.dumps({
         "Level": "info",
         "Message": f"Removing unused SSH key pairs for agent {executor_name_part}"
@@ -205,6 +221,12 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
 
 
 def handler(event, context):
+    """
+    Main entry point for the lambda function to clean up the resources if an Agent instance is terminated.
+
+    :param event: see https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event
+    :param context: see https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
+    """
     event_detail = event['detail']
 
     if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
