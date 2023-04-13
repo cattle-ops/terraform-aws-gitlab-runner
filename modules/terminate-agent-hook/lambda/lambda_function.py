@@ -205,7 +205,6 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
 
 
 def handler(event, context):
-    response = []
     event_detail = event['detail']
 
     if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
@@ -245,7 +244,7 @@ def handler(event, context):
 
     remove_unused_ssh_key_pairs(client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
 
-    return f"Housekeeping done"
+    return "Housekeeping done"
 
 
 if __name__ == "__main__":
