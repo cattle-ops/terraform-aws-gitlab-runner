@@ -28,6 +28,7 @@ package*.json
 yarn.lock
 
 builds/
+debug/
 
 # exceptions for semantic release
 !.release/package*

@@ -949,14 +949,23 @@ variable "runner_extra_config" {
   default     = ""
 }
 
-variable "output_runner_config_to_file" {
-  description = "When enabled, outputs the rendered config.toml file in the root module. This can then also be used by Terraform to show changes in plan. Note that enabling this can potentially expose sensitive information."
-  type        = bool
-  default     = false
-}
+variable "debug" {
+  description = <<EOT
+    Enable debug settings for development
 
-variable "output_user_data_to_file" {
-  description = "When enabled, outputs the rendered userdata.sh file in the root module. This can then also be used by Terraform to show changes in plan. Note that enabling this can potentially expose sensitive information."
-  type        = bool
-  default     = false
+    output_runner_config_to_file: When enabled, outputs the rendered config.toml file in the root module. This can
+                                  then also be used by Terraform to show changes in plan. Note that enabling this can
+                                  potentially expose sensitive information.
+    output_user_data_to_file: When enabled, outputs the rendered userdata.sh file in the root module. This can then
+                              also be used by Terraform to show changes in plan. Note that enabling this can
+                              potentially expose sensitive information.
+  EOT
+  type        = object({
+    output_runner_config_to_file    = bool
+    output_runner_user_data_to_file = bool
+  })
+  default        = object({
+    output_runner_config_to_file    = false
+    output_runner_user_data_to_file = false
+  })
 }

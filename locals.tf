@@ -93,13 +93,13 @@ locals {
 }
 
 resource "local_file" "config_toml" {
-  count    = var.output_runner_config_to_file ? 1 : 0
+  count    = var.debug.output_runner_config_to_file ? 1 : 0
   content  = local.template_runner_config
-  filename = "${path.root}/gitlab_runner/${local.name_runner_agent_instance}/runner_config.toml"
+  filename = "${path.root}/debug/${local.name_runner_agent_instance}/runner_config.toml"
 }
 
 resource "local_file" "user_data" {
-  count    = var.output_user_data_to_file ? 1 : 0
+  count    = var.debug.output_user_data_to_file ? 1 : 0
   content  = local.template_user_data
-  filename = "${path.root}/gitlab_runner/${local.name_runner_agent_instance}/user_data.sh"
+  filename = "${path.root}/debug/${local.name_runner_agent_instance}/user_data.sh"
 }
