@@ -15,9 +15,9 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-var git *gitlab.Client
-var project *gitlab.Project
-var pipeline *gitlab.Pipeline
+var git *gitlab.Client // nolint:typecheck // how to get rid of this?
+var project *gitlab.Project // nolint:typecheck // how to get rid of this?
+var pipeline *gitlab.Pipeline // nolint:typecheck // how to get rid of this?
 var conf *config.Config
 
 func init() {
