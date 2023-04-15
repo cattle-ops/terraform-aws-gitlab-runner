@@ -32,6 +32,7 @@
     "mypy",
     "Niek",
     "noexec",
+    "nolint",
     "npalm",
     "oxsecurity",
     "pylint",
@@ -52,6 +53,7 @@
     "tfvars",
     "tmpfs",
     "trivy",
+    "typecheck",
     "userdata",
     "xanzy"
   ],
