@@ -32,7 +32,7 @@ variable "subnet_id" {
 }
 
 variable "subnet_ids" {
-  description = "First subnet in the list is used for the runner. Complete list is used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
+  description = "List of subnets used for executors when the fleet mode is enabled. Note that the runner will be placed in the first subnet of the list. Must belong to the VPC specified above."
   type        = list(string)
   default     = []
 }
