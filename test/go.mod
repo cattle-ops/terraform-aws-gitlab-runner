@@ -1,4 +1,4 @@
-module github.com/npalm/terraform-aws-gitlab-runner/test
+module github.com/cattle-ops/terraform-aws-gitlab-runner/test
 
 go 1.19
 
