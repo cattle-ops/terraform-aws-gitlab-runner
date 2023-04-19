@@ -615,6 +615,12 @@ variable "gitlab_runner_registration_config" {
   }
 }
 
+variable "secure_parameter_store_registration_token_key" {
+  description = "The key name used store the Gitlab runner registration token in Secure Parameter Store"
+  type        = string
+  default     = "registration-token"
+}
+
 variable "secure_parameter_store_runner_token_key" {
   description = "The key name used store the Gitlab runner token in Secure Parameter Store"
   type        = string
