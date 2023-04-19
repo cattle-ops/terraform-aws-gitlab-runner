@@ -587,7 +587,7 @@ variable "gitlab_runner_registration_config" {
   type        = map(string)
 
   default = {
-    registration_token = ""
+    registration_token = "__GITLAB_REGISTRATION_TOKEN_REPLACED_BY_USER_DATA__"
     tag_list           = ""
     description        = ""
     locked_to_project  = ""
@@ -595,6 +595,12 @@ variable "gitlab_runner_registration_config" {
     maximum_timeout    = ""
     access_level       = ""
   }
+}
+
+variable "secure_parameter_store_registration_token_key" {
+  description = "The key name used store the Gitlab runner registration token in Secure Parameter Store"
+  type        = string
+  default     = "registration-token"
 }
 
 variable "secure_parameter_store_runner_token_key" {
