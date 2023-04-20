@@ -79,7 +79,6 @@ module "runner" {
   }
 
   executor_docker_privileged         = "true"
-  executor_docker_additional_volumes = ["/certs/client"]
 
   executor_docker_volumes_tmpfs = [
     {
