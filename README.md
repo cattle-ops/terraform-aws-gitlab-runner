@@ -385,8 +385,9 @@ module "runner" {
   aws_region  = "eu-west-3"
   environment = "spot-runners"
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids               = module.vpc.private_subnets
+  vpc_id                    = module.vpc.vpc_id
+  subnet_id                 = module.vpc.private_subnets[0] # subnet of the agent
+  fleet_executor_subnet_ids = module.vpc.private_subnets
 
   docker_machine_instance_types             = ["t3a.medium", "t3.medium", "t2.medium"]
   use_fleet                                 = true
@@ -474,6 +475,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.4.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 3 |
 
 ## Providers
 
@@ -481,7 +483,7 @@ Made with [contributors-img](https://contrib.rocks).
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | >= 2.4.0 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | n/a |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | >= 3 |
 
 ## Modules
 
@@ -598,6 +600,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_enable_schedule"></a> [enable\_schedule](#input\_enable\_schedule) | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | <a name="input_extra_security_group_ids_runner_agent"></a> [extra\_security\_group\_ids\_runner\_agent](#input\_extra\_security\_group\_ids\_runner\_agent) | Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default. | `list(string)` | `[]` | no |
+| <a name="input_fleet_executor_subnet_ids"></a> [fleet\_executor\_subnet\_ids](#input\_fleet\_executor\_subnet\_ids) | List of subnets used for executors when the fleet mode is enabled. Must belong to the VPC specified above. | `list(string)` | `[]` | no |
 | <a name="input_gitlab_runner_egress_rules"></a> [gitlab\_runner\_egress\_rules](#input\_gitlab\_runner\_egress\_rules) | List of egress rules for the gitlab runner instance. | <pre>list(object({<br>    cidr_blocks      = list(string)<br>    ipv6_cidr_blocks = list(string)<br>    prefix_list_ids  = list(string)<br>    from_port        = number<br>    protocol         = string<br>    security_groups  = list(string)<br>    self             = bool<br>    to_port          = number<br>    description      = string<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "description": null,<br>    "from_port": 0,<br>    "ipv6_cidr_blocks": [<br>      "::/0"<br>    ],<br>    "prefix_list_ids": null,<br>    "protocol": "-1",<br>    "security_groups": null,<br>    "self": null,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | <a name="input_gitlab_runner_registration_config"></a> [gitlab\_runner\_registration\_config](#input\_gitlab\_runner\_registration\_config) | Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo. | `map(string)` | <pre>{<br>  "access_level": "",<br>  "description": "",<br>  "locked_to_project": "",<br>  "maximum_timeout": "",<br>  "registration_token": "",<br>  "run_untagged": "",<br>  "tag_list": ""<br>}</pre> | no |
 | <a name="input_gitlab_runner_security_group_description"></a> [gitlab\_runner\_security\_group\_description](#input\_gitlab\_runner\_security\_group\_description) | A description for the gitlab-runner security group | `string` | `"A security group containing gitlab-runner agent instances"` | no |
@@ -679,7 +682,6 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_show_user_data_in_plan"></a> [show\_user\_data\_in\_plan](#input\_show\_user\_data\_in\_plan) | When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script | `bool` | `false` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet id used for the runner and executors. Must belong to the VPC specified above. | `string` | `""` | no |
 | <a name="input_subnet_id_runners"></a> [subnet\_id\_runners](#input\_subnet\_id\_runners) | Deprecated! Use subnet\_id instead. List of subnets used for hosting the gitlab-runners. | `string` | `""` | no |
-| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | First subnet in the list is used for the runner. Complete list is used for executors when the fleet mode is enabled. Must belong to the VPC specified above. | `list(string)` | `[]` | no |
 | <a name="input_subnet_ids_gitlab_runner"></a> [subnet\_ids\_gitlab\_runner](#input\_subnet\_ids\_gitlab\_runner) | Deprecated! Use subnet\_id instead. Subnet used for hosting the GitLab runner. | `list(string)` | `[]` | no |
 | <a name="input_suppressed_tags"></a> [suppressed\_tags](#input\_suppressed\_tags) | List of tag keys which are removed from tags, agent\_tags and runner\_tags and never added as default tag by the module. | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags that will be added to created resources. By default resources will be tagged with name and environment. | `map(string)` | `{}` | no |

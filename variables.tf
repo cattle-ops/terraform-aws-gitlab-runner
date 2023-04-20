@@ -31,8 +31,8 @@ variable "subnet_id" {
   default     = "" # TODO remove as soon as subnet_id_runners and subnet_ids_gitlab_runner are gone. Variable is mandatory now.
 }
 
-variable "subnet_ids" {
-  description = "List of subnets used for executors when the fleet mode is enabled. Note that the runner will be placed in the first subnet of the list. Must belong to the VPC specified above."
+variable "fleet_executor_subnet_ids" {
+  description = "List of subnets used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
   type        = list(string)
   default     = []
 }

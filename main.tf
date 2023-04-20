@@ -2,7 +2,7 @@ data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}
 
 data "aws_subnet" "runners" {
-  id = length(var.subnet_ids) > 0 ? var.subnet_ids[0] : (length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners)
+  id = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
 }
 
 data "aws_availability_zone" "runners" {
@@ -91,7 +91,7 @@ locals {
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
-      runners_subnet_ids                = length(var.subnet_ids) > 0 ? var.subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : [var.subnet_id_runners]
+      runners_subnet_ids                = length(var.fleet_executor_subnet_ids) > 0 ? var.fleet_executor_subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : [var.subnet_id_runners]
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
       runners_instance_types            = length(var.docker_machine_instance_types) > 0 ? var.docker_machine_instance_types : [var.docker_machine_instance_type]
@@ -170,7 +170,7 @@ data "aws_ami" "docker-machine" {
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = length(var.subnet_ids) > 0 ? var.subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
+  vpc_zone_identifier       = length(var.fleet_executor_subnet_ids) > 0 ? var.fleet_executor_subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
