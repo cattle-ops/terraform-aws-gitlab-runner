@@ -39,7 +39,7 @@ locals {
 
   # Determine IAM role for runner instance
   aws_iam_role_instance_name = coalesce(
-    var.runner_iam_role_profile_name,
+    var.runner_role.role_profile_name,
     "${local.name_iam_objects}-instance"
   )
   aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"
@@ -69,7 +69,7 @@ locals {
   secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.runner_sentry_secure_parameter_store_name}"
 
   # Custom names for runner agent instance, security groups, and IAM objects
-  name_runner_agent_instance = var.runner_instance_prefix == "" ? local.tags["Name"] : var.runner_instance_prefix
+  name_runner_agent_instance = var.runner_instance.name_prefix == "" ? local.tags["Name"] : var.runner_instance.name_prefix
   name_sg                    = var.security_group_prefix == "" ? local.tags["Name"] : var.security_group_prefix
   name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 

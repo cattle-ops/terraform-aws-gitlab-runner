@@ -246,20 +246,20 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 
   image_id               = data.aws_ami.runner.id
   user_data              = base64gzip(local.template_user_data)
-  instance_type          = var.runner_instance_type
+  instance_type          = var.runner_instance.type
   update_default_version = true
   ebs_optimized          = var.runner_ebs_optimized
   monitoring {
     enabled = var.runner_enable_monitoring
   }
   dynamic "instance_market_options" {
-    for_each = var.runner_spot_price == null || var.runner_spot_price == "" ? [] : ["spot"]
+    for_each = var.runner_instance.spot_price == null || var.runner_instance.spot_price == "" ? [] : ["spot"]
     content {
       market_type = instance_market_options.value
       dynamic "spot_options" {
-        for_each = var.runner_spot_price == "on-demand-price" ? [] : [0]
+        for_each = var.runner_instance.spot_price == "on-demand-price" ? [] : [0]
         content {
-          max_price = var.runner_spot_price
+          max_price = var.runner_instance.spot_price
         }
       }
     }
@@ -268,7 +268,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     name = local.aws_iam_role_instance_name
   }
   dynamic "block_device_mappings" {
-    for_each = [var.runner_root_block_device]
+    for_each = [var.runner_instance.root_device_config]
     content {
       # cSpell:ignore xvda
       device_name = lookup(block_device_mappings.value, "device_name", "/dev/xvda")
@@ -296,7 +296,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     tags          = local.tags
   }
   dynamic "tag_specifications" {
-    for_each = var.runner_spot_price == null || var.runner_spot_price == "" ? [] : ["spot"]
+    for_each = var.runner_instance.spot_price == null || var.runner_instance.spot_price == "" ? [] : ["spot"]
     content {
       resource_type = "spot-instances-request"
       tags          = local.tags
@@ -353,7 +353,7 @@ module "cache" {
 ### Trust policy
 ################################################################################
 resource "aws_iam_instance_profile" "instance" {
-  count = var.runner_create_runner_iam_role_profile ? 1 : 0
+  count = var.runner_role.create_role_profile ? 1 : 0
 
   name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
@@ -362,13 +362,13 @@ resource "aws_iam_instance_profile" "instance" {
 }
 
 resource "aws_iam_role" "instance" {
-  count = var.runner_create_runner_iam_role_profile ? 1 : 0
+  count = var.runner_role.create_role_profile ? 1 : 0
 
   name                 = local.aws_iam_role_instance_name
-  assume_role_policy   = length(var.runner_assume_role_json) > 0 ? var.runner_assume_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
+  assume_role_policy   = length(var.runner_role.assume_role_policy_json) > 0 ? var.var.runner_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
-  tags = merge(local.tags, var.runner_extra_role_tags)
+  tags = merge(local.tags, var.runner_role.additional_tags)
 }
 
 ################################################################################
@@ -392,7 +392,7 @@ resource "aws_iam_policy" "instance_kms_policy" {
 resource "aws_iam_role_policy_attachment" "instance_kms_policy" {
   count = var.enable_managed_kms_key ? 1 : 0
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.instance_kms_policy[0].arn
 }
 
@@ -403,7 +403,7 @@ resource "aws_iam_role_policy_attachment" "instance_kms_policy" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  count = var.runner_worker_type == "docker+machine" && var.runner_create_runner_iam_role_profile ? 1 : 0
+  count = var.runner_worker_type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
 
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
@@ -417,7 +417,7 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
-  count = var.runner_worker_type == "docker+machine" && var.runner_create_runner_iam_role_profile ? 1 : 0
+  count = var.runner_worker_type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
 
   role       = aws_iam_role.instance[0].name
   policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
@@ -440,14 +440,14 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
   count = var.runner_enable_ssm_access ? 1 : 0
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
   count = var.runner_enable_ssm_access ? 1 : 0
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
@@ -455,10 +455,10 @@ resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed"
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "user_defined_policies" {
-  count = length(var.runner_extra_iam_policy_arns)
+  count = length(var.runner_role.policy_arns)
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
-  policy_arn = var.runner_extra_iam_policy_arns[count.index]
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  policy_arn = var.runner_role.policy_arns[count.index]
 }
 
 ################################################################################
@@ -470,7 +470,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
   count = var.runner_worker_type == "docker+machine" ? (var.runner_worker_cache_s3_bucket["create"] || lookup(var.runner_worker_cache_s3_bucket, "policy", "") != "" ? 1 : 0) : 0
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
 }
 
@@ -519,7 +519,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
 ### Service linked policy, optional
 ################################################################################
 resource "aws_iam_policy" "service_linked_role" {
-  count = var.runner_allow_iam_service_linked_role_creation ? 1 : 0
+  count = var.runner_role.allow_iam_service_linked_role_creation ? 1 : 0
 
   name        = "${local.name_iam_objects}-service_linked_role"
   path        = "/"
@@ -530,9 +530,9 @@ resource "aws_iam_policy" "service_linked_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "service_linked_role" {
-  count = var.runner_allow_iam_service_linked_role_creation ? 1 : 0
+  count = var.runner_role.allow_iam_service_linked_role_creation ? 1 : 0
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.service_linked_role[0].arn
 }
 
@@ -556,7 +556,7 @@ resource "aws_iam_policy" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.ssm.arn
 }
 
@@ -577,7 +577,7 @@ resource "aws_iam_policy" "eip" {
 resource "aws_iam_role_policy_attachment" "eip" {
   count = var.runner_enable_eip ? 1 : 0
 
-  role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.eip[0].arn
 }
 

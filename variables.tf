@@ -100,40 +100,26 @@ variable "runner_manager_prometheus_listen_address" {
 /*
  * Runner: The agent that runs the code on the host platform and displays in the UI.
  */
-variable "runner_instance_prefix" {
-  description = "Set the name prefix and override the `Name` tag for the Agent instance."
-  type        = string
-  default     = ""
-}
-
-variable "runner_instance_type" {
-  description = "Agent instance type used."
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "runner_extra_instance_tags" {
-  description = "Map of tags that will be added to Agent EC2 instance."
-  type        = map(string)
-  default     = {}
-}
-
-variable "runner_spot_price" {
-  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
-  type        = string
-  default     = null
-}
-
-variable "runner_ebs_optimized" {
-  description = "Enable the Agent instance to be EBS-optimized."
-  type        = bool
-  default     = true
-}
-
-variable "runner_root_block_device" {
-  description = "The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
-  type        = map(string)
-  default     = {}
+variable "runner_instance" {
+  description = <<-EOT
+    additional_tags = Map of tags that will be added to the Agent instance.
+    ebs_optimized = Enable EBS optimization for the Agent instance.
+    name_prefix = Set the name prefix and override the `Name` tag for the Agent instance.
+    root_device_config = The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`
+    spot_price = By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen.
+    type = EC2 instance type used.
+  EOT
+  type = object({
+    additional_tags = optional(map(string))
+    ebs_optimized = optional(bool, true)
+    name_prefix = optional(string)
+    root_device_config = optional(map(string))
+    spot_price = optional(string, null)
+    type = string
+  })
+  default = {
+    type = "t3.micro"
+  }
 }
 
 variable "runner_ami_filter" {
@@ -215,40 +201,24 @@ variable "runner_extra_egress_rules" {
   ]
 }
 
-variable "runner_allow_iam_service_linked_role_creation" {
-  description = "Boolean used to control attaching the policy to the Agent to create service linked roles."
-  type        = bool
-  default     = true
-}
-
-variable "runner_create_runner_iam_role_profile" {
-  description = "Whether to create the IAM role/profile for the Agent. If you provide your own role, make sure that it has the required permissions."
-  type        = bool
-  default     = true
-}
-
-variable "runner_iam_role_profile_name" {
-  description = "IAM role/profile name for the Agent. If unspecified then `$${var.iam_object_prefix}-instance` is used."
-  type        = string
-  default     = ""
-}
-
-variable "runner_extra_role_tags" {
-  description = "Map of tags that will be added to the role created. Useful for tag based authorization."
-  type        = map(string)
-  default     = {}
-}
-
-variable "runner_assume_role_json" {
-  description = "The assume role policy for the Agent."
-  type        = string
-  default     = ""
-}
-
-variable "runner_extra_iam_policy_arns" {
-  description = "List of policy ARNs to be added to the instance profile of the Agent."
-  type        = list(string)
-  default     = []
+variable "runner_role" {
+    description = <<-EOT
+        additional_tags = Map of tags that will be added to the role created. Useful for tag based authorization.
+        allow_iam_service_linked_role_creation = Boolean used to control attaching the policy to the Agent to create service linked roles.
+        assume_role_policy_json = The assume role policy for the Agent.
+        create_role_profile = Whether to create the IAM role/profile for the Agent. If you provide your own role, make sure that it has the required permissions.
+        policy_arns = List of policy ARNs to be added to the instance profile of the Agent.
+        role_profile_name = IAM role/profile name for the Agent. If unspecified then `$${var.iam_object_prefix}-instance` is used.
+    EOT
+    type = object({
+      additional_tags = optional(map(string))
+      allow_iam_service_linked_role_creation = optional(bool, true)
+      assume_role_policy_json = optional(string, "")
+      create_role_profile = optional(bool, true)
+      policy_arns = optional(list(string), [])
+      role_profile_name = optional(string)
+    })
+    default = {}
 }
 
 variable "runner_enable_eip" {

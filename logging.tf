@@ -1,7 +1,7 @@
 resource "aws_iam_role_policy" "instance" {
-  count  = var.runner_cloudwatch_enable && var.runner_create_runner_iam_role_profile ? 1 : 0
+  count  = var.runner_cloudwatch_enable && var.runner_role.create_role_profile ? 1 : 0
   name   = "${local.name_iam_objects}-logging"
-  role   = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  role   = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy = templatefile("${path.module}/policies/instance-logging-policy.json", { partition = data.aws_partition.current.partition })
 }
 

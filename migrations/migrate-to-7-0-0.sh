@@ -215,4 +215,60 @@ echo "$(head -n -1 "$converted_file")
   $extracted_variables
 }" > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
 
+
+#
+# PR #810 refactor!: group variables for better overview
+#
+extracted_variables=$(grep -E '(runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
+
+sed -i '/runner_root_block_device/d' "$converted_file"
+sed -i '/runner_ebs_optimized/d' "$converted_file"
+sed -i '/runner_spot_price/d' "$converted_file"
+sed -i '/runner_instance_prefix/d' "$converted_file"
+sed -i '/runner_instance_type/d' "$converted_file"
+sed -i '/runner_extra_instance_tags/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_root_block_device/root_device_config/g' | \
+                      sed 's/runner_ebs_optimized/ebs_optimized/g' | \
+                      sed 's/runner_spot_price/spot_price/g' | \
+                      sed 's/runner_instance_prefix/name_prefix/g' | \
+                      sed 's/runner_instance_type/type/g' | \
+                      sed 's/runner_extra_instance_tags/additional_tags/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_instance = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_allow_iam_service_linked_role_creation|runner_create_runner_iam_role_profile|runner_iam_role_profile_name|runner_extra_role_tags|runner_assume_role_json)|runner_extra_iam_policy_arns' "$converted_file")
+
+sed -i '/runner_allow_iam_service_linked_role_creation/d' "$converted_file"
+sed -i '/runner_create_runner_iam_role_profile/d' "$converted_file"
+sed -i '/runner_iam_role_profile_name/d' "$converted_file"
+sed -i '/runner_extra_role_tags/d' "$converted_file"
+sed -i '/runner_assume_role_json/d' "$converted_file"
+sed -i '/runner_extra_iam_policy_arns/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_allow_iam_service_linked_role_creation/allow_iam_service_linked_role_creation/g' | \
+                      sed 's/runner_create_runner_iam_role_profile/create_role_profile/g' | \
+                      sed 's/runner_iam_role_profile_name/role_profile_name/g' | \
+                      sed 's/runner_extra_role_tags/additional_tags/g' | \
+                      sed 's/runner_assume_role_json/assume_role_policy_json/g' | \
+                      sed 's/runner_extra_iam_policy_arns/policy_arns/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_role = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
 echo "Module call converted. Output: $converted_file"
