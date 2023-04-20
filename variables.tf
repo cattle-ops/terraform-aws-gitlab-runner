@@ -637,54 +637,6 @@ variable "executor_docker_services_volumes_tmpfs" {
   default = []
 }
 
-variable "executor_docker_extra_hosts" {
-  description = "Extra hosts to be passed to the container, e.g other-host:127.0.0.1"
-  type        = list(any)
-  default     = []
-}
-
-variable "executor_docker_shm_size" {
-  description = "shm_size for the runners, will be used in the runner config.toml"
-  type        = number
-  default     = 0
-}
-
-variable "executor_docker_runtime" {
-  description = "Docker runtime for Executors"
-  type        = string
-  default     = ""
-}
-
-variable "executor_docker_privileged" {
-  description = "Executor will run in privileged mode"
-  type        = bool
-  default     = true
-}
-
-variable "executor_docker_image" {
-  description = "Image to run builds"
-  type        = string
-  default     = "docker:18.03.1-ce"
-}
-
-variable "executor_docker_helper_image" {
-  description = "Overrides the default helper image used to clone repos and upload artifacts"
-  type        = string
-  default     = ""
-}
-
-variable "executor_docker_pull_policies" {
-  description = "Pull policies for the Executor, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
-  type        = list(string)
-  default     = ["always"]
-}
-
-variable "executor_docker_disable_local_cache" {
-  description = "Runners will not use local cache"
-  type        = bool
-  default     = false
-}
-
 variable "executor_docker_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
@@ -755,7 +707,15 @@ variable "executor_docker_options" {
     wait_for_services_timeout    = optional(number)
   })
 
-  default = null
+  default = {
+    disable_cache = "false"
+    image         = "docker:18.03.1-ce"
+    privileged    = "true"
+    pull_policy   = "always"
+    shm_size      = 0
+    tls_verify    = "false"
+    volumes       = "/cache"
+  }
 }
 
 /*

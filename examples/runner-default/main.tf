@@ -78,8 +78,6 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  executor_docker_privileged         = "true"
-
   executor_docker_volumes_tmpfs = [
     {
       volume  = "/var/opt/cache",

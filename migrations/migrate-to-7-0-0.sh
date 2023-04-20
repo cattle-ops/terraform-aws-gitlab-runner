@@ -37,7 +37,7 @@ sed -i '/runners_pull_policy/d' "$converted_file"
 #
 # PR #511 feat!: allow to set all docker options for the Executor
 #
-extracted_variables=$(grep -E '(runners_docker_runtime|runners_helper_image|runners_shm_size|runners_shm_size|runners_extra_hosts|runners_disable_cache|runners_image|runners_privileged)' "$converted_file")
+extracted_variables=$(grep -E '(runners_pull_policies|runners_docker_runtime|runners_helper_image|runners_shm_size|runners_shm_size|runners_extra_hosts|runners_disable_cache|runners_image|runners_privileged)' "$converted_file")
 
 sed -i '/runners_image/d' "$converted_file"
 sed -i '/runners_privileged/d' "$converted_file"
@@ -46,6 +46,7 @@ sed -i '/runners_extra_hosts/d' "$converted_file"
 sed -i '/runners_shm_size/d' "$converted_file"
 sed -i '/runners_docker_runtime/d' "$converted_file"
 sed -i '/runners_helper_image/d' "$converted_file"
+sed -i '/runners_pull_policies/d' "$converted_file"
 
 # content to be added to `volumes`
 volumes=$(grep "runners_additional_volumes" "$converted_file" | cut -d '=' -f 2 | tr -d '[]')
@@ -66,7 +67,8 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runners_extra_hosts/extra_hosts/g' | \
                       sed 's/runners_shm_size/shm_size/g' | \
                       sed 's/runners_docker_runtime/runtime/g' | \
-                      sed 's/runners_helper_image/helper_image/g'
+                      sed 's/runners_helper_image/helper_image/g' | \
+                      sed 's/runners_pull_policies/pull_policies/g'
                     )
 
 # add new block runners_docker_options at the end
@@ -179,15 +181,7 @@ sed 's/enable_asg_recreation/agent_enable_asg_recreation/g' | \
 sed 's/secure_parameter_store_runner_sentry_dsn/agent_sentry_secure_parameter_store_name/g' | \
 sed 's/secure_parameter_store_runner_token_key/agent_gitlab_token_secure_parameter_store/g' | \
 sed 's/allow_iam_service_linked_role_creation/agent_allow_iam_service_linked_role_creation/g' | \
-sed 's/runners_pull_policies/executor_docker_pull_policies/g' | \
-sed 's/runners_helper_image/executor_docker_helper_image/g' | \
-sed 's/runners_docker_runtime/executor_docker_runtime/g' | \
-sed 's/runners_shm_size/executor_docker_shm_size/g' | \
-sed 's/runners_extra_hosts/executor_docker_extra_hosts/g' | \
 sed 's/runners_add_dind_volumes/executor_docker_add_dind_volumes/g' | \
-sed 's/runners_disable_cache/executor_docker_disable_local_cache/g' | \
-sed 's/runners_privileged/executor_docker_privileged/g' | \
-sed 's/runners_image/executor_docker_image/g' | \
 sed 's/runners_token/agent_gitlab_token/g' | \
 sed 's/runners_name/agent_gitlab_runner_name/g' | \
 sed 's/docker_machine_version/agent_docker_machine_version/g' | \

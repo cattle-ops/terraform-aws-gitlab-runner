@@ -86,7 +86,6 @@ locals {
       gitlab_url          = var.agent_gitlab_url
       gitlab_clone_url    = var.agent_gitlab_clone_url
       tls_ca_file         = length(var.agent_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
-      runners_extra_hosts = var.executor_docker_extra_hosts
       runners_machine_autoscaling = [for config in var.executor_docker_machine_autoscaling_options : {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.
@@ -112,12 +111,6 @@ locals {
       runners_executor                  = var.executor_type
       runners_limit                     = var.executor_max_jobs
       runners_concurrent                = var.agent_maximum_concurrent_jobs
-      runners_image                     = var.executor_docker_image
-      runners_privileged                = var.executor_docker_privileged
-      runners_disable_cache             = var.executor_docker_disable_local_cache
-      runners_docker_runtime            = var.executor_docker_runtime
-      runners_helper_image              = var.executor_docker_helper_image
-      runners_shm_size                  = var.executor_docker_shm_size
       runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.executor_idle_count
       runners_idle_time                 = var.executor_idle_time
