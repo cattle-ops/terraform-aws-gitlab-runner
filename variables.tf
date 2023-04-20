@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "arn_format" {
-  type        = string
-  default     = null
-  description = "Deprecated! Calculated automatically by the module. ARN format to be used. May be changed to support deployment in GovCloud/China regions."
-}
-
 variable "auth_type_cache_sr" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
   type        = string
@@ -279,14 +273,27 @@ variable "runners_ebs_optimized" {
   default     = true
 }
 
-variable "runners_machine_autoscaling" {
+variable "runners_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
-    periods    = list(string)
-    idle_count = number
-    idle_time  = number
-    timezone   = string
+    periods           = list(string)
+    idle_count        = optional(number)
+    idle_scale_factor = optional(number)
+    idle_count_min    = optional(number)
+    idle_time         = optional(number)
+    timezone          = optional(string, "UTC")
   }))
+
+  validation {
+    condition = alltrue([
+      for options in var.runners_machine_autoscaling_options :
+      length(
+        setsubtract([for key, value in options : key if value != null], ["periods", "timezone"])
+      ) > 0
+    ])
+
+    error_message = "Please specify an attribute that affects Autoscaling."
+  }
   default = []
 }
 
@@ -747,7 +754,7 @@ variable "runners_docker_services" {
 }
 
 variable "kms_key_id" {
-  description = "KMS key id to encrypted the resources. Ensure CloudWatch and Runner/Executor have access to the provided KMS key."
+  description = "KMS key ARN to encrypt the resources. Ensure CloudWatch has access to the provided KMS key (see policies/kms-policy.json)."
   type        = string
   default     = ""
 }
@@ -868,68 +875,10 @@ variable "docker_machine_egress_rules" {
   }]
 }
 
-variable "subnet_id_runners" {
-  description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
-  type        = string
-  default     = ""
-}
-
-variable "subnet_ids_gitlab_runner" {
-  description = "Deprecated! Use subnet_id instead. Subnet used for hosting the GitLab runner."
-  type        = list(string)
-  default     = []
-}
-
 variable "asg_terminate_lifecycle_hook_name" {
   description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
   type        = string
   default     = null
-}
-
-variable "asg_terminate_lifecycle_hook_create" {
-  description = "(Deprecated and always true now) Boolean toggling the creation of the ASG instance terminate lifecycle hook."
-  type        = bool
-  default     = true
-
-  validation {
-    condition     = var.asg_terminate_lifecycle_hook_create
-    error_message = "The hook must be created. Please remove the variable declaration."
-  }
-}
-
-variable "asg_terminate_lifecycle_hook_heartbeat_timeout" {
-  description = "(Deprecated and no longer in use) The amount of time, in seconds, for the instances to remain in wait state."
-  type        = number
-  default     = null
-
-  validation {
-    condition     = var.asg_terminate_lifecycle_hook_heartbeat_timeout == null
-    error_message = "The timeout value is managed by the module. Please remove the variable declaration."
-  }
-}
-
-# to be removed in future release
-# tflint-ignore: terraform_unused_declarations
-variable "asg_terminate_lifecycle_lambda_memory_size" {
-  description = "(Deprecated and no longer in use) The memory size in MB to allocate to the terminate-instances Lambda function."
-  type        = number
-  default     = 128
-}
-
-# to be removed in future release
-# tflint-ignore: terraform_unused_declarations
-variable "asg_terminate_lifecycle_lambda_runtime" {
-  description = "(Deprecated and no longer in use) Identifier of the function's runtime. This should be a python3.x runtime. See https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Runtime for more information."
-  type        = string
-  default     = "python3.8"
-}
-
-# to be removed in future release
-# tflint-ignore: terraform_unused_declarations
-variable "asg_terminate_lifecycle_lambda_timeout" {
-  description = "(Deprecated and no longer in use) Amount of time the terminate-instances Lambda Function has to run in seconds."
-  default     = 30
-  type        = number
 }
 
 variable "runner_yum_update" {
@@ -954,4 +903,10 @@ variable "runner_extra_config" {
   description = "Extra commands to run as part of starting the runner"
   type        = string
   default     = ""
+}
+
+variable "show_user_data_in_plan" {
+  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
+  type        = bool
+  default     = false
 }

@@ -2,6 +2,8 @@ data "aws_availability_zones" "available_main_region" {
   state = "available"
 }
 
+# VPC Flow logs are not needed here
+# kics-scan ignore-line
 module "vpc_main_region" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.70"
@@ -63,6 +65,8 @@ module "runner_main_region" {
   cache_bucket_name_include_account_id = false
 }
 
+# VPC Flow logs are not needed here
+# kics-scan ignore-line
 module "vpc_alternate_region" {
   providers = {
     aws = aws.alternate_region

@@ -37,4 +37,8 @@ builds/
 .vscode/
 
 # Python
+.mypy_cache/
 venv/
+
+# Terraform rendered templates
+debug/

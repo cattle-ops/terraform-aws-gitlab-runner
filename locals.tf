@@ -76,11 +76,6 @@ locals {
 
   runners_volumes = concat(var.runners_docker_options.volumes, var.runners_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [])
 
-  runners_machine_autoscaling = templatefile("${path.module}/template/runners_machine_autoscaling.tftpl", {
-    runners_machine_autoscaling = var.runners_machine_autoscaling
-    }
-  )
-
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
     runners_docker_services = var.runners_docker_services
     }
@@ -96,4 +91,15 @@ locals {
   ]
 
   docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0
+}
+
+resource "local_file" "config_toml" {
+  content  = local.template_runner_config
+  filename = "${path.module}/debug/runner_config.toml"
+}
+
+resource "local_file" "user_data" {
+  count    = var.show_user_data_in_plan ? 1 : 0
+  content  = nonsensitive(local.template_user_data)
+  filename = "${path.module}/debug/user_data.sh"
 }

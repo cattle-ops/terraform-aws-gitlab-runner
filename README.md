@@ -1,6 +1,9 @@
+<!-- First line should be a H1: Badges on top please! -->
+<!-- markdownlint-disable MD041/first-line-heading/first-line-h1 -->
 [![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Actions](https://github.com/cattle-ops/terraform-aws-gitlab-runner/workflows/CI/badge.svg)](https://github.com/cattle-ops/terraform-aws-gitlab-runner/actions)
+<!-- markdownlint-enable MD041/first-line-heading/first-line-h1 -->
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances <!-- omit in toc -->
 
@@ -24,7 +27,7 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 
 > 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances),
 > the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine).
-> For more details see [PR](https://github.com/npalm/terraform-aws-gitlab-runner/pull/697).
+> For more details see [PR](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/697).
 <!-- there is no blank line in between. These are two separate quotes! -->
 <!-- markdownlint-disable MD028 -->
 > 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current
@@ -60,7 +63,7 @@ In this scenario the runner agent is running on a single EC2 node and runners ar
 using spot instances. Runners will scale automatically based on the configuration. The module creates a S3 cache by default,
 which is shared across runners (spot instances).
 
-![runners-default](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-default.png)
+![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
 ### GitLab CI docker-machine runner - multiple runner agents
 
@@ -68,14 +71,14 @@ In this scenario the multiple runner agents can be created with different config
 Runners will scale automatically based on the configuration. The S3 cache can be shared across runners by managing the cache
 outside of the module.
 
-![runners-cache](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-cache.png)
+![runners-cache](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-cache.png)
 
 ### GitLab Ci docker runner
 
 In this scenario _not_ docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the
 agent. No auto scaling is supported.
 
-![runners-docker](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-docker.png)
+![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
 
 ## Prerequisites
 
@@ -136,7 +139,7 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 
 If a KMS key is set via `kms_key_id`, make sure that you also give proper access to the key. Otherwise, you might
 get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
-example checkout [kms-policy.json](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
+example checkout [kms-policy.json](https://github.com/cattle-ops/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
 
 ### GitLab runner token configuration
 
@@ -233,8 +236,8 @@ policy on the bucket.
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple
 runners. For this purpose the cache is implemented as a sub module. For more details see the
-[cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of this use
-case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
+[cache module](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of
+this use case can be found in the [runner-public](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
 example.
 
 In case you enable the access logging for the S3 cache bucket, you have to add the following statement to your S3 logging bucket
@@ -286,12 +289,12 @@ AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow 
 
 ### Scenario: Basic usage
 
-Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
+Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
-  source  = "npalm/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
@@ -339,8 +342,8 @@ map. A simple example for this would be to set _region-specific-prefix_ to the A
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
-  source  = "npalm/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
@@ -371,7 +374,7 @@ module "runner" {
 
 ## Examples
 
-A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
+A few [examples](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
 following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be
 run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory. Don't forget to remove the runners
 manually from your Gitlab instance as soon as your are done.
@@ -413,9 +416,9 @@ This project exists thanks to all the people who contribute.
 
 <!-- this is the only option to integrate the contributors list in the README.md -->
 <!-- markdownlint-disable MD033 -->
-<a href="https://github.com/npalm/terraform-aws-gitlab-runner/graphs/contributors">
+<a href="https://github.com/cattle-ops/terraform-aws-gitlab-runner/graphs/contributors">
   <!-- markdownlint-disable MD033 -->
-  <img src="https://contrib.rocks/image?repo=npalm/terraform-aws-gitlab-runner" />
+  <img src="https://contrib.rocks/image?repo=cattle-ops/terraform-aws-gitlab-runner" />
 </a>
 
 Made with [contributors-img](https://contrib.rocks).
@@ -432,12 +435,14 @@ Made with [contributors-img](https://contrib.rocks).
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | >= 2.4.0 |
 
 ## Modules
 
@@ -489,6 +494,8 @@ Made with [contributors-img](https://contrib.rocks).
 | [aws_security_group_rule.runner_ping_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_ssm_parameter.runner_registration_token](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.runner_sentry_dsn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
+| [local_file.config_toml](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.user_data](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [aws_ami.docker-machine](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_ami.runner](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_availability_zone.runners](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zone) | data source |
@@ -544,7 +551,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_enable_manage_gitlab_token"></a> [enable\_manage\_gitlab\_token](#input\_enable\_manage\_gitlab\_token) | (Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `null` | no |
 | <a name="input_enable_ping"></a> [enable\_ping](#input\_enable\_ping) | Allow ICMP Ping to the ec2 instances. | `bool` | `false` | no |
 | <a name="input_enable_runner_ssm_access"></a> [enable\_runner\_ssm\_access](#input\_enable\_runner\_ssm\_access) | Add IAM policies to the runner agent instance to connect via the Session Manager. | `bool` | `false` | no |
-| <a name="input_enable_runner_user_data_trace_log"></a> [enable\_runner\_user\_data\_trace\_log](#input\_enable\_runner\_user\_data\_trace\_log) | Enable bash xtrace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `true` | no |
+| <a name="input_enable_runner_user_data_trace_log"></a> [enable\_runner\_user\_data\_trace\_log](#input\_enable\_runner\_user\_data\_trace\_log) | Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `true` | no |
 | <a name="input_enable_schedule"></a> [enable\_schedule](#input\_enable\_schedule) | Flag used to enable/disable auto scaling group schedule for the runner instance. | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | <a name="input_extra_security_group_ids_runner_agent"></a> [extra\_security\_group\_ids\_runner\_agent](#input\_extra\_security\_group\_ids\_runner\_agent) | Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default. | `list(string)` | `[]` | no |
@@ -624,6 +631,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |
 | <a name="input_secure_parameter_store_runner_token_key"></a> [secure\_parameter\_store\_runner\_token\_key](#input\_secure\_parameter\_store\_runner\_token\_key) | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | <a name="input_sentry_dsn"></a> [sentry\_dsn](#input\_sentry\_dsn) | Sentry DSN of the project for the runner to use (uses legacy DSN format) | `string` | `"__SENTRY_DSN_REPLACED_BY_USER_DATA__"` | no |
+| <a name="input_show_user_data_in_plan"></a> [show\_user\_data\_in\_plan](#input\_show\_user\_data\_in\_plan) | When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script | `bool` | `false` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet id used for the runner and executors. Must belong to the VPC specified above. | `string` | `""` | no |
 | <a name="input_subnet_id_runners"></a> [subnet\_id\_runners](#input\_subnet\_id\_runners) | Deprecated! Use subnet\_id instead. List of subnets used for hosting the gitlab-runners. | `string` | `""` | no |
 | <a name="input_subnet_ids_gitlab_runner"></a> [subnet\_ids\_gitlab\_runner](#input\_subnet\_ids\_gitlab\_runner) | Deprecated! Use subnet\_id instead. Subnet used for hosting the GitLab runner. | `list(string)` | `[]` | no |

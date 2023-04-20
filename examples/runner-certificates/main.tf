@@ -2,6 +2,8 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# VPC Flow logs are not needed here
+# kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.70"

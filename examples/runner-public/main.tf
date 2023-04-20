@@ -2,9 +2,11 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Every VPC resource should have an associated Flow Log: This is an example only. No flow logs are created.
+# kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  version = "4.0.1"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -79,9 +81,8 @@ module "runner2" {
 
   runners_use_private_address = false
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.public_subnets, 0)
 
   docker_machine_spot_price_bid = "on-demand-price"
 

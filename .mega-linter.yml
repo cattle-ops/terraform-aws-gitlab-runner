@@ -2,6 +2,8 @@
 DISABLE_LINTERS:
   # Has some problems reading referenced policy files. I created a separate workflow for TfLint as it creates valuable output.
   - TERRAFORM_TFLINT
+  # Super slow linter, but useful. We disable it here and run it in parallel to Megalinter saves some minutes.
+  - TERRAFORM_KICS
   # Nice linter to report CVEs and other cool stuff. But it reports problems with the Terraform code which can't be disabled by
   # configuration.
   - REPOSITORY_TRIVY
@@ -10,3 +12,15 @@ DISABLE_LINTERS:
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER
   # CSpell does a great job. No need for a second linter.
   - SPELL_MISSPELL
+  # DevSkim as it has issues ignoring files/directories, e.g. .mypy_cache
+  - REPOSITORY_DEVSKIM
+
+PYTHON_PYLINT_PRE_COMMANDS:
+  # find all Python requirements and install them
+  - command: find . -name requirements.txt -exec pip install -r {} \;
+    cwd: root
+
+PYTHON_PYRIGHT_PRE_COMMANDS:
+  # find all Python requirements and install them
+  - command: find . -name requirements.txt -exec pip install -r {} \;
+    cwd: root

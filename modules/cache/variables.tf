@@ -52,7 +52,7 @@ variable "tags" {
 }
 
 variable "create_cache_bucket" {
-  description = "(deprecated) If the cache should not be craeted, remove the whole module call!"
+  description = "(deprecated) If the cache should not be created, remove the whole module call!"
   type        = bool
   default     = null
 
