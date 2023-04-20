@@ -99,7 +99,6 @@ locals {
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
       tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
-      runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = var.subnet_id
       runners_subnet_ids                = length(var.fleet_executor_subnet_ids) > 0 ? var.fleet_executor_subnet_ids : [var.subnet_id]
@@ -112,7 +111,6 @@ locals {
       runners_monitoring                = var.runners_monitoring
       runners_ebs_optimized             = var.runners_ebs_optimized
       runners_instance_profile          = var.runners_executor == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-      runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runners_name
@@ -122,13 +120,6 @@ locals {
       runners_executor                  = var.runners_executor
       runners_limit                     = var.runners_limit
       runners_concurrent                = var.runners_concurrent
-      runners_image                     = var.runners_image
-      runners_privileged                = var.runners_privileged
-      runners_disable_cache             = var.runners_disable_cache
-      runners_docker_runtime            = var.runners_docker_runtime
-      runners_helper_image              = var.runners_helper_image
-      runners_shm_size                  = var.runners_shm_size
-      runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
@@ -146,6 +137,7 @@ locals {
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
+      runners_docker_options            = local.runners_docker_options_toml
       runners_volumes_tmpfs             = join("\n", [for v in var.runners_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runners_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
