@@ -447,6 +447,32 @@ resource "aws_iam_role" "instance" {
 }
 
 ################################################################################
+### Policy for the instance to use the KMS key
+################################################################################
+resource "aws_iam_policy" "instance_kms_policy" {
+  count = var.enable_kms ? 1 : 0
+
+  name        = "${local.name_iam_objects}-kms"
+  path        = "/"
+  description = "Allow runner instance the ability to use the KMS key."
+  policy = templatefile("${path.module}/policies/instance-kms-policy.json",
+    {
+      kms_key_arn = var.enable_kms && var.kms_key_id == "" ? aws_kms_key.default[0].arn : var.kms_key_id
+    }
+  )
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "instance_kms_policy" {
+  count = var.enable_kms ? 1 : 0
+
+  role       = var.create_runner_iam_role ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  policy_arn = aws_iam_policy.instance_kms_policy[0].arn
+}
+
+
+################################################################################
 ### Policies for runner agent instance to create docker machines via spot req.
 ###
 ### iam:PassRole To pass the role from the agent to the docker machine runners
@@ -535,6 +561,8 @@ resource "aws_iam_role" "docker_machine" {
   tags = local.tags
 }
 
+
+
 resource "aws_iam_instance_profile" "docker_machine" {
   count = var.runners_executor == "docker+machine" ? 1 : 0
   name  = "${local.name_iam_objects}-docker-machine"
@@ -559,6 +587,8 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
+
 
 ################################################################################
 ### Service linked policy, optional
