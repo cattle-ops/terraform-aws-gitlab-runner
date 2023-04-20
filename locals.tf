@@ -52,6 +52,16 @@ locals {
 
   runners_docker_registry_mirror_option = var.runners_docker_registry_mirror == "" ? [] : ["engine-registry-mirror=${var.runners_docker_registry_mirror}"]
 
+  runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
+    options = merge({
+      for key, value in var.runners_docker_options : key => value if value != null && key != "volumes"
+      }, {
+      volumes = local.runners_volumes
+    })
+    }
+  )
+
+
   # Ensure max builds is optional
   runners_max_builds_string = var.runners_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runners_max_builds)
 
@@ -64,16 +74,12 @@ locals {
   name_sg                    = var.overrides["name_sg"] == "" ? local.tags["Name"] : var.overrides["name_sg"]
   name_iam_objects           = lookup(var.overrides, "name_iam_objects", "") == "" ? local.tags["Name"] : var.overrides["name_iam_objects"]
 
-  runners_additional_volumes = <<-EOT
-  %{~if var.runners_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.runners_additional_volumes~},"${volume}"%{endfor~}
-  EOT
+  runners_volumes = concat(var.runners_docker_options.volumes, var.runners_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [])
 
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
     runners_docker_services = var.runners_docker_services
     }
   )
-
-  runners_pull_policies = "[\"${join("\",\"", var.runners_pull_policies)}\"]"
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
