@@ -162,7 +162,7 @@ variable "agent_extra_security_group_ids" {
 
 variable "agent_extra_egress_rules" {
   description = "List of egress rules for the Agent."
-  type        = list(object({
+  type = list(object({
     cidr_blocks      = list(string)
     ipv6_cidr_blocks = list(string)
     prefix_list_ids  = list(string)
@@ -244,7 +244,7 @@ variable "agent_enable_ssm_access" {
 
 variable "agent_metadata_options" {
   description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
-  type        = object({
+  type = object({
     http_endpoint               = string
     http_tokens                 = string
     http_put_response_hop_limit = number
@@ -279,7 +279,7 @@ variable "agent_enable_asg_recreation" {
 variable "agent_schedule_config" {
   description = "Map containing the configuration of the ASG scale-out and scale-in for the Agent. Will only be used if `agent_schedule_enable` is set to `true`. "
   type        = map(any)
-  default     = {
+  default = {
     # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
     scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
@@ -532,7 +532,7 @@ variable "executor_cache_s3_bucket" {
     bucket name. See the public runner example for more details."
   EOT
   type        = map(any)
-  default     = {
+  default = {
     create = true
     policy = ""
     bucket = ""
@@ -610,7 +610,7 @@ variable "executor_post_build_script" {
  */
 variable "executor_docker_volumes_tmpfs" {
   description = "Mount a tmpfs in Executor container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type        = list(object({
+  type = list(object({
     volume  = string
     options = string
   }))
@@ -619,7 +619,7 @@ variable "executor_docker_volumes_tmpfs" {
 
 variable "executor_docker_services" {
   description = "Starts additional services with the Docker container. All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
-  type        = list(object({
+  type = list(object({
     name       = string
     alias      = string
     entrypoint = list(string)
@@ -630,7 +630,7 @@ variable "executor_docker_services" {
 
 variable "executor_docker_services_volumes_tmpfs" {
   description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type        = list(object({
+  type = list(object({
     volume  = string
     options = string
   }))
@@ -685,12 +685,6 @@ variable "executor_docker_disable_local_cache" {
   default     = false
 }
 
-variable "executor_docker_additional_volumes" {
-  description = "Additional volumes that will be used in the Executor, e.g Docker socket"
-  type        = list(any)
-  default     = []
-}
-
 variable "executor_docker_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
@@ -698,7 +692,7 @@ variable "executor_docker_add_dind_volumes" {
 }
 
 variable "executor_docker_options" {
-description = <<EOT
+  description = <<EOT
     Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
     details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
@@ -712,56 +706,56 @@ description = <<EOT
       volumes       = "/cache"
   EOT
 
-type = object({
-allowed_images               = optional(list(string))
-allowed_pull_policies        = optional(list(string))
-allowed_services             = optional(list(string))
-cache_dir                    = optional(string)
-cap_add                      = optional(list(string))
-cap_drop                     = optional(list(string))
-container_labels             = optional(list(string))
-cpuset_cpus                  = optional(string)
-cpu_shares                   = optional(number)
-cpus                         = optional(string)
-devices                      = optional(list(string))
-device_cgroup_rules          = optional(list(string))
-disable_cache                = optional(bool, false)
-disable_entrypoint_overwrite = optional(bool)
-dns                          = optional(list(string))
-dns_search                   = optional(list(string))
-extra_hosts                  = optional(list(string))
-gpus                         = optional(string)
-helper_image                 = optional(string)
-helper_image_flavor          = optional(string)
-host                         = optional(string)
-hostname                     = optional(string)
-image                        = optional(string, "docker:18.03.1-ce")
-isolation                    = optional(string)
-links                        = optional(list(string))
-mac_address                  = optional(string)
-memory                       = optional(string)
-memory_swap                  = optional(string)
-memory_reservation           = optional(string)
-network_mode                 = optional(string)
-oom_kill_disable             = optional(bool)
-oom_score_adjust             = optional(number)
-privileged                   = optional(bool, true)
-pull_policies                = optional(list(string), ["always"])
-runtime                      = optional(string)
-security_opt                 = optional(list(string))
-shm_size                     = optional(number, 0)
-sysctls                      = optional(list(string))
-tls_cert_path                = optional(string)
-tls_verify                   = optional(bool, false)
-user                         = optional(string)
-userns_mode                  = optional(string)
-volumes                      = optional(list(string), ["/cache"])
-volumes_from                 = optional(list(string))
-volume_driver                = optional(string)
-wait_for_services_timeout    = optional(number)
-})
+  type = object({
+    allowed_images               = optional(list(string))
+    allowed_pull_policies        = optional(list(string))
+    allowed_services             = optional(list(string))
+    cache_dir                    = optional(string)
+    cap_add                      = optional(list(string))
+    cap_drop                     = optional(list(string))
+    container_labels             = optional(list(string))
+    cpuset_cpus                  = optional(string)
+    cpu_shares                   = optional(number)
+    cpus                         = optional(string)
+    devices                      = optional(list(string))
+    device_cgroup_rules          = optional(list(string))
+    disable_cache                = optional(bool, false)
+    disable_entrypoint_overwrite = optional(bool)
+    dns                          = optional(list(string))
+    dns_search                   = optional(list(string))
+    extra_hosts                  = optional(list(string))
+    gpus                         = optional(string)
+    helper_image                 = optional(string)
+    helper_image_flavor          = optional(string)
+    host                         = optional(string)
+    hostname                     = optional(string)
+    image                        = optional(string, "docker:18.03.1-ce")
+    isolation                    = optional(string)
+    links                        = optional(list(string))
+    mac_address                  = optional(string)
+    memory                       = optional(string)
+    memory_swap                  = optional(string)
+    memory_reservation           = optional(string)
+    network_mode                 = optional(string)
+    oom_kill_disable             = optional(bool)
+    oom_score_adjust             = optional(number)
+    privileged                   = optional(bool, true)
+    pull_policies                = optional(list(string), ["always"])
+    runtime                      = optional(string)
+    security_opt                 = optional(list(string))
+    shm_size                     = optional(number, 0)
+    sysctls                      = optional(list(string))
+    tls_cert_path                = optional(string)
+    tls_verify                   = optional(bool, false)
+    user                         = optional(string)
+    userns_mode                  = optional(string)
+    volumes                      = optional(list(string), ["/cache"])
+    volumes_from                 = optional(list(string))
+    volume_driver                = optional(string)
+    wait_for_services_timeout    = optional(number)
+  })
 
-default = null
+  default = null
 }
 
 /*
@@ -782,7 +776,7 @@ variable "executor_docker_machine_extra_role_tags" {
 
 variable "executor_docker_machine_extra_egress_rules" {
   description = "List of egress rules for the docker-machine instance(s)."
-  type        = list(object({
+  type = list(object({
     cidr_blocks      = list(string)
     ipv6_cidr_blocks = list(string)
     prefix_list_ids  = list(string)
@@ -923,7 +917,7 @@ variable "executor_docker_machine_ec2_options" {
 
 variable "executor_docker_machine_ec2_metadata_options" {
   description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
-  type        = object({
+  type = object({
     http_tokens                 = string
     http_put_response_hop_limit = number
   })
@@ -935,7 +929,7 @@ variable "executor_docker_machine_ec2_metadata_options" {
 
 variable "executor_docker_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
-  type        = list(object({
+  type = list(object({
     periods           = list(string)
     idle_count        = optional(number)
     idle_scale_factor = optional(number)

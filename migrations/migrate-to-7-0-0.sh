@@ -184,7 +184,6 @@ sed 's/runners_helper_image/executor_docker_helper_image/g' | \
 sed 's/runners_docker_runtime/executor_docker_runtime/g' | \
 sed 's/runners_shm_size/executor_docker_shm_size/g' | \
 sed 's/runners_extra_hosts/executor_docker_extra_hosts/g' | \
-sed 's/runners_additional_volumes/executor_docker_additional_volumes/g' | \
 sed 's/runners_add_dind_volumes/executor_docker_add_dind_volumes/g' | \
 sed 's/runners_disable_cache/executor_docker_disable_local_cache/g' | \
 sed 's/runners_privileged/executor_docker_privileged/g' | \

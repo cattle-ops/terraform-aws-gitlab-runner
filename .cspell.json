@@ -18,6 +18,8 @@
     "codeowners",
     "companys",
     "concat",
+    "cpu",
+    "cpuset",
     "devskim",
     "dind",
     "endfor",
@@ -45,6 +47,7 @@
     "stretchr",
     "subkey",
     "substr",
+    "sysctl",
     "templatefile",
     "terrascan",
     "terratest",
@@ -58,6 +61,7 @@
     "trivy",
     "typecheck",
     "userdata",
+    "userns",
     "xanzy"
   ],
   "flagWords": []

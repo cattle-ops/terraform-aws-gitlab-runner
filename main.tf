@@ -82,11 +82,11 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
-      aws_region                        = data.aws_region.current.name
-      gitlab_url                        = var.agent_gitlab_url
-      gitlab_clone_url                  = var.agent_gitlab_clone_url
-      tls_ca_file                       = length(var.agent_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
-      runners_extra_hosts               = var.executor_docker_extra_hosts
+      aws_region          = data.aws_region.current.name
+      gitlab_url          = var.agent_gitlab_url
+      gitlab_clone_url    = var.agent_gitlab_clone_url
+      tls_ca_file         = length(var.agent_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
+      runners_extra_hosts = var.executor_docker_extra_hosts
       runners_machine_autoscaling = [for config in var.executor_docker_machine_autoscaling_options : {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.
@@ -169,7 +169,7 @@ data "aws_ami" "docker-machine" {
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   # TODO Please explain how `agent_enable_asg_recreation` works
-  name                      = var.agent_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+  name = var.agent_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
 
   vpc_zone_identifier       = [var.subnet_id]
   min_size                  = "1"
