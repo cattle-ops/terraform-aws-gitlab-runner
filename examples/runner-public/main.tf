@@ -38,8 +38,8 @@ module "runner" {
 
   executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  agent_gitlab_runner_name             = var.runner_name
-  agent_gitlab_url                     = var.gitlab_url
+  runner_manager_gitlab_runner_name             = var.runner_name
+  runner_manager_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
   executor_docker_options = {
@@ -47,7 +47,7 @@ module "runner" {
     volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
   }
 
-  agent_gitlab_registration_config = {
+  runner_manager_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"
@@ -58,7 +58,7 @@ module "runner" {
   }
 
   security_group_prefix                   = "my-security-group"
-  agent_instance_prefix                   = "my-runner-agent"
+  runner_manager_instance_prefix                   = "my-runner-agent"
   executor_docker_machine_instance_prefix = "my-runners-dm"
 
   executor_cache_shared = "true"
@@ -82,10 +82,10 @@ module "runner2" {
 
   executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  agent_gitlab_runner_name = var.runner_name
-  agent_gitlab_url         = var.gitlab_url
+  runner_manager_gitlab_runner_name = var.runner_name
+  runner_manager_gitlab_url         = var.gitlab_url
 
-  agent_gitlab_registration_config = {
+  runner_manager_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner_2"
     description        = "runner public - auto"

@@ -1,21 +1,21 @@
 locals {
   # Manage certificates
   pre_install_gitlab_certificate = (
-    length(var.agent_gitlab_certificate) > 0
+    length(var.runner_manager_gitlab_certificate) > 0
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
-      ${var.agent_gitlab_certificate}
+      ${var.runner_manager_gitlab_certificate}
       EOF
     EOT
     : ""
   )
   pre_install_ca_certificate = (
-    length(var.agent_gitlab_ca_certificate) > 0
+    length(var.runner_manager_gitlab_ca_certificate) > 0
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/ca.crt
-      ${var.agent_gitlab_ca_certificate}
+      ${var.runner_manager_gitlab_ca_certificate}
       EOF
     EOT
     : ""
@@ -28,7 +28,7 @@ locals {
   EOT
   pre_install_certificates = (
     # If either (or both) _certificate variables are specified
-    length(var.agent_gitlab_certificate) + length(var.agent_gitlab_ca_certificate) > 0
+    length(var.runner_manager_gitlab_certificate) + length(var.runner_manager_gitlab_ca_certificate) > 0
     ? join("\n", [
       local.pre_install_gitlab_certificate,
       local.pre_install_ca_certificate,
@@ -39,7 +39,7 @@ locals {
 
   # Determine IAM role for runner instance
   aws_iam_role_instance_name = coalesce(
-    var.agent_iam_role_profile_name,
+    var.runner_manager_iam_role_profile_name,
     "${local.name_iam_objects}-instance"
   )
   aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"
@@ -65,11 +65,11 @@ locals {
   runners_max_builds_string = var.executor_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_docker_machine_max_builds)
 
   # Define key for runner token for SSM
-  secure_parameter_store_runner_token_key  = "${var.environment}-${var.agent_gitlab_token_secure_parameter_store}"
-  secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.agent_sentry_secure_parameter_store_name}"
+  secure_parameter_store_runner_token_key  = "${var.environment}-${var.runner_manager_gitlab_token_secure_parameter_store}"
+  secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.runner_manager_sentry_secure_parameter_store_name}"
 
   # Custom names for runner agent instance, security groups, and IAM objects
-  name_runner_agent_instance = var.agent_instance_prefix == "" ? local.tags["Name"] : var.agent_instance_prefix
+  name_runner_agent_instance = var.runner_manager_instance_prefix == "" ? local.tags["Name"] : var.runner_manager_instance_prefix
   name_sg                    = var.security_group_prefix == "" ? local.tags["Name"] : var.security_group_prefix
   name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 
@@ -84,7 +84,7 @@ locals {
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
-  docker_machine_version_used          = split(".", split("-", var.agent_docker_machine_version)[0])
+  docker_machine_version_used          = split(".", split("-", var.runner_manager_docker_machine_version)[0])
   docker_machine_version_with_name_tag = split(".", "0.16.2")
   docker_machine_version_test = [
     for i, j in reverse(range(length(local.docker_machine_version_used)))

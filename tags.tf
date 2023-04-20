@@ -19,7 +19,7 @@ locals {
       "Environment" = format("%s", var.environment)
     },
     var.tags,
-    var.agent_extra_instance_tags
+    var.runner_manager_extra_instance_tags
   )
 
   agent_tags = { for k, v in local.agent_tags_merged : k => v if !contains(var.suppressed_tags, k) }

@@ -54,17 +54,17 @@ module "runner" {
 
   vpc_id                            = module.vpc.vpc_id
   subnet_id                         = element(module.vpc.private_subnets, 0)
-  agent_collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
+  runner_manager_collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
-  agent_gitlab_runner_name = var.runner_name
-  agent_gitlab_url         = var.gitlab_url
-  agent_enable_ssm_access  = true
+  runner_manager_gitlab_runner_name = var.runner_name
+  runner_manager_gitlab_url         = var.gitlab_url
+  runner_manager_enable_ssm_access  = true
 
-  agent_ping_allow_from_security_groups = [data.aws_security_group.default.id]
+  runner_manager_ping_allow_from_security_groups = [data.aws_security_group.default.id]
 
   executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  agent_gitlab_registration_config = {
+  runner_manager_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner default - auto"

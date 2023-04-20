@@ -6,10 +6,10 @@ resource "aws_security_group" "runner" {
   # checkov:skip=CKV2_AWS_5:False positive. Security group is used in a launch template network interface section.
   name_prefix = local.name_sg
   vpc_id      = var.vpc_id
-  description = var.agent_security_group_description
+  description = var.runner_manager_security_group_description
 
   dynamic "egress" {
-    for_each = var.agent_extra_egress_rules
+    for_each = var.runner_manager_extra_egress_rules
     iterator = each
 
     content {
@@ -43,19 +43,19 @@ resource "aws_security_group" "runner" {
 
 # Allow ICMP traffic from allowed security group IDs to gitlab-runner agent instances
 resource "aws_security_group_rule" "runner_ping_group" {
-  count = length(var.agent_ping_allow_from_security_groups) > 0 && var.agent_ping_enable ? length(var.agent_ping_allow_from_security_groups) : 0
+  count = length(var.runner_manager_ping_allow_from_security_groups) > 0 && var.runner_manager_ping_enable ? length(var.runner_manager_ping_allow_from_security_groups) : 0
 
   type      = "ingress"
   from_port = -1
   to_port   = -1
   protocol  = "icmp"
 
-  source_security_group_id = element(var.agent_ping_allow_from_security_groups, count.index)
+  source_security_group_id = element(var.runner_manager_ping_allow_from_security_groups, count.index)
   security_group_id        = aws_security_group.runner.id
 
   description = format(
     "Allow ICMP traffic from %s to gitlab-runner agent instances in group %s",
-    element(var.agent_ping_allow_from_security_groups, count.index),
+    element(var.runner_manager_ping_allow_from_security_groups, count.index),
     aws_security_group.runner.name
   )
 }
@@ -131,7 +131,7 @@ resource "aws_security_group_rule" "docker_machine_docker_runner" {
 # Combine runner security group id and additional security group IDs
 locals {
   # Only include runner security group id and additional if ping is enabled
-  security_groups_ping = var.agent_ping_enable && length(var.agent_ping_allow_from_security_groups) > 0 ? concat(var.agent_ping_allow_from_security_groups, [aws_security_group.runner.id]) : []
+  security_groups_ping = var.runner_manager_ping_enable && length(var.runner_manager_ping_allow_from_security_groups) > 0 ? concat(var.runner_manager_ping_allow_from_security_groups, [aws_security_group.runner.id]) : []
 }
 
 # Allow SSH traffic from gitlab-runner agent instances and security group IDs to docker-machine instances
@@ -214,7 +214,7 @@ resource "aws_security_group_rule" "docker_machine_ssh_self" {
 
 # Allow ICMP traffic from docker-machine instances to docker-machine instances
 resource "aws_security_group_rule" "docker_machine_ping_self" {
-  count = (var.executor_type == "docker+machine" && var.agent_ping_enable) ? 1 : 0
+  count = (var.executor_type == "docker+machine" && var.runner_manager_ping_enable) ? 1 : 0
 
   type      = "ingress"
   from_port = -1
