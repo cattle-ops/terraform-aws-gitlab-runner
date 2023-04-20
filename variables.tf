@@ -52,7 +52,6 @@ variable "metrics_autoscaling" {
 variable "key_pair_name" {
   description = "The name of the key pair used by the runner to connect to the docker-machine executors."
   type        = string
-  default     = "fleet-key"
 }
 
 variable "instance_type" {
