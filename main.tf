@@ -81,6 +81,12 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
+      runners_machine_autoscaling = [for config in var.runners_machine_autoscaling_options : {
+        for key, value in config :
+        # Convert key from snake_case to PascalCase which is the casing for this section.
+        join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
+      }]
+
       aws_region                        = var.aws_region
       gitlab_url                        = var.runners_gitlab_url
       gitlab_clone_url                  = var.runners_clone_url
@@ -116,7 +122,6 @@ locals {
       runners_idle_count                = var.runners_idle_count
       runners_idle_time                 = var.runners_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.runners_root_size
       runners_volume_type               = var.runners_volume_type
       runners_iam_instance_profile_name = var.runners_iam_instance_profile_name
