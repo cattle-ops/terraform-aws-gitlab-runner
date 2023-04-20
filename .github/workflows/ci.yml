@@ -70,7 +70,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@v6
+        uses: oxsecurity/megalinter@v6.22.2
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -82,16 +82,15 @@ jobs:
           TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
           # format issues fail the build
           TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
-          # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
-          TERRAFORM_KICS_ARGUMENTS: "--exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12"
           # it's an auto-generated file
           MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
+          # it's an auto-generated file
+          MARKDOWN_MARKDOWN_LINK_CHECK_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
           PAT: ${{ secrets.GITHUB_TOKEN }}
           # automatically commit fixes to the feature branch
           APPLY_FIXES: all
           APPLY_FIXES_EVENT: pull_request
           APPLY_FIXES_MODE: commit
-
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
         if: ${{ success() }} || ${{ failure() }}
@@ -101,6 +100,15 @@ jobs:
           path: |
             megalinter-reports
             mega-linter.log
+
+  kics:
+    runs-on: ubuntu-latest
+    container:
+      image: checkmarx/kics:v1.6.12-debian
+    steps:
+      - uses: actions/checkout@v3
+      # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
+      - run: kics scan -p . -o . --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
   tflint:
     runs-on: ubuntu-latest
