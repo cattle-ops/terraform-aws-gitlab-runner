@@ -79,9 +79,6 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  runners_privileged         = "true"
-  runners_additional_volumes = ["/certs/client"]
-
   runners_volumes_tmpfs = [
     {
       volume  = "/var/opt/cache",
@@ -105,6 +102,11 @@ module "runner" {
       timezone   = var.timezone
     }
   ]
+
+  runners_docker_options = {
+    privileged = "true"
+    volumes    = ["/cache", "/certs/client"]
+  }
 
   runners_pre_build_script = <<EOT
   '''
