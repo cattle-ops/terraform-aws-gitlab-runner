@@ -2,9 +2,11 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# VPC Flow logs are not needed here
+# kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  version = "4.0.1"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -20,7 +22,7 @@ module "vpc" {
 
 module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "3.19.0"
+  version = "4.0.1"
 
   vpc_id = module.vpc.vpc_id
 

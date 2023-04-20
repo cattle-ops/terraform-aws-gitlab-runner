@@ -1,3 +1,4 @@
+<!-- First line should be a H1: Badges on top please! -->
 <!-- markdownlint-disable MD041/first-line-heading/first-line-h1 -->
 [![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -26,7 +27,7 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 
 > 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances),
 > the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine).
-> For more details see [PR](https://github.com/npalm/terraform-aws-gitlab-runner/pull/697).
+> For more details see [PR](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/697).
 <!-- there is no blank line in between. These are two separate quotes! -->
 <!-- markdownlint-disable MD028 -->
 > 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current
@@ -62,7 +63,7 @@ In this scenario the runner agent is running on a single EC2 node and runners ar
 using spot instances. Runners will scale automatically based on the configuration. The module creates a S3 cache by default,
 which is shared across runners (spot instances).
 
-![runners-default](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-default.png)
+![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
 ### GitLab CI docker-machine runner - multiple runner agents
 
@@ -70,14 +71,14 @@ In this scenario the multiple runner agents can be created with different config
 Runners will scale automatically based on the configuration. The S3 cache can be shared across runners by managing the cache
 outside of the module.
 
-![runners-cache](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-cache.png)
+![runners-cache](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-cache.png)
 
 ### GitLab Ci docker runner
 
 In this scenario _not_ docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the
 agent. No auto scaling is supported.
 
-![runners-docker](https://github.com/npalm/assets/raw/main/images/terraform-aws-gitlab-runner/runner-docker.png)
+![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
 
 ## Prerequisites
 
@@ -138,7 +139,7 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 
 If a KMS key is set via `kms_key_id`, make sure that you also give proper access to the key. Otherwise, you might
 get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
-example checkout [kms-policy.json](https://github.com/npalm/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
+example checkout [kms-policy.json](https://github.com/cattle-ops/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
 
 ### GitLab runner token configuration
 
@@ -235,8 +236,8 @@ policy on the bucket.
 
 Creation of the bucket can be disabled and managed outside this module. A good use case is for sharing the cache across multiple
 runners. For this purpose the cache is implemented as a sub module. For more details see the
-[cache module](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of this use
-case can be found in the [runner-public](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
+[cache module](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/modules/cache). An example implementation of
+this use case can be found in the [runner-public](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-public)
 example.
 
 In case you enable the access logging for the S3 cache bucket, you have to add the following statement to your S3 logging bucket
@@ -288,12 +289,12 @@ AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow 
 
 ### Scenario: Basic usage
 
-Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
+Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
-  source  = "npalm/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
@@ -341,8 +342,8 @@ map. A simple example for this would be to set _region-specific-prefix_ to the A
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
-  source  = "npalm/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region  = "eu-west-1"
   environment = "spot-runners"
@@ -373,7 +374,7 @@ module "runner" {
 
 ## Examples
 
-A few [examples](https://github.com/npalm/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
+A few [examples](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
 following steps to deploy. Ensure your AWS and Terraform environment is set up correctly. All commands below should be
 run from the `terraform-aws-gitlab-runner/examples/<example-dir>` directory. Don't forget to remove the runners
 manually from your Gitlab instance as soon as your are done.
@@ -415,9 +416,9 @@ This project exists thanks to all the people who contribute.
 
 <!-- this is the only option to integrate the contributors list in the README.md -->
 <!-- markdownlint-disable MD033 -->
-<a href="https://github.com/npalm/terraform-aws-gitlab-runner/graphs/contributors">
+<a href="https://github.com/cattle-ops/terraform-aws-gitlab-runner/graphs/contributors">
   <!-- markdownlint-disable MD033 -->
-  <img src="https://contrib.rocks/image?repo=npalm/terraform-aws-gitlab-runner" />
+  <img src="https://contrib.rocks/image?repo=cattle-ops/terraform-aws-gitlab-runner" />
 </a>
 
 Made with [contributors-img](https://contrib.rocks).

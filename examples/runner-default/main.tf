@@ -7,16 +7,19 @@ data "aws_security_group" "default" {
   vpc_id = module.vpc.vpc_id
 }
 
+# VPC Flow logs are not needed here
+# kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  version = "4.0.1"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
 
-  azs             = [data.aws_availability_zones.available.names[0]]
-  private_subnets = ["10.0.1.0/24"]
-  public_subnets  = ["10.0.101.0/24"]
+  azs                     = [data.aws_availability_zones.available.names[0]]
+  private_subnets         = ["10.0.1.0/24"]
+  public_subnets          = ["10.0.101.0/24"]
+  map_public_ip_on_launch = false
 
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -28,7 +31,7 @@ module "vpc" {
 
 module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "3.19.0"
+  version = "4.0.1"
 
   vpc_id = module.vpc.vpc_id
 

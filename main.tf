@@ -163,8 +163,9 @@ data "aws_ami" "docker-machine" {
 # ignores: Auto Scaling Group With No Associated ELB --> that's simply not true, as the EC2 instance contacts GitLab. So no ELB needed here.
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
-  # TODO Please explain how `enable_asg_recreation` works
+  # TODO Please explain how `agent_enable_asg_recreation` works
   name                      = var.agent_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+
   vpc_zone_identifier       = [var.subnet_id]
   min_size                  = "1"
   max_size                  = "1"

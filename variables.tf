@@ -37,8 +37,8 @@ variable "kms_managed_deletion_rotation_window_in_days" {
 
 variable "iam_permissions_boundary" {
   description = "Name of permissions boundary policy to attach to AWS IAM roles"
-  default     = ""
   type        = string
+  default     = ""
 }
 
 variable "environment" {
