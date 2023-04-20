@@ -52,6 +52,7 @@ variable "metrics_autoscaling" {
 variable "key_pair_name" {
   description = "The name of the key pair used by the runner to connect to the docker-machine executors."
   type        = string
+  default     = ""
 }
 
 variable "instance_type" {
@@ -112,7 +113,7 @@ variable "docker_machine_instance_type" {
   default     = "m5.large"
 }
 
-variable "docker_machine_instance_types" {
+variable "docker_machine_instance_types_fleet" {
   description = "Instance types used for the instances hosting docker-machine. This variable is only supported when use_fleet is set to true."
   type        = list(string)
   default     = []

@@ -77,9 +77,9 @@ locals {
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.sentry_dsn
-      public_key                                   = var.use_fleet == true ? tls_private_key.runner[0].public_key_openssh : ""
+      public_key                                   = var.use_fleet == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                    = var.use_fleet
-      private_key                                  = var.use_fleet == true ? tls_private_key.runner[0].private_key_pem : ""
+      private_key                                  = var.use_fleet == true ? tls_private_key.fleet[0].private_key_pem : ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -94,7 +94,7 @@ locals {
       runners_subnet_ids                = length(var.fleet_executor_subnet_ids) > 0 ? var.fleet_executor_subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : [var.subnet_id_runners]
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
-      runners_instance_types            = length(var.docker_machine_instance_types) > 0 ? var.docker_machine_instance_types : [var.docker_machine_instance_type]
+      runners_instance_types            = length(var.docker_machine_instance_types_fleet) > 0 ? var.docker_machine_instance_types_fleet : [var.docker_machine_instance_type]
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" || var.docker_machine_spot_price_bid == null ? "" : var.docker_machine_spot_price_bid
       runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
@@ -144,7 +144,7 @@ locals {
       prometheus_listen_address         = var.prometheus_listen_address
       auth_type                         = var.auth_type_cache_sr
       use_fleet                         = var.use_fleet
-      launch_template                   = var.use_fleet == true ? aws_launch_template.gitlab_runners[0].name : ""
+      launch_template                   = var.use_fleet == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
     }
   )
 }
@@ -326,30 +326,30 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   depends_on = [aws_cloudwatch_log_group.environment]
 }
 
-resource "tls_private_key" "runner" {
+resource "tls_private_key" "fleet" {
   count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
 
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource "aws_key_pair" "fleet_key" {
+resource "aws_key_pair" "fleet" {
   count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
 
   key_name   = "${var.environment}-${var.key_pair_name}"
-  public_key = tls_private_key.runner[0].public_key_openssh
+  public_key = tls_private_key.fleet[0].public_key_openssh
 }
 
-resource "aws_launch_template" "gitlab_runners" {
+resource "aws_launch_template" "fleet_gitlab_runner" {
   # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
   # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
   count       = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
   name_prefix = "${local.name_runner_agent_instance}-worker-"
 
-  key_name               = aws_key_pair.fleet_key[0].key_name
+  key_name               = aws_key_pair.fleet[0].key_name
   image_id               = data.aws_ami.docker-machine[0].id
   user_data              = base64gzip(var.runners_userdata)
-  instance_type          = var.docker_machine_instance_types[0] # it will be override by the fleet
+  instance_type          = var.docker_machine_instance_types_fleet[0] # it will be override by the fleet
   update_default_version = true
   ebs_optimized          = var.runners_ebs_optimized
   monitoring {
