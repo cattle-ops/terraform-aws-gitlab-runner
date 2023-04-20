@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform: [ 1.0.11, 1.3.9, latest ]
+        terraform: [1.3.9, latest]
         example:
           [
             "runner-default",
