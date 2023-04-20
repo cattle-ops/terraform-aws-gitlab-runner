@@ -51,7 +51,12 @@ module "runner" {
   # cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
   # update-ca-certificates
   # Or similar OS-dependent commands. The above are an example for Ubuntu.
-  runners_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
+  runners_docker_options = {
+    volumes = [
+      "/cache",
+      "/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"
+    ]
+  }
 
   ###############################################
   # Registration
