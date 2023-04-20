@@ -5,7 +5,7 @@ locals {
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
-      ${var.runner_manager_gitlab_certificate}
+      ${var.runner_gitlab_certificate}
       EOF
     EOT
     : ""
@@ -15,7 +15,7 @@ locals {
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/ca.crt
-      ${var.runner_manager_gitlab_ca_certificate}
+      ${var.runner_gitlab_ca_certificate}
       EOF
     EOT
     : ""
@@ -28,7 +28,7 @@ locals {
   EOT
   pre_install_certificates = (
     # If either (or both) _certificate variables are specified
-    length(var.runner_manager_gitlab_certificate) + length(var.runner_manager_gitlab_ca_certificate) > 0
+    length(var.runner_gitlab_certificate) + length(var.runner_gitlab_ca_certificate) > 0
     ? join("\n", [
       local.pre_install_gitlab_certificate,
       local.pre_install_ca_certificate,
