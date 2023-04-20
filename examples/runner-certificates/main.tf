@@ -28,8 +28,8 @@ module "runner" {
   # General
   ###############################################
 
-  runner_manager_gitlab_runner_name = var.runner_name
-  runner_manager_gitlab_url         = var.gitlab_url
+  runner_gitlab_runner_name = var.runner_name
+  runner_gitlab_url         = var.gitlab_url
 
   runner_worker_type = "docker"
 
@@ -62,7 +62,7 @@ module "runner" {
   # Registration
   ###############################################
 
-  runner_manager_gitlab_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_runner"
     description        = "runner docker - auto"

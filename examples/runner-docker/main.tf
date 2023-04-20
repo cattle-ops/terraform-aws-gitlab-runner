@@ -44,19 +44,19 @@ module "runner" {
   environment = var.environment
 
   runner_worker_docker_machine_use_private_address = false
-  runner_manager_enable_eip                            = true
+  runner_enable_eip                            = true
 
   runner_worker_docker_machine_security_group_description = "Custom description for docker-machine"
-  runner_manager_security_group_description                   = "Custom description for gitlab-runner"
+  runner_security_group_description                   = "Custom description for gitlab-runner"
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
 
   runner_worker_type            = "docker"
-  runner_manager_gitlab_runner_name = var.runner_name
-  runner_manager_gitlab_url         = var.gitlab_url
+  runner_gitlab_runner_name = var.runner_name
+  runner_gitlab_url         = var.gitlab_url
 
-  runner_manager_gitlab_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_runner"
     description        = "runner docker - auto"

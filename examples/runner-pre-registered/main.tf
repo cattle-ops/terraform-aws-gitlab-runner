@@ -34,9 +34,9 @@ module "runner" {
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.private_subnets, 0)
 
-  runner_manager_gitlab_runner_name = var.runner_name
-  runner_manager_gitlab_url         = var.gitlab_url
-  runner_manager_gitlab_token       = var.runner_token
+  runner_gitlab_runner_name = var.runner_name
+  runner_gitlab_url         = var.gitlab_url
+  runner_gitlab_token       = var.runner_token
 
   # working 9 to 5 :)
   runner_worker_docker_machine_autoscaling_options = [

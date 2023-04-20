@@ -100,43 +100,43 @@ variable "runner_manager_prometheus_listen_address" {
 /*
  * Runner: The agent that runs the code on the host platform and displays in the UI.
  */
-variable "runner_manager_instance_prefix" {
+variable "runner_instance_prefix" {
   description = "Set the name prefix and override the `Name` tag for the Agent instance."
   type        = string
   default     = ""
 }
 
-variable "runner_manager_instance_type" {
+variable "runner_instance_type" {
   description = "Agent instance type used."
   type        = string
   default     = "t3.micro"
 }
 
-variable "runner_manager_extra_instance_tags" {
+variable "runner_extra_instance_tags" {
   description = "Map of tags that will be added to Agent EC2 instance."
   type        = map(string)
   default     = {}
 }
 
-variable "runner_manager_spot_price" {
+variable "runner_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
   type        = string
   default     = null
 }
 
-variable "runner_manager_ebs_optimized" {
+variable "runner_ebs_optimized" {
   description = "Enable the Agent instance to be EBS-optimized."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_root_block_device" {
+variable "runner_root_block_device" {
   description = "The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
   type        = map(string)
   default     = {}
 }
 
-variable "runner_manager_ami_filter" {
+variable "runner_ami_filter" {
   description = "List of maps used to create the AMI filter for the Agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
   type        = map(list(string))
 
@@ -145,49 +145,49 @@ variable "runner_manager_ami_filter" {
   }
 }
 
-variable "runner_manager_ami_owners" {
+variable "runner_ami_owners" {
   description = "The list of owners used to select the AMI of the Agent instance."
   type        = list(string)
   default     = ["amazon"]
 }
 
-variable "runner_manager_enable_monitoring" {
+variable "runner_enable_monitoring" {
   description = "Enable the detailed monitoring on the Agent instance."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_collect_autoscaling_metrics" {
+variable "runner_collect_autoscaling_metrics" {
   description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
   type        = list(string)
   default     = null
 }
 
-variable "runner_manager_ping_enable" {
+variable "runner_ping_enable" {
   description = "Allow ICMP Ping to the Agent. Specify `agent_ping_allowed_from_security_groups` too!"
   type        = bool
   default     = false
 }
 
-variable "runner_manager_ping_allow_from_security_groups" {
+variable "runner_ping_allow_from_security_groups" {
   description = "A list of security group ids that are allowed to access the gitlab runner agent"
   type        = list(string)
   default     = []
 }
 
-variable "runner_manager_security_group_description" {
+variable "runner_security_group_description" {
   description = "A description for the Agents security group"
   type        = string
   default     = "A security group containing gitlab-runner agent instances"
 }
 
-variable "runner_manager_extra_security_group_ids" {
+variable "runner_extra_security_group_ids" {
   description = "IDs of security groups to add to the Agent."
   type        = list(string)
   default     = []
 }
 
-variable "runner_manager_extra_egress_rules" {
+variable "runner_extra_egress_rules" {
   description = "List of egress rules for the Agent."
   type = list(object({
     cidr_blocks      = list(string)
@@ -215,61 +215,61 @@ variable "runner_manager_extra_egress_rules" {
   ]
 }
 
-variable "runner_manager_allow_iam_service_linked_role_creation" {
+variable "runner_allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to the Agent to create service linked roles."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_create_runner_iam_role_profile" {
+variable "runner_create_runner_iam_role_profile" {
   description = "Whether to create the IAM role/profile for the Agent. If you provide your own role, make sure that it has the required permissions."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_iam_role_profile_name" {
+variable "runner_iam_role_profile_name" {
   description = "IAM role/profile name for the Agent. If unspecified then `$${var.iam_object_prefix}-instance` is used."
   type        = string
   default     = ""
 }
 
-variable "runner_manager_extra_role_tags" {
+variable "runner_extra_role_tags" {
   description = "Map of tags that will be added to the role created. Useful for tag based authorization."
   type        = map(string)
   default     = {}
 }
 
-variable "runner_manager_assume_role_json" {
+variable "runner_assume_role_json" {
   description = "The assume role policy for the Agent."
   type        = string
   default     = ""
 }
 
-variable "runner_manager_extra_iam_policy_arns" {
+variable "runner_extra_iam_policy_arns" {
   description = "List of policy ARNs to be added to the instance profile of the Agent."
   type        = list(string)
   default     = []
 }
 
-variable "runner_manager_enable_eip" {
+variable "runner_enable_eip" {
   description = "Assigns an EIP to the Agent."
   type        = bool
   default     = false
 }
 
-variable "runner_manager_use_private_address" {
+variable "runner_use_private_address" {
   description = "Restrict the Agent to the use of a private IP address. If this is set to `false` it will override the `runners_use_private_address` for the agent."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_enable_ssm_access" {
+variable "runner_enable_ssm_access" {
   description = "Allows to connect to the Agent via SSM."
   type        = bool
   default     = false
 }
 
-variable "runner_manager_metadata_options" {
+variable "runner_metadata_options" {
   description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
   type = object({
     http_endpoint               = string
@@ -285,25 +285,25 @@ variable "runner_manager_metadata_options" {
   }
 }
 
-variable "runner_manager_schedule_enable" {
+variable "runner_schedule_enable" {
   description = "Set to `true` to enable the auto scaling group schedule for the Agent."
   type        = bool
   default     = false
 }
 
-variable "runner_manager_max_instance_lifetime_seconds" {
+variable "runner_max_instance_lifetime_seconds" {
   description = "The maximum time an Agent should live before it is killed."
   default     = null
   type        = number
 }
 
-variable "runner_manager_enable_asg_recreation" {
+variable "runner_enable_asg_recreation" {
   description = "Enable automatic redeployment of the Agent ASG when the Launch Configs change."
   default     = true
   type        = bool
 }
 
-variable "runner_manager_schedule_config" {
+variable "runner_schedule_config" {
   description = "Map containing the configuration of the ASG scale-out and scale-in for the Agent. Will only be used if `agent_schedule_enable` is set to `true`. "
   type        = map(any)
   default = {
@@ -321,84 +321,84 @@ variable "runner_manager_schedule_config" {
   }
 }
 
-variable "runner_manager_install_amazon_ecr_credential_helper" {
+variable "runner_install_amazon_ecr_credential_helper" {
   description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
   type        = bool
   default     = false
 }
 
-variable "runner_manager_docker_machine_version" {
+variable "runner_docker_machine_version" {
   description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
   type        = string
   default     = "0.16.2-gitlab.19-cki.2"
 }
 
-variable "runner_manager_docker_machine_download_url" {
+variable "runner_docker_machine_download_url" {
   description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
   type        = string
   default     = ""
 }
 
-variable "runner_manager_yum_update" {
+variable "runner_yum_update" {
   description = "Run a `yum` update as part of starting the Agent"
   type        = bool
   default     = true
 }
 
-variable "runner_manager_userdata_pre_install" {
+variable "runner_userdata_pre_install" {
   description = "User-data script snippet to insert before GitLab Runner install"
   type        = string
   default     = ""
 }
 
-variable "runner_manager_userdata_post_install" {
+variable "runner_userdata_post_install" {
   description = "User-data script snippet to insert after GitLab Runner install"
   type        = string
   default     = ""
 }
 
-variable "runner_manager_user_data_extra" {
+variable "runner_user_data_extra" {
   description = "Extra commands to run as part of starting the Agent"
   type        = string
   default     = ""
 }
 
-variable "runner_manager_user_data_enable_trace_log" {
+variable "runner_user_data_enable_trace_log" {
   description = "Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_cloudwatch_enable" {
+variable "runner_cloudwatch_enable" {
   description = "Boolean used to enable or disable the CloudWatch logging."
   type        = bool
   default     = true
 }
 
-variable "runner_manager_cloudwatch_retention_days" {
+variable "runner_cloudwatch_retention_days" {
   description = "Retention for cloudwatch logs. Defaults to unlimited. Requires `agent_cloudwatch_enable = true`."
   type        = number
   default     = 0
 }
 
-variable "runner_manager_cloudwatch_log_group_name" {
+variable "runner_cloudwatch_log_group_name" {
   description = "Option to override the default name (`environment`) of the log group. Requires `agent_cloudwatch_enable = true`."
   default     = null
   type        = string
 }
 
-variable "runner_manager_gitlab_runner_name" {
+variable "runner_gitlab_runner_name" {
   description = "Name of the Gitlab Runner."
   type        = string
 }
 
-variable "runner_manager_gitlab_runner_version" {
+variable "runner_gitlab_runner_version" {
   description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
   type        = string
   default     = "15.8.2"
 }
 
-variable "runner_manager_gitlab_registration_config" {
+variable "runner_gitlab_registration_config" {
   description = "Configuration used to register the Agent. See the README for an example, or reference the examples in the examples directory of this repo."
   type        = map(string)
 
@@ -413,7 +413,7 @@ variable "runner_manager_gitlab_registration_config" {
   }
 }
 
-variable "runner_manager_gitlab_token_secure_parameter_store" {
+variable "runner_gitlab_token_secure_parameter_store" {
   description = "Name of the Secure Parameter Store entry to hold the GitLab Runner token."
   type        = string
   default     = "runner-token"
@@ -431,36 +431,36 @@ variable "runner_manager_gitlab_certificate" {
   default     = ""
 }
 
-variable "runner_manager_gitlab_url" {
+variable "runner_gitlab_url" {
   description = "URL of the GitLab instance to connect to."
   type        = string
 }
 
-variable "runner_manager_gitlab_clone_url" {
+variable "runner_gitlab_clone_url" {
   description = "Overwrites the URL for the GitLab instance. Use only if the agent can’t connect to the GitLab URL."
   type        = string
   default     = ""
 }
 
-variable "runner_manager_gitlab_token" {
+variable "runner_gitlab_token" {
   description = "Token for the Agent to connect to GitLab"
   type        = string
   default     = "__REPLACED_BY_USER_DATA__"
 }
 
-variable "runner_manager_sentry_secure_parameter_store_name" {
+variable "runner_sentry_secure_parameter_store_name" {
   description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
   type        = string
   default     = "sentry-dsn"
 }
 
-variable "runner_manager_terminate_ec2_lifecycle_hook_name" {
+variable "runner_terminate_ec2_lifecycle_hook_name" {
   description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
   type        = string
   default     = null
 }
 
-variable "runner_manager_terraform_timeout_delete_asg" {
+variable "runner_terraform_timeout_delete_asg" {
   description = "Timeout when trying to delete the Agent ASG."
   default     = "10m"
   type        = string
