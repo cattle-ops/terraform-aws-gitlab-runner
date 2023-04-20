@@ -188,64 +188,77 @@ variable "runners_max_builds" {
   default     = 0
 }
 
-variable "runners_image" {
-  description = "Image to run builds, will be used in the runner config.toml"
-  type        = string
-  default     = "docker:18.03.1-ce"
-}
-
-variable "runners_privileged" {
-  description = "Runners will run in privileged mode, will be used in the runner config.toml"
-  type        = bool
-  default     = true
-}
-
-variable "runners_disable_cache" {
-  description = "Runners will not use local cache, will be used in the runner config.toml"
-  type        = bool
-  default     = false
-}
-
 variable "runners_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
   default     = false
 }
 
-variable "runners_additional_volumes" {
-  description = "Additional volumes that will be used in the runner config.toml, e.g Docker socket"
-  type        = list(any)
-  default     = []
-}
+variable "runners_docker_options" {
+  description = <<EOT
+    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
+    details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
-variable "runners_extra_hosts" {
-  description = "Extra hosts that will be used in the runner config.toml, e.g other-host:127.0.0.1"
-  type        = list(any)
-  default     = []
-}
+    Default values if the option is not given:
+      disable_cache = "false"
+      image         = "docker:18.03.1-ce"
+      privileged    = "true"
+      pull_policy   = "always"
+      shm_size      = 0
+      tls_verify    = "false"
+      volumes       = "/cache"
+  EOT
 
-variable "runners_shm_size" {
-  description = "shm_size for the runners, will be used in the runner config.toml"
-  type        = number
-  default     = 0
-}
+  type = object({
+    allowed_images               = optional(list(string))
+    allowed_pull_policies        = optional(list(string))
+    allowed_services             = optional(list(string))
+    cache_dir                    = optional(string)
+    cap_add                      = optional(list(string))
+    cap_drop                     = optional(list(string))
+    container_labels             = optional(list(string))
+    cpuset_cpus                  = optional(string)
+    cpu_shares                   = optional(number)
+    cpus                         = optional(string)
+    devices                      = optional(list(string))
+    device_cgroup_rules          = optional(list(string))
+    disable_cache                = optional(bool, false)
+    disable_entrypoint_overwrite = optional(bool)
+    dns                          = optional(list(string))
+    dns_search                   = optional(list(string))
+    extra_hosts                  = optional(list(string))
+    gpus                         = optional(string)
+    helper_image                 = optional(string)
+    helper_image_flavor          = optional(string)
+    host                         = optional(string)
+    hostname                     = optional(string)
+    image                        = optional(string, "docker:18.03.1-ce")
+    isolation                    = optional(string)
+    links                        = optional(list(string))
+    mac_address                  = optional(string)
+    memory                       = optional(string)
+    memory_swap                  = optional(string)
+    memory_reservation           = optional(string)
+    network_mode                 = optional(string)
+    oom_kill_disable             = optional(bool)
+    oom_score_adjust             = optional(number)
+    privileged                   = optional(bool, true)
+    pull_policies                = optional(list(string), ["always"])
+    runtime                      = optional(string)
+    security_opt                 = optional(list(string))
+    shm_size                     = optional(number, 0)
+    sysctls                      = optional(list(string))
+    tls_cert_path                = optional(string)
+    tls_verify                   = optional(bool, false)
+    user                         = optional(string)
+    userns_mode                  = optional(string)
+    volumes                      = optional(list(string), ["/cache"])
+    volumes_from                 = optional(list(string))
+    volume_driver                = optional(string)
+    wait_for_services_timeout    = optional(number)
+  })
 
-variable "runners_docker_runtime" {
-  description = "docker runtime for runners, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-variable "runners_helper_image" {
-  description = "Overrides the default helper image used to clone repos and upload artifacts, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-variable "runners_pull_policies" {
-  description = "pull policies for the runners, will be used in the runner config.toml, for Gitlab Runner >= 13.8, see https://docs.gitlab.com/runner/executors/docker.html#using-multiple-pull-policies "
-  type        = list(string)
-  default     = ["always"]
+  default = null
 }
 
 variable "runners_monitoring" {
