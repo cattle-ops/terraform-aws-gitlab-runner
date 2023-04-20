@@ -73,10 +73,10 @@ extracted_variables=$(echo "$extracted_variables" | \
 
 # add new block runners_docker_options at the end
 echo "$(head -n -1 "$converted_file")
-runners_docker_options {
+runner_worker_docker_options = {
   $extracted_variables
 }
-}" > x
+" > x
 
 mv x "$converted_file"
 
