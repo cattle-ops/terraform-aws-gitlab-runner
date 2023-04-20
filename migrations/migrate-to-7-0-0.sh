@@ -24,6 +24,10 @@ sed -i '/asg_terminate_lifecycle_lambda_memory_size/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_runtime/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_timeout/d' "$converted_file"
 
+#
+#  PR #711 feat!: refactor Docker Machine autoscaling options
+#
+sed -i 's/runners_machine_autoscaling/runners_machine_autoscaling_options/g' "$converted_file"
 
 #
 # PR #757 refactor!: rename variables and prefix with agent, executor and global scope
@@ -117,7 +121,7 @@ sed 's/runners_iam_instance_profile_name/executor_docker_machine_iam_instance_pr
 sed 's/runners_volume_type/executor_docker_machine_ec2_volume_type/g' | \
 sed 's/runners_ebs_optimized/executor_docker_machine_ec2_ebs_optimized/g' | \
 sed 's/runners_monitoring/executor_docker_machine_enable_monitoring/g' | \
-sed 's/runners_machine_autoscaling/executor_docker_machine_autoscaling/g' | \
+sed 's/runners_machine_autoscaling_options/executor_docker_machine_autoscaling_options/g' | \
 sed 's/runners_docker_services/executor_docker_services/g' | \
 sed 's/runners_services_volumes_tmpfs/executor_docker_services_volumes_tmpfs/g' | \
 sed 's/runners_volumes_tmpfs/executor_docker_volumes_tmpfs/g' | \

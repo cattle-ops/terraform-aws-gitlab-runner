@@ -87,6 +87,12 @@ locals {
       gitlab_clone_url                  = var.agent_gitlab_clone_url
       tls_ca_file                       = length(var.agent_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_extra_hosts               = var.executor_docker_extra_hosts
+      runners_machine_autoscaling = [for config in var.executor_docker_machine_autoscaling_options : {
+        for key, value in config :
+        # Convert key from snake_case to PascalCase which is the casing for this section.
+        join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
+      }]
+
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = var.subnet_id
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
@@ -117,7 +123,6 @@ locals {
       runners_idle_count                = var.executor_idle_count
       runners_idle_time                 = var.executor_idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_machine_autoscaling       = local.runners_machine_autoscaling
       runners_root_size                 = var.executor_docker_machine_ec2_root_size
       runners_volume_type               = var.executor_docker_machine_ec2_volume_type
       runners_iam_instance_profile_name = var.executor_docker_machine_iam_instance_profile_name
@@ -374,6 +379,32 @@ resource "aws_iam_role" "instance" {
 }
 
 ################################################################################
+### Policy for the instance to use the KMS key
+################################################################################
+resource "aws_iam_policy" "instance_kms_policy" {
+  count = var.enable_managed_kms_key ? 1 : 0
+
+  name        = "${local.name_iam_objects}-kms"
+  path        = "/"
+  description = "Allow runner instance the ability to use the KMS key."
+  policy = templatefile("${path.module}/policies/instance-kms-policy.json",
+    {
+      kms_key_arn = var.enable_managed_kms_key && var.kms_key_id == "" ? aws_kms_key.default[0].arn : var.kms_key_id
+    }
+  )
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "instance_kms_policy" {
+  count = var.enable_managed_kms_key ? 1 : 0
+
+  role       = var.agent_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
+  policy_arn = aws_iam_policy.instance_kms_policy[0].arn
+}
+
+
+################################################################################
 ### Policies for runner agent instance to create docker machines via spot req.
 ###
 ### iam:PassRole To pass the role from the agent to the docker machine runners
@@ -462,6 +493,8 @@ resource "aws_iam_role" "docker_machine" {
   tags = local.tags
 }
 
+
+
 resource "aws_iam_instance_profile" "docker_machine" {
   count = var.executor_type == "docker+machine" ? 1 : 0
   name  = "${local.name_iam_objects}-docker-machine"
@@ -486,6 +519,8 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
+
 
 ################################################################################
 ### Service linked policy, optional

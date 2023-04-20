@@ -68,11 +68,6 @@ locals {
   %{~if var.executor_docker_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.executor_docker_additional_volumes~},"${volume}"%{endfor~}
   EOT
 
-  runners_machine_autoscaling = templatefile("${path.module}/template/runners_machine_autoscaling.tftpl", {
-    runners_machine_autoscaling = var.executor_docker_machine_autoscaling
-    }
-  )
-
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
     runners_docker_services = var.executor_docker_services
     }

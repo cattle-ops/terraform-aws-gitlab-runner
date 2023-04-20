@@ -98,7 +98,7 @@ module "runner" {
   # working 9 to 5 :)
   executor_docker_machine_autoscaling = [
     {
-      periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
+      periods    = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
       idle_count = 0
       idle_time  = 60
       timezone   = var.timezone

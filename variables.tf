@@ -162,7 +162,7 @@ variable "agent_extra_security_group_ids" {
 
 variable "agent_extra_egress_rules" {
   description = "List of egress rules for the Agent."
-  type = list(object({
+  type        = list(object({
     cidr_blocks      = list(string)
     ipv6_cidr_blocks = list(string)
     prefix_list_ids  = list(string)
@@ -173,17 +173,19 @@ variable "agent_extra_egress_rules" {
     to_port          = number
     description      = string
   }))
-  default = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    prefix_list_ids  = null
-    from_port        = 0
-    protocol         = "-1"
-    security_groups  = null
-    self             = null
-    to_port          = 0
-    description      = null
-  }]
+  default = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+      prefix_list_ids  = null
+      from_port        = 0
+      protocol         = "-1"
+      security_groups  = null
+      self             = null
+      to_port          = 0
+      description      = null
+    }
+  ]
 }
 
 # agent
@@ -243,7 +245,7 @@ variable "agent_enable_ssm_access" {
 
 variable "agent_metadata_options" {
   description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
-  type = object({
+  type        = object({
     http_endpoint               = string
     http_tokens                 = string
     http_put_response_hop_limit = number
@@ -278,7 +280,7 @@ variable "agent_enable_asg_recreation" {
 variable "agent_schedule_config" {
   description = "Map containing the configuration of the ASG scale-out and scale-in for the Agent. Will only be used if `agent_schedule_enable` is set to `true`. "
   type        = map(any)
-  default = {
+  default     = {
     # Configure optional scale_out scheduled action
     scale_out_recurrence = "0 8 * * 1-5"
     scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
@@ -531,7 +533,7 @@ variable "executor_cache_s3_bucket" {
     bucket name. See the public runner example for more details."
   EOT
   type        = map(any)
-  default = {
+  default     = {
     create = true
     policy = ""
     bucket = ""
@@ -609,7 +611,7 @@ variable "executor_post_build_script" {
  */
 variable "executor_docker_volumes_tmpfs" {
   description = "Mount a tmpfs in Executor container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type = list(object({
+  type        = list(object({
     volume  = string
     options = string
   }))
@@ -618,7 +620,7 @@ variable "executor_docker_volumes_tmpfs" {
 
 variable "executor_docker_services" {
   description = "Starts additional services with the Docker container. All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
-  type = list(object({
+  type        = list(object({
     name       = string
     alias      = string
     entrypoint = list(string)
@@ -629,7 +631,7 @@ variable "executor_docker_services" {
 
 variable "executor_docker_services_volumes_tmpfs" {
   description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type = list(object({
+  type        = list(object({
     volume  = string
     options = string
   }))
@@ -714,7 +716,7 @@ variable "executor_docker_machine_extra_role_tags" {
 
 variable "executor_docker_machine_extra_egress_rules" {
   description = "List of egress rules for the docker-machine instance(s)."
-  type = list(object({
+  type        = list(object({
     cidr_blocks      = list(string)
     ipv6_cidr_blocks = list(string)
     prefix_list_ids  = list(string)
@@ -725,17 +727,19 @@ variable "executor_docker_machine_extra_egress_rules" {
     to_port          = number
     description      = string
   }))
-  default = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    prefix_list_ids  = null
-    from_port        = 0
-    protocol         = "-1"
-    security_groups  = null
-    self             = null
-    to_port          = 0
-    description      = "Allow all egress traffic for docker machine build runners"
-  }]
+  default = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+      prefix_list_ids  = null
+      from_port        = 0
+      protocol         = "-1"
+      security_groups  = null
+      self             = null
+      to_port          = 0
+      description      = "Allow all egress traffic for docker machine build runners"
+    }
+  ]
 }
 
 variable "executor_docker_machine_iam_instance_profile_name" {
@@ -853,7 +857,7 @@ variable "executor_docker_machine_ec2_options" {
 
 variable "executor_docker_machine_ec2_metadata_options" {
   description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
-  type = object({
+  type        = object({
     http_tokens                 = string
     http_put_response_hop_limit = number
   })
@@ -863,15 +867,27 @@ variable "executor_docker_machine_ec2_metadata_options" {
   }
 }
 
-variable "executor_docker_machine_autoscaling" {
+variable "executor_docker_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
-  type = list(object({
-    periods    = list(string)
-    idle_count = number
-    idle_time  = number
-    timezone   = string
+  type        = list(object({
+    periods           = list(string)
+    idle_count        = optional(number)
+    idle_scale_factor = optional(number)
+    idle_count_min    = optional(number)
+    idle_time         = optional(number)
+    timezone          = optional(string, "UTC")
   }))
-  default = []
+
+  validation {
+    condition = alltrue([
+      for options in var.executor_docker_machine_autoscaling_options :
+      length(
+        setsubtract([for key, value in options : key if value != null], ["periods", "timezone"])
+      ) > 0
+      ])
+
+    error_message = "Please specify an attribute that affects Autoscaling."
+  }  default = []
 }
 
 variable "executor_docker_machine_max_builds" {
