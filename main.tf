@@ -336,7 +336,7 @@ resource "tls_private_key" "fleet" {
 resource "aws_key_pair" "fleet" {
   count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
 
-  key_name   = "${var.environment}-${var.key_pair_name}"
+  key_name   = "${var.environment}-${var.fleet_key_pair_name}"
   public_key = tls_private_key.fleet[0].public_key_openssh
 }
 
