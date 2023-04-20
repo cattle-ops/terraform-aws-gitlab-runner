@@ -188,7 +188,6 @@ variable "agent_extra_egress_rules" {
   ]
 }
 
-# agent
 variable "agent_allow_iam_service_linked_role_creation" {
   description = "Boolean used to control attaching the policy to the Agent to create service linked roles."
   type        = bool
@@ -696,6 +695,73 @@ variable "executor_docker_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
   default     = false
+}
+
+variable "executor_docker_options" {
+description = <<EOT
+    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
+    details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+
+    Default values if the option is not given:
+      disable_cache = "false"
+      image         = "docker:18.03.1-ce"
+      privileged    = "true"
+      pull_policy   = "always"
+      shm_size      = 0
+      tls_verify    = "false"
+      volumes       = "/cache"
+  EOT
+
+type = object({
+allowed_images               = optional(list(string))
+allowed_pull_policies        = optional(list(string))
+allowed_services             = optional(list(string))
+cache_dir                    = optional(string)
+cap_add                      = optional(list(string))
+cap_drop                     = optional(list(string))
+container_labels             = optional(list(string))
+cpuset_cpus                  = optional(string)
+cpu_shares                   = optional(number)
+cpus                         = optional(string)
+devices                      = optional(list(string))
+device_cgroup_rules          = optional(list(string))
+disable_cache                = optional(bool, false)
+disable_entrypoint_overwrite = optional(bool)
+dns                          = optional(list(string))
+dns_search                   = optional(list(string))
+extra_hosts                  = optional(list(string))
+gpus                         = optional(string)
+helper_image                 = optional(string)
+helper_image_flavor          = optional(string)
+host                         = optional(string)
+hostname                     = optional(string)
+image                        = optional(string, "docker:18.03.1-ce")
+isolation                    = optional(string)
+links                        = optional(list(string))
+mac_address                  = optional(string)
+memory                       = optional(string)
+memory_swap                  = optional(string)
+memory_reservation           = optional(string)
+network_mode                 = optional(string)
+oom_kill_disable             = optional(bool)
+oom_score_adjust             = optional(number)
+privileged                   = optional(bool, true)
+pull_policies                = optional(list(string), ["always"])
+runtime                      = optional(string)
+security_opt                 = optional(list(string))
+shm_size                     = optional(number, 0)
+sysctls                      = optional(list(string))
+tls_cert_path                = optional(string)
+tls_verify                   = optional(bool, false)
+user                         = optional(string)
+userns_mode                  = optional(string)
+volumes                      = optional(list(string), ["/cache"])
+volumes_from                 = optional(list(string))
+volume_driver                = optional(string)
+wait_for_services_timeout    = optional(number)
+})
+
+default = null
 }
 
 /*

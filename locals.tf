@@ -52,6 +52,16 @@ locals {
 
   runners_docker_registry_mirror_option = var.executor_docker_machine_docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.executor_docker_machine_docker_registry_mirror_url}"]
 
+  runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
+    options = merge({
+      for key, value in var.runners_docker_options : key => value if value != null && key != "volumes"
+      }, {
+      volumes = local.runners_volumes
+    })
+    }
+  )
+
+
   # Ensure max builds is optional
   runners_max_builds_string = var.executor_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_docker_machine_max_builds)
 

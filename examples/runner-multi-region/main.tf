@@ -37,8 +37,10 @@ module "runner_main_region" {
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  executor_docker_privileged         = "false"
-  executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+  executor_docker_options = {
+    privileged = "false"
+    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
+  }
 
   agent_gitlab_registration_config = {
     registration_token = var.registration_token
@@ -104,8 +106,10 @@ module "runner_alternate_region" {
   agent_gitlab_url                     = var.gitlab_url
   executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  executor_docker_privileged         = "false"
-  executor_docker_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
+  executor_docker_options = {
+    privileged = "false"
+    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
+  }
 
   agent_gitlab_registration_config = {
     registration_token = var.registration_token

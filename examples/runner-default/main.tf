@@ -105,6 +105,11 @@ module "runner" {
     }
   ]
 
+  executor_docker_options = {
+    privileged = "true"
+    volumes    = ["/cache", "/certs/client"]
+  }
+
   executor_pre_build_script = <<EOT
   '''
   echo 'multiline 1'
