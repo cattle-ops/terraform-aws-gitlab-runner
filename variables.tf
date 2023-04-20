@@ -464,68 +464,68 @@ variable "runner_manager_terraform_timeout_delete_asg" {
 }
 
 /*
- * Executor variables valid for all executors.
+ * Runner Worker: The process created by the runner on the host computing platform to run jobs.
  */
-variable "executor_type" {
+variable "runner_worker_type" {
   description = "The executor type to use. Currently supports `docker+machine` or `docker`."
   type        = string
   default     = "docker+machine"
 
   validation {
-    condition     = contains(["docker+machine", "docker"], var.executor_type)
+    condition     = contains(["docker+machine", "docker"], var.runner_worker_type)
     error_message = "The executor currently supports `docker+machine` or `docker`."
   }
 }
 
-variable "executor_enable_ssm_access" {
+variable "runner_worker_enable_ssm_access" {
   description = "Allows to connect to the Executor via SSM."
   type        = bool
   default     = false
 }
 
-variable "executor_max_jobs" {
+variable "runner_worker_max_jobs" {
   description = "Number of jobs which can be processed in parallel by the executor."
   type        = number
   default     = 0
 }
 
-variable "executor_idle_time" {
+variable "runner_worker_idle_time" {
   description = "Idle time of the runners before they are destroyed."
   type        = number
   default     = 600
 }
 
-variable "executor_idle_count" {
+variable "runner_worker_idle_count" {
   description = "Number of idle Executor instances."
   type        = number
   default     = 0
 }
 
-variable "executor_request_concurrency" {
+variable "runner_worker_request_concurrency" {
   description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
   type        = number
   default     = 1
 }
 
-variable "executor_output_limit" {
+variable "runner_worker_output_limit" {
   description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
   type        = number
   default     = 4096
 }
 
-variable "executor_extra_environment_variables" {
+variable "runner_worker_extra_environment_variables" {
   description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example."
   type        = list(string)
   default     = []
 }
 
-variable "executor_cache_shared" {
+variable "runner_worker_cache_shared" {
   description = "Enables cache sharing between runners. `false` by default."
   type        = bool
   default     = false
 }
 
-variable "executor_cache_s3_bucket" {
+variable "runner_worker_cache_s3_bucket" {
   description = <<-EOT
     Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
     cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and
@@ -539,67 +539,67 @@ variable "executor_cache_s3_bucket" {
   }
 }
 
-variable "executor_cache_s3_authentication_type" {
+variable "runner_worker_cache_s3_authentication_type" {
   description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
   type        = string
   default     = "iam"
 }
 
-variable "executor_cache_s3_expiration_days" {
+variable "runner_worker_cache_s3_expiration_days" {
   description = "Number of days before cache objects expire."
   type        = number
   default     = 1
 }
 
-variable "executor_cache_s3_enable_versioning" {
+variable "runner_worker_cache_s3_enable_versioning" {
   description = "Boolean used to enable versioning on the cache bucket, false by default."
   type        = bool
   default     = false
 }
 
-variable "executor_cache_s3_bucket_prefix" {
+variable "runner_worker_cache_s3_bucket_prefix" {
   description = "Prefix for s3 cache bucket name."
   type        = string
   default     = ""
 }
 
-variable "executor_cache_s3_bucket_name_include_account_id" {
+variable "runner_worker_cache_s3_bucket_name_include_account_id" {
   description = "Boolean to add current account ID to cache bucket name."
   type        = bool
   default     = true
 }
 
-variable "executor_cache_s3_bucket_enable_random_suffix" {
+variable "runner_worker_cache_s3_bucket_enable_random_suffix" {
   description = "Append the cache bucket name with a random string suffix"
   type        = bool
   default     = false
 }
 
-variable "executor_cache_s3_logging_bucket_id" {
+variable "runner_worker_cache_s3_logging_bucket_id" {
   type        = string
   description = "S3 Bucket ID where the access logs to the cache bucket are stored."
   default     = null
 }
 
-variable "executor_cache_s3_logging_bucket_prefix" {
+variable "runner_worker_cache_s3_logging_bucket_prefix" {
   type        = string
   description = "Prefix within the `executor_cache_logging_bucket_name`."
   default     = null
 }
 
-variable "executor_pre_clone_script" {
+variable "runner_worker_pre_clone_script" {
   description = "Script to execute in the pipeline before cloning the Git repository. this can be used to adjust the Git client configuration first, for example."
   type        = string
   default     = "\"\""
 }
 
-variable "executor_pre_build_script" {
+variable "runner_worker_pre_build_script" {
   description = "Script to execute in the pipeline just before the build."
   type        = string
   default     = "\"\""
 }
 
-variable "executor_post_build_script" {
+variable "runner_worker_post_build_script" {
   description = "Script to execute in the pipeline just after the build, but before executing after_script."
   type        = string
   default     = "\"\""
@@ -608,7 +608,7 @@ variable "executor_post_build_script" {
 /*
  * Docker Executor variables.
  */
-variable "executor_docker_volumes_tmpfs" {
+variable "runner_worker_docker_volumes_tmpfs" {
   description = "Mount a tmpfs in Executor container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
   type = list(object({
     volume  = string
@@ -617,7 +617,7 @@ variable "executor_docker_volumes_tmpfs" {
   default = []
 }
 
-variable "executor_docker_services" {
+variable "runner_worker_docker_services" {
   description = "Starts additional services with the Docker container. All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
   type = list(object({
     name       = string
@@ -628,7 +628,7 @@ variable "executor_docker_services" {
   default = []
 }
 
-variable "executor_docker_services_volumes_tmpfs" {
+variable "runner_worker_docker_services_volumes_tmpfs" {
   description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
   type = list(object({
     volume  = string
@@ -637,13 +637,13 @@ variable "executor_docker_services_volumes_tmpfs" {
   default = []
 }
 
-variable "executor_docker_add_dind_volumes" {
+variable "runner_worker_docker_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
   default     = false
 }
 
-variable "executor_docker_options" {
+variable "runner_worker_docker_options" {
   description = <<EOT
     Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
     details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
@@ -722,19 +722,19 @@ variable "executor_docker_options" {
  * docker+machine Executor variables. The executor is the actual machine that runs the job. Please specify the
  * `executor_docker_*` variables as well as Docker is used on the docker+machine executor.
  */
-variable "executor_docker_machine_instance_type" {
+variable "runner_worker_docker_machine_instance_type" {
   description = "Instance type used for the instances hosting docker-machine."
   type        = string
   default     = "m5.large"
 }
 
-variable "executor_docker_machine_extra_role_tags" {
+variable "runner_worker_docker_machine_extra_role_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
   default     = {}
 }
 
-variable "executor_docker_machine_extra_egress_rules" {
+variable "runner_worker_docker_machine_extra_egress_rules" {
   description = "List of egress rules for the docker-machine instance(s)."
   type = list(object({
     cidr_blocks      = list(string)
@@ -762,32 +762,32 @@ variable "executor_docker_machine_extra_egress_rules" {
   ]
 }
 
-variable "executor_docker_machine_iam_instance_profile_name" {
+variable "runner_worker_docker_machine_iam_instance_profile_name" {
   description = "IAM instance profile name of the Executors."
   type        = string
   default     = ""
 }
 
-variable "executor_docker_machine_assume_role_json" {
+variable "runner_worker_docker_machine_assume_role_json" {
   description = "Assume role policy for the docker+machine Executor."
   type        = string
   default     = ""
 }
 
 # executor
-variable "executor_docker_machine_extra_iam_policy_arns" {
+variable "runner_worker_docker_machine_extra_iam_policy_arns" {
   type        = list(string)
   description = "List of policy ARNs to be added to the instance profile of the docker+machine Executor."
   default     = []
 }
 
-variable "executor_docker_machine_security_group_description" {
+variable "runner_worker_docker_machine_security_group_description" {
   description = "A description for the docker+machine Executor security group"
   type        = string
   default     = "A security group containing docker-machine instances"
 }
 
-variable "executor_docker_machine_ami_filter" {
+variable "runner_worker_docker_machine_ami_filter" {
   description = "List of maps used to create the AMI filter for the docker+machine Executor."
   type        = map(list(string))
 
@@ -796,7 +796,7 @@ variable "executor_docker_machine_ami_filter" {
   }
 }
 
-variable "executor_docker_machine_ami_owners" {
+variable "runner_worker_docker_machine_ami_owners" {
   description = "The list of owners used to select the AMI of the docker+machine Executor."
   type        = list(string)
 
@@ -804,78 +804,78 @@ variable "executor_docker_machine_ami_owners" {
   default = ["099720109477"]
 }
 
-variable "executor_docker_machine_use_private_address" {
+variable "runner_worker_docker_machine_use_private_address" {
   description = "Restrict Executors to the use of a private IP address. If `agent_use_private_address` is set to `true` (default), `executor_docker_machine_use_private_address` will also apply for the agent."
   type        = bool
   default     = true
 }
 
-variable "executor_docker_machine_instance_prefix" {
+variable "runner_worker_docker_machine_instance_prefix" {
   description = "Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances."
   type        = string
   default     = ""
 
   validation {
-    condition     = length(var.executor_docker_machine_instance_prefix) <= 28
+    condition     = length(var.runner_worker_docker_machine_instance_prefix) <= 28
     error_message = "Maximum length for docker+machine executor name is 28 characters!"
   }
 
   validation {
-    condition     = var.executor_docker_machine_instance_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.executor_docker_machine_instance_prefix))
+    condition     = var.runner_worker_docker_machine_instance_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance_prefix))
     error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
   }
 }
 
-variable "executor_docker_machine_enable_monitoring" {
+variable "runner_worker_docker_machine_enable_monitoring" {
   description = "Enable detailed cloudwatch monitoring for spot instances."
   type        = bool
   default     = false
 }
 
-variable "executor_docker_machine_request_spot_instances" {
+variable "runner_worker_docker_machine_request_spot_instances" {
   description = "Whether or not to request spot instances via docker-machine"
   type        = bool
   default     = true
 }
 
-variable "executor_docker_machine_userdata" {
+variable "runner_worker_docker_machine_userdata" {
   description = "Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted."
   type        = string
   default     = ""
 }
 
-variable "executor_docker_machine_ec2_volume_type" {
+variable "runner_worker_docker_machine_ec2_volume_type" {
   description = "Executor volume type"
   type        = string
   default     = "gp2"
 }
 
-variable "executor_docker_machine_ec2_root_size" {
+variable "runner_worker_docker_machine_ec2_root_size" {
   description = "Executor root size in GB."
   type        = number
   default     = 16
 }
 
-variable "executor_docker_machine_ec2_ebs_optimized" {
+variable "runner_worker_docker_machine_ec2_ebs_optimized" {
   description = "Enable Executors to be EBS-optimized."
   type        = bool
   default     = true
 }
 
-variable "executor_docker_machine_ec2_spot_price_bid" {
+variable "runner_worker_docker_machine_ec2_spot_price_bid" {
   description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
   type        = string
   default     = "on-demand-price"
 }
 
-variable "executor_docker_machine_ec2_options" {
+variable "runner_worker_docker_machine_ec2_options" {
   # cspell:ignore amazonec
   description = "List of additional options for the docker+machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
   type        = list(string)
   default     = []
 }
 
-variable "executor_docker_machine_ec2_metadata_options" {
+variable "runner_worker_docker_machine_ec2_metadata_options" {
   description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
   type = object({
     http_tokens                 = string
@@ -887,7 +887,7 @@ variable "executor_docker_machine_ec2_metadata_options" {
   }
 }
 
-variable "executor_docker_machine_autoscaling_options" {
+variable "runner_worker_docker_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
     periods           = list(string)
@@ -901,13 +901,13 @@ variable "executor_docker_machine_autoscaling_options" {
 
 }
 
-variable "executor_docker_machine_max_builds" {
+variable "runner_worker_docker_machine_max_builds" {
   description = "Destroys the executor after processing this many jobs. Set to `0` to disable this feature."
   type        = number
   default     = 0
 }
 
-variable "executor_docker_machine_docker_registry_mirror_url" {
+variable "runner_worker_docker_machine_docker_registry_mirror_url" {
   description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
   type        = string
   default     = ""

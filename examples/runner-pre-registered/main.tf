@@ -39,7 +39,7 @@ module "runner" {
   runner_manager_gitlab_token       = var.runner_token
 
   # working 9 to 5 :)
-  executor_docker_machine_autoscaling_options = [
+  runner_worker_docker_machine_autoscaling_options = [
     {
       periods    = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
       idle_count = 0

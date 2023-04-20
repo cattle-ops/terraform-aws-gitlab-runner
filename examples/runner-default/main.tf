@@ -62,7 +62,7 @@ module "runner" {
 
   runner_manager_ping_allow_from_security_groups = [data.aws_security_group.default.id]
 
-  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
+  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
   runner_manager_gitlab_registration_config = {
     registration_token = var.registration_token
@@ -78,14 +78,14 @@ module "runner" {
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
   }
 
-  executor_docker_volumes_tmpfs = [
+  runner_worker_docker_volumes_tmpfs = [
     {
       volume  = "/var/opt/cache",
       options = "rw,noexec"
     }
   ]
 
-  executor_docker_services_volumes_tmpfs = [
+  runner_worker_docker_services_volumes_tmpfs = [
     {
       volume  = "/var/lib/mysql",
       options = "rw,noexec"
@@ -93,7 +93,7 @@ module "runner" {
   ]
 
   # working 9 to 5 :)
-  executor_docker_machine_autoscaling_options = [
+  runner_worker_docker_machine_autoscaling_options = [
     {
       periods    = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
       idle_count = 0
@@ -102,19 +102,19 @@ module "runner" {
     }
   ]
 
-  executor_docker_options = {
+  runner_worker_docker_options = {
     privileged = "true"
     volumes    = ["/cache", "/certs/client"]
   }
 
-  executor_pre_build_script = <<EOT
+  runner_worker_pre_build_script = <<EOT
   '''
   echo 'multiline 1'
   echo 'multiline 2'
   '''
   EOT
 
-  executor_post_build_script = "\"echo 'single line'\""
+  runner_worker_post_build_script = "\"echo 'single line'\""
 
   # Uncomment the HCL code below to configure a docker service so that registry mirror is used in auto-devops jobs
   # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27171 and https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#the-service-in-the-gitlab-runner-configuration-file

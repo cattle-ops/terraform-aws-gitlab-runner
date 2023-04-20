@@ -46,15 +46,15 @@ locals {
 
   # Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
-    ",\"amazonec2-metadata-token=${var.executor_docker_machine_ec2_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.executor_docker_machine_ec2_metadata_options.http_put_response_hop_limit}\",%s",
-    join(",", formatlist("%q", concat(var.executor_docker_machine_ec2_options, local.runners_docker_registry_mirror_option))),
+    ",\"amazonec2-metadata-token=${var.runner_worker_docker_machine_ec2_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.runner_worker_docker_machine_ec2_metadata_options.http_put_response_hop_limit}\",%s",
+    join(",", formatlist("%q", concat(var.runner_worker_docker_machine_ec2_options, local.runners_docker_registry_mirror_option))),
   )
 
-  runners_docker_registry_mirror_option = var.executor_docker_machine_docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.executor_docker_machine_docker_registry_mirror_url}"]
+  runners_docker_registry_mirror_option = var.runner_worker_docker_machine_docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.runner_worker_docker_machine_docker_registry_mirror_url}"]
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = merge({
-      for key, value in var.executor_docker_options : key => value if value != null && key != "volumes"
+      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes"
       }, {
       volumes = local.runners_volumes
     })
@@ -62,7 +62,7 @@ locals {
   )
 
   # Ensure max builds is optional
-  runners_max_builds_string = var.executor_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_docker_machine_max_builds)
+  runners_max_builds_string = var.runner_worker_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runner_worker_docker_machine_max_builds)
 
   # Define key for runner token for SSM
   secure_parameter_store_runner_token_key  = "${var.environment}-${var.runner_manager_gitlab_token_secure_parameter_store}"
@@ -73,14 +73,14 @@ locals {
   name_sg                    = var.security_group_prefix == "" ? local.tags["Name"] : var.security_group_prefix
   name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 
-  runners_volumes = concat(var.executor_docker_options.volumes, var.executor_docker_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [])
+  runners_volumes = concat(var.runner_worker_docker_options.volumes, var.runner_worker_docker_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [])
 
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
-    runners_docker_services = var.executor_docker_services
+    runners_docker_services = var.runner_worker_docker_services
     }
   )
 
-  runners_pull_policies = "[\"${join("\",\"", var.executor_docker_options.pull_policies)}\"]"
+  runners_pull_policies = "[\"${join("\",\"", var.runner_worker_docker_options.pull_policies)}\"]"
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"

@@ -31,7 +31,7 @@ module "runner" {
   runner_manager_gitlab_runner_name = var.runner_name
   runner_manager_gitlab_url         = var.gitlab_url
 
-  executor_type = "docker"
+  runner_worker_type = "docker"
 
   environment = var.environment
 
@@ -51,7 +51,7 @@ module "runner" {
   # update-ca-certificates
   # Or similar OS-dependent commands. The above are an example for Ubuntu.
 
-  executor_docker_options = {
+  runner_worker_docker_options = {
     volumes = [
       "/cache",
       "/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"

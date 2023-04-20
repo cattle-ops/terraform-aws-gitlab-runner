@@ -31,18 +31,18 @@ module "runner" {
 
   environment = var.environment
 
-  executor_docker_machine_use_private_address = false
+  runner_worker_docker_machine_use_private_address = false
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
 
-  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
+  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
   runner_manager_gitlab_runner_name             = var.runner_name
   runner_manager_gitlab_url                     = var.gitlab_url
-  executor_extra_environment_variables = ["KEY=Value", "FOO=bar"]
+  runner_worker_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
-  executor_docker_options = {
+  runner_worker_docker_options = {
     privileged = "false"
     volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
   }
@@ -59,11 +59,11 @@ module "runner" {
 
   security_group_prefix                   = "my-security-group"
   runner_manager_instance_prefix                   = "my-runner-agent"
-  executor_docker_machine_instance_prefix = "my-runners-dm"
+  runner_worker_docker_machine_instance_prefix = "my-runners-dm"
 
-  executor_cache_shared = "true"
+  runner_worker_cache_shared = "true"
 
-  executor_cache_s3_bucket = {
+  runner_worker_cache_s3_bucket = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
@@ -75,12 +75,12 @@ module "runner2" {
 
   environment = "${var.environment}-2"
 
-  executor_docker_machine_use_private_address = false
+  runner_worker_docker_machine_use_private_address = false
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
 
-  executor_docker_machine_ec2_spot_price_bid = "on-demand-price"
+  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
   runner_manager_gitlab_runner_name = var.runner_name
   runner_manager_gitlab_url         = var.gitlab_url
@@ -94,9 +94,9 @@ module "runner2" {
     maximum_timeout    = "3600"
   }
 
-  executor_cache_shared = "true"
+  runner_worker_cache_shared = "true"
 
-  executor_cache_s3_bucket = {
+  runner_worker_cache_s3_bucket = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
