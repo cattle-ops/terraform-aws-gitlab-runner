@@ -419,13 +419,13 @@ variable "runner_gitlab_token_secure_parameter_store" {
   default     = "runner-token"
 }
 
-variable "runner_manager_gitlab_ca_certificate" {
+variable "runner_gitlab_ca_certificate" {
   description = "Trusted CA certificate bundle (PEM format). Example: `file(\"$${path.module}/ca.crt\")`"
   type        = string
   default     = ""
 }
 
-variable "runner_manager_gitlab_certificate" {
+variable "runner_gitlab_certificate" {
   description = "Certificate of the GitLab instance to connect to (PEM format). Example: `file(\"$${path.module}/my-gitlab.crt\")`"
   type        = string
   default     = ""

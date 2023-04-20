@@ -40,10 +40,10 @@ module "runner" {
   ###############################################
 
   # Public cert of my companys gitlab instance
-  agent_gitlab_certificate = file("${path.module}/my_gitlab_instance_cert.crt")
+  runner_gitlab_certificate = file("${path.module}/my_gitlab_instance_cert.crt")
 
   # Other public certs relating to my company.
-  agent_gitlab_ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
+  runner_gitlab_ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
 
   # Mount EC2 host certs in docker so all user docker images can reference them.
   # Each user image will need to do:
