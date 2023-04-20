@@ -52,8 +52,8 @@ module "runner" {
 
   environment = var.environment
 
-  vpc_id                            = module.vpc.vpc_id
-  subnet_id                         = element(module.vpc.private_subnets, 0)
+  vpc_id                             = module.vpc.vpc_id
+  subnet_id                          = element(module.vpc.private_subnets, 0)
   runner_collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
 
   runner_gitlab_runner_name = var.runner_name

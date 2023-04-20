@@ -82,10 +82,10 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
-      aws_region          = data.aws_region.current.name
-      gitlab_url          = var.runner_gitlab_url
-      gitlab_clone_url    = var.runner_gitlab_clone_url
-      tls_ca_file         = length(var.runner_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
+      aws_region       = data.aws_region.current.name
+      gitlab_url       = var.runner_gitlab_url
+      gitlab_clone_url = var.runner_gitlab_clone_url
+      tls_ca_file      = length(var.runner_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_machine_autoscaling = [for config in var.runner_worker_docker_machine_autoscaling_options : {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.

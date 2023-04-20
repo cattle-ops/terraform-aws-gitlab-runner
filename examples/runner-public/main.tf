@@ -38,8 +38,8 @@ module "runner" {
 
   runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
 
-  runner_gitlab_runner_name             = var.runner_name
-  runner_gitlab_url                     = var.gitlab_url
+  runner_gitlab_runner_name                 = var.runner_name
+  runner_gitlab_url                         = var.gitlab_url
   runner_worker_extra_environment_variables = ["KEY=Value", "FOO=bar"]
 
   runner_worker_docker_options = {
@@ -57,8 +57,8 @@ module "runner" {
     access_level       = "ref_protected"
   }
 
-  security_group_prefix                   = "my-security-group"
-  runner_instance_prefix                   = "my-runner-agent"
+  security_group_prefix                        = "my-security-group"
+  runner_instance_prefix                       = "my-runner-agent"
   runner_worker_docker_machine_instance_prefix = "my-runners-dm"
 
   runner_worker_cache_shared = "true"
