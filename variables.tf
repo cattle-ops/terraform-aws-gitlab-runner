@@ -877,17 +877,8 @@ variable "executor_docker_machine_autoscaling_options" {
     idle_time         = optional(number)
     timezone          = optional(string, "UTC")
   }))
+  default = []
 
-  validation {
-    condition = alltrue([
-      for options in var.executor_docker_machine_autoscaling_options :
-      length(
-        setsubtract([for key, value in options : key if value != null], ["periods", "timezone"])
-      ) > 0
-      ])
-
-    error_message = "Please specify an attribute that affects Autoscaling."
-  }  default = []
 }
 
 variable "executor_docker_machine_max_builds" {
