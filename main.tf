@@ -103,7 +103,6 @@ locals {
       runners_monitoring                = var.executor_docker_machine_enable_monitoring
       runners_ebs_optimized             = var.executor_docker_machine_ec2_ebs_optimized
       runners_instance_profile          = var.executor_type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-      runners_additional_volumes        = local.runners_additional_volumes
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.agent_gitlab_runner_name
@@ -139,6 +138,7 @@ locals {
       runners_volumes_tmpfs             = join("\n", [for v in var.executor_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.executor_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
+      runners_docker_options            = local.runners_docker_options_toml
       bucket_name                       = local.bucket_name
       shared_cache                      = var.executor_cache_shared
       sentry_dsn                        = var.agent_sentry_dsn

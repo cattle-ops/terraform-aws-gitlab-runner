@@ -54,13 +54,12 @@ locals {
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = merge({
-      for key, value in var.runners_docker_options : key => value if value != null && key != "volumes"
+      for key, value in var.executor_docker_options : key => value if value != null && key != "volumes"
       }, {
       volumes = local.runners_volumes
     })
     }
   )
-
 
   # Ensure max builds is optional
   runners_max_builds_string = var.executor_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.executor_docker_machine_max_builds)
@@ -74,9 +73,7 @@ locals {
   name_sg                    = var.security_group_prefix == "" ? local.tags["Name"] : var.security_group_prefix
   name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 
-  runners_additional_volumes = <<-EOT
-  %{~if var.executor_docker_add_dind_volumes~},"/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"%{endif~}%{~for volume in var.executor_docker_additional_volumes~},"${volume}"%{endfor~}
-  EOT
+  runners_volumes = concat(var.executor_docker_options.volumes, var.executor_docker_add_dind_volumes ? ["/certs/client", "/builds", "/var/run/docker.sock:/var/run/docker.sock"] : [])
 
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
     runners_docker_services = var.executor_docker_services
