@@ -23,3 +23,8 @@ sed -i '/asg_terminate_lifecycle_hook_heartbeat_timeout/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_memory_size/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_runtime/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_lambda_timeout/d' "$converted_file"
+
+#
+#  PR #711 feat!: refactor Docker Machine autoscaling options 
+#
+sed -i 's/runners_machine_autoscaling/runners_machine_autoscaling_options/g' "$converted_file"

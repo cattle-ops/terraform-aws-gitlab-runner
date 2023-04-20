@@ -97,9 +97,9 @@ module "runner" {
   ]
 
   # working 9 to 5 :)
-  runners_machine_autoscaling = [
+  runners_machine_autoscaling_options = [
     {
-      periods    = ["\"* * 0-9,17-23 * * mon-fri *\"", "\"* * * * * sat,sun *\""]
+      periods    = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
       idle_count = 0
       idle_time  = 60
       timezone   = var.timezone

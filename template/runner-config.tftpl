@@ -80,4 +80,10 @@ listen_address = "${prometheus_listen_address}"
       ${docker_machine_options}
     ]
 
-${runners_machine_autoscaling}
+%{~ for config in runners_machine_autoscaling ~}
+    [[runners.machine.autoscaling]]
+    %{~ for key, value in config ~}
+      ${key} = ${value}
+      %{~ endfor ~}
+%{~ endfor ~}
+
