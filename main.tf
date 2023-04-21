@@ -59,7 +59,7 @@ locals {
       docker_machine_download_url                  = var.runner_install.docker_machine_download_url
       runners_config                               = local.template_runner_config
       runners_userdata                             = var.runner_worker_docker_machine_userdata
-      runners_executor                             = var.runner_worker_type
+      runners_executor                             = var.runner_worker.type
       runners_install_amazon_ecr_credential_helper = var.runner_install.ecr_credential_helper
       curl_cacert                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
@@ -97,23 +97,23 @@ locals {
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.runner_worker_docker_machine_instance_type
       runners_spot_price_bid            = var.runner_worker_docker_machine_ec2_spot_price_bid == "on-demand-price" || var.runner_worker_docker_machine_ec2_spot_price_bid == null ? "" : var.runner_worker_docker_machine_ec2_spot_price_bid
-      runners_ami                       = var.runner_worker_type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
-      runners_security_group_name       = var.runner_worker_type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+      runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
       runners_monitoring                = var.runner_worker_docker_machine_enable_monitoring
       runners_ebs_optimized             = var.runner_worker_docker_machine_ec2_ebs_optimized
-      runners_instance_profile          = var.runner_worker_type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+      runners_instance_profile          = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runner_instance.name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runner_gitlab.registration_token
       runners_userdata                  = var.runner_worker_docker_machine_userdata
-      runners_executor                  = var.runner_worker_type
-      runners_limit                     = var.runner_worker_max_jobs
+      runners_executor                  = var.runner_worker.type
+      runners_limit                     = var.runner_worker.max_jobs
       runners_concurrent                = var.runner_manager.maximum_concurrent_jobs
       runners_pull_policies             = local.runners_pull_policies
-      runners_idle_count                = var.runner_worker_idle_count
-      runners_idle_time                 = var.runner_worker_idle_time
+      runners_idle_count                = var.runner_worker.idle_count
+      runners_idle_time                 = var.runner_worker.idle_time
       runners_max_builds                = local.runners_max_builds_string
       runners_root_size                 = var.runner_worker_docker_machine_ec2_root_size
       runners_volume_type               = var.runner_worker_docker_machine_ec2_volume_type
@@ -121,28 +121,28 @@ locals {
       runners_use_private_address_only  = var.runner_worker_docker_machine_use_private_address
       runners_use_private_address       = !var.runner_worker_docker_machine_use_private_address
       runners_request_spot_instance     = var.runner_worker_docker_machine_request_spot_instances
-      runners_environment_vars          = jsonencode(var.runner_worker_extra_environment_variables)
+      runners_environment_vars          = jsonencode(var.runner_worker.environment_variables)
       runners_pre_build_script          = var.runner_worker_pre_build_script
       runners_post_build_script         = var.runner_worker_post_build_script
       runners_pre_clone_script          = var.runner_worker_pre_clone_script
-      runners_request_concurrency       = var.runner_worker_request_concurrency
-      runners_output_limit              = var.runner_worker_output_limit
+      runners_request_concurrency       = var.runner_worker.request_concurrency
+      runners_output_limit              = var.runner_worker.output_limit
       runners_check_interval            = var.runner_manager.gitlab_check_interval
       runners_volumes_tmpfs             = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
       runners_docker_options            = local.runners_docker_options_toml
       bucket_name                       = local.bucket_name
-      shared_cache                      = var.runner_worker_cache_shared
+      shared_cache                      = var.runner_worker_cache.shared
       sentry_dsn                        = var.runner_manager.sentry_dsn
       prometheus_listen_address         = var.runner_manager.prometheus_listen_address
-      auth_type                         = var.runner_worker_cache_s3_authentication_type
+      auth_type                         = var.runner_worker_cache.authentication_type
     }
   )
 }
 
 data "aws_ami" "docker-machine" {
-  count = var.runner_worker_type == "docker+machine" ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
   most_recent = "true"
 
@@ -324,25 +324,25 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 ### Create cache bucket
 ################################################################################
 locals {
-  bucket_name   = var.runner_worker_cache_s3_bucket["create"] ? module.cache[0].bucket : var.runner_worker_cache_s3_bucket["bucket"]
-  bucket_policy = var.runner_worker_cache_s3_bucket["create"] ? module.cache[0].policy_arn : var.runner_worker_cache_s3_bucket["policy"]
+  bucket_name   = var.runner_worker_cache["create"] ? module.cache[0].bucket : var.runner_worker_cache["bucket"]
+  bucket_policy = var.runner_worker_cache["create"] ? module.cache[0].policy_arn : var.runner_worker_cache["policy"]
 }
 
 module "cache" {
-  count  = var.runner_worker_cache_s3_bucket["create"] ? 1 : 0
+  count  = var.runner_worker_cache["create"] ? 1 : 0
   source = "./modules/cache"
 
   environment = var.environment
   tags        = local.tags
 
-  cache_bucket_prefix                  = var.runner_worker_cache_s3_bucket_prefix
-  cache_bucket_name_include_account_id = var.runner_worker_cache_s3_bucket_name_include_account_id
-  cache_bucket_set_random_suffix       = var.runner_worker_cache_s3_bucket_enable_random_suffix
-  cache_bucket_versioning              = var.runner_worker_cache_s3_enable_versioning
-  cache_expiration_days                = var.runner_worker_cache_s3_expiration_days
-  cache_lifecycle_prefix               = var.runner_worker_cache_shared ? "project/" : "runner/"
-  cache_logging_bucket                 = var.runner_worker_cache_s3_logging_bucket_id
-  cache_logging_bucket_prefix          = var.runner_worker_cache_s3_logging_bucket_prefix
+  cache_bucket_prefix                  = var.runner_worker_cache.bucket_prefix
+  cache_bucket_name_include_account_id = var.runner_worker_cache.bucket_include_account_id
+  cache_bucket_set_random_suffix       = var.runner_worker_cache.random_suffix
+  cache_bucket_versioning              = var.runner_worker_cache.versioning
+  cache_expiration_days                = var.runner_worker_cache.expiration_days
+  cache_lifecycle_prefix               = var.runner_worker_cache.shared ? "project/" : "runner/"
+  cache_logging_bucket                 = var.runner_worker_cache.access_log_bucket_id
+  cache_logging_bucket_prefix          = var.runner_worker_cache.access_log_bucket_prefix
 
   kms_key_id = local.kms_key
 
@@ -403,7 +403,7 @@ resource "aws_iam_role_policy_attachment" "instance_kms_policy" {
 ### iam:PassRole To pass the role from the agent to the docker machine runners
 ################################################################################
 resource "aws_iam_policy" "instance_docker_machine_policy" {
-  count = var.runner_worker_type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
 
   name        = "${local.name_iam_objects}-docker-machine"
   path        = "/"
@@ -417,7 +417,7 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
-  count = var.runner_worker_type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
 
   role       = aws_iam_role.instance[0].name
   policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
@@ -468,7 +468,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
-  count = var.runner_worker_type == "docker+machine" ? (var.runner_worker_cache_s3_bucket["create"] || lookup(var.runner_worker_cache_s3_bucket, "policy", "") != "" ? 1 : 0) : 0
+  count = var.runner_worker.type == "docker+machine" ? (var.runner_worker_cache["create"] || lookup(var.runner_worker_cache, "policy", "") != "" ? 1 : 0) : 0
 
   role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
@@ -478,7 +478,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
-  count                = var.runner_worker_type == "docker+machine" ? 1 : 0
+  count                = var.runner_worker.type == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.runner_worker_docker_machine_assume_role_json) > 0 ? var.runner_worker_docker_machine_assume_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
@@ -489,7 +489,7 @@ resource "aws_iam_role" "docker_machine" {
 
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  count = var.runner_worker_type == "docker+machine" ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" ? 1 : 0
   name  = "${local.name_iam_objects}-docker-machine"
   role  = aws_iam_role.docker_machine[0].name
   tags  = local.tags
@@ -499,7 +499,7 @@ resource "aws_iam_instance_profile" "docker_machine" {
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
-  count = var.runner_worker_type == "docker+machine" ? length(var.runner_worker_docker_machine_extra_iam_policy_arns) : 0
+  count = var.runner_worker.type == "docker+machine" ? length(var.runner_worker_docker_machine_extra_iam_policy_arns) : 0
 
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = var.runner_worker_docker_machine_extra_iam_policy_arns[count.index]
@@ -507,7 +507,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies"
 
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
-  count = (var.runner_worker_type == "docker+machine" && var.runner_worker_enable_ssm_access) ? 1 : 0
+  count = (var.runner_worker.type == "docker+machine" && var.runner_worker.ssm_access) ? 1 : 0
 
   role       = aws_iam_role.docker_machine[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"

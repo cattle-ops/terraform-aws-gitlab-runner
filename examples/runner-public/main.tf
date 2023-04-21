@@ -63,7 +63,7 @@ module "runner" {
 
   runner_worker_cache_shared = "true"
 
-  runner_worker_cache_s3_bucket = {
+  runner_worker_cache = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
@@ -96,7 +96,7 @@ module "runner2" {
 
   runner_worker_cache_shared = "true"
 
-  runner_worker_cache_s3_bucket = {
+  runner_worker_cache = {
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket

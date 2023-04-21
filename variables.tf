@@ -370,125 +370,71 @@ variable "runner_terraform_timeout_delete_asg" {
 /*
  * Runner Worker: The process created by the runner on the host computing platform to run jobs.
  */
-variable "runner_worker_type" {
-  description = "The executor type to use. Currently supports `docker+machine` or `docker`."
-  type        = string
-  default     = "docker+machine"
+variable "runner_worker" {
+  description = <<-EOT
+    environment_variables = List of environment variables to add to the runner.
+    idle_count = Number of idle Executor instances.
+    idle_time = Idle time of the runners before they are destroyed.
+    max_jobs = Number of jobs which can be processed in parallel by the executor.
+    output_limit = Sets the maximum build log size in kilobytes. Default is 4MB
+    request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1).
+    ssm_access = Allows to connect to the Executor via SSM.
+    type = The executor type to use. Currently supports `docker+machine` or `docker`.
+  EOT
+  type = object({
+    environment_variables = optional(list(string), [])
+    idle_count = optional(number, 0)
+    idle_time = optional(number, 600)
+    max_jobs = optional(number, 0)
+    output_limit = optional(number, 4096)
+    request_concurrency = optional(number, 1)
+    ssm_access = optional(bool, false)
+    type = optional(string, "docker+machine")
+  })
+  default = {}
 
   validation {
-    condition     = contains(["docker+machine", "docker"], var.runner_worker_type)
-    error_message = "The executor currently supports `docker+machine` or `docker`."
+    condition     = contains(["docker+machine", "docker"], var.runner_worker.executor_type)
+    error_message = "The executor currently supports `docker+machine` and `docker`."
   }
 }
 
-variable "runner_worker_enable_ssm_access" {
-  description = "Allows to connect to the Executor via SSM."
-  type        = bool
-  default     = false
-}
-
-variable "runner_worker_max_jobs" {
-  description = "Number of jobs which can be processed in parallel by the executor."
-  type        = number
-  default     = 0
-}
-
-variable "runner_worker_idle_time" {
-  description = "Idle time of the runners before they are destroyed."
-  type        = number
-  default     = 600
-}
-
-variable "runner_worker_idle_count" {
-  description = "Number of idle Executor instances."
-  type        = number
-  default     = 0
-}
-
-variable "runner_worker_request_concurrency" {
-  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
-  type        = number
-  default     = 1
-}
-
-variable "runner_worker_output_limit" {
-  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
-  type        = number
-  default     = 4096
-}
-
-variable "runner_worker_extra_environment_variables" {
-  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example."
-  type        = list(string)
-  default     = []
-}
-
-variable "runner_worker_cache_shared" {
-  description = "Enables cache sharing between runners. `false` by default."
-  type        = bool
-  default     = false
-}
-
-variable "runner_worker_cache_s3_bucket" {
+variable "runner_worker_cache" {
   description = <<-EOT
     Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
     cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and
     bucket name. See the public runner example for more details."
+
+    access_log_bucker_id = The ID of the bucket where the access logs are stored.
+    access_log_bucket_prefix = The bucket prefix for the access logs.
+    authentication_type = A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'
+    bucket = Name of the cache bucket. Requires `create = false`.
+    bucket_prefix = Prefix for s3 cache bucket name. Requires `create = true`.
+    create = Boolean used to enable or disable the creation of the cache bucket.
+    expiration_days = Number of days before cache objects expire. Requires `create = true`.
+    include_account_id = Boolean used to include the account id in the cache bucket name. Requires `create = true`.
+    policy = Policy to use for the cache bucket. Requires `create = false`.
+    random_suffix = Boolean used to enable or disable the use of a random string suffix on the cache bucket name. Requires `create = true`.
+    shared = Boolean used to enable or disable the use of the cache bucket as shared cache.
+    versioning = Boolean used to enable versioning on the cache bucket. Requires `create = true`.
   EOT
-  type        = map(any)
+  type        = object({
+    access_log_bucket_id = optional(string, null)
+    access_log_bucket_prefix = optional(string, null)
+    authentication_type = optional(string, "iam")
+    bucket = optional(string, "")
+    bucket_prefix = optional(string, "")
+    create = bool
+    expiration_days = optional(number, 1)
+    include_account_id = optional(bool, true)
+    policy = optional(string, "")
+    random_suffix = optional(bool, false)
+    shared = optional(bool, false)
+    versioning = optional(bool, false)
+  })
   default = {
     create = true
-    policy = ""
-    bucket = ""
   }
-}
-
-variable "runner_worker_cache_s3_authentication_type" {
-  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
-  type        = string
-  default     = "iam"
-}
-
-variable "runner_worker_cache_s3_expiration_days" {
-  description = "Number of days before cache objects expire."
-  type        = number
-  default     = 1
-}
-
-variable "runner_worker_cache_s3_enable_versioning" {
-  description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = bool
-  default     = false
-}
-
-variable "runner_worker_cache_s3_bucket_prefix" {
-  description = "Prefix for s3 cache bucket name."
-  type        = string
-  default     = ""
-}
-
-variable "runner_worker_cache_s3_bucket_name_include_account_id" {
-  description = "Boolean to add current account ID to cache bucket name."
-  type        = bool
-  default     = true
-}
-
-variable "runner_worker_cache_s3_bucket_enable_random_suffix" {
-  description = "Append the cache bucket name with a random string suffix"
-  type        = bool
-  default     = false
-}
-
-variable "runner_worker_cache_s3_logging_bucket_id" {
-  type        = string
-  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
-  default     = null
-}
-
-variable "runner_worker_cache_s3_logging_bucket_prefix" {
-  type        = string
-  description = "Prefix within the `executor_cache_logging_bucket_name`."
-  default     = null
 }
 
 variable "runner_worker_pre_clone_script" {

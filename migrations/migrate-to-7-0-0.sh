@@ -394,4 +394,65 @@ runner_cloudwatch = {
   $extracted_variables
 }
 " > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_worker_extra_environment_variables|runner_worker_output_limit|runner_worker_request_concurrency|runner_worker_idle_count|runner_worker_idle_time|runner_worker_max_jobs|runner_worker_type|runner_worker_enable_ssm_access)' "$converted_file")
+
+sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
+sed -i '/runner_worker_type/d' "$converted_file"
+sed -i '/runner_worker_max_jobs/d' "$converted_file"
+sed -i '/runner_worker_idle_time/d' "$converted_file"
+sed -i '/runner_worker_idle_count/d' "$converted_file"
+sed -i '/runner_worker_request_concurrency/d' "$converted_file"
+sed -i '/runner_worker_output_limit/d' "$converted_file"
+sed -i '/runner_worker_extra_environment_variables/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_worker_enable_ssm_access/ssm_access/g' | \
+                      sed 's/runner_worker_max_jobs/max_jobs/g' | \
+                      sed 's/runner_worker_idle_time/idle_time/g' | \
+                      sed 's/runner_worker_idle_count/idle_count/g' | \
+                      sed 's/runner_worker_request_concurrency/request_concurrency/g' | \
+                      sed 's/runner_worker_output_limit/output_limit/g' | \
+                      sed 's/runner_worker_extra_environment_variables/environment_variables/g' | \
+                      sed 's/runner_worker_type/type/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_worker = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+sed -i 's/runner_worker_cache_s3_bucket/runner_worker_cache/g' "$converted_file"
+
+# integrate the new variables into existing block
+extracted_variables=$(grep -E '(runner_worker_cache_s3_logging_bucket_prefix|runner_worker_cache_s3_logging_bucket_id|runner_worker_cache_s3_bucket_enable_random_suffix|runner_worker_cache_s3_bucket_name_include_account_id|runner_worker_cache_s3_bucket_prefix|runner_worker_cache_s3_enable_versioning|runner_worker_cache_s3_expiration_days|runner_worker_cache_s3_authentication_type|runner_worker_cache_shared)' "$converted_file")
+
+sed -i '/runner_worker_cache_shared/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_authentication_type/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_expiration_days/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_enable_versioning/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_bucket_prefix/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_bucket_name_include_account_id/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_bucket_enable_random_suffix/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_logging_bucket_id/d' "$converted_file"
+sed -i '/runner_worker_cache_s3_logging_bucket_prefix/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_worker_cache_shared/shared/g' | \
+                      sed 's/runner_worker_cache_s3_authentication_type/authentication_type/g' | \
+                      sed 's/runner_worker_cache_s3_expiration_days/expiration_days/g' | \
+                      sed 's/runner_worker_cache_s3_enable_versioning/versioning/g' | \
+                      sed 's/runner_worker_cache_s3_bucket_prefix/bucket_prefix/g' | \
+                      sed 's/runner_worker_cache_s3_bucket_name_include_account_id/include_account_id/g' | \
+                      sed 's/runner_worker_cache_s3_bucket_enable_random_suffix/random_suffix/g' | \
+                      sed 's/runner_worker_cache_s3_logging_bucket_id/access_log_bucket_id/g' | \
+                      sed 's/runner_worker_cache_s3_logging_bucket_prefix/access_log_bucket_prefix/g'
+                    )
+# insert the new variables into the existing block
+sed -i "/runner_worker_cache/runner_worker_cache { $extracted_variables/g" "$converted_file"
+
 echo "Module call converted. Output: $converted_file"
