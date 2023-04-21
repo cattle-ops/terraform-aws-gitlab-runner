@@ -271,4 +271,26 @@ runner_role = {
 }
 " > x && mv x "$converted_file"
 
+extracted_variables=$(grep -E '(runner_manager_maximum_concurrent_jobs|runner_manager_sentry_dsn|runner_manager_gitlab_check_interval|runner_manager_prometheus_listen_address' "$converted_file")
+
+sed -i '/runner_manager_maximum_concurrent_jobs/d' "$converted_file"
+sed -i '/runner_manager_sentry_dsn/d' "$converted_file"
+sed -i '/runner_manager_gitlab_check_interval/d' "$converted_file"
+sed -i '/runner_manager_prometheus_listen_address/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_manager_maximum_concurrent_jobs/maximum_concurrent_jobs/g' | \
+                      sed 's/runner_manager_sentry_dsn/sentry_dsn/g' | \
+                      sed 's/runner_manager_gitlab_check_interval/gitlab_check_interval/g' | \
+                      sed 's/runner_manager_prometheus_listen_address/prometheus_listen_address/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_manager = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
 echo "Module call converted. Output: $converted_file"

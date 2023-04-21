@@ -77,7 +77,7 @@ locals {
       gitlab_runner_run_untagged                   = var.runner_gitlab_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                = var.runner_gitlab_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.runner_gitlab_registration_config, "access_level", "not_protected")
-      sentry_dsn                                   = var.runner_manager_sentry_dsn
+      sentry_dsn                                   = var.runner_manager.sentry_dsn
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -110,7 +110,7 @@ locals {
       runners_userdata                  = var.runner_worker_docker_machine_userdata
       runners_executor                  = var.runner_worker_type
       runners_limit                     = var.runner_worker_max_jobs
-      runners_concurrent                = var.runner_manager_maximum_concurrent_jobs
+      runners_concurrent                = var.runner_manager.maximum_concurrent_jobs
       runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runner_worker_idle_count
       runners_idle_time                 = var.runner_worker_idle_time
@@ -127,15 +127,15 @@ locals {
       runners_pre_clone_script          = var.runner_worker_pre_clone_script
       runners_request_concurrency       = var.runner_worker_request_concurrency
       runners_output_limit              = var.runner_worker_output_limit
-      runners_check_interval            = var.runner_manager_gitlab_check_interval
+      runners_check_interval            = var.runner_manager.gitlab_check_interval
       runners_volumes_tmpfs             = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs    = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services           = local.runners_docker_services
       runners_docker_options            = local.runners_docker_options_toml
       bucket_name                       = local.bucket_name
       shared_cache                      = var.runner_worker_cache_shared
-      sentry_dsn                        = var.runner_manager_sentry_dsn
-      prometheus_listen_address         = var.runner_manager_prometheus_listen_address
+      sentry_dsn                        = var.runner_manager.sentry_dsn
+      prometheus_listen_address         = var.runner_manager.prometheus_listen_address
       auth_type                         = var.runner_worker_cache_s3_authentication_type
     }
   )

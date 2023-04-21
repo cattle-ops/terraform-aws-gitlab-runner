@@ -73,28 +73,20 @@ variable "iam_object_prefix" {
 /*
  * Runner Manager: A type of runner that can create multiple runners for autoscaling. Specific to the type of executor used.
  */
-variable "runner_manager_maximum_concurrent_jobs" {
-  description = "The maximum number of jobs which can be processed by all executors at the same time."
-  type        = number
-  default     = 10
-}
-
-variable "runner_manager_sentry_dsn" {
-  description = "Sentry DSN of the project for the Agent to use (uses legacy DSN format)"
-  type        = string
-  default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
-}
-
-variable "runner_manager_gitlab_check_interval" {
-  description = "Number of seconds between checking for available jobs."
-  type        = number
-  default     = 3
-}
-
-variable "runner_manager_prometheus_listen_address" {
-  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
-  type        = string
-  default     = ""
+variable "runner_manager" {
+  description = <<-EOT
+    gitlab_check_interval = Number of seconds between checking for available jobs.
+    maximum_concurrent_jobs = The maximum number of jobs which can be processed by all executors at the same time.
+    prometheus_listen_address = Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on.
+    sentry_dsn = Sentry DSN of the project for the Agent to use (uses legacy DSN format)
+  EOT
+  type = object({
+    gitlab_check_interval = optional(number, 3)
+    maximum_concurrent_jobs = optional(number, 10)
+    prometheus_listen_address = optional(string, "")
+    sentry_dsn = optional(string, "__SENTRY_DSN_REPLACED_BY_USER_DATA__")
+  })
+  default = {}
 }
 
 /*
