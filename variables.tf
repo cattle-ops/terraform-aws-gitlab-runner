@@ -97,16 +97,20 @@ variable "runner_instance" {
     additional_tags = Map of tags that will be added to the Agent instance.
     ebs_optimized = Enable EBS optimization for the Agent instance.
     name_prefix = Set the name prefix and override the `Name` tag for the Agent instance.
+    private_address_only = Restrict the Agent to the use of a private IP address. If this is set to `false` it will override the `runners_use_private_address` for the agent.
     root_device_config = The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`
     spot_price = By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen.
+    ssm_access = Allows to connect to the Agent via SSM.
     type = EC2 instance type used.
   EOT
   type = object({
     additional_tags = optional(map(string))
     ebs_optimized = optional(bool, true)
     name_prefix = optional(string)
+    private_address_only = optional(bool, true)
     root_device_config = optional(map(string))
     spot_price = optional(string, null)
+    ssm_access = optional(bool, false)
     type = string
   })
   default = {
@@ -219,18 +223,6 @@ variable "runner_enable_eip" {
   default     = false
 }
 
-variable "runner_use_private_address" {
-  description = "Restrict the Agent to the use of a private IP address. If this is set to `false` it will override the `runners_use_private_address` for the agent."
-  type        = bool
-  default     = true
-}
-
-variable "runner_enable_ssm_access" {
-  description = "Allows to connect to the Agent via SSM."
-  type        = bool
-  default     = false
-}
-
 variable "runner_metadata_options" {
   description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
   type = object({
@@ -283,46 +275,26 @@ variable "runner_schedule_config" {
   }
 }
 
-variable "runner_install_amazon_ecr_credential_helper" {
-  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
-  type        = bool
-  default     = false
-}
-
-variable "runner_docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
-  type        = string
-  default     = "0.16.2-gitlab.19-cki.2"
-}
-
-variable "runner_docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
-  type        = string
-  default     = ""
-}
-
-variable "runner_yum_update" {
-  description = "Run a `yum` update as part of starting the Agent"
-  type        = bool
-  default     = true
-}
-
-variable "runner_userdata_pre_install" {
-  description = "User-data script snippet to insert before GitLab Runner install"
-  type        = string
-  default     = ""
-}
-
-variable "runner_userdata_post_install" {
-  description = "User-data script snippet to insert after GitLab Runner install"
-  type        = string
-  default     = ""
-}
-
-variable "runner_user_data_extra" {
-  description = "Extra commands to run as part of starting the Agent"
-  type        = string
-  default     = ""
+variable "runner_install" {
+  description = <<-EOT
+    amazon_ecr_credentials_helper = Install amazon-ecr-credential-helper inside `userdata_pre_install` script
+    docker_machine_download_url = URL to download docker machine binary. If not set, the docker machine version will be used to download the binary.
+    docker_machine_version = By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases
+    pre_install_script = Script to run before installing the runner
+    post_install_script = Script to run after installing the runner
+    start_script = Script to run after starting the runner
+    yum_update = Update the yum packages before installing the runner
+  EOT
+  type = object({
+    amazon_ecr_credential_helper = optional(bool, false)
+    docker_machine_download_url = optional(string, "")
+    docker_machine_version = optional(string, "0.16.2-gitlab.19-cki.2")
+    pre_install_script = optional(string, "")
+    post_install_script = optional(string, "")
+    start_script = optional(string, "")
+    yum_update = optional(bool, true)
+  })
+  default = {}
 }
 
 variable "runner_user_data_enable_trace_log" {

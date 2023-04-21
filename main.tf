@@ -42,8 +42,8 @@ locals {
       logging             = var.runner_cloudwatch_enable ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.runner_user_data_enable_trace_log
-      yum_update          = var.runner_yum_update ? local.file_yum_update : ""
-      extra_config        = var.runner_user_data_extra
+      yum_update          = var.runner_install.yum_update ? local.file_yum_update : ""
+      extra_config        = var.runner_install.start_script
   })
 
   file_yum_update = file("${path.module}/template/yum_update.tftpl")
@@ -55,16 +55,16 @@ locals {
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
       gitlab_runner_version                        = var.runner_gitlab_runner_version
-      docker_machine_version                       = var.runner_docker_machine_version
-      docker_machine_download_url                  = var.runner_docker_machine_download_url
+      docker_machine_version                       = var.runner_install.docker_machine_version
+      docker_machine_download_url                  = var.runner_install.docker_machine_download_url
       runners_config                               = local.template_runner_config
       runners_userdata                             = var.runner_worker_docker_machine_userdata
       runners_executor                             = var.runner_worker_type
-      runners_install_amazon_ecr_credential_helper = var.runner_install_amazon_ecr_credential_helper
+      runners_install_amazon_ecr_credential_helper = var.runner_install.ecr_credential_helper
       curl_cacert                                  = length(var.runner_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
-      pre_install                                  = var.runner_userdata_pre_install
-      post_install                                 = var.runner_userdata_post_install
+      pre_install                                  = var.runner_install.pre_install_script
+      post_install                                 = var.runner_install.post_install_script
       runners_gitlab_url                           = var.runner_gitlab_url
       runners_token                                = var.runner_gitlab_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
@@ -285,7 +285,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   }
   network_interfaces {
     security_groups             = concat([aws_security_group.runner.id], var.runner_extra_security_group_ids)
-    associate_public_ip_address = false == (var.runner_use_private_address == false ? var.runner_use_private_address : var.runner_worker_docker_machine_use_private_address)
+    associate_public_ip_address = false == (var.runner_instance.private_address_only == false ? var.runner_instance.private_address_only : var.runner_worker_docker_machine_use_private_address)
   }
   tag_specifications {
     resource_type = "instance"
@@ -427,7 +427,7 @@ resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
 ### Policies for runner agent instance to allow connection via Session Manager
 ################################################################################
 resource "aws_iam_policy" "instance_session_manager_policy" {
-  count = var.runner_enable_ssm_access ? 1 : 0
+  count = var.runner_instance.ssm_access ? 1 : 0
 
   name        = "${local.name_iam_objects}-session-manager"
   path        = "/"
@@ -438,14 +438,14 @@ resource "aws_iam_policy" "instance_session_manager_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_policy" {
-  count = var.runner_enable_ssm_access ? 1 : 0
+  count = var.runner_instance.ssm_access ? 1 : 0
 
   role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.instance_session_manager_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "instance_session_manager_aws_managed" {
-  count = var.runner_enable_ssm_access ? 1 : 0
+  count = var.runner_instance.ssm_access ? 1 : 0
 
   role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"

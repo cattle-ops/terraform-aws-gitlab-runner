@@ -219,7 +219,7 @@ echo "$(head -n -1 "$converted_file")
 #
 # PR #810 refactor!: group variables for better overview
 #
-extracted_variables=$(grep -E '(runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
+extracted_variables=$(grep -E '(runner_enable_ssm_access|runner_use_private_address|runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
 
 sed -i '/runner_root_block_device/d' "$converted_file"
 sed -i '/runner_ebs_optimized/d' "$converted_file"
@@ -227,6 +227,8 @@ sed -i '/runner_spot_price/d' "$converted_file"
 sed -i '/runner_instance_prefix/d' "$converted_file"
 sed -i '/runner_instance_type/d' "$converted_file"
 sed -i '/runner_extra_instance_tags/d' "$converted_file"
+sed -i '/runner_use_private_address/d' "$converted_file"
+sed -i '/runner_enable_ssm_access/d' "$converted_file"
 
 # rename the variables
 extracted_variables=$(echo "$extracted_variables" | \
@@ -235,7 +237,9 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_spot_price/spot_price/g' | \
                       sed 's/runner_instance_prefix/name_prefix/g' | \
                       sed 's/runner_instance_type/type/g' | \
-                      sed 's/runner_extra_instance_tags/additional_tags/g'
+                      sed 's/runner_extra_instance_tags/additional_tags/g' | \
+                      sed 's/runner_use_private_address/private_address_only/g' | \
+                      sed 's/runner_enable_ssm_access/ssm_access/g'
                     )
 
 # add new block runners_docker_options at the end
@@ -289,6 +293,35 @@ extracted_variables=$(echo "$extracted_variables" | \
 # add new block runners_docker_options at the end
 echo "$(head -n -1 "$converted_file")
 runner_manager = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_yum_update|runner_user_data_extra|runner_userdata_post_install|runner_userdata_pre_install|runner_install_amazon_ecr_credential_helper|runner_docker_machine_version|runner_docker_machine_download_url)' "$converted_file")
+
+sed -i '/runner_docker_machine_download_url/d' "$converted_file"
+sed -i '/runner_docker_machine_version/d' "$converted_file"
+sed -i '/runner_install_amazon_ecr_credential_helper/d' "$converted_file"
+sed -i '/runner_userdata_pre_install/d' "$converted_file"
+sed -i '/runner_userdata_post_install/d' "$converted_file"
+sed -i '/runner_user_data_extra/d' "$converted_file"
+sed -i '/runner_yum_update/d' "$converted_file"
+
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_docker_machine_download_url/docker_machine_download_url/g' | \
+                      sed 's/runner_docker_machine_version/docker_machine_version/g' | \
+                      sed 's/runner_install_amazon_ecr_credential_helper/amazon_ecr_credential_helper/g' | \
+                      sed 's/runner_userdata_pre_install/pre_install_script/g' | \
+                      sed 's/runner_userdata_post_install/post_install_script/g' | \
+                      sed 's/runner_user_data_extra/start_script/g' | \
+                      sed 's/runner_yum_update/yum_update/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_install = {
   $extracted_variables
 }
 " > x && mv x "$converted_file"
