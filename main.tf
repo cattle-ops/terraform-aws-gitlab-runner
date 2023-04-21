@@ -77,6 +77,9 @@ locals {
       gitlab_runner_maximum_timeout                = var.gitlab_runner_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.sentry_dsn
+      public_key                                   = var.use_fleet == true ? tls_private_key.fleet[0].public_key_openssh : ""
+      use_fleet                                    = var.use_fleet
+      private_key                                  = var.use_fleet == true ? tls_private_key.fleet[0].private_key_pem : ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -88,8 +91,10 @@ locals {
       runners_extra_hosts               = var.runners_extra_hosts
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = length(var.subnet_id) > 0 ? var.subnet_id : var.subnet_id_runners
+      runners_subnet_ids                = length(var.fleet_executor_subnet_ids) > 0 ? var.fleet_executor_subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : [var.subnet_id_runners]
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.docker_machine_instance_type
+      runners_instance_types            = length(var.docker_machine_instance_types_fleet) > 0 ? var.docker_machine_instance_types_fleet : [var.docker_machine_instance_type]
       runners_spot_price_bid            = var.docker_machine_spot_price_bid == "on-demand-price" || var.docker_machine_spot_price_bid == null ? "" : var.docker_machine_spot_price_bid
       runners_ami                       = var.runners_executor == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runners_executor == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
@@ -138,6 +143,8 @@ locals {
       sentry_dsn                        = var.sentry_dsn
       prometheus_listen_address         = var.prometheus_listen_address
       auth_type                         = var.auth_type_cache_sr
+      use_fleet                         = var.use_fleet
+      launch_template                   = var.use_fleet == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
     }
   )
 }
@@ -163,7 +170,7 @@ data "aws_ami" "docker-machine" {
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   name                      = var.enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
+  vpc_zone_identifier       = length(var.fleet_executor_subnet_ids) > 0 ? var.fleet_executor_subnet_ids : length(var.subnet_id) > 0 ? [var.subnet_id] : var.subnet_ids_gitlab_runner
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -317,6 +324,77 @@ resource "aws_launch_template" "gitlab_runner_instance" {
 
   # otherwise the agent running on the EC2 instance tries to create the log group
   depends_on = [aws_cloudwatch_log_group.environment]
+}
+
+resource "tls_private_key" "fleet" {
+  count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "fleet" {
+  count = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+
+  key_name   = "${var.environment}-${var.fleet_key_pair_name}"
+  public_key = tls_private_key.fleet[0].public_key_openssh
+
+  tags = local.tags
+}
+
+resource "aws_launch_template" "fleet_gitlab_runner" {
+  # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
+  # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
+  count       = var.use_fleet == true && var.runners_executor == "docker+machine" ? 1 : 0
+  name_prefix = "${local.name_runner_agent_instance}-worker-"
+
+  key_name               = aws_key_pair.fleet[0].key_name
+  image_id               = data.aws_ami.docker-machine[0].id
+  user_data              = base64gzip(var.runners_userdata)
+  instance_type          = var.docker_machine_instance_types_fleet[0] # it will be override by the fleet
+  update_default_version = true
+  ebs_optimized          = var.runners_ebs_optimized
+  monitoring {
+    enabled = var.runners_monitoring
+  }
+  block_device_mappings {
+    device_name = "/dev/sda1"
+
+    ebs {
+      volume_size = var.runners_root_size
+      volume_type = var.runners_volume_type
+    }
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.docker_machine[0].name
+  }
+
+  network_interfaces {
+    security_groups             = [aws_security_group.docker_machine[0].id]
+    associate_public_ip_address = !var.runners_use_private_address
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "volume"
+    tags          = local.tags
+  }
+
+  tags = local.tags
+
+  metadata_options {
+    http_tokens                 = var.docker_machine_instance_metadata_options.http_tokens
+    http_put_response_hop_limit = var.docker_machine_instance_metadata_options.http_put_response_hop_limit
+    instance_metadata_tags      = "enabled"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 ################################################################################
