@@ -39,9 +39,9 @@ locals {
   template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
       eip                 = var.runner_enable_eip ? local.template_eip : ""
-      logging             = var.runner_cloudwatch_enable ? local.logging_user_data : ""
+      logging             = var.runner_cloudwatch.enable ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
-      user_data_trace_log = var.runner_user_data_enable_trace_log
+      user_data_trace_log = var.debug.trace_runner_user_data
       yum_update          = var.runner_install.yum_update ? local.file_yum_update : ""
       extra_config        = var.runner_install.start_script
   })
@@ -54,19 +54,19 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
-      gitlab_runner_version                        = var.runner_gitlab_runner_version
+      gitlab_runner_version                        = var.runner_gitlab.runner_version
       docker_machine_version                       = var.runner_install.docker_machine_version
       docker_machine_download_url                  = var.runner_install.docker_machine_download_url
       runners_config                               = local.template_runner_config
       runners_userdata                             = var.runner_worker_docker_machine_userdata
       runners_executor                             = var.runner_worker_type
       runners_install_amazon_ecr_credential_helper = var.runner_install.ecr_credential_helper
-      curl_cacert                                  = length(var.runner_gitlab_certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
+      curl_cacert                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.runner_install.pre_install_script
       post_install                                 = var.runner_install.post_install_script
-      runners_gitlab_url                           = var.runner_gitlab_url
-      runners_token                                = var.runner_gitlab_token
+      runners_gitlab_url                           = var.runner_gitlab.url
+      runners_token                                = var.runner_gitlab.registration_token
       secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_region                = data.aws_region.current.name
@@ -83,9 +83,9 @@ locals {
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
       aws_region       = data.aws_region.current.name
-      gitlab_url       = var.runner_gitlab_url
-      gitlab_clone_url = var.runner_gitlab_clone_url
-      tls_ca_file      = length(var.runner_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
+      gitlab_url       = var.runner_gitlab.url
+      gitlab_clone_url = var.runner_gitlab.clone_url
+      tls_ca_file      = length(var.runner_gitlab.certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_machine_autoscaling = [for config in var.runner_worker_docker_machine_autoscaling_options : {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.
@@ -104,9 +104,9 @@ locals {
       runners_instance_profile          = var.runner_worker_type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
-      runners_name                      = var.runner_gitlab_runner_name
+      runners_name                      = var.runner_instance.name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
-      runners_token                     = var.runner_gitlab_token
+      runners_token                     = var.runner_gitlab.registration_token
       runners_userdata                  = var.runner_worker_docker_machine_userdata
       runners_executor                  = var.runner_worker_type
       runners_limit                     = var.runner_worker_max_jobs
@@ -248,9 +248,9 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   user_data              = base64gzip(local.template_user_data)
   instance_type          = var.runner_instance.type
   update_default_version = true
-  ebs_optimized          = var.runner_ebs_optimized
+  ebs_optimized          = var.runner_instance.ebs_optimized
   monitoring {
-    enabled = var.runner_enable_monitoring
+    enabled = var.runner_instance.enable_monitoring
   }
   dynamic "instance_market_options" {
     for_each = var.runner_instance.spot_price == null || var.runner_instance.spot_price == "" ? [] : ["spot"]
@@ -591,7 +591,7 @@ module "terminate_agent_hook" {
   environment                          = var.environment
   asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
   asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
-  cloudwatch_logging_retention_in_days = var.runner_cloudwatch_retention_days
+  cloudwatch_logging_retention_in_days = var.runner_cloudwatch.retention_days
   name_iam_objects                     = local.name_iam_objects
   name_docker_machine_runners          = local.runner_tags_merged["Name"]
   role_permissions_boundary            = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"

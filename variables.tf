@@ -96,6 +96,8 @@ variable "runner_instance" {
   description = <<-EOT
     additional_tags = Map of tags that will be added to the Agent instance.
     ebs_optimized = Enable EBS optimization for the Agent instance.
+    monitoring = Enable the detailed monitoring on the Agent instance.
+    name = Name of the Runner instance.
     name_prefix = Set the name prefix and override the `Name` tag for the Agent instance.
     private_address_only = Restrict the Agent to the use of a private IP address. If this is set to `false` it will override the `runners_use_private_address` for the agent.
     root_device_config = The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`
@@ -106,15 +108,17 @@ variable "runner_instance" {
   type = object({
     additional_tags = optional(map(string))
     ebs_optimized = optional(bool, true)
+    monitoring = optional(bool, true)
+    name = string
     name_prefix = optional(string)
     private_address_only = optional(bool, true)
     root_device_config = optional(map(string))
     spot_price = optional(string, null)
     ssm_access = optional(bool, false)
-    type = string
+    type = optional(string, "t3.micro")
   })
   default = {
-    type = "t3.micro"
+    name = "gitlab-runner"
   }
 }
 
@@ -131,12 +135,6 @@ variable "runner_ami_owners" {
   description = "The list of owners used to select the AMI of the Agent instance."
   type        = list(string)
   default     = ["amazon"]
-}
-
-variable "runner_enable_monitoring" {
-  description = "Enable the detailed monitoring on the Agent instance."
-  type        = bool
-  default     = true
 }
 
 variable "runner_collect_autoscaling_metrics" {
@@ -297,89 +295,58 @@ variable "runner_install" {
   default = {}
 }
 
-variable "runner_user_data_enable_trace_log" {
-  description = "Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token."
-  type        = bool
-  default     = true
-}
-
-variable "runner_cloudwatch_enable" {
-  description = "Boolean used to enable or disable the CloudWatch logging."
-  type        = bool
-  default     = true
-}
-
-variable "runner_cloudwatch_retention_days" {
-  description = "Retention for cloudwatch logs. Defaults to unlimited. Requires `agent_cloudwatch_enable = true`."
-  type        = number
-  default     = 0
-}
-
-variable "runner_cloudwatch_log_group_name" {
-  description = "Option to override the default name (`environment`) of the log group. Requires `agent_cloudwatch_enable = true`."
-  default     = null
-  type        = string
-}
-
-variable "runner_gitlab_runner_name" {
-  description = "Name of the Gitlab Runner."
-  type        = string
-}
-
-variable "runner_gitlab_runner_version" {
-  description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
-  type        = string
-  default     = "15.8.2"
+variable "runner_cloudwatch" {
+  description = <<-EOT
+    enable = Boolean used to enable or disable the CloudWatch logging.
+    log_group_name = Option to override the default name (`environment`) of the log group. Requires `enable = true`.
+    retention_days = Retention for cloudwatch logs. Defaults to unlimited. Requires `enable = true`.
+  EOT
+  type = object({
+    enable = optional(bool, true)
+    log_group_name = optional(string, null)
+    retention_days = optional(number, 0)
+  })
+  default = {}
 }
 
 variable "runner_gitlab_registration_config" {
   description = "Configuration used to register the Agent. See the README for an example, or reference the examples in the examples directory of this repo."
-  type        = map(string)
+  type        = object({
+    registration_token = optional(string, "")
+    tag_list           = optional(string, "")
+    description        = optional(string, "")
+    locked_to_project  = optional(string, "")
+    run_untagged       = optional(string, "")
+    maximum_timeout    = optional(string, "")
+    access_level       = optional(string, "")
+  })
 
-  default = {
-    registration_token = ""
-    tag_list           = ""
-    description        = ""
-    locked_to_project  = ""
-    run_untagged       = ""
-    maximum_timeout    = ""
-    access_level       = ""
-  }
+  default = {}
+}
+
+variable "runner_gitlab" {
+  description = <<-EOT
+    ca_certificate = Trusted CA certificate bundle (PEM format).
+    certificate = Certificate of the GitLab instance to connect to (PEM format).
+    registration_token = Registration token to use to register the runner. Do not use. This is replaced by the `registration_token` in `runner_gitlab_registration_config`.
+    runner_version = Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
+    url = URL of the GitLab instance to connect to.
+    url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
+  EOT
+  type = object({
+    ca_certificate = optional(string, "")
+    certificate = optional(string, "")
+    registration_token = optional(string, "__REPLACED_BY_USER_DATA__")
+    runner_version = optional(string, "15.8.2")
+    url = optional(string)
+    url_clone = optional(string)
+  })
 }
 
 variable "runner_gitlab_token_secure_parameter_store" {
   description = "Name of the Secure Parameter Store entry to hold the GitLab Runner token."
   type        = string
   default     = "runner-token"
-}
-
-variable "runner_gitlab_ca_certificate" {
-  description = "Trusted CA certificate bundle (PEM format). Example: `file(\"$${path.module}/ca.crt\")`"
-  type        = string
-  default     = ""
-}
-
-variable "runner_gitlab_certificate" {
-  description = "Certificate of the GitLab instance to connect to (PEM format). Example: `file(\"$${path.module}/my-gitlab.crt\")`"
-  type        = string
-  default     = ""
-}
-
-variable "runner_gitlab_url" {
-  description = "URL of the GitLab instance to connect to."
-  type        = string
-}
-
-variable "runner_gitlab_clone_url" {
-  description = "Overwrites the URL for the GitLab instance. Use only if the agent can’t connect to the GitLab URL."
-  type        = string
-  default     = ""
-}
-
-variable "runner_gitlab_token" {
-  description = "Token for the Agent to connect to GitLab"
-  type        = string
-  default     = "__REPLACED_BY_USER_DATA__"
 }
 
 variable "runner_sentry_secure_parameter_store_name" {
@@ -850,8 +817,14 @@ variable "runner_worker_docker_machine_docker_registry_mirror_url" {
   default     = ""
 }
 
-variable "show_user_data_in_plan" {
-  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
-  type        = bool
-  default     = false
+variable "debug" {
+  description = <<-EOT
+    trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.
+    write_runner_config_to_file: Outputs the user data script and `config.toml` to the local file system.
+  EOT
+  type = object({
+    trace_runner_user_data = optional(bool, false)
+    write_runner_config_to_file = optional(bool, false)
+  })
+  default = {}
 }

@@ -219,7 +219,7 @@ echo "$(head -n -1 "$converted_file")
 #
 # PR #810 refactor!: group variables for better overview
 #
-extracted_variables=$(grep -E '(runner_enable_ssm_access|runner_use_private_address|runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
+extracted_variables=$(grep -E '(runner_enable_monitoring|runner_gitlab_runner_name|runner_enable_ssm_access|runner_use_private_address|runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
 
 sed -i '/runner_root_block_device/d' "$converted_file"
 sed -i '/runner_ebs_optimized/d' "$converted_file"
@@ -229,6 +229,8 @@ sed -i '/runner_instance_type/d' "$converted_file"
 sed -i '/runner_extra_instance_tags/d' "$converted_file"
 sed -i '/runner_use_private_address/d' "$converted_file"
 sed -i '/runner_enable_ssm_access/d' "$converted_file"
+sed -i '/runner_gitlab_runner_name/d' "$converted_file"
+sed -i '/runner_enable_monitoring/d' "$converted_file"
 
 # rename the variables
 extracted_variables=$(echo "$extracted_variables" | \
@@ -239,6 +241,8 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_instance_type/type/g' | \
                       sed 's/runner_extra_instance_tags/additional_tags/g' | \
                       sed 's/runner_use_private_address/private_address_only/g' | \
+                      sed 's/runner_gitlab_runner_name/name/g' | \
+                      sed 's/runner_enable_monitoring/monitoring/g' | \
                       sed 's/runner_enable_ssm_access/ssm_access/g'
                     )
 
@@ -326,4 +330,68 @@ runner_install = {
 }
 " > x && mv x "$converted_file"
 
+extracted_variables=$(grep -E '(runner_gitlab_clone_url|runner_gitlab_url|runner_gitlab_runner_version|runner_gitlab_token|runner_gitlab_certificate|runner_gitlab_ca_certificate)' "$converted_file")
+
+sed -i '/runner_gitlab_ca_certificate/d' "$converted_file"
+sed -i '/runner_gitlab_certificate/d' "$converted_file"
+sed -i '/runner_gitlab_token/d' "$converted_file"
+sed -i '/runner_gitlab_runner_version/d' "$converted_file"
+sed -i '/runner_gitlab_url/d' "$converted_file"
+sed -i '/runner_gitlab_clone_url/d' "$converted_file"
+
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_gitlab_ca_certificate/ca_certificate/g' | \
+                      sed 's/runner_gitlab_certificate/certificate/g' | \
+                      sed 's/runner_gitlab_token/registration_token/g' | \
+                      sed 's/runner_gitlab_runner_version/runner_version/g' | \
+                      sed 's/runner_gitlab_url/url/g' | \
+                      sed 's/runner_gitlab_clone_url/url_clone/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_gitlab = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(show_user_data_in_plan|runner_user_data_enable_trace_log)' "$converted_file")
+
+sed -i '/runner_user_data_enable_trace_log/d' "$converted_file"
+sed -i '/show_user_data_in_plan/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_user_data_enable_trace_log/trace_runner_user_data/g' | \
+                      sed 's/show_user_data_in_plan/write_runner_config_to_file/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+debug = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_cloudwatch_log_group_name|runner_cloudwatch_retention_days|runner_cloudwatch_enable)' "$converted_file")
+
+sed -i '/runner_cloudwatch_enable/d' "$converted_file"
+sed -i '/runner_cloudwatch_retention_days/d' "$converted_file"
+sed -i '/runner_cloudwatch_log_group_name/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_cloudwatch_enable/enable/g' | \
+                      sed 's/runner_cloudwatch_retention_days/retention_days/g' | \
+                      sed 's/runner_cloudwatch_log_group_name/log_group_name/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_cloudwatch = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
 echo "Module call converted. Output: $converted_file"

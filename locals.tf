@@ -1,21 +1,21 @@
 locals {
   # Manage certificates
   pre_install_gitlab_certificate = (
-    length(var.runner_gitlab_certificate) > 0
+    length(var.runner_gitlab.certificate) > 0
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/gitlab.crt
-      ${var.runner_gitlab_certificate}
+      ${var.runner_gitlab.certificate}
       EOF
     EOT
     : ""
   )
   pre_install_ca_certificate = (
-    length(var.runner_gitlab_ca_certificate) > 0
+    length(var.runner_gitlab.ca_certificate) > 0
     ? <<-EOT
       mkdir -p /etc/gitlab-runner/certs/
       cat <<- EOF > /etc/gitlab-runner/certs/ca.crt
-      ${var.runner_gitlab_ca_certificate}
+      ${var.runner_gitlab.ca_certificate}
       EOF
     EOT
     : ""
@@ -28,7 +28,7 @@ locals {
   EOT
   pre_install_certificates = (
     # If either (or both) _certificate variables are specified
-    length(var.runner_gitlab_certificate) + length(var.runner_gitlab_ca_certificate) > 0
+    length(var.runner_gitlab.certificate) + length(var.runner_gitlab.ca_certificate) > 0
     ? join("\n", [
       local.pre_install_gitlab_certificate,
       local.pre_install_ca_certificate,
@@ -95,12 +95,15 @@ locals {
 }
 
 resource "local_file" "config_toml" {
+  count    = var.debug.write_runner_config_to_file ? 1 : 0
+
   content  = local.template_runner_config
   filename = "${path.module}/debug/runner_config.toml"
 }
 
 resource "local_file" "user_data" {
-  count    = var.show_user_data_in_plan ? 1 : 0
+  count    = var.debug.write_runner_config_to_file ? 1 : 0
+
   content  = nonsensitive(local.template_user_data)
   filename = "${path.module}/debug/user_data.sh"
 }
