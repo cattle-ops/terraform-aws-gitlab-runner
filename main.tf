@@ -338,7 +338,7 @@ resource "aws_key_pair" "fleet" {
 
   key_name   = "${var.environment}-${var.fleet_key_pair_name}"
   public_key = tls_private_key.fleet[0].public_key_openssh
-  
+
   tags = local.tags
 }
 
