@@ -96,7 +96,7 @@ locals {
       runners_subnet_id                 = var.subnet_id
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
       runners_instance_type             = var.runner_worker_docker_machine_instance_type
-      runners_spot_price_bid            = var.runner_worker_docker_machine_ec2_spot_price_bid == "on-demand-price" || var.runner_worker_docker_machine_ec2_spot_price_bid == null ? "" : var.runner_worker_docker_machine_ec2_spot_price_bid
+      runners_spot_price_bid            = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
       runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
       runners_monitoring                = var.runner_worker_docker_machine_instance.monitoring
@@ -120,7 +120,7 @@ locals {
       runners_iam_instance_profile_name = var.runner_worker_docker_machine_iam_instance_profile_name
       runners_use_private_address_only  = var.runner_worker_docker_machine_instance.private_address_only
       runners_use_private_address       = !var.runner_worker_docker_machine_instance.private_address_only
-      runners_request_spot_instance     = var.runner_worker_docker_machine_request_spot_instances
+      runners_request_spot_instance     = var.runner_worker_docker_machine_instance_spot.enable
       runners_environment_vars          = jsonencode(var.runner_worker.environment_variables)
       runners_pre_build_script          = var.runner_worker_pre_build_script
       runners_post_build_script         = var.runner_worker_post_build_script

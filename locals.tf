@@ -50,7 +50,7 @@ locals {
     join(",", formatlist("%q", concat(var.runner_worker_docker_machine_ec2_options, local.runners_docker_registry_mirror_option))),
   )
 
-  runners_docker_registry_mirror_option = var.runner_worker_docker_machine_docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.runner_worker_docker_machine_docker_registry_mirror_url}"]
+  runners_docker_registry_mirror_option = var.runner_worker_docker_machine_instance.docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.runner_worker_docker_machine_instance.docker_registry_mirror_url}"]
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = merge({
@@ -62,7 +62,7 @@ locals {
   )
 
   # Ensure max builds is optional
-  runners_max_builds_string = var.runner_worker_docker_machine_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runner_worker_docker_machine_max_builds)
+  runners_max_builds_string = var.runner_worker_docker_machine_instance.destroy_after_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runner_worker_docker_machine_instance.destroy_after_max_builds)
 
   # Define key for runner token for SSM
   secure_parameter_store_runner_token_key  = "${var.environment}-${var.runner_gitlab_token_secure_parameter_store}"

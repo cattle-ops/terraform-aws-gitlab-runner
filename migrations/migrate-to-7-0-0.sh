@@ -455,7 +455,7 @@ extracted_variables=$(echo "$extracted_variables" | \
 # insert the new variables into the existing block
 sed -i "/runner_worker_cache/runner_worker_cache { $extracted_variables/g" "$converted_file"
 
-extracted_variables=$(grep -E '(runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
+extracted_variables=$(grep -E '(runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
 
 sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_instance_prefix/d' "$converted_file"
@@ -464,6 +464,8 @@ sed -i '/runner_worker_docker_machine_userdata/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_ec2_volume_type/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_ec2_root_size/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_ec2_ebs_optimized/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_max_builds/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_docker_registry_mirror_url/d' "$converted_file"
 
 # rename the variables
 extracted_variables=$(echo "$extracted_variables" | \
@@ -473,12 +475,32 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_docker_machine_ec2_volume_type/volume_type/g' | \
                       sed 's/runner_worker_docker_machine_ec2_root_size/root_size/g' | \
                       sed 's/runner_worker_docker_machine_ec2_ebs_optimized/ebs_optimized/g' | \
+                      sed 's/runner_worker_docker_machine_max_builds/destroy_after_max_builds/g' | \
+                      sed 's/runner_worker_docker_machine_docker_registry_mirror_url/docker_registry_mirror_url/g' | \
                       sed 's/runner_worker_docker_machine_instance_prefix/name_prefix/g'
                     )
 
 # add new block runners_docker_options at the end
 echo "$(head -n -1 "$converted_file")
 runner_worker_docker_machine_instance = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_worker_docker_machine_request_spot_instances|runner_worker_docker_machine_ec2_spot_price_bid)' "$converted_file")
+
+sed -i '/runner_worker_docker_machine_ec2_spot_price_bid/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_request_spot_instances/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_worker_docker_machine_ec2_spot_price_bid/max_price/g' | \
+                      sed 's/runner_worker_docker_machine_request_spot_instances/enable/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_worker_docker_machine_instance_spot = {
   $extracted_variables
 }
 " > x && mv x "$converted_file"

@@ -656,6 +656,8 @@ variable "runner_worker_docker_machine_ami_owners" {
 
 variable "runner_worker_docker_machine_instance" {
   description = <<-EOT
+    docker_registry_mirror_url = The URL of the Docker registry mirror to use for the GitLab Runner Executor instances.
+    destroy_after_max_builds = Destroy the instance after the maximum number of builds has been reached.
     ebs_optimized = Enable EBS optimization for the GitLab Runner Executor instances.
     monitoring = Enable detailed monitoring for the GitLab Runner Executor instances.
     name_prefix = Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances.
@@ -665,6 +667,8 @@ variable "runner_worker_docker_machine_instance" {
     volume_type = The type of volume to use for the GitLab Runner Executor instances.
   EOT
   type = object({
+    destroy_after_max_builds = optional(number, 0)
+    docker_registry_mirror_url = optional(string, "")
     ebs_optimized = optional(bool, true)
     monitoring = optional(bool, false)
     name_prefix = optional(string, "")
@@ -687,16 +691,16 @@ variable "runner_worker_docker_machine_instance" {
   }
 }
 
-variable "runner_worker_docker_machine_ec2_spot_price_bid" {
-  description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
-  type        = string
-  default     = "on-demand-price"
-}
-
-variable "runner_worker_docker_machine_request_spot_instances" {
-  description = "Whether or not to request spot instances via docker-machine"
-  type        = bool
-  default     = true
+variable "runner_worker_docker_machine_instance_spot" {
+  description = <<-EOT
+    enable = Enable spot instances for the docker+machine Executor.
+    max_price = The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen.
+  EOT
+  type = object({
+    enable = optional(bool, true)
+    max_price = optional(string, "on-demand-price")
+  })
+  default = {}
 }
 
 variable "runner_worker_docker_machine_ec2_options" {
@@ -730,18 +734,6 @@ variable "runner_worker_docker_machine_autoscaling_options" {
   }))
   default = []
 
-}
-
-variable "runner_worker_docker_machine_max_builds" {
-  description = "Destroys the executor after processing this many jobs. Set to `0` to disable this feature."
-  type        = number
-  default     = 0
-}
-
-variable "runner_worker_docker_machine_docker_registry_mirror_url" {
-  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
-  type        = string
-  default     = ""
 }
 
 variable "debug" {
