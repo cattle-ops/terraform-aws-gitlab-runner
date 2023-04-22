@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -u
 
 #
 # Precondition: The module call has been extracted to a separate file given in "$1". The code is well-formatted.
@@ -72,13 +72,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_worker_docker_options = {
-  $extracted_variables
-}
-" > x
-
-mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker_docker_options = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 #
 # PR #757 refactor!: rename variables and prefix with agent, executor and global scope
@@ -211,10 +211,11 @@ sed '/name_docker_machine_runners/d' | \
 sed '/overrides = {/d' \
 > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
 
-echo "$(head -n -1 "$converted_file")
-  $extracted_variables
-}" > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
-
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+    $extracted_variables
+  }" > "$converted_file.tmp" && mv "$converted_file.tmp" "$converted_file"
+fi
 
 #
 # PR #810 refactor!: group variables for better overview
@@ -253,13 +254,15 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_instance = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_instance = {
+    $extracted_variables
+  }
+  " > x && cp x "$converted_file"
+fi
 
-extracted_variables=$(grep -E '(runner_allow_iam_service_linked_role_creation|runner_create_runner_iam_role_profile|runner_iam_role_profile_name|runner_extra_role_tags|runner_assume_role_json)|runner_extra_iam_policy_arns' "$converted_file")
+extracted_variables=$(grep -E '(runner_allow_iam_service_linked_role_creation|runner_create_runner_iam_role_profile|runner_iam_role_profile_name|runner_extra_role_tags|runner_assume_role_json)|runner_extra_iam_policy_arns)' "$converted_file")
 
 sed -i '/runner_allow_iam_service_linked_role_creation/d' "$converted_file"
 sed -i '/runner_create_runner_iam_role_profile/d' "$converted_file"
@@ -279,13 +282,15 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_role = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_role = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
-extracted_variables=$(grep -E '(runner_manager_maximum_concurrent_jobs|runner_manager_sentry_dsn|runner_manager_gitlab_check_interval|runner_manager_prometheus_listen_address' "$converted_file")
+extracted_variables=$(grep -E '(runner_manager_maximum_concurrent_jobs|runner_manager_sentry_dsn|runner_manager_gitlab_check_interval|runner_manager_prometheus_listen_address)' "$converted_file")
 
 sed -i '/runner_manager_maximum_concurrent_jobs/d' "$converted_file"
 sed -i '/runner_manager_sentry_dsn/d' "$converted_file"
@@ -301,11 +306,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_manager = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_manager = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_yum_update|runner_user_data_extra|runner_userdata_post_install|runner_userdata_pre_install|runner_install_amazon_ecr_credential_helper|runner_docker_machine_version|runner_docker_machine_download_url)' "$converted_file")
 
@@ -330,11 +337,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_install = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_install = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_gitlab_clone_url|runner_gitlab_url|runner_gitlab_runner_version|runner_gitlab_token|runner_gitlab_certificate|runner_gitlab_ca_certificate)' "$converted_file")
 
@@ -357,11 +366,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_gitlab = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_gitlab = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(show_user_data_in_plan|runner_user_data_enable_trace_log)' "$converted_file")
 
@@ -375,11 +386,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-debug = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  debug = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_cloudwatch_log_group_name|runner_cloudwatch_retention_days|runner_cloudwatch_enable)' "$converted_file")
 
@@ -395,11 +408,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_cloudwatch = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_cloudwatch = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_worker_extra_environment_variables|runner_worker_output_limit|runner_worker_request_concurrency|runner_worker_idle_count|runner_worker_idle_time|runner_worker_max_jobs|runner_worker_type|runner_worker_enable_ssm_access)' "$converted_file")
 
@@ -425,11 +440,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_worker = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 sed -i 's/runner_worker_cache_s3_bucket/runner_worker_cache/g' "$converted_file"
 
@@ -489,11 +506,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_worker_docker_machine_instance = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker_docker_machine_instance = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_worker_docker_machine_request_spot_instances|runner_worker_docker_machine_ec2_spot_price_bid)' "$converted_file")
 
@@ -507,11 +526,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_worker_docker_machine_instance_spot = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker_docker_machine_instance_spot = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_extra_security_group_ids|runner_security_group_description|runner_ping_allow_from_security_groups|runner_ping_enable)' "$converted_file")
 
@@ -529,11 +550,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_networking = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_networking = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 sed -i 's/runner_extra_egress_rules/runner_networking_egress_rules/g' "$converted_file"
 
@@ -551,11 +574,13 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_worker_gitlab_pipeline = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker_gitlab_pipeline = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
 extracted_variables=$(grep -E '(runner_worker_docker_machine_extra_iam_policy_arns|runner_worker_docker_machine_assume_role_json|runner_worker_docker_machine_iam_instance_profile_name|runner_worker_docker_machine_extra_role_tags)' "$converted_file")
 
@@ -573,10 +598,18 @@ extracted_variables=$(echo "$extracted_variables" | \
                     )
 
 # add new block runners_docker_options at the end
-echo "$(head -n -1 "$converted_file")
-runner_worker_docker_machine_role = {
-  $extracted_variables
-}
-" > x && mv x "$converted_file"
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker_docker_machine_role = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
 
+cat <<EOT
+Not all cases are handled by this script. Please check the output file and make sure that all variables are converted correctly.
+Especially it you have comments or multiline templates in your file.
+EOT
+
+echo
 echo "Module call converted. Output: $converted_file"
