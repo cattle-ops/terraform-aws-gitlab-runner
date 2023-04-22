@@ -26,7 +26,7 @@ locals {
 
   runner_tags_merged = merge(
     local.tags,
-    var.runner_worker_docker_machine_extra_role_tags,
+    var.runner_worker_docker_machine_role.additional_tags,
     # overwrites the `Name` key from `local.tags`
     var.runner_worker_docker_machine_instance.name_prefix == "" ? { Name = substr(format("%s", var.environment), 0, 16) } : { Name = var.runner_worker_docker_machine_instance.name_prefix },
   )

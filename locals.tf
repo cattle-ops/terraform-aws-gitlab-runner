@@ -95,14 +95,14 @@ locals {
 }
 
 resource "local_file" "config_toml" {
-  count    = var.debug.write_runner_config_to_file ? 1 : 0
+  count = var.debug.write_runner_config_to_file ? 1 : 0
 
   content  = local.template_runner_config
   filename = "${path.module}/debug/runner_config.toml"
 }
 
 resource "local_file" "user_data" {
-  count    = var.debug.write_runner_config_to_file ? 1 : 0
+  count = var.debug.write_runner_config_to_file ? 1 : 0
 
   content  = nonsensitive(local.template_user_data)
   filename = "${path.module}/debug/user_data.sh"

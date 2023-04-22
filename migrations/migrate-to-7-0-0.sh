@@ -219,7 +219,7 @@ echo "$(head -n -1 "$converted_file")
 #
 # PR #810 refactor!: group variables for better overview
 #
-extracted_variables=$(grep -E '(runner_enable_monitoring|runner_gitlab_runner_name|runner_enable_ssm_access|runner_use_private_address|runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
+extracted_variables=$(grep -E '(runner_max_instance_lifetime_seconds|runner_enable_eip|runner_collect_autoscaling_metrics|runner_enable_monitoring|runner_gitlab_runner_name|runner_enable_ssm_access|runner_use_private_address|runner_root_block_device|runner_ebs_optimized|runner_spot_price|runner_instance_prefix|runner_instance_type|runner_extra_instance_tags)' "$converted_file")
 
 sed -i '/runner_root_block_device/d' "$converted_file"
 sed -i '/runner_ebs_optimized/d' "$converted_file"
@@ -231,6 +231,9 @@ sed -i '/runner_use_private_address/d' "$converted_file"
 sed -i '/runner_enable_ssm_access/d' "$converted_file"
 sed -i '/runner_gitlab_runner_name/d' "$converted_file"
 sed -i '/runner_enable_monitoring/d' "$converted_file"
+sed -i '/runner_collect_autoscaling_metrics/d' "$converted_file"
+sed -i '/runner_enable_eip/d' "$converted_file"
+sed -i '/runner_max_instance_lifetime_seconds/d' "$converted_file"
 
 # rename the variables
 extracted_variables=$(echo "$extracted_variables" | \
@@ -243,6 +246,9 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_use_private_address/private_address_only/g' | \
                       sed 's/runner_gitlab_runner_name/name/g' | \
                       sed 's/runner_enable_monitoring/monitoring/g' | \
+                      sed 's/runner_collect_autoscaling_metrics/collect_autoscaling_metrics/g' | \
+                      sed 's/runner_enable_eip/use_eip/g' | \
+                      sed 's/runner_max_instance_lifetime_seconds/max_lifetime_seconds/g' | \
                       sed 's/runner_enable_ssm_access/ssm_access/g'
                     )
 
@@ -455,7 +461,7 @@ extracted_variables=$(echo "$extracted_variables" | \
 # insert the new variables into the existing block
 sed -i "/runner_worker_cache/runner_worker_cache { $extracted_variables/g" "$converted_file"
 
-extracted_variables=$(grep -E '(runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
+extracted_variables=$(grep -E '(runner_worker_docker_machine_instance_type|runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
 
 sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_instance_prefix/d' "$converted_file"
@@ -466,6 +472,7 @@ sed -i '/runner_worker_docker_machine_ec2_root_size/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_ec2_ebs_optimized/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_max_builds/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_docker_registry_mirror_url/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_instance_type/d' "$converted_file"
 
 # rename the variables
 extracted_variables=$(echo "$extracted_variables" | \
@@ -477,6 +484,7 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_docker_machine_ec2_ebs_optimized/ebs_optimized/g' | \
                       sed 's/runner_worker_docker_machine_max_builds/destroy_after_max_builds/g' | \
                       sed 's/runner_worker_docker_machine_docker_registry_mirror_url/docker_registry_mirror_url/g' | \
+                      sed 's/runner_worker_docker_machine_instance_type/type/g' | \
                       sed 's/runner_worker_docker_machine_instance_prefix/name_prefix/g'
                     )
 
@@ -501,6 +509,72 @@ extracted_variables=$(echo "$extracted_variables" | \
 # add new block runners_docker_options at the end
 echo "$(head -n -1 "$converted_file")
 runner_worker_docker_machine_instance_spot = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_extra_security_group_ids|runner_security_group_description|runner_ping_allow_from_security_groups|runner_ping_enable)' "$converted_file")
+
+sed -i '/runner_ping_enable/d' "$converted_file"
+sed -i '/runner_ping_allow_from_security_groups/d' "$converted_file"
+sed -i '/runner_security_group_description/d' "$converted_file"
+sed -i '/runner_extra_security_group_ids/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_ping_enable/allow_incoming_ping/g' | \
+                      sed 's/runner_security_group_description/security_group_description/g' | \
+                      sed 's/runner_extra_security_group_ids/security_group_ids/g' | \
+                      sed 's/runner_ping_allow_from_security_groups/allow_incoming_ping_security_group_ids/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_networking = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+sed -i 's/runner_extra_egress_rules/runner_networking_egress_rules/g' "$converted_file"
+
+extracted_variables=$(grep -E '(runner_worker_post_build_script|runner_worker_pre_build_script|runner_worker_pre_clone_script)' "$converted_file")
+
+sed -i '/runner_worker_pre_clone_script/d' "$converted_file"
+sed -i '/runner_worker_pre_build_script/d' "$converted_file"
+sed -i '/runner_worker_post_build_script/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_worker_pre_clone_script/pre_clone_script/g' | \
+                      sed 's/runner_worker_pre_build_script/pre_build_script/g' | \
+                      sed 's/runner_worker_post_build_script/post_build_script/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_worker_gitlab_pipeline = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
+extracted_variables=$(grep -E '(runner_worker_docker_machine_extra_iam_policy_arns|runner_worker_docker_machine_assume_role_json|runner_worker_docker_machine_iam_instance_profile_name|runner_worker_docker_machine_extra_role_tags)' "$converted_file")
+
+sed -i '/runner_worker_docker_machine_extra_role_tags/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_iam_instance_profile_name/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_assume_role_json/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_extra_iam_policy_arns/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_worker_docker_machine_iam_instance_profile_name/profile_name/g' | \
+                      sed 's/runner_worker_docker_machine_assume_role_json/assume_role_policy_json/g' | \
+                      sed 's/runner_worker_docker_machine_extra_iam_policy_arns/policy_arns/g' | \
+                      sed 's/runner_worker_docker_machine_extra_role_tags/additional_tags/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_worker_docker_machine_role = {
   $extracted_variables
 }
 " > x && mv x "$converted_file"

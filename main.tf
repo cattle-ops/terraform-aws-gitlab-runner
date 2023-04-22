@@ -38,7 +38,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
 locals {
   template_user_data = templatefile("${path.module}/template/user-data.tftpl",
     {
-      eip                 = var.runner_enable_eip ? local.template_eip : ""
+      eip                 = var.runner_instance.use_eip ? local.template_eip : ""
       logging             = var.runner_cloudwatch.enable ? local.logging_user_data : ""
       gitlab_runner       = local.template_gitlab_runner
       user_data_trace_log = var.debug.trace_runner_user_data
@@ -95,7 +95,7 @@ locals {
       runners_vpc_id                    = var.vpc_id
       runners_subnet_id                 = var.subnet_id
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
-      runners_instance_type             = var.runner_worker_docker_machine_instance_type
+      runners_instance_type             = var.runner_worker_docker_machine_instance.type
       runners_spot_price_bid            = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
       runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
@@ -117,14 +117,14 @@ locals {
       runners_max_builds                = local.runners_max_builds_string
       runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
       runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
-      runners_iam_instance_profile_name = var.runner_worker_docker_machine_iam_instance_profile_name
+      runners_iam_instance_profile_name = var.runner_worker_docker_machine_role.profile_name
       runners_use_private_address_only  = var.runner_worker_docker_machine_instance.private_address_only
       runners_use_private_address       = !var.runner_worker_docker_machine_instance.private_address_only
       runners_request_spot_instance     = var.runner_worker_docker_machine_instance_spot.enable
       runners_environment_vars          = jsonencode(var.runner_worker.environment_variables)
-      runners_pre_build_script          = var.runner_worker_pre_build_script
-      runners_post_build_script         = var.runner_worker_post_build_script
-      runners_pre_clone_script          = var.runner_worker_pre_clone_script
+      runners_pre_build_script          = var.runner_worker_gitlab_pipeline.pre_build_script
+      runners_post_build_script         = var.runner_worker_gitlab_pipeline.post_build_script
+      runners_pre_clone_script          = var.runner_worker_gitlab_pipeline.pre_clone_script
       runners_request_concurrency       = var.runner_worker.request_concurrency
       runners_output_limit              = var.runner_worker.output_limit
       runners_check_interval            = var.runner_manager.gitlab_check_interval
@@ -169,8 +169,8 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   max_size                  = "1"
   desired_capacity          = "1"
   health_check_grace_period = 0
-  max_instance_lifetime     = var.runner_max_instance_lifetime_seconds
-  enabled_metrics           = var.runner_collect_autoscaling_metrics
+  max_instance_lifetime     = var.runner_instance.max_lifetime_seconds
+  enabled_metrics           = var.runner_instance.collect_autoscaling_metrics
 
   dynamic "tag" {
     for_each = local.agent_tags
@@ -284,7 +284,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     }
   }
   network_interfaces {
-    security_groups             = concat([aws_security_group.runner.id], var.runner_extra_security_group_ids)
+    security_groups             = concat([aws_security_group.runner.id], var.runner_networking.security_group_ids)
     associate_public_ip_address = false == (var.runner_instance.private_address_only == false ? var.runner_instance.private_address_only : var.runner_worker_docker_machine_instance.private_address_only)
   }
   tag_specifications {
@@ -480,7 +480,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 resource "aws_iam_role" "docker_machine" {
   count                = var.runner_worker.type == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
-  assume_role_policy   = length(var.runner_worker_docker_machine_assume_role_json) > 0 ? var.runner_worker_docker_machine_assume_role_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
+  assume_role_policy   = length(var.runner_worker_docker_machine_role.assume_role_policy_json) > 0 ? var.runner_worker_docker_machine_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
   tags = local.tags
@@ -499,10 +499,10 @@ resource "aws_iam_instance_profile" "docker_machine" {
 ### Add user defined policies
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies" {
-  count = var.runner_worker.type == "docker+machine" ? length(var.runner_worker_docker_machine_extra_iam_policy_arns) : 0
+  count = var.runner_worker.type == "docker+machine" ? length(var.runner_worker_docker_machine_role.policy_arns) : 0
 
   role       = aws_iam_role.docker_machine[0].name
-  policy_arn = var.runner_worker_docker_machine_extra_iam_policy_arns[count.index]
+  policy_arn = var.runner_worker_docker_machine_role.policy_arns[count.index]
 }
 
 ################################################################################
@@ -538,7 +538,7 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 
 resource "aws_eip" "gitlab_runner" {
   # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
-  count = var.runner_enable_eip ? 1 : 0
+  count = var.runner_instance.use_eip ? 1 : 0
 
   tags = local.tags
 }
@@ -564,7 +564,7 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 ### AWS assign EIP
 ################################################################################
 resource "aws_iam_policy" "eip" {
-  count = var.runner_enable_eip ? 1 : 0
+  count = var.runner_instance.use_eip ? 1 : 0
 
   name        = "${local.name_iam_objects}-eip"
   path        = "/"
@@ -575,7 +575,7 @@ resource "aws_iam_policy" "eip" {
 }
 
 resource "aws_iam_role_policy_attachment" "eip" {
-  count = var.runner_enable_eip ? 1 : 0
+  count = var.runner_instance.use_eip ? 1 : 0
 
   role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.eip[0].arn
