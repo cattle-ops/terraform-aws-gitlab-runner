@@ -58,7 +58,7 @@ locals {
       docker_machine_version                       = var.runner_install.docker_machine_version
       docker_machine_download_url                  = var.runner_install.docker_machine_download_url
       runners_config                               = local.template_runner_config
-      runners_userdata                             = var.runner_worker_docker_machine_userdata
+      runners_userdata                             = var.runner_worker_docker_machine_instance.start_script
       runners_executor                             = var.runner_worker.type
       runners_install_amazon_ecr_credential_helper = var.runner_install.ecr_credential_helper
       curl_cacert                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
@@ -99,15 +99,15 @@ locals {
       runners_spot_price_bid            = var.runner_worker_docker_machine_ec2_spot_price_bid == "on-demand-price" || var.runner_worker_docker_machine_ec2_spot_price_bid == null ? "" : var.runner_worker_docker_machine_ec2_spot_price_bid
       runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
-      runners_monitoring                = var.runner_worker_docker_machine_enable_monitoring
-      runners_ebs_optimized             = var.runner_worker_docker_machine_ec2_ebs_optimized
+      runners_monitoring                = var.runner_worker_docker_machine_instance.monitoring
+      runners_ebs_optimized             = var.runner_worker_docker_machine_instance.ebs_optimized
       runners_instance_profile          = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runner_instance.name
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runner_gitlab.registration_token
-      runners_userdata                  = var.runner_worker_docker_machine_userdata
+      runners_userdata                  = var.runner_worker_docker_machine_instance.start_script
       runners_executor                  = var.runner_worker.type
       runners_limit                     = var.runner_worker.max_jobs
       runners_concurrent                = var.runner_manager.maximum_concurrent_jobs
@@ -115,11 +115,11 @@ locals {
       runners_idle_count                = var.runner_worker.idle_count
       runners_idle_time                 = var.runner_worker.idle_time
       runners_max_builds                = local.runners_max_builds_string
-      runners_root_size                 = var.runner_worker_docker_machine_ec2_root_size
-      runners_volume_type               = var.runner_worker_docker_machine_ec2_volume_type
+      runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
+      runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
       runners_iam_instance_profile_name = var.runner_worker_docker_machine_iam_instance_profile_name
-      runners_use_private_address_only  = var.runner_worker_docker_machine_use_private_address
-      runners_use_private_address       = !var.runner_worker_docker_machine_use_private_address
+      runners_use_private_address_only  = var.runner_worker_docker_machine_instance.private_address_only
+      runners_use_private_address       = !var.runner_worker_docker_machine_instance.private_address_only
       runners_request_spot_instance     = var.runner_worker_docker_machine_request_spot_instances
       runners_environment_vars          = jsonencode(var.runner_worker.environment_variables)
       runners_pre_build_script          = var.runner_worker_pre_build_script
@@ -285,7 +285,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   }
   network_interfaces {
     security_groups             = concat([aws_security_group.runner.id], var.runner_extra_security_group_ids)
-    associate_public_ip_address = false == (var.runner_instance.private_address_only == false ? var.runner_instance.private_address_only : var.runner_worker_docker_machine_use_private_address)
+    associate_public_ip_address = false == (var.runner_instance.private_address_only == false ? var.runner_instance.private_address_only : var.runner_worker_docker_machine_instance.private_address_only)
   }
   tag_specifications {
     resource_type = "instance"

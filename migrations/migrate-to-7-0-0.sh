@@ -455,4 +455,32 @@ extracted_variables=$(echo "$extracted_variables" | \
 # insert the new variables into the existing block
 sed -i "/runner_worker_cache/runner_worker_cache { $extracted_variables/g" "$converted_file"
 
+extracted_variables=$(grep -E '(runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
+
+sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_instance_prefix/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_enable_monitoring/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_userdata/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_ec2_volume_type/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_ec2_root_size/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_ec2_ebs_optimized/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/runner_worker_docker_machine_use_private_address/private_address_only/g' | \
+                      sed 's/runner_worker_docker_machine_enable_monitoring/monitoring/g' | \
+                      sed 's/runner_worker_docker_machine_userdata/start_script/g' | \
+                      sed 's/runner_worker_docker_machine_ec2_volume_type/volume_type/g' | \
+                      sed 's/runner_worker_docker_machine_ec2_root_size/root_size/g' | \
+                      sed 's/runner_worker_docker_machine_ec2_ebs_optimized/ebs_optimized/g' | \
+                      sed 's/runner_worker_docker_machine_instance_prefix/name_prefix/g'
+                    )
+
+# add new block runners_docker_options at the end
+echo "$(head -n -1 "$converted_file")
+runner_worker_docker_machine_instance = {
+  $extracted_variables
+}
+" > x && mv x "$converted_file"
+
 echo "Module call converted. Output: $converted_file"

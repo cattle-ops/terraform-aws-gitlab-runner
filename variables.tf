@@ -654,68 +654,49 @@ variable "runner_worker_docker_machine_ami_owners" {
   default = ["099720109477"]
 }
 
-variable "runner_worker_docker_machine_use_private_address" {
-  description = "Restrict Executors to the use of a private IP address. If `agent_use_private_address` is set to `true` (default), `executor_docker_machine_use_private_address` will also apply for the agent."
-  type        = bool
-  default     = true
-}
-
-variable "runner_worker_docker_machine_instance_prefix" {
-  description = "Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances."
-  type        = string
-  default     = ""
+variable "runner_worker_docker_machine_instance" {
+  description = <<-EOT
+    ebs_optimized = Enable EBS optimization for the GitLab Runner Executor instances.
+    monitoring = Enable detailed monitoring for the GitLab Runner Executor instances.
+    name_prefix = Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances.
+    private_address_only = Restrict Executors to the use of a private IP address. If `agent_use_private_address` is set to `true` (default), `executor_docker_machine_use_private_address` will also apply for the agent.
+    root_size = The size of the root volume for the GitLab Runner Executor instances.
+    start_script = Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted.
+    volume_type = The type of volume to use for the GitLab Runner Executor instances.
+  EOT
+  type = object({
+    ebs_optimized = optional(bool, true)
+    monitoring = optional(bool, false)
+    name_prefix = optional(string, "")
+    private_address_only = optional(bool, true)
+    root_size = optional(number, 8)
+    start_script = optional(string, "")
+    volume_type = optional(string, "gp2")
+  })
+  default = {
+  }
 
   validation {
-    condition     = length(var.runner_worker_docker_machine_instance_prefix) <= 28
+    condition     = length(var.runner_worker_docker_machine_instance.name_prefix) <= 28
     error_message = "Maximum length for docker+machine executor name is 28 characters!"
   }
 
   validation {
-    condition     = var.runner_worker_docker_machine_instance_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance_prefix))
+    condition     = var.runner_worker_docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance_prefix))
     error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
   }
-}
-
-variable "runner_worker_docker_machine_enable_monitoring" {
-  description = "Enable detailed cloudwatch monitoring for spot instances."
-  type        = bool
-  default     = false
-}
-
-variable "runner_worker_docker_machine_request_spot_instances" {
-  description = "Whether or not to request spot instances via docker-machine"
-  type        = bool
-  default     = true
-}
-
-variable "runner_worker_docker_machine_userdata" {
-  description = "Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted."
-  type        = string
-  default     = ""
-}
-
-variable "runner_worker_docker_machine_ec2_volume_type" {
-  description = "Executor volume type"
-  type        = string
-  default     = "gp2"
-}
-
-variable "runner_worker_docker_machine_ec2_root_size" {
-  description = "Executor root size in GB."
-  type        = number
-  default     = 16
-}
-
-variable "runner_worker_docker_machine_ec2_ebs_optimized" {
-  description = "Enable Executors to be EBS-optimized."
-  type        = bool
-  default     = true
 }
 
 variable "runner_worker_docker_machine_ec2_spot_price_bid" {
   description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
   type        = string
   default     = "on-demand-price"
+}
+
+variable "runner_worker_docker_machine_request_spot_instances" {
+  description = "Whether or not to request spot instances via docker-machine"
+  type        = bool
+  default     = true
 }
 
 variable "runner_worker_docker_machine_ec2_options" {
