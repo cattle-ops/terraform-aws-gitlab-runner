@@ -375,7 +375,7 @@ variable "runner_worker" {
   default = {}
 
   validation {
-    condition     = contains(["docker+machine", "docker"], var.runner_worker.executor_type)
+    condition     = contains(["docker+machine", "docker"], var.runner_worker.type)
     error_message = "The executor currently supports `docker+machine` and `docker`."
   }
 }

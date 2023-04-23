@@ -60,7 +60,7 @@ locals {
       runners_config                               = local.template_runner_config
       runners_userdata                             = var.runner_worker_docker_machine_instance.start_script
       runners_executor                             = var.runner_worker.type
-      runners_install_amazon_ecr_credential_helper = var.runner_install.ecr_credential_helper
+      runners_install_amazon_ecr_credential_helper = var.runner_install.amazon_ecr_credential_helper
       curl_cacert                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                     = local.pre_install_certificates
       pre_install                                  = var.runner_install.pre_install_script
@@ -84,7 +84,7 @@ locals {
     {
       aws_region       = data.aws_region.current.name
       gitlab_url       = var.runner_gitlab.url
-      gitlab_clone_url = var.runner_gitlab.clone_url
+      gitlab_clone_url = var.runner_gitlab.url_clone
       tls_ca_file      = length(var.runner_gitlab.certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
       runners_machine_autoscaling = [for config in var.runner_worker_docker_machine_autoscaling_options : {
         for key, value in config :
@@ -250,7 +250,7 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   update_default_version = true
   ebs_optimized          = var.runner_instance.ebs_optimized
   monitoring {
-    enabled = var.runner_instance.enable_monitoring
+    enabled = var.runner_instance.monitoring
   }
   dynamic "instance_market_options" {
     for_each = var.runner_instance.spot_price == null || var.runner_instance.spot_price == "" ? [] : ["spot"]
@@ -336,7 +336,7 @@ module "cache" {
   tags        = local.tags
 
   cache_bucket_prefix                  = var.runner_worker_cache.bucket_prefix
-  cache_bucket_name_include_account_id = var.runner_worker_cache.bucket_include_account_id
+  cache_bucket_name_include_account_id = var.runner_worker_cache.include_account_id
   cache_bucket_set_random_suffix       = var.runner_worker_cache.random_suffix
   cache_bucket_versioning              = var.runner_worker_cache.versioning
   cache_expiration_days                = var.runner_worker_cache.expiration_days
@@ -365,7 +365,7 @@ resource "aws_iam_role" "instance" {
   count = var.runner_role.create_role_profile ? 1 : 0
 
   name                 = local.aws_iam_role_instance_name
-  assume_role_policy   = length(var.runner_role.assume_role_policy_json) > 0 ? var.var.runner_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
+  assume_role_policy   = length(var.runner_role.assume_role_policy_json) > 0 ? var.runner_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
   tags = merge(local.tags, var.runner_role.additional_tags)

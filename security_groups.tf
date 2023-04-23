@@ -9,7 +9,7 @@ resource "aws_security_group" "runner" {
   description = var.runner_networking.security_group_description
 
   dynamic "egress" {
-    for_each = var.runner_extra_egress_rules
+    for_each = var.runner_networking_egress_rules
     iterator = each
 
     content {
