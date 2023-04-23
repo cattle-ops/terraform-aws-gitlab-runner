@@ -52,13 +52,13 @@ module "runner" {
 
   environment = var.environment
 
-  vpc_id                             = module.vpc.vpc_id
-  subnet_id                          = element(module.vpc.private_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
 
   runner_instance = {
     collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
-    name = var.runner_name
-    ssm_access  = true
+    name                        = var.runner_name
+    ssm_access                  = true
   }
 
   runner_networking = {
@@ -66,7 +66,7 @@ module "runner" {
   }
 
   runner_gitlab = {
-    url         = var.gitlab_url
+    url = var.gitlab_url
   }
 
   runner_gitlab_registration_config = {
@@ -79,7 +79,7 @@ module "runner" {
   }
 
   runner_worker_gitlab_pipeline = {
-    pre_build_script = <<EOT
+    pre_build_script  = <<EOT
         '''
         echo 'multiline 1'
         echo 'multiline 2'

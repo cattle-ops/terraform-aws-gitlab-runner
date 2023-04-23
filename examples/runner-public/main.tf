@@ -79,8 +79,8 @@ module "runner" {
 module "runner2" {
   source = "../../"
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.public_subnets, 0)
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = element(module.vpc.public_subnets, 0)
   environment = "${var.environment}-2"
 
   runner_instance = {

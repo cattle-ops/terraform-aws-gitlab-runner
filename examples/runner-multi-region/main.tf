@@ -128,8 +128,8 @@ module "runner_alternate_region" {
   }
 
   runner_worker_cache = {
-    shared             = "true"
-    bucket_prefix      = local.bucket_prefix_alternate_region
+    shared        = "true"
+    bucket_prefix = local.bucket_prefix_alternate_region
   }
 
   runner_worker_docker_options = {

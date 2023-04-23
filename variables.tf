@@ -650,7 +650,7 @@ variable "runner_worker_docker_machine_instance" {
   }
 
   validation {
-    condition     = var.runner_worker_docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance_prefix))
+    condition     = var.runner_worker_docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance.name_prefix))
     error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
   }
 }
