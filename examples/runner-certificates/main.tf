@@ -27,12 +27,6 @@ module "runner" {
   ###############################################
   # General
   ###############################################
-
-  runner_gitlab_runner_name = var.runner_name
-  runner_gitlab_url         = var.gitlab_url
-
-  runner_worker_type = "docker"
-
   environment = var.environment
 
   ###############################################
@@ -40,10 +34,12 @@ module "runner" {
   ###############################################
 
   # Public cert of my companys gitlab instance
-  runner_gitlab_certificate = file("${path.module}/my_gitlab_instance_cert.crt")
-
   # Other public certs relating to my company.
-  runner_gitlab_ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
+  runner_gitlab = {
+    url            = var.gitlab_url
+    certificate    = file("${path.module}/my_gitlab_instance_cert.crt")
+    ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
+  }
 
   # Mount EC2 host certs in docker so all user docker images can reference them.
   # Each user image will need to do:
@@ -61,7 +57,6 @@ module "runner" {
   ###############################################
   # Registration
   ###############################################
-
   runner_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_runner"
@@ -74,7 +69,13 @@ module "runner" {
   ###############################################
   # Network
   ###############################################
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.public_subnets, 0)
+  vpc_id          = module.vpc.vpc_id
+  subnet_id       = element(module.vpc.public_subnets, 0)
+  runner_instance = {
+    name = var.runner_name
+  }
 
+  runner_worker = {
+    type = "docker"
+  }
 }

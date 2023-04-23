@@ -165,8 +165,8 @@ sed 's/log_group_name/runner_cloudwatch_log_group_name/g' | \
 sed 's/asg_max_instance_lifetime/runner_max_instance_lifetime_seconds/g' | \
 sed 's/asg_delete_timeout/runner_terraform_timeout_delete_asg/g' | \
 sed 's/enable_docker_machine_ssm_access/runner_worker_enable_ssm_access/g' | \
-sed 's/cache_bucket/runner_worker_cache_s3_bucket/g' | \
-sed 's/docker_machine_security_group_description//g' | \
+sed 's/ cache_bucket/ runner_worker_cache_s3_bucket/g' | \
+sed 's/docker_machine_security_group_description/runner_worker_docker_machine_security_group_description/g' | \
 sed 's/docker_machine_options/runner_worker_docker_machine_ec2_options/g' | \
 sed 's/runners_iam_instance_profile_name/runner_worker_docker_machine_iam_instance_profile_name/g' | \
 sed 's/runners_volume_type/runner_worker_docker_machine_ec2_volume_type/g' | \
@@ -448,7 +448,8 @@ if [ -n "$extracted_variables" ]; then
   " > x && mv x "$converted_file"
 fi
 
-sed -i 's/runner_worker_cache_s3_bucket/runner_worker_cache/g' "$converted_file"
+# renames the block
+sed -i 's/runner_worker_cache_s3_bucket /runner_worker_cache /g' "$converted_file"
 
 # integrate the new variables into existing block
 extracted_variables=$(grep -E '(runner_worker_cache_s3_logging_bucket_prefix|runner_worker_cache_s3_logging_bucket_id|runner_worker_cache_s3_bucket_enable_random_suffix|runner_worker_cache_s3_bucket_name_include_account_id|runner_worker_cache_s3_bucket_prefix|runner_worker_cache_s3_enable_versioning|runner_worker_cache_s3_expiration_days|runner_worker_cache_s3_authentication_type|runner_worker_cache_shared)' "$converted_file")
@@ -475,10 +476,22 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_cache_s3_logging_bucket_id/access_log_bucket_id/g' | \
                       sed 's/runner_worker_cache_s3_logging_bucket_prefix/access_log_bucket_prefix/g'
                     )
-# insert the new variables into the existing block
-sed -i "/runner_worker_cache/runner_worker_cache { $extracted_variables/g" "$converted_file"
 
-extracted_variables=$(grep -E '(runner_worker_docker_machine_instance_type|runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
+# insert the new variables into the existing block or append new block
+if [ -n "$extracted_variables" ]; then
+  if grep -q "runner_worker_cache = {" "$converted_file"; then
+    cp "$converted_file" "$converted_file.bak"
+    sed -i "s/runner_worker_cache = {/runner_worker_cache = { $extracted_variables/g" "$converted_file"
+  else
+    echo "$(head -n -1 "$converted_file")
+    runner_worker_cache = {
+      $extracted_variables
+    }
+    " > x && mv x "$converted_file"
+  fi
+fi
+
+extracted_variables=$(grep -E '(runner_worker_docker_machine_use_private_address|runner_worker_docker_machine_instance_type|runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
 
 sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_instance_prefix/d' "$converted_file"
@@ -489,6 +502,7 @@ sed -i '/runner_worker_docker_machine_ec2_root_size/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_ec2_ebs_optimized/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_max_builds/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_docker_registry_mirror_url/d' "$converted_file"
+sed -i '/runner_worker_docker_machine_use_private_address/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_instance_type/d' "$converted_file"
 
 # rename the variables

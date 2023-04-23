@@ -29,14 +29,18 @@ module "vpc" {
 module "runner" {
   source = "../../"
 
-  environment = var.environment
-
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.private_subnets, 0)
+  environment = var.environment
 
-  runner_gitlab_runner_name = var.runner_name
-  runner_gitlab_url         = var.gitlab_url
-  runner_gitlab_token       = var.runner_token
+  runner_instance = {
+    name = var.runner_name
+  }
+
+  runner_gitlab = {
+    url                = var.gitlab_url
+    registration_token = var.runner_token
+  }
 
   # working 9 to 5 :)
   runner_worker_docker_machine_autoscaling_options = [

@@ -24,22 +24,20 @@ module "vpc_main_region" {
 module "runner_main_region" {
   source = "../../"
 
+  vpc_id      = module.vpc_main_region.vpc_id
+  subnet_id   = element(module.vpc_main_region.public_subnets, 0)
   environment = var.environment
 
-  runner_worker_docker_machine_use_private_address = false
+  security_group_prefix = "my-security-group"
+  iam_object_prefix     = local.iam_object_prefix_main_region
 
-  vpc_id    = module.vpc_main_region.vpc_id
-  subnet_id = element(module.vpc_main_region.public_subnets, 0)
+  runner_instance = {
+    name        = var.runner_name
+    name_prefix = "my-runner-agent"
+  }
 
-  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
-
-  runner_gitlab_runner_name                 = var.runner_name
-  runner_gitlab_url                         = var.gitlab_url
-  runner_worker_extra_environment_variables = ["KEY=Value", "FOO=bar"]
-
-  runner_worker_docker_options = {
-    privileged = "false"
-    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
+  runner_gitlab = {
+    url = var.gitlab_url
   }
 
   runner_gitlab_registration_config = {
@@ -51,15 +49,25 @@ module "runner_main_region" {
     maximum_timeout    = "3600"
   }
 
-  security_group_prefix                        = "my-security-group"
-  runner_instance_prefix                       = "my-runner-agent"
-  runner_worker_docker_machine_instance_prefix = "my-runners-dm"
-  iam_object_prefix                            = local.name_iam_objects_main_region
+  runner_worker = {
+    environment_variables = ["KEY=Value", "FOO=bar"]
+  }
 
-  runner_worker_cache_shared = "true"
+  runner_worker_cache = {
+    shared             = "true"
+    bucket_prefix      = local.bucket_prefix_main_region
+    include_account_id = false
+  }
 
-  runner_worker_cache_s3_bucket_prefix                  = local.cache_bucket_prefix_main_region
-  runner_worker_cache_s3_bucket_name_include_account_id = false
+  runner_worker_docker_options = {
+    privileged = "false"
+    volumes    = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+  }
+
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
+    name_prefix          = "my-runners-dm"
+  }
 }
 
 # VPC Flow logs are not needed here
@@ -87,28 +95,17 @@ module "vpc_alternate_region" {
 }
 
 module "runner_alternate_region" {
-  providers = {
-    aws = aws.alternate_region
-  }
-
   source = "../../"
 
+  vpc_id      = module.vpc_alternate_region.vpc_id
+  subnet_id   = element(module.vpc_alternate_region.public_subnets, 0)
   environment = var.environment
 
-  runner_worker_docker_machine_use_private_address = false
+  security_group_prefix = "my-security-group"
+  iam_object_prefix     = local.iam_object_prefix_main_region # <--
 
-  vpc_id    = module.vpc_alternate_region.vpc_id
-  subnet_id = element(module.vpc_alternate_region.public_subnets, 0)
-
-  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
-
-  runner_gitlab_runner_name                 = var.runner_name
-  runner_gitlab_url                         = var.gitlab_url
-  runner_worker_extra_environment_variables = ["KEY=Value", "FOO=bar"]
-
-  runner_worker_docker_options = {
-    privileged = "false"
-    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
+  runner_gitlab = {
+    url = var.gitlab_url
   }
 
   runner_gitlab_registration_config = {
@@ -121,13 +118,31 @@ module "runner_alternate_region" {
     access_level       = "ref_protected"
   }
 
-  security_group_prefix                        = "my-security-group"
-  runner_instance_prefix                       = "my-runner-agent"
-  runner_worker_docker_machine_instance_prefix = "my-runners-dm"
-  iam_object_prefix                            = local.name_iam_objects_main_region # <--
+  runner_instance = {
+    name        = var.runner_name
+    name_prefix = "my-runner-agent"
+  }
 
-  runner_worker_cache_shared = "true"
+  runner_worker = {
+    environment_variables = ["KEY=Value", "FOO=bar"]
+  }
 
-  runner_worker_cache_s3_bucket_prefix                  = local.cache_bucket_prefix_alternate_region
-  runner_worker_cache_s3_bucket_name_include_account_id = false
+  runner_worker_cache = {
+    shared             = "true"
+    bucket_prefix      = local.bucket_prefix_alternate_region
+  }
+
+  runner_worker_docker_options = {
+    privileged = "false"
+    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
+  }
+
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
+    name_prefix          = "my-runners-dm"
+  }
+
+  providers = {
+    aws = aws.alternate_region
+  }
 }

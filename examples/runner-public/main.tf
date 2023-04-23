@@ -29,22 +29,19 @@ module "cache" {
 module "runner" {
   source = "../../"
 
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = element(module.vpc.public_subnets, 0)
   environment = var.environment
 
-  runner_worker_docker_machine_use_private_address = false
+  security_group_prefix = "my-security-group"
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.public_subnets, 0)
+  runner_instance = {
+    name        = var.runner_name
+    name_prefix = "my-runner-agent"
+  }
 
-  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
-
-  runner_gitlab_runner_name                 = var.runner_name
-  runner_gitlab_url                         = var.gitlab_url
-  runner_worker_extra_environment_variables = ["KEY=Value", "FOO=bar"]
-
-  runner_worker_docker_options = {
-    privileged = "false"
-    volumes    = ["/var/run/docker.sock:/var/run/docker.sock"]
+  runner_gitlab = {
+    url = var.gitlab_url
   }
 
   runner_gitlab_registration_config = {
@@ -57,33 +54,42 @@ module "runner" {
     access_level       = "ref_protected"
   }
 
-  security_group_prefix                        = "my-security-group"
-  runner_instance_prefix                       = "my-runner-agent"
-  runner_worker_docker_machine_instance_prefix = "my-runners-dm"
-
-  runner_worker_cache_shared = "true"
+  runner_worker = {
+    environment_variables = ["KEY=Value", "FOO=bar"]
+  }
 
   runner_worker_cache = {
+    shared = "true"
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
+  }
+
+  runner_worker_docker_options = {
+    privileged = "false"
+    volumes    = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+  }
+
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
+    name_prefix          = "my-runners-dm"
   }
 }
 
 module "runner2" {
   source = "../../"
 
-  environment = "${var.environment}-2"
-
-  runner_worker_docker_machine_use_private_address = false
-
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.public_subnets, 0)
+  environment = "${var.environment}-2"
 
-  runner_worker_docker_machine_ec2_spot_price_bid = "on-demand-price"
+  runner_instance = {
+    name = var.runner_name
+  }
 
-  runner_gitlab_runner_name = var.runner_name
-  runner_gitlab_url         = var.gitlab_url
+  runner_gitlab = {
+    url = var.gitlab_url
+  }
 
   runner_gitlab_registration_config = {
     registration_token = var.registration_token
@@ -94,11 +100,14 @@ module "runner2" {
     maximum_timeout    = "3600"
   }
 
-  runner_worker_cache_shared = "true"
-
   runner_worker_cache = {
-    create = false
-    policy = module.cache.policy_arn
-    bucket = module.cache.bucket
+    runner_worker_shared = "true"
+    create               = false
+    policy               = module.cache.policy_arn
+    bucket               = module.cache.bucket
+  }
+
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
   }
 }
