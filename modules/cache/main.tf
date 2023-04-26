@@ -38,12 +38,6 @@ resource "aws_s3_bucket" "build_cache" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_acl" "build_cache_acl" {
-  bucket = aws_s3_bucket.build_cache.id
-
-  acl = "private"
-}
-
 resource "aws_s3_bucket_versioning" "build_cache_versioning" {
   bucket = aws_s3_bucket.build_cache.id
 
