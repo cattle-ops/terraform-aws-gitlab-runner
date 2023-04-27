@@ -29,12 +29,14 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 >    - harmonize the documentation
 >    - remove deprecated variables
 >    - gain a better overview of the features provided
->    - add all possible Docker settings
->    - introduce the `idle_scale_factor`
 >
-> We know that this is a breaking change, but we think it is worth it. We hope you agree. And to make the transition as
-> smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases, but some minor
-> rework might still be possible.
+> And it also adds
+>   - all possible Docker settings
+>   - the `idle_scale_factor`
+>
+> We know that this is a breaking change causing some pain, but we think it is worth it. We hope you agree. And to make the
+> transition as smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases,
+> but some minor rework might still be possible.
 > 
 > Checkout [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819)
 
