@@ -374,10 +374,14 @@ module "runner" {
 
 ### Scenario: Use of Spot Fleet
 
-Since spot instances can be taken over by AWS depending on the instance type and AZ you are using, you may want multiple instances types in multiple AZs. This is where spot fleets come in, when there is no capacity on one instance type and one AZ, AWS will take the next instance type and so on. This update has been possible since the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine supports spot fleets.
+Since spot instances can be taken over by AWS depending on the instance type and AZ you are using, you may want multiple instances
+types in multiple AZs. This is where spot fleets come in, when there is no capacity on one instance type and one AZ, AWS will take
+the next instance type and so on. This update has been possible since the
+[fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine supports spot fleets.
 
-We have seen that the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine this module is using consume more RAM using spot fleets.
-For comparison, if you launch 50 machines in the same time, it consumes ~1.2GB of RAM. In our case, we had to change the `instance_type` of the runner from `t3.micro` to `t3.small`.
+We have seen that the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine this
+module is using consume more RAM using spot fleets. For comparison, if you launch 50 machines in the same time, it consumes
+~1.2GB of RAM. In our case, we had to change the `instance_type` of the runner from `t3.micro` to `t3.small`.
 
 #### Configuration example
 ```hcl

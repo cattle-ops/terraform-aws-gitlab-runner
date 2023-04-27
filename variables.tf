@@ -638,7 +638,7 @@ variable "runner_worker_docker_machine_instance" {
     ebs_optimized = Enable EBS optimization for the Runner Worker.
     monitoring = Enable detailed monitoring for the Runner Worker.
     name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
-    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_isntance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
+    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
     root_size = The size of the root volume for the Runner Worker.
     start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
