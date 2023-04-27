@@ -548,7 +548,7 @@ variable "runner_worker_docker_machine_fleet" {
     key_pair_name = The name of the key pair used by the runner to connect to the docker-machine executors. This variable is only supported when use_fleet is set to true.
   EOT
   type = object({
-    enable = bool
+    enable        = bool
     key_pair_name = optional(string, "fleet-key")
   })
   default = {
@@ -713,7 +713,7 @@ variable "debug" {
     trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.
     write_runner_config_to_file: Outputs the user data script and `config.toml` to the local file system.
   EOT
-  type        = object({
+  type = object({
     trace_runner_user_data      = optional(bool, false)
     write_runner_config_to_file = optional(bool, false)
   })

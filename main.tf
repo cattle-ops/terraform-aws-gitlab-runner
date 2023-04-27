@@ -81,7 +81,7 @@ locals {
       public_key                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
-    })
+  })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
@@ -168,7 +168,7 @@ data "aws_ami" "docker-machine" {
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   # TODO Please explain how `agent_enable_asg_recreation` works
-  name = var.runner_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
+  name                      = var.runner_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
   vpc_zone_identifier       = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : [var.subnet_id]
   min_size                  = "1"
   max_size                  = "1"
