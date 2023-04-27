@@ -2,17 +2,20 @@
  * Global variables
  */
 variable "vpc_id" {
-  description = "The target VPC for the agent and executors (e.g. docker-machine) instances."
+  description = "The VPC used for the runner and runner workers."
   type        = string
 }
 
 variable "subnet_id" {
-  description = "Subnet id used for the agent and executors. Must belong to the `vpc_id`."
+  description = <<-EOT
+    Subnet id used for the Runner and Runner Workers. Must belong to the `vpc_id`. In case the fleet mode is used, multiple subnets for
+    the Runner Workers can be provided with runner_worker_docker_machine_instance.subnet_ids.
+  EOT
   type        = string
 }
 
 variable "kms_key_id" {
-  description = "KMS key id to encrypt the resources. Ensure CloudWatch and Agent/Executors have access to the provided KMS key."
+  description = "KMS key id to encrypt the resources. Ensure that CloudWatch and Runner/Runner Workers have access to the provided KMS key."
   type        = string
   default     = ""
 }
@@ -53,7 +56,7 @@ variable "tags" {
 }
 
 variable "suppressed_tags" {
-  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
+  description = "List of tag keys which are automatically removed and never added as default tag by the module."
   type        = list(string)
   default     = []
 }
@@ -71,14 +74,15 @@ variable "iam_object_prefix" {
 }
 
 /*
- * Runner Manager: A type of runner that can create multiple runners for autoscaling. Specific to the type of executor used.
+ * Runner Manager: A manager which creates multiple Runners (only one Runner supported by this module) which in turn creates
+ *                 multiple Runner Workers (e.g. docker-machine).
  */
 variable "runner_manager" {
   description = <<-EOT
     gitlab_check_interval = Number of seconds between checking for available jobs.
-    maximum_concurrent_jobs = The maximum number of jobs which can be processed by all executors at the same time.
+    maximum_concurrent_jobs = The maximum number of jobs which can be processed by all Runners at the same time.
     prometheus_listen_address = Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on.
-    sentry_dsn = Sentry DSN of the project for the Agent to use (uses legacy DSN format)
+    sentry_dsn = Sentry DSN of the project for the Runner Manager to use (uses legacy DSN format)
   EOT
   type = object({
     gitlab_check_interval     = optional(number, 3)
@@ -94,19 +98,19 @@ variable "runner_manager" {
  */
 variable "runner_instance" {
   description = <<-EOT
-    additional_tags = Map of tags that will be added to the Agent instance.
+    additional_tags = Map of tags that will be added to the Runner instance.
     collect_autoscaling_metrics = A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances.
-    ebs_optimized = Enable EBS optimization for the Agent instance.
-    max_lifetime_seconds = The maximum time an Agent should live before it is killed.
-    monitoring = Enable the detailed monitoring on the Agent instance.
+    ebs_optimized = Enable EBS optimization for the Runner instance.
+    max_lifetime_seconds = The maximum time a Runner should live before it is killed.
+    monitoring = Enable the detailed monitoring on the Runner instance.
     name = Name of the Runner instance.
-    name_prefix = Set the name prefix and override the `Name` tag for the Agent instance.
-    private_address_only = Restrict the Agent to the use of a private IP address. If this is set to `false` it will override the `runners_use_private_address` for the agent.
-    root_device_config = The Agent's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`
-    spot_price = By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen.
-    ssm_access = Allows to connect to the Agent via SSM.
+    name_prefix = Set the name prefix and override the `Name` tag for the Runner instance.
+    private_address_only = Restrict the Runner to use private IP addresses only. If this is set to `true` the Runner will use a private IP address only in case the Runner Workers use private addresses only.
+    root_device_config = The Runner's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`
+    spot_price = By setting a spot price bid price the Runner is created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen.
+    ssm_access = Allows to connect to the Runner via SSM.
     type = EC2 instance type used.
-    use_eip = Assigns an EIP to the Agent.
+    use_eip = Assigns an EIP to the Runner.
   EOT
   type = object({
     additional_tags             = optional(map(string))
@@ -129,7 +133,7 @@ variable "runner_instance" {
 }
 
 variable "runner_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
+  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1 or 2 image."
   type        = map(list(string))
 
   default = {
@@ -138,17 +142,17 @@ variable "runner_ami_filter" {
 }
 
 variable "runner_ami_owners" {
-  description = "The list of owners used to select the AMI of the Agent instance."
+  description = "The list of owners used to select the AMI of the Runner instance."
   type        = list(string)
   default     = ["amazon"]
 }
 
 variable "runner_networking" {
   description = <<-EOT
-    allow_incoming_ping = Allow ICMP Ping to the Agent. Specify `allow_incoming_ping_security_group_ids` too!
-    allow_incoming_ping_security_group_ids = A list of security group ids that are allowed to ping the gitlab runner agent
-    security_group_description = A description for the Agent's security group
-    security_group_ids = IDs of security groups to add to the Agent.
+    allow_incoming_ping = Allow ICMP Ping to the Runner. Specify `allow_incoming_ping_security_group_ids` too!
+    allow_incoming_ping_security_group_ids = A list of security group ids that are allowed to ping the Runner.
+    security_group_description = A description for the Runner's security group
+    security_group_ids = IDs of security groups to add to the Runner.
   EOT
   type = object({
     allow_incoming_ping                    = optional(bool, false)
@@ -160,7 +164,7 @@ variable "runner_networking" {
 }
 
 variable "runner_networking_egress_rules" {
-  description = "List of egress rules for the Agent."
+  description = "List of egress rules for the Runner."
   type = list(object({
     cidr_blocks      = list(string)
     ipv6_cidr_blocks = list(string)
@@ -190,11 +194,11 @@ variable "runner_networking_egress_rules" {
 variable "runner_role" {
   description = <<-EOT
         additional_tags = Map of tags that will be added to the role created. Useful for tag based authorization.
-        allow_iam_service_linked_role_creation = Boolean used to control attaching the policy to the Agent to create service linked roles.
-        assume_role_policy_json = The assume role policy for the Agent.
-        create_role_profile = Whether to create the IAM role/profile for the Agent. If you provide your own role, make sure that it has the required permissions.
-        policy_arns = List of policy ARNs to be added to the instance profile of the Agent.
-        role_profile_name = IAM role/profile name for the Agent. If unspecified then `$${var.iam_object_prefix}-instance` is used.
+        allow_iam_service_linked_role_creation = Boolean used to control attaching the policy to the Runner to create service linked roles.
+        assume_role_policy_json = The assume role policy for the Runner.
+        create_role_profile = Whether to create the IAM role/profile for the Runner. If you provide your own role, make sure that it has the required permissions.
+        policy_arns = List of policy ARNs to be added to the instance profile of the Runner.
+        role_profile_name = IAM role/profile name for the Runner. If unspecified then `$${var.iam_object_prefix}-instance` is used.
     EOT
   type = object({
     additional_tags                        = optional(map(string))
@@ -208,7 +212,7 @@ variable "runner_role" {
 }
 
 variable "runner_metadata_options" {
-  description = "Enable the Gitlab runner agent instance metadata service. IMDSv2 is enabled by default."
+  description = "Enable the Runner instance metadata service. IMDSv2 is enabled by default."
   type = object({
     http_endpoint               = string
     http_tokens                 = string
@@ -224,19 +228,19 @@ variable "runner_metadata_options" {
 }
 
 variable "runner_schedule_enable" {
-  description = "Set to `true` to enable the auto scaling group schedule for the Agent."
+  description = "Set to `true` to enable the auto scaling group schedule for the Runner."
   type        = bool
   default     = false
 }
 
 variable "runner_enable_asg_recreation" {
-  description = "Enable automatic redeployment of the Agent ASG when the Launch Configs change."
+  description = "Enable automatic redeployment of the Runner's ASG when the Launch Configs change."
   default     = true
   type        = bool
 }
 
 variable "runner_schedule_config" {
-  description = "Map containing the configuration of the ASG scale-out and scale-in for the Agent. Will only be used if `agent_schedule_enable` is set to `true`. "
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the Runner. Will only be used if `agent_schedule_enable` is set to `true`. "
   type        = map(any)
   default = {
     # Configure optional scale_out scheduled action
@@ -258,10 +262,10 @@ variable "runner_install" {
     amazon_ecr_credentials_helper = Install amazon-ecr-credential-helper inside `userdata_pre_install` script
     docker_machine_download_url = URL to download docker machine binary. If not set, the docker machine version will be used to download the binary.
     docker_machine_version = By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases
-    pre_install_script = Script to run before installing the runner
-    post_install_script = Script to run after installing the runner
-    start_script = Script to run after starting the runner
-    yum_update = Update the yum packages before installing the runner
+    pre_install_script = Script to run before installing the Runner
+    post_install_script = Script to run after installing the Runner
+    start_script = Script to run after starting the Runner
+    yum_update = Update the yum packages before installing the Runner
   EOT
   type = object({
     amazon_ecr_credential_helper = optional(bool, false)
@@ -290,7 +294,7 @@ variable "runner_cloudwatch" {
 }
 
 variable "runner_gitlab_registration_config" {
-  description = "Configuration used to register the Agent. See the README for an example, or reference the examples in the examples directory of this repo."
+  description = "Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo."
   type = object({
     registration_token = optional(string, "")
     tag_list           = optional(string, "")
@@ -308,8 +312,8 @@ variable "runner_gitlab" {
   description = <<-EOT
     ca_certificate = Trusted CA certificate bundle (PEM format).
     certificate = Certificate of the GitLab instance to connect to (PEM format).
-    registration_token = Registration token to use to register the runner. Do not use. This is replaced by the `registration_token` in `runner_gitlab_registration_config`.
-    runner_version = Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
+    registration_token = Registration token to use to register the Runner. Do not use. This is replaced by the `registration_token` in `runner_gitlab_registration_config`.
+    runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
     url = URL of the GitLab instance to connect to.
     url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
   EOT
@@ -342,24 +346,24 @@ variable "runner_terminate_ec2_lifecycle_hook_name" {
 }
 
 variable "runner_terraform_timeout_delete_asg" {
-  description = "Timeout when trying to delete the Agent ASG."
+  description = "Timeout when trying to delete the Runner ASG."
   default     = "10m"
   type        = string
 }
 
 /*
- * Runner Worker: The process created by the runner on the host computing platform to run jobs.
+ * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */
 variable "runner_worker" {
   description = <<-EOT
-    environment_variables = List of environment variables to add to the runner.
-    idle_count = Number of idle Executor instances.
-    idle_time = Idle time of the runners before they are destroyed.
-    max_jobs = Number of jobs which can be processed in parallel by the executor.
+    environment_variables = List of environment variables to add to the Runner Worker.
+    idle_count = Number of idle Runner Worker instances.
+    idle_time = Idle time of the Runner Worker before they are destroyed.
+    max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1).
-    ssm_access = Allows to connect to the Executor via SSM.
-    type = The executor type to use. Currently supports `docker+machine` or `docker`.
+    ssm_access = Allows to connect to the Runner Worker via SSM.
+    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
   EOT
   type = object({
     environment_variables = optional(list(string), [])
@@ -382,7 +386,7 @@ variable "runner_worker" {
 variable "runner_worker_cache" {
   description = <<-EOT
     Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
-    cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and
+    cache. To use the same cache across multiple Runner Worker disable the creation of the cache and provide a policy and
     bucket name. See the public runner example for more details."
 
     access_log_bucker_id = The ID of the bucket where the access logs are stored.
@@ -404,7 +408,7 @@ variable "runner_worker_cache" {
     authentication_type      = optional(string, "iam")
     bucket                   = optional(string, "")
     bucket_prefix            = optional(string, "")
-    create                   = bool
+    create                   = optional(bool, true)
     expiration_days          = optional(number, 1)
     include_account_id       = optional(bool, true)
     policy                   = optional(string, "")
@@ -412,9 +416,7 @@ variable "runner_worker_cache" {
     shared                   = optional(bool, false)
     versioning               = optional(bool, false)
   })
-  default = {
-    create = true
-  }
+  default = {}
 }
 
 variable "runner_worker_gitlab_pipeline" {
@@ -471,7 +473,7 @@ variable "runner_worker_docker_add_dind_volumes" {
 
 variable "runner_worker_docker_options" {
   description = <<EOT
-    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
+    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Runner Worker. For
     details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
     Default values if the option is not given:
@@ -545,13 +547,13 @@ variable "runner_worker_docker_options" {
 }
 
 /*
- * docker+machine Executor variables. The executor is the actual machine that runs the job. Please specify the
- * `executor_docker_*` variables as well as Docker is used on the docker+machine executor.
+ * docker+machine Runner Worker variables. The Runner Worker is the actual machine that runs the job. Please specify the
+ * `runner_worker_docker_*` variables as well as Docker is used on the docker+machine Runner Worker.
  */
 variable "runner_worker_docker_machine_fleet" {
   description = <<-EOT
-    enable = Use the fleet mode for agents. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode
-    key_pair_name = The name of the key pair used by the runner to connect to the docker-machine executors. This variable is only supported when use_fleet is set to true.
+    enable = Activates the fleet mode on the Runner. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode
+    key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
   EOT
   type = object({
     enable        = bool
@@ -564,10 +566,10 @@ variable "runner_worker_docker_machine_fleet" {
 
 variable "runner_worker_docker_machine_role" {
   description = <<-EOT
-    additional_tags = Map of tags that will be added to runner EC2 instances.
-    assume_role_policy_json = Assume role policy for the docker+machine Executor.
-    policy_arns = List of ARNs of IAM policies to attach to the runner EC2 instances.
-    profile_name    = Name of the IAM profile to attach to the runner EC2 instances.
+    additional_tags = Map of tags that will be added to the Runner Worker.
+    assume_role_policy_json = Assume role policy for the Runner Worker.
+    policy_arns = List of ARNs of IAM policies to attach to the Runner Workers.
+    profile_name    = Name of the IAM profile to attach to the Runner Workers.
   EOT
   type = object({
     additional_tags         = optional(map(string), {})
@@ -579,7 +581,7 @@ variable "runner_worker_docker_machine_role" {
 }
 
 variable "runner_worker_docker_machine_extra_egress_rules" {
-  description = "List of egress rules for the docker-machine instance(s)."
+  description = "List of egress rules for the Runner Workers."
   type = list(object({
     cidr_blocks      = list(string)
     ipv6_cidr_blocks = list(string)
@@ -601,19 +603,19 @@ variable "runner_worker_docker_machine_extra_egress_rules" {
       security_groups  = null
       self             = null
       to_port          = 0
-      description      = "Allow all egress traffic for docker machine build runners"
+      description      = "Allow all egress traffic for Runner Workers."
     }
   ]
 }
 
 variable "runner_worker_docker_machine_security_group_description" {
-  description = "A description for the docker+machine Executor security group"
+  description = "A description for the Runner Worker security group"
   type        = string
-  default     = "A security group containing docker-machine instances"
+  default     = "A security group containing Runner Worker instances"
 }
 
 variable "runner_worker_docker_machine_ami_filter" {
-  description = "List of maps used to create the AMI filter for the docker+machine Executor."
+  description = "List of maps used to create the AMI filter for the Runner Worker."
   type        = map(list(string))
 
   default = {
@@ -622,7 +624,7 @@ variable "runner_worker_docker_machine_ami_filter" {
 }
 
 variable "runner_worker_docker_machine_ami_owners" {
-  description = "The list of owners used to select the AMI of the docker+machine Executor."
+  description = "The list of owners used to select the AMI of the Runner Worker."
   type        = list(string)
 
   # Canonical
@@ -631,17 +633,17 @@ variable "runner_worker_docker_machine_ami_owners" {
 
 variable "runner_worker_docker_machine_instance" {
   description = <<-EOT
-    docker_registry_mirror_url = The URL of the Docker registry mirror to use for the GitLab Runner Executor instances.
+    docker_registry_mirror_url = The URL of the Docker registry mirror to use for the Runner Worker.
     destroy_after_max_builds = Destroy the instance after the maximum number of builds has been reached.
-    ebs_optimized = Enable EBS optimization for the GitLab Runner Executor instances.
-    monitoring = Enable detailed monitoring for the GitLab Runner Executor instances.
-    name_prefix = Set the name prefix and override the `Name` tag for the GitLab Runner Executor instances.
-    private_address_only = Restrict Executors to the use of a private IP address. If `agent_use_private_address` is set to `true` (default), `executor_docker_machine_use_private_address` will also apply for the agent.
-    root_size = The size of the root volume for the GitLab Runner Executor instances.
-    start_script = Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted.
-    subnet_ids = The list of subnet IDs to use for the GitLab Runner Executor instances when the fleet mode is enabled.
-    types = The type of instance to use for the GitLab Runner Executor instances. In case of fleet mode, multiple values are supported.
-    volume_type = The type of volume to use for the GitLab Runner Executor instances.
+    ebs_optimized = Enable EBS optimization for the Runner Worker.
+    monitoring = Enable detailed monitoring for the Runner Worker.
+    name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
+    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_isntance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
+    root_size = The size of the root volume for the Runner Worker.
+    start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
+    subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
+    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
+    volume_type = The type of volume to use for the Runner Worker.
   EOT
   type = object({
     destroy_after_max_builds   = optional(number, 0)
@@ -672,7 +674,7 @@ variable "runner_worker_docker_machine_instance" {
 
 variable "runner_worker_docker_machine_instance_spot" {
   description = <<-EOT
-    enable = Enable spot instances for the docker+machine Executor.
+    enable = Enable spot instances for the Runner Worker.
     max_price = The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen.
   EOT
   type = object({
@@ -689,7 +691,7 @@ variable "runner_worker_docker_machine_ec2_options" {
 }
 
 variable "runner_worker_docker_machine_ec2_metadata_options" {
-  description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
+  description = "Enable the Runner Worker metadata service. Requires you use CKI maintained docker machines."
   type = object({
     http_tokens                 = string
     http_put_response_hop_limit = number
