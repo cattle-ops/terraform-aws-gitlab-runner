@@ -358,12 +358,9 @@ variable "runner_terraform_timeout_delete_asg" {
  */
 variable "runner_worker" {
   description = <<-EOT
-    For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section
-    and https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section
+    For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
 
     environment_variables = List of environment variables to add to the Runner Worker (environment).
-    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
-    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
     max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
@@ -372,8 +369,6 @@ variable "runner_worker" {
   EOT
   type = object({
     environment_variables = optional(list(string), [])
-    idle_count            = optional(number, 0)
-    idle_time             = optional(number, 600)
     max_jobs              = optional(number, 0)
     output_limit          = optional(number, 4096)
     request_concurrency   = optional(number, 1)
@@ -393,6 +388,8 @@ variable "runner_worker_cache" {
     Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
     cache. To use the same cache across multiple Runner Worker disable the creation of the cache and provide a policy and
     bucket name. See the public runner example for more details."
+
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnerscaches3-section
 
     access_log_bucker_id = The ID of the bucket where the access logs are stored.
     access_log_bucket_prefix = The bucket prefix for the access logs.
@@ -638,9 +635,13 @@ variable "runner_worker_docker_machine_ami_owners" {
 
 variable "runner_worker_docker_machine_instance" {
   description = <<-EOT
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section
+
     docker_registry_mirror_url = The URL of the Docker registry mirror to use for the Runner Worker.
     destroy_after_max_builds = Destroy the instance after the maximum number of builds has been reached.
     ebs_optimized = Enable EBS optimization for the Runner Worker.
+    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
+    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
     monitoring = Enable detailed monitoring for the Runner Worker.
     name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
     private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
@@ -654,6 +655,8 @@ variable "runner_worker_docker_machine_instance" {
     destroy_after_max_builds   = optional(number, 0)
     docker_registry_mirror_url = optional(string, "")
     ebs_optimized              = optional(bool, true)
+    idle_count                 = optional(number, 0)
+    idle_time                  = optional(number, 600)
     monitoring                 = optional(bool, false)
     name_prefix                = optional(string, "")
     private_address_only       = optional(bool, true)

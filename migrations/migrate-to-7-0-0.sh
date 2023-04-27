@@ -416,13 +416,11 @@ if [ -n "$extracted_variables" ]; then
   " > x && mv x "$converted_file"
 fi
 
-extracted_variables=$(grep -E '(runner_worker_extra_environment_variables|runner_worker_output_limit|runner_worker_request_concurrency|runner_worker_idle_count|runner_worker_idle_time|runner_worker_max_jobs|runner_worker_type|runner_worker_enable_ssm_access)' "$converted_file")
+extracted_variables=$(grep -E '(runner_worker_extra_environment_variables|runner_worker_output_limit|runner_worker_request_concurrency|runner_worker_max_jobs|runner_worker_type|runner_worker_enable_ssm_access)' "$converted_file")
 
 sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
 sed -i '/runner_worker_type/d' "$converted_file"
 sed -i '/runner_worker_max_jobs/d' "$converted_file"
-sed -i '/runner_worker_idle_time/d' "$converted_file"
-sed -i '/runner_worker_idle_count/d' "$converted_file"
 sed -i '/runner_worker_request_concurrency/d' "$converted_file"
 sed -i '/runner_worker_output_limit/d' "$converted_file"
 sed -i '/runner_worker_extra_environment_variables/d' "$converted_file"
@@ -431,8 +429,6 @@ sed -i '/runner_worker_extra_environment_variables/d' "$converted_file"
 extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_enable_ssm_access/ssm_access/g' | \
                       sed 's/runner_worker_max_jobs/max_jobs/g' | \
-                      sed 's/runner_worker_idle_time/idle_time/g' | \
-                      sed 's/runner_worker_idle_count/idle_count/g' | \
                       sed 's/runner_worker_request_concurrency/request_concurrency/g' | \
                       sed 's/runner_worker_output_limit/output_limit/g' | \
                       sed 's/runner_worker_extra_environment_variables/environment_variables/g' | \
@@ -491,7 +487,7 @@ if [ -n "$extracted_variables" ]; then
   fi
 fi
 
-extracted_variables=$(grep -E '(runner_worker_docker_machine_use_private_address|runner_worker_docker_machine_instance_type|runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
+extracted_variables=$(grep -E '(runner_worker_idle_count|runner_worker_idle_time|runner_worker_docker_machine_use_private_address|runner_worker_docker_machine_instance_type|runner_worker_docker_machine_docker_registry_mirror_url|runner_worker_docker_machine_max_builds|runner_worker_docker_machine_ec2_ebs_optimized|runner_worker_docker_machine_ec2_root_size|runner_worker_docker_machine_ec2_volume_type|runner_worker_docker_machine_userdata|runner_worker_docker_machine_enable_monitoring|runner_worker_enable_ssm_access|runner_worker_docker_machine_instance_prefix)' "$converted_file")
 
 sed -i '/runner_worker_enable_ssm_access/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_instance_prefix/d' "$converted_file"
@@ -504,6 +500,8 @@ sed -i '/runner_worker_docker_machine_max_builds/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_docker_registry_mirror_url/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_use_private_address/d' "$converted_file"
 sed -i '/runner_worker_docker_machine_instance_type/d' "$converted_file"
+sed -i '/runner_worker_idle_time/d' "$converted_file"
+sed -i '/runner_worker_idle_count/d' "$converted_file"
 
 # rename the variables
 extracted_variables=$(echo "$extracted_variables" | \
@@ -516,6 +514,8 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_docker_machine_max_builds/destroy_after_max_builds/g' | \
                       sed 's/runner_worker_docker_machine_docker_registry_mirror_url/docker_registry_mirror_url/g' | \
                       sed 's/runner_worker_docker_machine_instance_type/types/g' | \
+                      sed 's/runner_worker_idle_time/idle_time/g' | \
+                      sed 's/runner_worker_idle_count/idle_count/g' | \
                       sed 's/runner_worker_docker_machine_instance_prefix/name_prefix/g'
                     )
 
