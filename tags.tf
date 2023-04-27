@@ -13,6 +13,8 @@ locals {
 
   agent_tags_merged = merge(
     {
+      # false positive: TfLint fails with: Call to function "format" failed: unsupported value for "%s" at 0: null value cannot be formatted.
+      # tflint-ignore: aws_iam_policy_sid_invalid_characters
       "Name" = format("%s", local.name_runner_agent_instance)
     },
     {
