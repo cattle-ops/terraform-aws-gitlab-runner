@@ -52,6 +52,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "use_fleet" {
+  description = "Use the fleet mode for agents. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode"
+  type        = bool
+  default     = false
+}
+
 variable "suppressed_tags" {
   description = "List of tag keys which are removed from `tags`, `agent_tags`  and `executor_tags` and never added as default tag by the module."
   type        = list(string)
@@ -122,6 +128,12 @@ variable "runner_spot_price" {
   description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
   type        = string
   default     = null
+}
+
+variable "runner_fleet_key_pair_name" {
+  description = "The name of the key pair used by the runner to connect to the docker-machine executors."
+  type        = string
+  default     = "fleet-key"
 }
 
 variable "runner_ebs_optimized" {
@@ -295,6 +307,65 @@ variable "runner_max_instance_lifetime_seconds" {
   description = "The maximum time an Agent should live before it is killed."
   default     = null
   type        = number
+}
+
+variable "runners_gitlab_url" {
+  description = "URL of the GitLab instance to connect to."
+  type        = string
+}
+
+variable "runners_clone_url" {
+  description = "Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL."
+  type        = string
+  default     = ""
+}
+
+variable "runners_monitoring" {
+  description = "Enable detailed cloudwatch monitoring for spot instances."
+  type        = bool
+  default     = false
+}
+
+variable "runners_ebs_optimized" {
+  description = "Enable runners to be EBS-optimized."
+  type        = bool
+  default     = true
+}
+
+variable "runners_machine_autoscaling_options" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
+  type = list(object({
+    periods           = list(string)
+    idle_count        = optional(number)
+    idle_scale_factor = optional(number)
+    idle_count_min    = optional(number)
+    idle_time         = optional(number)
+    timezone          = optional(string, "UTC")
+  }))
+
+  validation {
+    condition = alltrue([
+      for options in var.runners_machine_autoscaling_options :
+      length(
+        setsubtract([for key, value in options : key if value != null], ["periods", "timezone"])
+      ) > 0
+    ])
+
+    error_message = "Please specify an attribute that affects Autoscaling."
+  }
+  default = []
+}
+
+variable "runners_root_size" {
+  description = "Runner instance root size in GB."
+  type        = number
+  default     = 16
+}
+
+variable "runners_volume_type" {
+  description = "Runner instance volume type"
+  type        = string
+  default     = "gp2"
 }
 
 variable "runner_enable_asg_recreation" {
@@ -731,6 +802,18 @@ variable "runner_worker_docker_machine_instance_type" {
   default     = "m5.large"
 }
 
+variable "runner_worker_docker_machine_instance_types_fleet" {
+  description = "Instance types used for the instances hosting docker-machine. This variable is only supported when use_fleet is set to true."
+  type        = list(string)
+  default     = []
+}
+
+variable "runner_worker_docker_machine_fleet_subnet_ids" {
+  description = "List of subnets used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
+  type        = list(string)
+  default     = []
+}
+
 variable "runner_worker_docker_machine_extra_role_tags" {
   description = "Map of tags that will be added to runner EC2 instances."
   type        = map(string)
@@ -843,6 +926,12 @@ variable "runner_worker_docker_machine_request_spot_instances" {
 
 variable "runner_worker_docker_machine_userdata" {
   description = "Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted."
+  type        = string
+  default     = ""
+}
+
+variable "runners_gitlab_certificate" {
+  description = "Certificate of the GitLab instance to connect to. Example: `file(\"$${path.module}/my-gitlab.crt\")`"
   type        = string
   default     = ""
 }

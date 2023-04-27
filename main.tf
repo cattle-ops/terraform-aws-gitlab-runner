@@ -78,6 +78,9 @@ locals {
       gitlab_runner_maximum_timeout                = var.runner_gitlab_registration_config["maximum_timeout"]
       gitlab_runner_access_level                   = lookup(var.runner_gitlab_registration_config, "access_level", "not_protected")
       sentry_dsn                                   = var.runner_manager_sentry_dsn
+      public_key                                   = var.use_fleet == true ? tls_private_key.fleet[0].public_key_openssh : ""
+      use_fleet                                    = var.use_fleet
+      private_key                                  = var.use_fleet == true ? tls_private_key.fleet[0].private_key_pem : ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -102,6 +105,11 @@ locals {
       runners_monitoring                = var.runner_worker_docker_machine_enable_monitoring
       runners_ebs_optimized             = var.runner_worker_docker_machine_ec2_ebs_optimized
       runners_instance_profile          = var.runner_worker_type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+      gitlab_url                        = var.runners_gitlab_url
+      gitlab_clone_url                  = var.runners_clone_url
+      tls_ca_file                       = length(var.runners_gitlab_certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
+      runners_subnet_ids                = length(var.runner_worker_docker_machine_fleet_subnet_ids) > 0 ? var.runner_worker_docker_machine_fleet_subnet_ids : [var.subnet_id]
+      runners_instance_types            = length(var.runner_worker_docker_machine_instance_types_fleet) > 0 ? var.runner_worker_docker_machine_instance_types_fleet : [var.runner_worker_docker_machine_instance_type]
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_name                      = var.runner_gitlab_runner_name
@@ -137,6 +145,8 @@ locals {
       sentry_dsn                        = var.runner_manager_sentry_dsn
       prometheus_listen_address         = var.runner_manager_prometheus_listen_address
       auth_type                         = var.runner_worker_cache_s3_authentication_type
+      use_fleet                         = var.use_fleet
+      launch_template                   = var.use_fleet == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
     }
   )
 }
@@ -163,8 +173,7 @@ data "aws_ami" "docker-machine" {
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   # TODO Please explain how `agent_enable_asg_recreation` works
   name = var.runner_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-
-  vpc_zone_identifier       = [var.subnet_id]
+  vpc_zone_identifier       = length(var.runner_worker_docker_machine_fleet_subnet_ids) > 0 ? var.runner_worker_docker_machine_fleet_subnet_ids : [var.subnet_id]
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
@@ -320,6 +329,77 @@ resource "aws_launch_template" "gitlab_runner_instance" {
   depends_on = [aws_cloudwatch_log_group.environment]
 }
 
+resource "tls_private_key" "fleet" {
+  count = var.use_fleet == true && var.runner_worker_type == "docker+machine" ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "fleet" {
+  count = var.use_fleet == true && var.runner_worker_type == "docker+machine" ? 1 : 0
+
+  key_name   = "${var.environment}-${var.runner_fleet_key_pair_name}"
+  public_key = tls_private_key.fleet[0].public_key_openssh
+
+  tags = local.tags
+}
+
+resource "aws_launch_template" "fleet_gitlab_runner" {
+  # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
+  # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
+  count       = var.use_fleet == true && var.runner_worker_type == "docker+machine" ? 1 : 0
+  name_prefix = "${local.name_runner_agent_instance}-worker-"
+
+  key_name               = aws_key_pair.fleet[0].key_name
+  image_id               = data.aws_ami.docker-machine[0].id
+  user_data              = base64gzip(var.runner_worker_docker_machine_userdata)
+  instance_type          = var.runner_worker_docker_machine_instance_types_fleet[0] # it will be override by the fleet
+  update_default_version = true
+  ebs_optimized          = var.runners_ebs_optimized
+  monitoring {
+    enabled = var.runners_monitoring
+  }
+  block_device_mappings {
+    device_name = "/dev/sda1"
+
+    ebs {
+      volume_size = var.runners_root_size
+      volume_type = var.runners_volume_type
+    }
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.docker_machine[0].name
+  }
+
+  network_interfaces {
+    security_groups             = [aws_security_group.docker_machine[0].id]
+    associate_public_ip_address = !var.runner_worker_docker_machine_use_private_address
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "volume"
+    tags          = local.tags
+  }
+
+  tags = local.tags
+
+  metadata_options {
+    http_tokens                 = var.runner_worker_docker_machine_ec2_metadata_options.http_tokens
+    http_put_response_hop_limit = var.runner_worker_docker_machine_ec2_metadata_options.http_put_response_hop_limit
+    instance_metadata_tags      = "enabled"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 ################################################################################
 ### Create cache bucket
 ################################################################################
@@ -468,7 +548,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
   /* If the S3 cache adapter is configured to use an IAM instance profile, the
      adapter uses the profile attached to the GitLab Runner machine. So do not
      use aws_iam_role.docker_machine.name here! See https://docs.gitlab.com/runner/configuration/advanced-configuration.html */
-  count = var.runner_worker_type == "docker+machine" ? (var.runner_worker_cache_s3_bucket["create"] || lookup(var.runner_worker_cache_s3_bucket, "policy", "") != "" ? 1 : 0) : 0
+  count = var.runner_worker_cache_s3_bucket["create"] || lookup(var.runner_worker_cache_s3_bucket, "policy", "") != "" ? 1 : 0
 
   role       = var.runner_create_runner_iam_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = local.bucket_policy
