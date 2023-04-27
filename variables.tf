@@ -52,6 +52,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "suppressed_tags" {
+  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
+  type        = list(string)
+  default     = []
+}
+
 variable "security_group_prefix" {
   description = "Set the name prefix and overwrite the `Name` tag for all security groups."
   type        = string
