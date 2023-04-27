@@ -24,6 +24,7 @@
     "devskim",
     "dind",
     "endfor",
+    "filesha",
     "formatlist",
     "gitter",
     "glrunners",
@@ -64,7 +65,8 @@
     "typecheck",
     "userdata",
     "userns",
-    "xanzy"
+    "xanzy",
+    "xvda"
   ],
   "flagWords": []
 }

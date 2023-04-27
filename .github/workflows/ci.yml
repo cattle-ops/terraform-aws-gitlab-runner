@@ -138,7 +138,7 @@ jobs:
 
       - name: Run TFLint
         # assign necessary variables to avoid errors
-        run: "tflint -var:'runner_instance={\"name_prefix\": \"a\", \"name\": \"b\"}'"
+        run: "tflint --var='runner_instance={\"name_prefix\": \"a\", \"name\": \"b\"}'"
 
   tfsec:
     name: tfsec PR commenter
