@@ -27,7 +27,10 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 > 💥 BREAKING CHANGE AHEAD: Version 7 of the module rewrites the whole variable section to
 >    - harmonize the variable names
 >    - harmonize the documentation
+>    - remove deprecated variables
 >    - gain a better overview of the features provided
+>    - add all possible Docker settings
+>    - introduce the `idle_scale_factor`
 >
 > We know that this is a breaking change, but we think it is worth it. We hope you agree. And to make the transition as
 > smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases, but some minor
