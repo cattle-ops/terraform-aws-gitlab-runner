@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.3.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.0...6.3.1) (2023-04-27)
+
+
+### Bug Fixes
+
+* allow s3 cache access for the "docker" runner executor ([#817](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/817)) ([a17015f](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/a17015f0fb0cbf2159b938a0b60eac31530a9eb7))
+* remove explicit aws_s3_bucket_acl ([#815](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/815)) ([5d88370](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/5d883706afb0313a098027d8320f275171ec74a7))
+
 ## [6.3.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.2.0...6.3.0) (2023-04-21)
 
 
