@@ -52,12 +52,6 @@ variable "tags" {
   default     = {}
 }
 
-variable "suppressed_tags" {
-  description = "List of tag keys which are removed from `tags`, `agent_tags`  and `executor_tags` and never added as default tag by the module."
-  type        = list(string)
-  default     = []
-}
-
 variable "security_group_prefix" {
   description = "Set the name prefix and overwrite the `Name` tag for all security groups."
   type        = string
@@ -228,7 +222,6 @@ variable "runner_schedule_enable" {
   type        = bool
   default     = false
 }
-
 
 variable "runner_enable_asg_recreation" {
   description = "Enable automatic redeployment of the Agent ASG when the Launch Configs change."
@@ -549,6 +542,20 @@ variable "runner_worker_docker_options" {
  * docker+machine Executor variables. The executor is the actual machine that runs the job. Please specify the
  * `executor_docker_*` variables as well as Docker is used on the docker+machine executor.
  */
+variable "runner_worker_docker_machine_fleet" {
+  description = <<-EOT
+    enable = Use the fleet mode for agents. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode
+    key_pair_name = The name of the key pair used by the runner to connect to the docker-machine executors. This variable is only supported when use_fleet is set to true.
+  EOT
+  type = object({
+    enable = bool
+    key_pair_name = optional(string, "fleet-key")
+  })
+  default = {
+    enable = false
+  }
+}
+
 variable "runner_worker_docker_machine_role" {
   description = <<-EOT
     additional_tags = Map of tags that will be added to runner EC2 instances.
@@ -626,7 +633,8 @@ variable "runner_worker_docker_machine_instance" {
     private_address_only = Restrict Executors to the use of a private IP address. If `agent_use_private_address` is set to `true` (default), `executor_docker_machine_use_private_address` will also apply for the agent.
     root_size = The size of the root volume for the GitLab Runner Executor instances.
     start_script = Cloud-init user data that will be passed to the Executor EC2 instance. Should not be base64 encrypted.
-       type = The type of instance to use for the GitLab Runner Executor instances.
+    subnet_ids = The list of subnet IDs to use for the GitLab Runner Executor instances when the fleet mode is enabled.
+    types = The type of instance to use for the GitLab Runner Executor instances. In case of fleet mode, multiple values are supported.
     volume_type = The type of volume to use for the GitLab Runner Executor instances.
   EOT
   type = object({
@@ -638,7 +646,8 @@ variable "runner_worker_docker_machine_instance" {
     private_address_only       = optional(bool, true)
     root_size                  = optional(number, 8)
     start_script               = optional(string, "")
-    type                       = optional(string, "m5.large")
+    subnet_ids                 = optional(list(string), [])
+    types                      = optional(list(string), ["m5.large"])
     volume_type                = optional(string, "gp2")
   })
   default = {
@@ -704,7 +713,7 @@ variable "debug" {
     trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.
     write_runner_config_to_file: Outputs the user data script and `config.toml` to the local file system.
   EOT
-  type = object({
+  type        = object({
     trace_runner_user_data      = optional(bool, false)
     write_runner_config_to_file = optional(bool, false)
   })

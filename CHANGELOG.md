@@ -1,5 +1,21 @@
 # Changelog
 
+## [6.3.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.0...6.3.1) (2023-04-27)
+
+
+### Bug Fixes
+
+* allow s3 cache access for the "docker" runner executor ([#817](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/817)) ([a17015f](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/a17015f0fb0cbf2159b938a0b60eac31530a9eb7))
+* remove explicit aws_s3_bucket_acl ([#815](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/815)) ([5d88370](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/5d883706afb0313a098027d8320f275171ec74a7))
+
+## [6.3.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.2.0...6.3.0) (2023-04-21)
+
+
+### Features
+
+* add an IAM policy to grant the runner access to the KMS key ([#778](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/778)) ([df25b6a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/df25b6ae06b7cbbb85c089fc45a181dce0aa1e00))
+* **spotfleet:** add supports spot fleets for spot instances allowing us to use multiple instance types and AZs ([#777](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/777)) ([1bb7e11](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/1bb7e1126e5d9f2950e5931cb19d691dcf579eb7))
+
 ## [6.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.2...6.2.0) (2023-03-22)
 
 

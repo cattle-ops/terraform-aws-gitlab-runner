@@ -30,17 +30,17 @@ check `.terraform-version` for the tested version.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.59.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.64.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | 2.4.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.1 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | 3.4.3 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | 3.5.1 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.64.0 |
 
 ## Modules
 
@@ -49,13 +49,13 @@ check `.terraform-version` for the tested version.
 | <a name="module_cache"></a> [cache](#module\_cache) | ../../modules/cache | n/a |
 | <a name="module_runner"></a> [runner](#module\_runner) | ../../ | n/a |
 | <a name="module_runner2"></a> [runner2](#module\_runner2) | ../../ | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 4.0.1 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/4.59.0/docs/data-sources/availability_zones) | data source |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/4.64.0/docs/data-sources/availability_zones) | data source |
 
 ## Inputs
 

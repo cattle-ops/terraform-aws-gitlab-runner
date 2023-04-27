@@ -515,15 +515,22 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_docker_machine_ec2_ebs_optimized/ebs_optimized/g' | \
                       sed 's/runner_worker_docker_machine_max_builds/destroy_after_max_builds/g' | \
                       sed 's/runner_worker_docker_machine_docker_registry_mirror_url/docker_registry_mirror_url/g' | \
-                      sed 's/runner_worker_docker_machine_instance_type/type/g' | \
+                      sed 's/runner_worker_docker_machine_instance_type/types/g' | \
                       sed 's/runner_worker_docker_machine_instance_prefix/name_prefix/g'
                     )
+
+extracted_fleet_types=$(grep -E '(docker_machine_instance_types_fleet)' "$converted_file" | sed 's/docker_machine_instance_types_fleet/types/g')
+extracted_fleet_subnets=$(grep -E '(fleet_executor_subnet_ids)' "$converted_file" | sed 's/fleet_executor_subnet_ids/subnet_ids/g')
+sed -i '/docker_machine_instance_types_fleet/d' "$converted_file"
+sed -i '/fleet_executor_subnet_ids/d' "$converted_file"
 
 # add new block runners_docker_options at the end
 if [ -n "$extracted_variables" ]; then
   echo "$(head -n -1 "$converted_file")
   runner_worker_docker_machine_instance = {
     $extracted_variables
+    $extracted_fleet_types
+    $extracted_fleet_subnets
   }
   " > x && mv x "$converted_file"
 fi
@@ -615,6 +622,26 @@ extracted_variables=$(echo "$extracted_variables" | \
 if [ -n "$extracted_variables" ]; then
   echo "$(head -n -1 "$converted_file")
   runner_worker_docker_machine_role = {
+    $extracted_variables
+  }
+  " > x && mv x "$converted_file"
+fi
+
+extracted_variables=$(grep -E '(use_fleet|fleet_key_pair_name)' "$converted_file")
+
+sed -i '/use_fleet/d' "$converted_file"
+sed -i '/fleet_key_pair_name/d' "$converted_file"
+
+# rename the variables
+extracted_variables=$(echo "$extracted_variables" | \
+                      sed 's/use_fleet/enable/g' | \
+                      sed 's/fleet_key_pair_name/key_pair_name/g'
+                    )
+
+# add new block at the end
+if [ -n "$extracted_variables" ]; then
+  echo "$(head -n -1 "$converted_file")
+  runner_worker_docker_machine_fleet = {
     $extracted_variables
   }
   " > x && mv x "$converted_file"
