@@ -79,10 +79,12 @@ variable "iam_object_prefix" {
  */
 variable "runner_manager" {
   description = <<-EOT
-    gitlab_check_interval = Number of seconds between checking for available jobs.
-    maximum_concurrent_jobs = The maximum number of jobs which can be processed by all Runners at the same time.
-    prometheus_listen_address = Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on.
-    sentry_dsn = Sentry DSN of the project for the Runner Manager to use (uses legacy DSN format)
+    For details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
+
+    gitlab_check_interval = Number of seconds between checking for available jobs (check_interval)
+    maximum_concurrent_jobs = The maximum number of jobs which can be processed by all Runners at the same time (concurrent).
+    prometheus_listen_address = Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on (listen_address).
+    sentry_dsn = Sentry DSN of the project for the Runner Manager to use (uses legacy DSN format) (sentry_dsn)
   EOT
   type = object({
     gitlab_check_interval     = optional(number, 3)
@@ -294,7 +296,7 @@ variable "runner_cloudwatch" {
 }
 
 variable "runner_gitlab_registration_config" {
-  description = "Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo."
+  description = "Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
   type = object({
     registration_token = optional(string, "")
     tag_list           = optional(string, "")
@@ -356,12 +358,15 @@ variable "runner_terraform_timeout_delete_asg" {
  */
 variable "runner_worker" {
   description = <<-EOT
-    environment_variables = List of environment variables to add to the Runner Worker.
-    idle_count = Number of idle Runner Worker instances.
-    idle_time = Idle time of the Runner Worker before they are destroyed.
+    For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section
+    and https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section
+
+    environment_variables = List of environment variables to add to the Runner Worker (environment).
+    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
+    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
     max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
-    output_limit = Sets the maximum build log size in kilobytes. Default is 4MB
-    request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1).
+    output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
+    request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
     ssm_access = Allows to connect to the Runner Worker via SSM.
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
   EOT
