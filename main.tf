@@ -98,7 +98,6 @@ locals {
       runners_subnet_id                 = var.subnet_id
       runners_subnet_ids                = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : [var.subnet_id]
       runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
-      runners_instance_type             = var.runner_worker_docker_machine_instance.type
       runners_instance_types            = var.runner_worker_docker_machine_instance.types
       runners_spot_price_bid            = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
       runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
