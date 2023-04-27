@@ -29,7 +29,7 @@ module "runner_main_region" {
   environment = var.environment
 
   security_group_prefix = "my-security-group"
-  iam_object_prefix     = local.iam_object_prefix_main_region
+  iam_object_prefix     = local.name_iam_objects_main_region
 
   runner_instance = {
     name        = var.runner_name
@@ -55,7 +55,7 @@ module "runner_main_region" {
 
   runner_worker_cache = {
     shared             = "true"
-    bucket_prefix      = local.bucket_prefix_main_region
+    bucket_prefix      = local.cache_bucket_prefix_main_region
     include_account_id = false
   }
 
@@ -102,7 +102,7 @@ module "runner_alternate_region" {
   environment = var.environment
 
   security_group_prefix = "my-security-group"
-  iam_object_prefix     = local.iam_object_prefix_main_region # <--
+  iam_object_prefix     = local.name_iam_objects_alternate_region # <--
 
   runner_gitlab = {
     url = var.gitlab_url
@@ -129,7 +129,7 @@ module "runner_alternate_region" {
 
   runner_worker_cache = {
     shared        = "true"
-    bucket_prefix = local.bucket_prefix_alternate_region
+    bucket_prefix = local.cache_bucket_prefix_alternate_region
   }
 
   runner_worker_docker_options = {
