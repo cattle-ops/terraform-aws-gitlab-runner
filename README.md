@@ -24,14 +24,21 @@ This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner]
 describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).
 The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-> 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances),
-> the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine).
-> For more details see [PR](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/697).
-<!-- there is no blank line in between. These are two separate quotes! -->
-<!-- markdownlint-disable MD028 -->
-> 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current
-> GitHub links and Terraform registry links remain working. After release 6.0.0 we move the repository to
-> [https://github.com/cattle-ops/terraform-aws-gitlab-runner](https://github.com/cattle-ops/terraform-aws-gitlab-runner).
+> 💥 BREAKING CHANGE AHEAD: Version 7 of the module rewrites the whole variable section to
+>    - harmonize the variable names
+>    - harmonize the documentation
+>    - remove deprecated variables
+>    - gain a better overview of the features provided
+>
+> And it also adds
+>   - all possible Docker settings
+>   - the `idle_scale_factor`
+>
+> We know that this is a breaking change causing some pain, but we think it is worth it. We hope you agree. And to make the
+> transition as smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases,
+> but some minor rework might still be possible.
+> 
+> Checkout [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819)
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
 
