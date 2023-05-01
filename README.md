@@ -162,6 +162,8 @@ gitlab_runner_registration_config = {
   access_level       = "<not_protected OR ref_protected>"
 }
 ```
+The registration token can also be read in via SSM parameter store. If no registration token is passed in, the module
+will look up the token in the SSM parameter store at the location specified by `secure_parameter_store_gitlab_runner_registration_token_name`.
 
 For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the
 required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
