@@ -36,7 +36,7 @@ gitlab_runner_registration_token=${gitlab_runner_registration_token}
 # fetch registration token from SSM
 if [[ "$gitlab_runner_registration_token" == "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__" ]]
 then
-    gitlab_runner_registration_token=$(aws ssm get-parameters --names "${secure_parameter_store_registration_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+    gitlab_runner_registration_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_runner_registration_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
 fi
 
 if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
