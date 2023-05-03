@@ -983,4 +983,29 @@ variable "show_user_data_in_plan" {
   description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
   type        = bool
   default     = false
+  validation {
+    condition     = !var.show_user_data_in_plan
+    error_message = "The variable is deprecated. Please use the 'debug' variable instead."
+  }
+}
+
+variable "debug" {
+  description = <<EOT
+    Enable debug settings for development
+
+    output_runner_config_to_file: When enabled, outputs the rendered config.toml file in the root module. This can
+                                  then also be used by Terraform to show changes in plan. Note that enabling this can
+                                  potentially expose sensitive information.
+    output_user_data_to_file: When enabled, outputs the rendered userdata.sh file in the root module. This can then
+                              also be used by Terraform to show changes in plan. Note that enabling this can
+                              potentially expose sensitive information.
+  EOT
+  type = object({
+    output_runner_config_to_file    = bool
+    output_runner_user_data_to_file = bool
+  })
+  default = {
+    output_runner_config_to_file    = false
+    output_runner_user_data_to_file = false
+  }
 }
