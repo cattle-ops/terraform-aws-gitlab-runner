@@ -170,6 +170,9 @@ gitlab_runner_registration_config = {
 }
 ```
 
+The registration token can also be read in via SSM parameter store. If no registration token is passed in, the module
+will look up the token in the SSM parameter store at the location specified by `secure_parameter_store_gitlab_runner_registration_token_name`.
+
 For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the
 required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
 
@@ -380,12 +383,18 @@ module "runner" {
 
 ### Scenario: Use of Spot Fleet
 
-Since spot instances can be taken over by AWS depending on the instance type and AZ you are using, you may want multiple instances types in multiple AZs. This is where spot fleets come in, when there is no capacity on one instance type and one AZ, AWS will take the next instance type and so on. This update has been possible since the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine supports spot fleets.
+Since spot instances can be taken over by AWS depending on the instance type and AZ you are using, you may want multiple instances
+types in multiple AZs. This is where spot fleets come in, when there is no capacity on one instance type and one AZ, AWS will take
+the next instance type and so on. This update has been possible since the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2)
+of docker-machine supports spot fleets.
 
-We have seen that the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine this module is using consume more RAM using spot fleets.
-For comparison, if you launch 50 machines in the same time, it consumes ~1.2GB of RAM. In our case, we had to change the `instance_type` of the runner from `t3.micro` to `t3.small`.
+We have seen that the [fork](https://gitlab.com/cki-project/docker-machine/-/tree/v0.16.2-gitlab.19-cki.2) of docker-machine this
+module is using consume more RAM using spot fleets.
+For comparison, if you launch 50 machines in the same time, it consumes ~1.2GB of RAM. In our case, we had to change the
+`instance_type` of the runner from `t3.micro` to `t3.small`.
 
 #### Configuration example
+
 ```hcl
 module "runner" {
   # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
