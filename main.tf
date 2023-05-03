@@ -68,7 +68,7 @@ locals {
       runners_token                                                = var.runners_token
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
-      secure_parameter_store_gitlab_runner_registration_token_name = local.secure_parameter_store_gitlab_runner_registration_token_name
+      secure_parameter_store_gitlab_runner_registration_token_name = var.secure_parameter_store_gitlab_runner_registration_token_name
       secure_parameter_store_region                                = var.aws_region
       gitlab_runner_registration_token                             = lookup(var.gitlab_runner_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
       gitlab_runner_description                                    = var.gitlab_runner_registration_config["description"]
