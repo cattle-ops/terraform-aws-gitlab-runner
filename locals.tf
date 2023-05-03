@@ -61,16 +61,6 @@ locals {
     }
   )
 
-  runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
-    options = merge({
-      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes"
-      }, {
-      volumes = local.runners_volumes
-    })
-    }
-  )
-
-
   # Ensure max builds is optional
   runners_max_builds_string = var.runner_worker_docker_machine_instance.destroy_after_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runner_worker_docker_machine_instance.destroy_after_max_builds)
 

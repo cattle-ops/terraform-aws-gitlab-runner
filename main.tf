@@ -54,34 +54,34 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
-      gitlab_runner_version                        = var.runner_gitlab.runner_version
-      docker_machine_version                       = var.runner_install.docker_machine_version
-      docker_machine_download_url                  = var.runner_install.docker_machine_download_url
-      runners_config                               = local.template_runner_config
-      runners_userdata                             = var.runner_worker_docker_machine_instance.start_script
-      runners_executor                             = var.runner_worker.type
-      runners_install_amazon_ecr_credential_helper = var.runner_install.amazon_ecr_credential_helper
-      curl_cacert                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
-      pre_install_certificates                     = local.pre_install_certificates
-      pre_install                                  = var.runner_install.pre_install_script
-      post_install                                 = var.runner_install.post_install_script
-      runners_gitlab_url                           = var.runner_gitlab.url
-      runners_token                                = var.runner_gitlab.registration_token
+      gitlab_runner_version                                        = var.runner_gitlab.runner_version
+      docker_machine_version                                       = var.runner_install.docker_machine_version
+      docker_machine_download_url                                  = var.runner_install.docker_machine_download_url
+      runners_config                                               = local.template_runner_config
+      runners_userdata                                             = var.runner_worker_docker_machine_instance.start_script
+      runners_executor                                             = var.runner_worker.type
+      runners_install_amazon_ecr_credential_helper                 = var.runner_install.amazon_ecr_credential_helper
+      curl_cacert                                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
+      pre_install_certificates                                     = local.pre_install_certificates
+      pre_install                                                  = var.runner_install.pre_install_script
+      post_install                                                 = var.runner_install.post_install_script
+      runners_gitlab_url                                           = var.runner_gitlab.url
+      runners_token                                                = var.runner_gitlab.registration_token
       secure_parameter_store_gitlab_runner_registration_token_name = var.runner_gitlab_registration_token_secure_parameter_store_name
-      secure_parameter_store_runner_token_key      = local.secure_parameter_store_runner_token_key
-      secure_parameter_store_runner_sentry_dsn     = local.secure_parameter_store_runner_sentry_dsn
-      secure_parameter_store_region                = data.aws_region.current.name
-      gitlab_runner_registration_token             = lookup(var.runner_gitlab_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
-      gitlab_runner_description                    = var.runner_gitlab_registration_config["description"]
-      gitlab_runner_tag_list                       = var.runner_gitlab_registration_config["tag_list"]
-      gitlab_runner_locked_to_project              = var.runner_gitlab_registration_config["locked_to_project"]
-      gitlab_runner_run_untagged                   = var.runner_gitlab_registration_config["run_untagged"]
-      gitlab_runner_maximum_timeout                = var.runner_gitlab_registration_config["maximum_timeout"]
-      gitlab_runner_access_level                   = lookup(var.runner_gitlab_registration_config, "access_level", "not_protected")
-      sentry_dsn                                   = var.runner_manager.sentry_dsn
-      public_key                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
-      use_fleet                                    = var.runner_worker_docker_machine_fleet.enable
-      private_key                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
+      secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
+      secure_parameter_store_region                                = data.aws_region.current.name
+      gitlab_runner_registration_token                             = lookup(var.runner_gitlab_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
+      gitlab_runner_description                                    = var.runner_gitlab_registration_config["description"]
+      gitlab_runner_tag_list                                       = var.runner_gitlab_registration_config["tag_list"]
+      gitlab_runner_locked_to_project                              = var.runner_gitlab_registration_config["locked_to_project"]
+      gitlab_runner_run_untagged                                   = var.runner_gitlab_registration_config["run_untagged"]
+      gitlab_runner_maximum_timeout                                = var.runner_gitlab_registration_config["maximum_timeout"]
+      gitlab_runner_access_level                                   = lookup(var.runner_gitlab_registration_config, "access_level", "not_protected")
+      sentry_dsn                                                   = var.runner_manager.sentry_dsn
+      public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
+      use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
+      private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",

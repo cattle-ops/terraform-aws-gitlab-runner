@@ -739,8 +739,8 @@ variable "debug" {
                                     can potentially expose sensitive information.
   EOT
   type = object({
-    trace_runner_user_data = optional(bool, false)
-    write_runner_config_to_file = optional(bool, false)
+    trace_runner_user_data         = optional(bool, false)
+    write_runner_config_to_file    = optional(bool, false)
     write_runner_user_data_to_file = optional(bool, false)
   })
   default = {}
