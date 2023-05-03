@@ -62,8 +62,3 @@ output "runner_config_toml_rendered" {
   description = "The rendered config.toml given to the Runner Manager."
   value       = local.template_runner_config
 }
-
-output "runner_config_toml_rendered" {
-  description = "The rendered config.toml given to the Runner Manager."
-  value       = local.template_runner_config
-}
