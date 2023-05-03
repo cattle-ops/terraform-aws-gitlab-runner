@@ -180,6 +180,7 @@ sed 's/runners_root_size/runner_worker_docker_machine_ec2_root_size/g' | \
 sed 's/enable_asg_recreation/runner_enable_asg_recreation/g' | \
 sed 's/secure_parameter_store_runner_sentry_dsn/runner_sentry_secure_parameter_store_name/g' | \
 sed 's/secure_parameter_store_runner_token_key/runner_gitlab_token_secure_parameter_store/g' | \
+sed 's/secure_parameter_store_gitlab_runner_registration_token_name/runner_gitlab_registration_token_secure_parameter_store_name/g' | \
 sed 's/allow_iam_service_linked_role_creation/runner_allow_iam_service_linked_role_creation/g' | \
 sed 's/runners_add_dind_volumes/runner_worker_docker_add_dind_volumes/g' | \
 sed 's/runners_token/runner_gitlab_token/g' | \
@@ -393,6 +394,8 @@ if [ -n "$extracted_variables" ]; then
   }
   " > x && mv x "$converted_file"
 fi
+
+sed -i 's/output_runner_user_data_to_file/write_runner_user_data_to_file/g' "$converted_file"
 
 extracted_variables=$(grep -E '(runner_cloudwatch_log_group_name|runner_cloudwatch_retention_days|runner_cloudwatch_enable)' "$converted_file")
 

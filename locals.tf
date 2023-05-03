@@ -61,6 +61,16 @@ locals {
     }
   )
 
+  runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
+    options = merge({
+      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes"
+      }, {
+      volumes = local.runners_volumes
+    })
+    }
+  )
+
+
   # Ensure max builds is optional
   runners_max_builds_string = var.runner_worker_docker_machine_instance.destroy_after_max_builds == 0 ? "" : format("MaxBuilds = %d", var.runner_worker_docker_machine_instance.destroy_after_max_builds)
 
@@ -98,12 +108,12 @@ resource "local_file" "config_toml" {
   count = var.debug.write_runner_config_to_file ? 1 : 0
 
   content  = local.template_runner_config
-  filename = "${path.module}/debug/runner_config.toml"
+  filename = "${path.root}/debug/${local.name_runner_agent_instance}/runner_config.toml"
 }
 
 resource "local_file" "user_data" {
-  count = var.debug.write_runner_config_to_file ? 1 : 0
+  count = var.debug.write_runner_user_data_to_file ? 1 : 0
 
-  content  = nonsensitive(local.template_user_data)
-  filename = "${path.module}/debug/user_data.sh"
+  content  = local.template_user_data
+  filename = "${path.root}/debug/${local.name_runner_agent_instance}/user_data.sh"
 }

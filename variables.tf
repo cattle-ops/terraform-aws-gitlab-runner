@@ -235,6 +235,7 @@ variable "runner_schedule_enable" {
   default     = false
 }
 
+
 variable "runner_enable_asg_recreation" {
   description = "Enable automatic redeployment of the Runner's ASG when the Launch Configs change."
   default     = true
@@ -327,6 +328,12 @@ variable "runner_gitlab" {
     url                = optional(string)
     url_clone          = optional(string)
   })
+}
+
+variable "runner_gitlab_registration_token_secure_parameter_store_name" {
+  description = "The name of the SSM parameter to read the GitLab Runner registration token from."
+  type        = string
+  default     = "gitlab-runner-registration-token"
 }
 
 variable "runner_gitlab_token_secure_parameter_store" {
@@ -721,17 +728,20 @@ variable "runner_worker_docker_machine_autoscaling_options" {
     timezone          = optional(string, "UTC")
   }))
   default = []
-
 }
 
 variable "debug" {
   description = <<-EOT
     trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.
-    write_runner_config_to_file: Outputs the user data script and `config.toml` to the local file system.
+    write_runner_config_to_file: When enabled, outputs the rendered config.toml file in the root module. Note that enabling this can
+                                 potentially expose sensitive information.
+    write_runner_user_data_to_file: When enabled, outputs the rendered userdata.sh file in the root module. Note that enabling this
+                                    can potentially expose sensitive information.
   EOT
   type = object({
-    trace_runner_user_data      = optional(bool, false)
+    trace_runner_user_data = optional(bool, false)
     write_runner_config_to_file = optional(bool, false)
+    write_runner_user_data_to_file = optional(bool, false)
   })
   default = {}
 }

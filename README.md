@@ -25,14 +25,21 @@ This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner]
 describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).
 The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
-> 💥 BREAKING CHANGE: Due to various problems of the GitLab docker+machine driver (especially with spot instances),
-> the driver is switched to the version provided by [CKI](https://gitlab.com/cki-project/docker-machine).
-> For more details see [PR](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/697).
-<!-- there is no blank line in between. These are two separate quotes! -->
-<!-- markdownlint-disable MD028 -->
-> 🚚 CHANGE AHEAD: We have decided to move this repository to a dedicated org soon. No user impact expected, current
-> GitHub links and Terraform registry links remain working. After release 6.0.0 we move the repository to
-> [https://github.com/cattle-ops/terraform-aws-gitlab-runner](https://github.com/cattle-ops/terraform-aws-gitlab-runner).
+> 💥 BREAKING CHANGE AHEAD: Version 7 of the module rewrites the whole variable section to
+>    - harmonize the variable names
+>    - harmonize the documentation
+>    - remove deprecated variables
+>    - gain a better overview of the features provided
+>
+> And it also adds
+>   - all possible Docker settings
+>   - the `idle_scale_factor`
+>
+> We know that this is a breaking change causing some pain, but we think it is worth it. We hope you agree. And to make the
+> transition as smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases,
+> but some minor rework might still be possible.
+> 
+> Checkout [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819)
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
 
@@ -163,6 +170,9 @@ gitlab_runner_registration_config = {
   access_level       = "<not_protected OR ref_protected>"
 }
 ```
+
+The registration token can also be read in via SSM parameter store. If no registration token is passed in, the module
+will look up the token in the SSM parameter store at the location specified by `secure_parameter_store_gitlab_runner_registration_token_name`.
 
 For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the
 required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
@@ -384,6 +394,7 @@ module is using consume more RAM using spot fleets. For comparison, if you launc
 ~1.2GB of RAM. In our case, we had to change the `instance_type` of the runner from `t3.micro` to `t3.small`.
 
 #### Configuration example
+
 ```hcl
 module "runner" {
   # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
@@ -489,7 +500,7 @@ Made with [contributors-img](https://contrib.rocks).
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
-| <a name="provider_local"></a> [local](#provider\_local) | >= 2.4.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | 2.4.0 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | >= 3 |
 
 ## Modules
@@ -586,6 +597,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_cache_shared"></a> [cache\_shared](#input\_cache\_shared) | Enables cache sharing between runners, false by default. | `bool` | `false` | no |
 | <a name="input_cloudwatch_logging_retention_in_days"></a> [cloudwatch\_logging\_retention\_in\_days](#input\_cloudwatch\_logging\_retention\_in\_days) | Retention for cloudwatch logs. Defaults to unlimited | `number` | `0` | no |
 | <a name="input_create_runner_iam_role"></a> [create\_runner\_iam\_role](#input\_create\_runner\_iam\_role) | Whether to create the runner IAM role of the gitlab runner agent EC2 instance. | `bool` | `true` | no |
+| <a name="input_debug"></a> [debug](#input\_debug) | Enable debug settings for development<br><br>    output\_runner\_config\_to\_file: When enabled, outputs the rendered config.toml file in the root module. This can<br>                                  then also be used by Terraform to show changes in plan. Note that enabling this can<br>                                  potentially expose sensitive information.<br>    output\_user\_data\_to\_file: When enabled, outputs the rendered userdata.sh file in the root module. This can then<br>                              also be used by Terraform to show changes in plan. Note that enabling this can<br>                              potentially expose sensitive information. | <pre>object({<br>    output_runner_config_to_file    = bool<br>    output_runner_user_data_to_file = bool<br>  })</pre> | <pre>{<br>  "output_runner_config_to_file": false,<br>  "output_runner_user_data_to_file": false<br>}</pre> | no |
 | <a name="input_docker_machine_download_url"></a> [docker\_machine\_download\_url](#input\_docker\_machine\_download\_url) | (Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install | `string` | `""` | no |
 | <a name="input_docker_machine_egress_rules"></a> [docker\_machine\_egress\_rules](#input\_docker\_machine\_egress\_rules) | List of egress rules for the docker-machine instance(s). | <pre>list(object({<br>    cidr_blocks      = list(string)<br>    ipv6_cidr_blocks = list(string)<br>    prefix_list_ids  = list(string)<br>    from_port        = number<br>    protocol         = string<br>    security_groups  = list(string)<br>    self             = bool<br>    to_port          = number<br>    description      = string<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "description": "Allow all egress traffic for docker machine build runners",<br>    "from_port": 0,<br>    "ipv6_cidr_blocks": [<br>      "::/0"<br>    ],<br>    "prefix_list_ids": null,<br>    "protocol": "-1",<br>    "security_groups": null,<br>    "self": null,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | <a name="input_docker_machine_iam_policy_arns"></a> [docker\_machine\_iam\_policy\_arns](#input\_docker\_machine\_iam\_policy\_arns) | List of policy ARNs to be added to the instance profile of the docker machine runners. | `list(string)` | `[]` | no |
@@ -684,6 +696,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
 | <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_in_time_zone": "Etc/UTC",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5",<br>  "scale_out_time_zone": "Etc/UTC"<br>}</pre> | no |
+| <a name="input_secure_parameter_store_gitlab_runner_registration_token_name"></a> [secure\_parameter\_store\_gitlab\_runner\_registration\_token\_name](#input\_secure\_parameter\_store\_gitlab\_runner\_registration\_token\_name) | The name of the SSM parameter to read the GitLab Runner registration token from. | `string` | `"gitlab-runner-registration-token"` | no |
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |
 | <a name="input_secure_parameter_store_runner_token_key"></a> [secure\_parameter\_store\_runner\_token\_key](#input\_secure\_parameter\_store\_runner\_token\_key) | The key name used store the Gitlab runner token in Secure Parameter Store | `string` | `"runner-token"` | no |
 | <a name="input_sentry_dsn"></a> [sentry\_dsn](#input\_sentry\_dsn) | Sentry DSN of the project for the runner to use (uses legacy DSN format) | `string` | `"__SENTRY_DSN_REPLACED_BY_USER_DATA__"` | no |

@@ -55,7 +55,12 @@ output "runner_launch_template_name" {
 
 output "runner_user_data" {
   description = "The user data of the Gitlab Runner Agent's launch template."
-  value       = local.template_user_data
+  value       = nonsensitive(local.template_user_data)
+}
+
+output "runner_config_toml_rendered" {
+  description = "The rendered config.toml given to the Runner Manager."
+  value       = local.template_runner_config
 }
 
 output "runner_config_toml_rendered" {
