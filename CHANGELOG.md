@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.1...6.4.0) (2023-05-03)
+
+
+### Features
+
+* add option to read Gitlab Runner Registration token from SSM ([#822](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/822)) ([51d63e6](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/51d63e61f8fe30abe050e14e608f01063a4f5142))
+
+
+### Bug Fixes
+
+* disable outputting config.toml by default ([#768](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/768)) ([2cd1e44](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2cd1e447e1aa87e60afdbfd3162e1792949a1b3c))
+
 ## [6.3.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.0...6.3.1) (2023-04-27)
 
 
