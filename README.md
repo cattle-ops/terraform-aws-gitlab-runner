@@ -407,7 +407,7 @@ module "runner" {
   subnet_id                 = module.vpc.private_subnets[0] # subnet of the agent
   fleet_executor_subnet_ids = module.vpc.private_subnets
 
-  docker_machine_instance_types             = ["t3a.medium", "t3.medium", "t2.medium"]
+  docker_machine_instance_types_fleet       = ["t3a.medium", "t3.medium", "t2.medium"]
   use_fleet                                 = true
   key_pair_name                             = "<key_pair_name>"
 
