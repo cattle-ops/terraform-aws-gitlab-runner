@@ -650,6 +650,9 @@ if [ -n "$extracted_variables" ]; then
   " > x && mv x "$converted_file"
 fi
 
+# change the module source to cattle-ops
+sed -i 's/npalm/cattle-ops/g' "$converted_file"
+
 cat <<EOT
 Not all cases are handled by this script. Please check the output file and make sure that all variables are converted correctly.
 Especially it you have comments or multiline templates in your file.
