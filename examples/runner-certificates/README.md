@@ -32,20 +32,24 @@ Create a PEM-encoded `.crt` file containing the public certificate of your Gitla
 
 ```hcl
 module {
-  ...
+  # ...
   # Public cert of my companys gitlab instance
-  agent_gitlab_certificate = file("${path.module}/my_gitlab_instance_cert.crt")
-  ...
+  runner_gitlab = {
+    certificate = file("${path.module}/my_gitlab_instance_cert.crt")
+  }  
+  # ...
 }
 ```
 
 Add your CA and intermediary certs to a second PEM-encoded `.crt` file.
 ```hcl
 module {
-  ...
+  # ...
   # Other public certs relating to my company.
-  agent_gitlab_ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
-  ...
+  runner_gitlab = {
+    ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
+  }
+  # ...
 }
 ```
 
@@ -62,11 +66,13 @@ For **user images**, you must:
       # ...
       
       # Mount EC2 host certs in docker so all user docker images can reference them.
-      runners_additional_volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
-      
-        # ...
+      runner_worker_docker_options = {
+        volumes = ["/etc/gitlab-runner/certs/:/etc/gitlab-runner/certs:ro"]
       }
-      ```
+      
+      # ...
+    }
+    ```
       
 2. Trust the certificates from within the user image.
   
@@ -110,14 +116,15 @@ For **user images**, you must:
     module "runner" {
       # ...
     
-      runners_pre_build_script = <<EOT
-      '''
-      apt-get install -y ca-certificates
-      cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
-      update-ca-certificates
-      '''
-      EOT
-    
+      runner_worker_gitlab_pipeline = {
+        pre_build_script = <<EOT
+        '''
+        apt-get install -y ca-certificates
+        cp /etc/gitlab-runner/certs/* /usr/local/share/ca-certificates/
+        update-ca-certificates
+        '''
+        EOT
+      }
       # ...
     }
     ```
