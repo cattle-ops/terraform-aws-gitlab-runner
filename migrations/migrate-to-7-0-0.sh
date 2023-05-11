@@ -67,7 +67,6 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runners_extra_hosts/extra_hosts/g' | \
                       sed 's/runners_shm_size/shm_size/g' | \
                       sed 's/runners_docker_runtime/runtime/g' | \
-<<<<<<< HEAD
                       sed 's/runners_helper_image/helper_image/g' | \
                       sed 's/runners_pull_policies/pull_policies/g'
                     )
