@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.4.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.0...6.4.1) (2023-05-11)
+
+
+### Reverts
+
+* removes the `nonsensitive` from `runner_user_data` output ([#832](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/832)) ([3481b0d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/3481b0d5ac0ba35902de4379975bb82fd6e41d5c))
+
 ## [6.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.1...6.4.0) (2023-05-03)
 
 
