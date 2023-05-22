@@ -27,35 +27,47 @@ _runner_main_region_ and _runner_alternate_region_.
 module "runner_main_region" {
   # ...
   
-  overrides = {
-    name_sg                     = "my-security-group"
-    name_runner_agent_instance  = "my-runner-agent"
-    name_docker_machine_runners = "my-runners-dm"
-    name_iam_objects            = local.name_iam_objects_main_region # <--
+  security_group_prefix                   = "my-security-group"
+  iam_object_prefix                       = local.name_iam_objects_main_region # <--
+
+  runner_instance = {
+    agent_instance_prefix = "my-runner-agent"  
   }
 
+  runner_worker_cache = {
+    include_account_id = false
+    bucket_prefix = local.cache_bucket_prefix_main_region # <--
+  }
+  
+  runner_worker_docker_machine_instance = {
+    name_prefix          = "my-runners-dm"
+  }
+  
   # ...
-
-  cache_bucket_prefix                  = local.cache_bucket_prefix_main_region # <--
-  cache_bucket_name_include_account_id = false
 }
 
 # ...
 
 module "runner_alternate_region" {
   # ...
-  
-  overrides = {
-    name_sg                     = "my-security-group"
-    name_runner_agent_instance  = "my-runner-agent"
-    name_docker_machine_runners = "my-runners-dm"
-    name_iam_objects            = local.name_iam_objects_alternate_region # <--
+
+  security_group_prefix                   = "my-security-group"
+  iam_object_prefix                       = local.name_iam_objects_alternate_region # <--
+
+  runner_instance = {
+    agent_instance_prefix = "my-runner-agent"
   }
 
-  # ...
+  runner_worker_cache = {
+    include_account_id = false
+    bucket_prefix = local.cache_bucket_prefix_alternate_region # <--
+  }
 
-  cache_bucket_prefix                  = local.cache_bucket_prefix_alternate_region # <--
-  cache_bucket_name_include_account_id = false
+  runner_worker_docker_machine_instance = {
+    name_prefix          = "my-runners-dm"
+  }
+  
+  # ...
 }
 ```
 

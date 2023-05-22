@@ -29,18 +29,21 @@ module "vpc" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = element(module.vpc.private_subnets, 0)
   environment = var.environment
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.private_subnets, 0)
+  runner_instance = {
+    name = var.runner_name
+  }
 
-  runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
-  runners_token      = var.runner_token
+  runner_gitlab = {
+    url                = var.gitlab_url
+    registration_token = var.runner_token
+  }
 
   # working 9 to 5 :)
-  runners_machine_autoscaling_options = [
+  runner_worker_docker_machine_autoscaling_options = [
     {
       periods    = ["* * 0-9,17-23 * * mon-fri *", "* * * * * sat,sun *"]
       idle_count = 0
