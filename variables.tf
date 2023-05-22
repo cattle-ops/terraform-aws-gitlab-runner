@@ -1,12 +1,47 @@
-variable "aws_region" {
-  description = "AWS region."
+/*
+ * Global variables
+ */
+variable "vpc_id" {
+  description = "The VPC used for the runner and runner workers."
   type        = string
 }
 
-variable "auth_type_cache_sr" {
-  description = "A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'"
+variable "subnet_id" {
+  description = <<-EOT
+    Subnet id used for the Runner and Runner Workers. Must belong to the `vpc_id`. In case the fleet mode is used, multiple subnets for
+    the Runner Workers can be provided with runner_worker_docker_machine_instance.subnet_ids.
+  EOT
   type        = string
-  default     = "iam"
+}
+
+variable "kms_key_id" {
+  description = "KMS key id to encrypt the resources. Ensure that CloudWatch and Runner/Runner Workers have access to the provided KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "enable_managed_kms_key" {
+  description = "Let the module manage a KMS key. Be-aware of the costs of an custom key. Do not specify a `kms_key_id` when `enable_kms` is set to `true`."
+  type        = bool
+  default     = false
+}
+
+variable "kms_managed_alias_name" {
+  description = "Alias added to the created KMS key."
+  type        = string
+  default     = ""
+}
+
+variable "kms_managed_deletion_rotation_window_in_days" {
+  description = "Key deletion/rotation window for the created KMS key. Set to 0 for no rotation/deletion window."
+  type        = number
+  default     = 7
+}
+
+variable "iam_permissions_boundary" {
+  description = "Name of permissions boundary policy to attach to AWS IAM roles"
+  type        = string
+  default     = ""
 }
 
 variable "environment" {
@@ -14,67 +49,172 @@ variable "environment" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "The target VPC for the docker-machine and runner instances."
-  type        = string
+variable "tags" {
+  description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
+  type        = map(string)
+  default     = {}
 }
 
-variable "subnet_id" {
-  description = "Subnet id used for the runner and executors. Must belong to the VPC specified above."
-  type        = string
-  default     = "" # TODO remove as soon as subnet_id_runners and subnet_ids_gitlab_runner are gone. Variable is mandatory now.
-}
-
-variable "fleet_executor_subnet_ids" {
-  description = "List of subnets used for executors when the fleet mode is enabled. Must belong to the VPC specified above."
+variable "suppressed_tags" {
+  description = "List of tag keys which are automatically removed and never added as default tag by the module."
   type        = list(string)
   default     = []
 }
 
-variable "extra_security_group_ids_runner_agent" {
-  description = "Optional IDs of extra security groups to apply to the runner agent. This will not apply to the runners spun up when using the docker+machine executor, which is the default."
+variable "security_group_prefix" {
+  description = "Set the name prefix and overwrite the `Name` tag for all security groups."
+  type        = string
+  default     = ""
+}
+
+variable "iam_object_prefix" {
+  description = "Set the name prefix of all AWS IAM resources."
+  type        = string
+  default     = ""
+}
+
+/*
+ * Runner Manager: A manager which creates multiple Runners (only one Runner supported by this module) which in turn creates
+ *                 multiple Runner Workers (e.g. docker-machine).
+ */
+variable "runner_manager" {
+  description = <<-EOT
+    For details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
+
+    gitlab_check_interval = Number of seconds between checking for available jobs (check_interval)
+    maximum_concurrent_jobs = The maximum number of jobs which can be processed by all Runners at the same time (concurrent).
+    prometheus_listen_address = Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on (listen_address).
+    sentry_dsn = Sentry DSN of the project for the Runner Manager to use (uses legacy DSN format) (sentry_dsn)
+  EOT
+  type = object({
+    gitlab_check_interval     = optional(number, 3)
+    maximum_concurrent_jobs   = optional(number, 10)
+    prometheus_listen_address = optional(string, "")
+    sentry_dsn                = optional(string, "__SENTRY_DSN_REPLACED_BY_USER_DATA__")
+  })
+  default = {}
+}
+
+/*
+ * Runner: The agent that runs the code on the host platform and displays in the UI.
+ */
+variable "runner_instance" {
+  description = <<-EOT
+    additional_tags = Map of tags that will be added to the Runner instance.
+    collect_autoscaling_metrics = A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances.
+    ebs_optimized = Enable EBS optimization for the Runner instance.
+    max_lifetime_seconds = The maximum time a Runner should live before it is killed.
+    monitoring = Enable the detailed monitoring on the Runner instance.
+    name = Name of the Runner instance.
+    name_prefix = Set the name prefix and override the `Name` tag for the Runner instance.
+    private_address_only = Restrict the Runner to use private IP addresses only. If this is set to `true` the Runner will use a private IP address only in case the Runner Workers use private addresses only.
+    root_device_config = The Runner's root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`
+    spot_price = By setting a spot price bid price the Runner is created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen.
+    ssm_access = Allows to connect to the Runner via SSM.
+    type = EC2 instance type used.
+    use_eip = Assigns an EIP to the Runner.
+  EOT
+  type = object({
+    additional_tags             = optional(map(string))
+    collect_autoscaling_metrics = optional(list(string), null)
+    ebs_optimized               = optional(bool, true)
+    max_lifetime_seconds        = optional(number, null)
+    monitoring                  = optional(bool, true)
+    name                        = string
+    name_prefix                 = optional(string)
+    private_address_only        = optional(bool, true)
+    root_device_config          = optional(map(string))
+    spot_price                  = optional(string, null)
+    ssm_access                  = optional(bool, false)
+    type                        = optional(string, "t3.micro")
+    use_eip                     = optional(bool, false)
+  })
+  default = {
+    name = "gitlab-runner"
+  }
+}
+
+variable "runner_ami_filter" {
+  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1 or 2 image."
+  type        = map(list(string))
+
+  default = {
+    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
+  }
+}
+
+variable "runner_ami_owners" {
+  description = "The list of owners used to select the AMI of the Runner instance."
   type        = list(string)
-  default     = []
+  default     = ["amazon"]
 }
 
-variable "metrics_autoscaling" {
-  description = "A list of metrics to collect. The allowed values are GroupDesiredCapacity, GroupInServiceCapacity, GroupPendingCapacity, GroupMinSize, GroupMaxSize, GroupInServiceInstances, GroupPendingInstances, GroupStandbyInstances, GroupStandbyCapacity, GroupTerminatingCapacity, GroupTerminatingInstances, GroupTotalCapacity, GroupTotalInstances."
-  type        = list(string)
-  default     = null
+variable "runner_networking" {
+  description = <<-EOT
+    allow_incoming_ping = Allow ICMP Ping to the Runner. Specify `allow_incoming_ping_security_group_ids` too!
+    allow_incoming_ping_security_group_ids = A list of security group ids that are allowed to ping the Runner.
+    security_group_description = A description for the Runner's security group
+    security_group_ids = IDs of security groups to add to the Runner.
+  EOT
+  type = object({
+    allow_incoming_ping                    = optional(bool, false)
+    allow_incoming_ping_security_group_ids = optional(list(string), [])
+    security_group_description             = optional(string, "A security group containing gitlab-runner agent instances")
+    security_group_ids                     = optional(list(string), [])
+  })
+  default = {}
 }
 
-variable "fleet_key_pair_name" {
-  description = "The name of the key pair used by the runner to connect to the docker-machine executors."
-  type        = string
-  default     = "fleet-key"
+variable "runner_networking_egress_rules" {
+  description = "List of egress rules for the Runner."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+      prefix_list_ids  = null
+      from_port        = 0
+      protocol         = "-1"
+      security_groups  = null
+      self             = null
+      to_port          = 0
+      description      = null
+    }
+  ]
 }
 
-variable "instance_type" {
-  description = "Instance type used for the GitLab runner."
-  type        = string
-  default     = "t3.micro"
+variable "runner_role" {
+  description = <<-EOT
+        additional_tags = Map of tags that will be added to the role created. Useful for tag based authorization.
+        allow_iam_service_linked_role_creation = Boolean used to control attaching the policy to the Runner to create service linked roles.
+        assume_role_policy_json = The assume role policy for the Runner.
+        create_role_profile = Whether to create the IAM role/profile for the Runner. If you provide your own role, make sure that it has the required permissions.
+        policy_arns = List of policy ARNs to be added to the instance profile of the Runner.
+        role_profile_name = IAM role/profile name for the Runner. If unspecified then `$${var.iam_object_prefix}-instance` is used.
+    EOT
+  type = object({
+    additional_tags                        = optional(map(string))
+    allow_iam_service_linked_role_creation = optional(bool, true)
+    assume_role_policy_json                = optional(string, "")
+    create_role_profile                    = optional(bool, true)
+    policy_arns                            = optional(list(string), [])
+    role_profile_name                      = optional(string)
+  })
+  default = {}
 }
 
-variable "runner_instance_ebs_optimized" {
-  description = "Enable the GitLab runner instance to be EBS-optimized."
-  type        = bool
-  default     = true
-}
-
-variable "runner_instance_enable_monitoring" {
-  description = "Enable the GitLab runner instance to have detailed monitoring."
-  type        = bool
-  default     = true
-}
-
-variable "runner_instance_spot_price" {
-  description = "By setting a spot price bid price the runner agent will be created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen."
-  type        = string
-  default     = null
-}
-
-variable "runner_instance_metadata_options" {
-  description = "Enable the Gitlab runner agent instance metadata service."
+variable "runner_metadata_options" {
+  description = "Enable the Runner instance metadata service. IMDSv2 is enabled by default."
   type = object({
     http_endpoint               = string
     http_tokens                 = string
@@ -89,132 +229,260 @@ variable "runner_instance_metadata_options" {
   }
 }
 
-variable "docker_machine_instance_metadata_options" {
-  description = "Enable the docker machine instances metadata service. Requires you use GitLab maintained docker machines."
-  type = object({
-    http_tokens                 = string
-    http_put_response_hop_limit = number
-  })
-  default = {
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 2
-  }
-}
-
-variable "docker_machine_instance_type" {
-  description = "Instance type used for the instances hosting docker-machine."
-  type        = string
-  default     = "m5.large"
-}
-
-variable "docker_machine_instance_types_fleet" {
-  description = "Instance types used for the instances hosting docker-machine. This variable is only supported when use_fleet is set to true."
-  type        = list(string)
-  default     = []
-}
-
-variable "docker_machine_spot_price_bid" {
-  description = "Spot price bid. The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen."
-  type        = string
-  default     = "on-demand-price"
-}
-
-variable "docker_machine_download_url" {
-  description = "(Optional) By default the module will use `docker_machine_version` to download the CKI maintained version (https://gitlab.com/cki-project/docker-machine) of Docker Machine. Alternative you can set this property to download location of the distribution of for the OS. See also https://docs.gitlab.com/runner/executors/docker_machine.html#install"
-  type        = string
-  default     = ""
-}
-
-variable "docker_machine_version" {
-  description = "By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases"
-  type        = string
-  default     = "0.16.2-gitlab.19-cki.2"
-}
-
-variable "runners_name" {
-  description = "Name of the runner, will be used in the runner config.toml."
-  type        = string
-}
-
-variable "runners_userdata" {
-  description = "Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted."
-  type        = string
-  default     = ""
-}
-
-variable "runners_executor" {
-  description = "The executor to use. Currently supports `docker+machine` or `docker`."
-  type        = string
-  default     = "docker+machine"
-
-  validation {
-    condition     = contains(["docker+machine", "docker"], var.runners_executor)
-    error_message = "The executor currently supports `docker+machine` or `docker`."
-  }
-}
-
-variable "runners_install_amazon_ecr_credential_helper" {
-  description = "Install amazon-ecr-credential-helper inside `userdata_pre_install` script"
+variable "runner_schedule_enable" {
+  description = "Set to `true` to enable the auto scaling group schedule for the Runner."
   type        = bool
   default     = false
 }
 
-variable "runners_gitlab_url" {
-  description = "URL of the GitLab instance to connect to."
+
+variable "runner_enable_asg_recreation" {
+  description = "Enable automatic redeployment of the Runner's ASG when the Launch Configs change."
+  default     = true
+  type        = bool
+}
+
+variable "runner_schedule_config" {
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the Runner. Will only be used if `agent_schedule_enable` is set to `true`. "
+  type        = map(any)
+  default = {
+    # Configure optional scale_out scheduled action
+    scale_out_recurrence = "0 8 * * 1-5"
+    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    scale_out_time_zone  = "Etc/UTC"
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+
+    # Configure optional scale_in scheduled action
+    scale_in_recurrence = "0 18 * * 1-5"
+    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
+    scale_in_time_zone  = "Etc/UTC"
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+  }
+}
+
+variable "runner_install" {
+  description = <<-EOT
+    amazon_ecr_credentials_helper = Install amazon-ecr-credential-helper inside `userdata_pre_install` script
+    docker_machine_download_url = URL to download docker machine binary. If not set, the docker machine version will be used to download the binary.
+    docker_machine_version = By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases
+    pre_install_script = Script to run before installing the Runner
+    post_install_script = Script to run after installing the Runner
+    start_script = Script to run after starting the Runner
+    yum_update = Update the yum packages before installing the Runner
+  EOT
+  type = object({
+    amazon_ecr_credential_helper = optional(bool, false)
+    docker_machine_download_url  = optional(string, "")
+    docker_machine_version       = optional(string, "0.16.2-gitlab.19-cki.2")
+    pre_install_script           = optional(string, "")
+    post_install_script          = optional(string, "")
+    start_script                 = optional(string, "")
+    yum_update                   = optional(bool, true)
+  })
+  default = {}
+}
+
+variable "runner_cloudwatch" {
+  description = <<-EOT
+    enable = Boolean used to enable or disable the CloudWatch logging.
+    log_group_name = Option to override the default name (`environment`) of the log group. Requires `enable = true`.
+    retention_days = Retention for cloudwatch logs. Defaults to unlimited. Requires `enable = true`.
+  EOT
+  type = object({
+    enable         = optional(bool, true)
+    log_group_name = optional(string, null)
+    retention_days = optional(number, 0)
+  })
+  default = {}
+}
+
+variable "runner_gitlab_registration_config" {
+  description = "Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
+  type = object({
+    registration_token = optional(string, "")
+    tag_list           = optional(string, "")
+    description        = optional(string, "")
+    locked_to_project  = optional(string, "")
+    run_untagged       = optional(string, "")
+    maximum_timeout    = optional(string, "")
+    access_level       = optional(string, "")
+  })
+
+  default = {}
+}
+
+variable "runner_gitlab" {
+  description = <<-EOT
+    ca_certificate = Trusted CA certificate bundle (PEM format).
+    certificate = Certificate of the GitLab instance to connect to (PEM format).
+    registration_token = Registration token to use to register the Runner. Do not use. This is replaced by the `registration_token` in `runner_gitlab_registration_config`.
+    runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
+    url = URL of the GitLab instance to connect to.
+    url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
+  EOT
+  type = object({
+    ca_certificate     = optional(string, "")
+    certificate        = optional(string, "")
+    registration_token = optional(string, "__REPLACED_BY_USER_DATA__")
+    runner_version     = optional(string, "15.8.2")
+    url                = optional(string)
+    url_clone          = optional(string)
+  })
+}
+
+variable "runner_gitlab_registration_token_secure_parameter_store_name" {
+  description = "The name of the SSM parameter to read the GitLab Runner registration token from."
+  type        = string
+  default     = "gitlab-runner-registration-token"
+}
+
+variable "runner_gitlab_token_secure_parameter_store" {
+  description = "Name of the Secure Parameter Store entry to hold the GitLab Runner token."
+  type        = string
+  default     = "runner-token"
+}
+
+variable "runner_sentry_secure_parameter_store_name" {
+  description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
+  type        = string
+  default     = "sentry-dsn"
+}
+
+variable "runner_terminate_ec2_lifecycle_hook_name" {
+  description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
+  type        = string
+  default     = null
+}
+
+variable "runner_terraform_timeout_delete_asg" {
+  description = "Timeout when trying to delete the Runner ASG."
+  default     = "10m"
   type        = string
 }
 
-variable "runners_clone_url" {
-  description = "Overwrites the URL for the GitLab instance. Use only if the runner can’t connect to the GitLab URL."
-  type        = string
-  default     = ""
+/*
+ * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
+ */
+variable "runner_worker" {
+  description = <<-EOT
+    For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
+
+    environment_variables = List of environment variables to add to the Runner Worker (environment).
+    max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
+    output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
+    request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
+    ssm_access = Allows to connect to the Runner Worker via SSM.
+    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
+  EOT
+  type = object({
+    environment_variables = optional(list(string), [])
+    max_jobs              = optional(number, 0)
+    output_limit          = optional(number, 4096)
+    request_concurrency   = optional(number, 1)
+    ssm_access            = optional(bool, false)
+    type                  = optional(string, "docker+machine")
+  })
+  default = {}
+
+  validation {
+    condition     = contains(["docker+machine", "docker"], var.runner_worker.type)
+    error_message = "The executor currently supports `docker+machine` and `docker`."
+  }
 }
 
-variable "runners_token" {
-  description = "Token for the runner, will be used in the runner config.toml."
-  type        = string
-  default     = "__REPLACED_BY_USER_DATA__"
+variable "runner_worker_cache" {
+  description = <<-EOT
+    Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
+    cache. To use the same cache across multiple Runner Worker disable the creation of the cache and provide a policy and
+    bucket name. See the public runner example for more details."
+
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnerscaches3-section
+
+    access_log_bucker_id = The ID of the bucket where the access logs are stored.
+    access_log_bucket_prefix = The bucket prefix for the access logs.
+    authentication_type = A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'
+    bucket = Name of the cache bucket. Requires `create = false`.
+    bucket_prefix = Prefix for s3 cache bucket name. Requires `create = true`.
+    create = Boolean used to enable or disable the creation of the cache bucket.
+    expiration_days = Number of days before cache objects expire. Requires `create = true`.
+    include_account_id = Boolean used to include the account id in the cache bucket name. Requires `create = true`.
+    policy = Policy to use for the cache bucket. Requires `create = false`.
+    random_suffix = Boolean used to enable or disable the use of a random string suffix on the cache bucket name. Requires `create = true`.
+    shared = Boolean used to enable or disable the use of the cache bucket as shared cache.
+    versioning = Boolean used to enable versioning on the cache bucket. Requires `create = true`.
+  EOT
+  type = object({
+    access_log_bucket_id     = optional(string, null)
+    access_log_bucket_prefix = optional(string, null)
+    authentication_type      = optional(string, "iam")
+    bucket                   = optional(string, "")
+    bucket_prefix            = optional(string, "")
+    create                   = optional(bool, true)
+    expiration_days          = optional(number, 1)
+    include_account_id       = optional(bool, true)
+    policy                   = optional(string, "")
+    random_suffix            = optional(bool, false)
+    shared                   = optional(bool, false)
+    versioning               = optional(bool, false)
+  })
+  default = {}
 }
 
-variable "runners_limit" {
-  description = "Limit for the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
+variable "runner_worker_gitlab_pipeline" {
+  description = <<-EOT
+    post_build_script = Script to execute in the pipeline just after the build, but before executing after_script.
+    pre_build_script = Script to execute in the pipeline just before the build.
+    pre_clone_script = Script to execute in the pipeline before cloning the Git repository. this can be used to adjust the Git client configuration first, for example.
+  EOT
+  type = object({
+    post_build_script = optional(string, "\"\"")
+    pre_build_script  = optional(string, "\"\"")
+    pre_clone_script  = optional(string, "\"\"")
+  })
+  default = {}
 }
 
-variable "runners_concurrent" {
-  description = "Concurrent value for the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 10
+/*
+ * Docker Executor variables.
+ */
+variable "runner_worker_docker_volumes_tmpfs" {
+  description = "Mount a tmpfs in Executor container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = []
 }
 
-variable "runners_idle_time" {
-  description = "Idle time of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 600
+variable "runner_worker_docker_services" {
+  description = "Starts additional services with the Docker container. All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
+  type = list(object({
+    name       = string
+    alias      = string
+    entrypoint = list(string)
+    command    = list(string)
+  }))
+  default = []
 }
 
-variable "runners_idle_count" {
-  description = "Idle count of the runners, will be used in the runner config.toml."
-  type        = number
-  default     = 0
+variable "runner_worker_docker_services_volumes_tmpfs" {
+  description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
+  type = list(object({
+    volume  = string
+    options = string
+  }))
+  default = []
 }
 
-variable "runners_max_builds" {
-  description = "Max builds for each runner after which it will be removed, will be used in the runner config.toml. By default set to 0, no maxBuilds will be set in the configuration."
-  type        = number
-  default     = 0
-}
-
-variable "runners_add_dind_volumes" {
+variable "runner_worker_docker_add_dind_volumes" {
   description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
   type        = bool
   default     = false
 }
 
-variable "runners_docker_options" {
+variable "runner_worker_docker_options" {
   description = <<EOT
-    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Executors. For
+    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Runner Worker. For
     details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
 
     Default values if the option is not given:
@@ -276,22 +544,180 @@ variable "runners_docker_options" {
     wait_for_services_timeout    = optional(number)
   })
 
-  default = null
+  default = {
+    disable_cache = "false"
+    image         = "docker:18.03.1-ce"
+    privileged    = "true"
+    pull_policy   = "always"
+    shm_size      = 0
+    tls_verify    = "false"
+    volumes       = ["/cache"]
+  }
 }
 
-variable "runners_monitoring" {
-  description = "Enable detailed cloudwatch monitoring for spot instances."
-  type        = bool
-  default     = false
+/*
+ * docker+machine Runner Worker variables. The Runner Worker is the actual machine that runs the job. Please specify the
+ * `runner_worker_docker_*` variables as well as Docker is used on the docker+machine Runner Worker.
+ */
+variable "runner_worker_docker_machine_fleet" {
+  description = <<-EOT
+    enable = Activates the fleet mode on the Runner. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode
+    key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
+  EOT
+  type = object({
+    enable        = bool
+    key_pair_name = optional(string, "fleet-key")
+  })
+  default = {
+    enable = false
+  }
 }
 
-variable "runners_ebs_optimized" {
-  description = "Enable runners to be EBS-optimized."
-  type        = bool
-  default     = true
+variable "runner_worker_docker_machine_role" {
+  description = <<-EOT
+    additional_tags = Map of tags that will be added to the Runner Worker.
+    assume_role_policy_json = Assume role policy for the Runner Worker.
+    policy_arns = List of ARNs of IAM policies to attach to the Runner Workers.
+    profile_name    = Name of the IAM profile to attach to the Runner Workers.
+  EOT
+  type = object({
+    additional_tags         = optional(map(string), {})
+    assume_role_policy_json = optional(string, "")
+    policy_arns             = optional(list(string), [])
+    profile_name            = optional(string, "")
+  })
+  default = {}
 }
 
-variable "runners_machine_autoscaling_options" {
+variable "runner_worker_docker_machine_extra_egress_rules" {
+  description = "List of egress rules for the Runner Workers."
+  type = list(object({
+    cidr_blocks      = list(string)
+    ipv6_cidr_blocks = list(string)
+    prefix_list_ids  = list(string)
+    from_port        = number
+    protocol         = string
+    security_groups  = list(string)
+    self             = bool
+    to_port          = number
+    description      = string
+  }))
+  default = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+      prefix_list_ids  = null
+      from_port        = 0
+      protocol         = "-1"
+      security_groups  = null
+      self             = null
+      to_port          = 0
+      description      = "Allow all egress traffic for Runner Workers."
+    }
+  ]
+}
+
+variable "runner_worker_docker_machine_security_group_description" {
+  description = "A description for the Runner Worker security group"
+  type        = string
+  default     = "A security group containing Runner Worker instances"
+}
+
+variable "runner_worker_docker_machine_ami_filter" {
+  description = "List of maps used to create the AMI filter for the Runner Worker."
+  type        = map(list(string))
+
+  default = {
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+}
+
+variable "runner_worker_docker_machine_ami_owners" {
+  description = "The list of owners used to select the AMI of the Runner Worker."
+  type        = list(string)
+
+  # Canonical
+  default = ["099720109477"]
+}
+
+variable "runner_worker_docker_machine_instance" {
+  description = <<-EOT
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section
+
+    docker_registry_mirror_url = The URL of the Docker registry mirror to use for the Runner Worker.
+    destroy_after_max_builds = Destroy the instance after the maximum number of builds has been reached.
+    ebs_optimized = Enable EBS optimization for the Runner Worker.
+    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
+    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
+    monitoring = Enable detailed monitoring for the Runner Worker.
+    name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
+    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
+    root_size = The size of the root volume for the Runner Worker.
+    start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
+    subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
+    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
+    volume_type = The type of volume to use for the Runner Worker.
+  EOT
+  type = object({
+    destroy_after_max_builds   = optional(number, 0)
+    docker_registry_mirror_url = optional(string, "")
+    ebs_optimized              = optional(bool, true)
+    idle_count                 = optional(number, 0)
+    idle_time                  = optional(number, 600)
+    monitoring                 = optional(bool, false)
+    name_prefix                = optional(string, "")
+    private_address_only       = optional(bool, true)
+    root_size                  = optional(number, 8)
+    start_script               = optional(string, "")
+    subnet_ids                 = optional(list(string), [])
+    types                      = optional(list(string), ["m5.large"])
+    volume_type                = optional(string, "gp2")
+  })
+  default = {
+  }
+
+  validation {
+    condition     = length(var.runner_worker_docker_machine_instance.name_prefix) <= 28
+    error_message = "Maximum length for docker+machine executor name is 28 characters!"
+  }
+
+  validation {
+    condition     = var.runner_worker_docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance.name_prefix))
+    error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
+  }
+}
+
+variable "runner_worker_docker_machine_instance_spot" {
+  description = <<-EOT
+    enable = Enable spot instances for the Runner Worker.
+    max_price = The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen.
+  EOT
+  type = object({
+    enable    = optional(bool, true)
+    max_price = optional(string, "on-demand-price")
+  })
+  default = {}
+}
+
+variable "runner_worker_docker_machine_ec2_options" {
+  description = "List of additional options for the docker+machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
+  type        = list(string)
+  default     = []
+}
+
+variable "runner_worker_docker_machine_ec2_metadata_options" {
+  description = "Enable the Runner Worker metadata service. Requires you use CKI maintained docker machines."
+  type = object({
+    http_tokens                 = string
+    http_put_response_hop_limit = number
+  })
+  default = {
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+}
+
+variable "runner_worker_docker_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
     periods           = list(string)
@@ -301,667 +727,21 @@ variable "runners_machine_autoscaling_options" {
     idle_time         = optional(number)
     timezone          = optional(string, "UTC")
   }))
-
-  validation {
-    condition = alltrue([
-      for options in var.runners_machine_autoscaling_options :
-      length(
-        setsubtract([for key, value in options : key if value != null], ["periods", "timezone"])
-      ) > 0
-    ])
-
-    error_message = "Please specify an attribute that affects Autoscaling."
-  }
   default = []
-}
-
-variable "runners_root_size" {
-  description = "Runner instance root size in GB."
-  type        = number
-  default     = 16
-}
-
-variable "runners_volume_type" {
-  description = "Runner instance volume type"
-  type        = string
-  default     = "gp2"
-}
-
-variable "runners_iam_instance_profile_name" {
-  description = "IAM instance profile name of the runners, will be used in the runner config.toml"
-  type        = string
-  default     = ""
-}
-
-variable "runners_docker_registry_mirror" {
-  description = "The docker registry mirror to use to avoid rate limiting by hub.docker.com"
-  type        = string
-  default     = ""
-}
-
-variable "runners_environment_vars" {
-  description = "Environment variables during build execution, e.g. KEY=Value, see runner-public example. Will be used in the runner config.toml"
-  type        = list(string)
-  default     = []
-}
-
-variable "runners_pre_build_script" {
-  description = "Script to execute in the pipeline just before the build, will be used in the runner config.toml"
-  type        = string
-  default     = "\"\""
-}
-
-variable "runners_post_build_script" {
-  description = "Commands to be executed on the Runner just after executing the build, but before executing after_script. "
-  type        = string
-  default     = "\"\""
-}
-
-variable "runners_pre_clone_script" {
-  description = "Commands to be executed on the Runner before cloning the Git repository. this can be used to adjust the Git client configuration first, for example. "
-  type        = string
-  default     = "\"\""
-}
-
-variable "runners_request_concurrency" {
-  description = "Limit number of concurrent requests for new jobs from GitLab (default 1)."
-  type        = number
-  default     = 1
-}
-
-variable "runners_output_limit" {
-  description = "Sets the maximum build log size in kilobytes, by default set to 4096 (4MB)."
-  type        = number
-  default     = 4096
-}
-
-variable "userdata_pre_install" {
-  description = "User-data script snippet to insert before GitLab runner install"
-  type        = string
-  default     = ""
-}
-
-variable "userdata_post_install" {
-  description = "User-data script snippet to insert after GitLab runner install"
-  type        = string
-  default     = ""
-}
-
-variable "runners_use_private_address" {
-  description = "Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent."
-  type        = bool
-  default     = true
-}
-
-variable "runner_agent_uses_private_address" {
-  description = "Restrict the runner agent to the use of a private IP address. If `runner_agent_uses_private_address` is set to `false` it will override the `runners_use_private_address` for the agent."
-  type        = bool
-  default     = true
-}
-
-variable "runners_request_spot_instance" {
-  description = "Whether or not to request spot instances via docker-machine"
-  type        = bool
-  default     = true
-}
-
-variable "runners_check_interval" {
-  description = "defines the interval length, in seconds, between new jobs check."
-  type        = number
-  default     = 3
-}
-
-variable "cache_logging_bucket" {
-  type        = string
-  description = "S3 Bucket ID where the access logs to the cache bucket are stored."
-  default     = null
-}
-
-variable "cache_logging_bucket_prefix" {
-  type        = string
-  description = "Prefix within the `cache_logging_bucket`."
-  default     = null
-}
-
-variable "cache_bucket_prefix" {
-  description = "Prefix for s3 cache bucket name."
-  type        = string
-  default     = ""
-}
-
-variable "cache_bucket_name_include_account_id" {
-  description = "Boolean to add current account ID to cache bucket name."
-  type        = bool
-  default     = true
-}
-
-variable "cache_bucket_set_random_suffix" {
-  description = "Append the cache bucket name with a random string suffix"
-  type        = bool
-  default     = false
-}
-
-variable "cache_bucket_versioning" {
-  description = "Boolean used to enable versioning on the cache bucket, false by default."
-  type        = bool
-  default     = false
-}
-
-variable "cache_expiration_days" {
-  description = "Number of days before cache objects expires."
-  type        = number
-  default     = 1
-}
-
-variable "cache_shared" {
-  description = "Enables cache sharing between runners, false by default."
-  type        = bool
-  default     = false
-}
-
-variable "gitlab_runner_version" {
-  description = "Version of the [GitLab runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases)."
-  type        = string
-  default     = "15.8.2"
-}
-
-variable "enable_ping" {
-  description = "Allow ICMP Ping to the ec2 instances."
-  type        = bool
-  default     = false
-}
-
-variable "gitlab_runner_egress_rules" {
-  description = "List of egress rules for the gitlab runner instance."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
-  }))
-  default = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    prefix_list_ids  = null
-    from_port        = 0
-    protocol         = "-1"
-    security_groups  = null
-    self             = null
-    to_port          = 0
-    description      = null
-  }]
-}
-
-variable "gitlab_runner_security_group_ids" {
-  description = "A list of security group ids that are allowed to access the gitlab runner agent"
-  type        = list(string)
-  default     = []
-}
-
-variable "gitlab_runner_security_group_description" {
-  description = "A description for the gitlab-runner security group"
-  type        = string
-  default     = "A security group containing gitlab-runner agent instances"
-}
-
-variable "enable_cloudwatch_logging" {
-  description = "Boolean used to enable or disable the CloudWatch logging."
-  type        = bool
-  default     = true
-}
-
-variable "cloudwatch_logging_retention_in_days" {
-  description = "Retention for cloudwatch logs. Defaults to unlimited"
-  type        = number
-  default     = 0
-}
-
-variable "tags" {
-  description = "Map of tags that will be added to created resources. By default resources will be tagged with name and environment."
-  type        = map(string)
-  default     = {}
-}
-
-variable "agent_tags" {
-  description = "Map of tags that will be added to agent EC2 instances."
-  type        = map(string)
-  default     = {}
-}
-
-variable "runner_tags" {
-  description = "Map of tags that will be added to runner EC2 instances."
-  type        = map(string)
-  default     = {}
-}
-
-variable "suppressed_tags" {
-  description = "List of tag keys which are removed from tags, agent_tags and runner_tags and never added as default tag by the module."
-  type        = list(string)
-  default     = []
-}
-
-variable "role_tags" {
-  description = "Map of tags that will be added to the role created. Useful for tag based authorization."
-  type        = map(string)
-  default     = {}
-}
-
-variable "allow_iam_service_linked_role_creation" {
-  description = "Boolean used to control attaching the policy to a runner instance to create service linked roles."
-  type        = bool
-  default     = true
-}
-
-variable "docker_machine_options" {
-  # cspell:ignore amazonec
-  description = "List of additional options for the docker machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
-  type        = list(string)
-  default     = []
-}
-
-variable "instance_role_json" {
-  description = "Default runner instance override policy, expected to be in JSON format."
-  type        = string
-  default     = ""
-}
-
-variable "docker_machine_role_json" {
-  description = "Docker machine runner instance override policy, expected to be in JSON format."
-  type        = string
-  default     = ""
-}
-
-variable "docker_machine_security_group_description" {
-  description = "A description for the docker-machine security group"
-  type        = string
-  default     = "A security group containing docker-machine instances"
-}
-
-variable "ami_filter" {
-  description = "List of maps used to create the AMI filter for the Gitlab runner agent AMI. Must resolve to an Amazon Linux 1 or 2 image."
-  type        = map(list(string))
-
-  default = {
-    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
-  }
-}
-
-variable "ami_owners" {
-  description = "The list of owners used to select the AMI of Gitlab runner agent instances."
-  type        = list(string)
-  default     = ["amazon"]
-}
-
-variable "runner_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Gitlab runner docker-machine AMI."
-  type        = map(list(string))
-
-  default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
-}
-
-variable "runner_ami_owners" {
-  description = "The list of owners used to select the AMI of Gitlab runner docker-machine instances."
-  type        = list(string)
-
-  # Canonical
-  default = ["099720109477"]
-}
-
-variable "gitlab_runner_registration_config" {
-  description = "Configuration used to register the runner. See the README for an example, or reference the examples in the examples directory of this repo."
-  type        = map(string)
-
-  default = {
-    registration_token = ""
-    tag_list           = ""
-    description        = ""
-    locked_to_project  = ""
-    run_untagged       = ""
-    maximum_timeout    = ""
-    access_level       = ""
-  }
-}
-
-variable "secure_parameter_store_gitlab_runner_registration_token_name" {
-  description = "The name of the SSM parameter to read the GitLab Runner registration token from."
-  type        = string
-  default     = "gitlab-runner-registration-token"
-}
-
-variable "secure_parameter_store_runner_token_key" {
-  description = "The key name used store the Gitlab runner token in Secure Parameter Store"
-  type        = string
-  default     = "runner-token"
-}
-
-variable "secure_parameter_store_runner_sentry_dsn" {
-  description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
-  type        = string
-  default     = "sentry-dsn"
-}
-
-variable "enable_manage_gitlab_token" {
-  description = "(Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`."
-  type        = bool
-  default     = null
-
-  validation {
-    # false positive. There is no secret!
-    # kics-scan ignore-line
-    condition     = anytrue([var.enable_manage_gitlab_token == null])
-    error_message = "Deprecated, this variable is no longer in use and can be removed."
-  }
-}
-
-variable "overrides" {
-  description = <<-EOT
-    This map provides the possibility to override some defaults.
-    The following attributes are supported:
-      * `name_sg` set the name prefix and overwrite the `Name` tag for all security groups created by this module.
-      * `name_runner_agent_instance` set the name prefix and override the `Name` tag for the EC2 gitlab runner instances defined in the auto launch configuration.
-      * `name_docker_machine_runners` override the `Name` tag of EC2 instances created by the runner agent (used as name prefix for `docker_machine_version` >= 0.16.2).
-      * `name_iam_objects` set the name prefix of all AWS IAM resources created by this module.
-  EOT
-  type        = map(string)
-
-  default = {
-    name_sg                     = ""
-    name_iam_objects            = ""
-    name_runner_agent_instance  = ""
-    name_docker_machine_runners = ""
-  }
-
-  validation {
-    condition     = length(var.overrides["name_docker_machine_runners"]) <= 28
-    error_message = "Maximum length for name_docker_machine_runners is 28 characters!"
-  }
-
-  validation {
-    condition     = var.overrides["name_docker_machine_runners"] == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.overrides["name_docker_machine_runners"]))
-    error_message = "Valid characters for the docker machine name are: [a-zA-Z0-9\\.-]."
-  }
-}
-
-variable "cache_bucket" {
-  description = "Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared cache. To use the same cache across multiple runners disable the creation of the cache and provide a policy and bucket name. See the public runner example for more details."
-  type        = map(any)
-
-  default = {
-    create = true
-    policy = ""
-    bucket = ""
-  }
-}
-
-variable "enable_runner_user_data_trace_log" {
-  description = "Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token."
-  type        = bool
-  default     = true
-}
-
-variable "enable_schedule" {
-  description = "Flag used to enable/disable auto scaling group schedule for the runner instance. "
-  type        = bool
-  default     = false
-}
-
-variable "schedule_config" {
-  description = "Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable_schedule is set to true. "
-  type        = map(any)
-  default = {
-    # Configure optional scale_out scheduled action
-    scale_out_recurrence = "0 8 * * 1-5"
-    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
-    scale_out_time_zone  = "Etc/UTC"
-    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
-
-    # Configure optional scale_in scheduled action
-    scale_in_recurrence = "0 18 * * 1-5"
-    scale_in_count      = 0 # Default for min_size, desired_capacity and max_size
-    scale_in_time_zone  = "Etc/UTC"
-    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
-  }
-}
-
-variable "runner_root_block_device" {
-  description = "The EC2 instance root block device configuration. Takes the following keys: `device_name`, `delete_on_termination`, `volume_type`, `volume_size`, `encrypted`, `iops`, `throughput`, `kms_key_id`"
-  type        = map(string)
-  default     = {}
-}
-
-variable "enable_runner_ssm_access" {
-  description = "Add IAM policies to the runner agent instance to connect via the Session Manager."
-  type        = bool
-  default     = false
-}
-
-variable "enable_docker_machine_ssm_access" {
-  description = "Add IAM policies to the docker-machine instances to connect via the Session Manager."
-  type        = bool
-  default     = false
-}
-
-variable "runners_volumes_tmpfs" {
-  description = "Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type = list(object({
-    volume  = string
-    options = string
-  }))
-  default = []
-}
-
-variable "runners_services_volumes_tmpfs" {
-  description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
-  type = list(object({
-    volume  = string
-    options = string
-  }))
-  default = []
-}
-
-variable "runners_docker_services" {
-  description = "adds `runners.docker.services` blocks to config.toml.  All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
-  type = list(object({
-    name       = string
-    alias      = string
-    entrypoint = list(string)
-    command    = list(string)
-  }))
-  default = []
-}
-
-variable "kms_key_id" {
-  description = "KMS key ARN to encrypt the resources. Ensure CloudWatch has access to the provided KMS key (see policies/kms-policy.json)."
-  type        = string
-  default     = ""
-}
-
-variable "enable_kms" {
-  description = "Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key."
-  type        = bool
-  default     = false
-}
-
-variable "kms_alias_name" {
-  description = "Alias added to the kms_key (if created and not provided by kms_key_id)"
-  type        = string
-  default     = ""
-}
-
-variable "kms_deletion_window_in_days" {
-  description = "Key rotation window, set to 0 for no rotation. Only used when `enable_kms` is set to `true`."
-  type        = number
-  default     = 7
-}
-
-variable "use_fleet" {
-  description = "Use the fleet mode for agents. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode"
-  type        = bool
-  default     = false
-}
-
-variable "enable_eip" {
-  description = "Enable the assignment of an EIP to the gitlab runner instance"
-  default     = false
-  type        = bool
-}
-
-variable "enable_asg_recreation" {
-  description = "Enable automatic redeployment of the Runner ASG when the Launch Configs change."
-  default     = true
-  type        = bool
-}
-
-variable "asg_delete_timeout" {
-  description = "Timeout when trying to delete the Runner ASG."
-  default     = "10m"
-  type        = string
-}
-
-variable "asg_max_instance_lifetime" {
-  description = "The seconds before an instance is refreshed in the ASG."
-  default     = null
-  type        = number
-}
-
-variable "permissions_boundary" {
-  description = "Name of permissions boundary policy to attach to AWS IAM roles"
-  default     = ""
-  type        = string
-}
-
-variable "log_group_name" {
-  description = "Option to override the default name (`environment`) of the log group, requires `enable_cloudwatch_logging = true`."
-  default     = null
-  type        = string
-}
-
-variable "runner_iam_role_name" {
-  type        = string
-  description = "IAM role name of the gitlab runner agent EC2 instance. If unspecified then `{name_iam_objects}-instance` is used"
-  default     = ""
-}
-
-variable "create_runner_iam_role" {
-  type        = bool
-  description = "Whether to create the runner IAM role of the gitlab runner agent EC2 instance."
-  default     = true
-}
-
-variable "runner_iam_policy_arns" {
-  type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the gitlab runner agent ec2 instance."
-  default     = []
-}
-
-variable "docker_machine_iam_policy_arns" {
-  type        = list(string)
-  description = "List of policy ARNs to be added to the instance profile of the docker machine runners."
-  default     = []
-}
-
-variable "sentry_dsn" {
-  default     = "__SENTRY_DSN_REPLACED_BY_USER_DATA__"
-  description = "Sentry DSN of the project for the runner to use (uses legacy DSN format)"
-  type        = string
-}
-
-variable "prometheus_listen_address" {
-  default     = ""
-  description = "Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on."
-  type        = string
-}
-
-variable "docker_machine_egress_rules" {
-  description = "List of egress rules for the docker-machine instance(s)."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
-  }))
-  default = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    prefix_list_ids  = null
-    from_port        = 0
-    protocol         = "-1"
-    security_groups  = null
-    self             = null
-    to_port          = 0
-    description      = "Allow all egress traffic for docker machine build runners"
-  }]
-}
-
-variable "asg_terminate_lifecycle_hook_name" {
-  description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
-  type        = string
-  default     = null
-}
-
-variable "runner_yum_update" {
-  description = "Run a yum update as part of starting the runner"
-  type        = bool
-  default     = true
-}
-
-variable "runners_gitlab_certificate" {
-  description = "Certificate of the GitLab instance to connect to. Example: `file(\"$${path.module}/my-gitlab.crt\")`"
-  type        = string
-  default     = ""
-}
-
-variable "runners_ca_certificate" {
-  description = "Trusted CA certificate bundle. Example: `file(\"$${path.module}/ca.crt\")`"
-  type        = string
-  default     = ""
-}
-
-variable "runner_extra_config" {
-  description = "Extra commands to run as part of starting the runner"
-  type        = string
-  default     = ""
-}
-
-variable "show_user_data_in_plan" {
-  description = "When enabled, shows the diff for agent configuration files in Terraform plan: `config.toml` and user data script"
-  type        = bool
-  default     = false
-  validation {
-    condition     = !var.show_user_data_in_plan
-    error_message = "The variable is deprecated. Please use the 'debug' variable instead."
-  }
 }
 
 variable "debug" {
-  description = <<EOT
-    Enable debug settings for development
-
-    output_runner_config_to_file: When enabled, outputs the rendered config.toml file in the root module. This can
-                                  then also be used by Terraform to show changes in plan. Note that enabling this can
-                                  potentially expose sensitive information.
-    output_user_data_to_file: When enabled, outputs the rendered userdata.sh file in the root module. This can then
-                              also be used by Terraform to show changes in plan. Note that enabling this can
-                              potentially expose sensitive information.
+  description = <<-EOT
+    trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.
+    write_runner_config_to_file: When enabled, outputs the rendered config.toml file in the root module. Note that enabling this can
+                                 potentially expose sensitive information.
+    write_runner_user_data_to_file: When enabled, outputs the rendered userdata.sh file in the root module. Note that enabling this
+                                    can potentially expose sensitive information.
   EOT
   type = object({
-    output_runner_config_to_file    = bool
-    output_runner_user_data_to_file = bool
+    trace_runner_user_data         = optional(bool, false)
+    write_runner_config_to_file    = optional(bool, false)
+    write_runner_user_data_to_file = optional(bool, false)
   })
-  default = {
-    output_runner_config_to_file    = false
-    output_runner_user_data_to_file = false
-  }
+  default = {}
 }

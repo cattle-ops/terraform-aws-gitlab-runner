@@ -41,23 +41,24 @@ module "vpc_endpoints" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = element(module.vpc.public_subnets, 0)
   environment = var.environment
 
-  runners_use_private_address = false
-  enable_eip                  = true
+  runner_instance = {
+    runner_use_eip = true
+    name           = var.runner_name
+  }
 
-  docker_machine_security_group_description = "Custom description for docker-machine"
-  gitlab_runner_security_group_description  = "Custom description for gitlab-runner"
+  runner_networking = {
+    security_group_description = "Custom description for gitlab-runner"
+  }
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.public_subnets, 0)
+  runner_gitlab = {
+    url = var.gitlab_url
+  }
 
-  runners_executor   = "docker"
-  runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
-
-  gitlab_runner_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_runner"
     description        = "runner docker - auto"
@@ -65,4 +66,14 @@ module "runner" {
     run_untagged       = "false"
     maximum_timeout    = "3600"
   }
+
+  runner_worker = {
+    type = "docker"
+  }
+
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
+  }
+
+  runner_worker_docker_machine_security_group_description = "Custom description for docker-machine"
 }
