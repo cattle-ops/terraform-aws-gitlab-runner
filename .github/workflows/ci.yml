@@ -137,7 +137,8 @@ jobs:
         run: tflint --init
 
       - name: Run TFLint
-        run: tflint --var 'enable_kms=true'
+        # assign necessary variables to avoid errors
+        run: "tflint --var 'enable_kms=true' --var='runner_instance={\"name_prefix\": \"a\", \"name\": \"b\"}'"
 
   tfsec:
     name: tfsec PR commenter

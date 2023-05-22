@@ -92,7 +92,7 @@ module "runner" {
   docker_machine_options = var.docker_machine_options
 
   # See https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/160
-  runners_additional_volumes = ["/certs/client"]
+  executor_docker_additional_volumes = ["/certs/client"]
 
   tags = local.common_tags
 
