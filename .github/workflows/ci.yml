@@ -13,9 +13,23 @@ permissions:
   pull-requests: write
 
 jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Get app installation token
+        uses: npalm/action-app-token@dd4bb16d91ced5659bc618705c96b822c5a42136 # ratchet:npalm/action-app-token@v1.1.0
+        id: token
+        with:
+          appId: ${{ secrets.APP_ID }} # ${{ secrets.RELEASER_APP_ID }}
+          appPrivateKeyBase64: ${{ secrets.APPLICATION_PRIVATE_KEY }} # ${{ secrets.RELEASER_APP_PRIVATE_KEY_BASE64 }}
+          appInstallationType: org
+          appInstallationValue: cattle-ops
+          
   get-temp-token:
     runs-on: ubuntu-latest
-
     steps:
       - name: Get Token
         id: get_workflow_token
