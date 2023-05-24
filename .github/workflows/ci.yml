@@ -13,20 +13,16 @@ permissions:
   pull-requests: write
 
 jobs:
-  release-test:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: write
-        pull-requests: write
-      steps:
-        - name: Get app installation token
-          uses: npalm/action-app-token@dd4bb16d91ced5659bc618705c96b822c5a42136 # ratchet:npalm/action-app-token@v1.1.0
-          id: token
-          with:
-            appId: ${{ secrets.RELEASER_APP_ID }}
-            appPrivateKeyBase64: ${{ secrets.RELEASER_APP_PRIVATE_KEY_BASE64 }}
-            appInstallationType: org
-            appInstallationValue: cattle-ops
+  get-temp-token:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.APP_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
 
   verify_module:
     name: Verify module
