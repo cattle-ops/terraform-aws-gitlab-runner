@@ -123,7 +123,7 @@ variable "runner_instance" {
     name                        = string
     name_prefix                 = optional(string)
     private_address_only        = optional(bool, true)
-    root_device_config          = optional(map(string))
+    root_device_config          = optional(map(string), {})
     spot_price                  = optional(string, null)
     ssm_access                  = optional(bool, false)
     type                        = optional(string, "t3.micro")
