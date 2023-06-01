@@ -305,7 +305,7 @@ variable "runner_gitlab_registration_config" {
     locked_to_project  = optional(string, "")
     run_untagged       = optional(string, "")
     maximum_timeout    = optional(string, "")
-    access_level       = optional(string, "")
+    access_level       = optional(string, "not_protected") # this is the only mandatory field calling the GitLab get token for executor operation
   })
 
   default = {}
