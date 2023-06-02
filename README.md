@@ -10,13 +10,14 @@
 - [Prerequisites](#prerequisites)
 - [Usage](#usage)
 - [Examples](#examples)
-- [Contributors ✨](#contributors-) <!-- markdown-link-check-disable-line -->
-- [Requirements](#requirements) <!-- markdown-link-check-disable-line -->
-- [Providers](#providers) <!-- markdown-link-check-disable-line -->
-- [Modules](#modules) <!-- markdown-link-check-disable-line -->
-- [Resources](#resources) <!-- markdown-link-check-disable-line -->
-- [Inputs](#inputs) <!-- markdown-link-check-disable-line -->
-- [Outputs](#outputs) <!-- markdown-link-check-disable-line -->
+- [Contributors ✨](#contributors-)
+- [Module Documentation](#module-documentation)
+- [Requirements](#requirements)
+- [Providers](#providers)
+- [Modules](#modules)
+- [Resources](#resources)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
 
 ## The module
 
@@ -37,7 +38,7 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 > We know that this is a breaking change causing some pain, but we think it is worth it. We hope you agree. And to make the
 > transition as smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases,
 > but some minor rework might still be possible.
-> 
+>
 > Checkout [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819)
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
@@ -693,6 +694,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_shm_size"></a> [runners\_shm\_size](#input\_runners\_shm\_size) | shm\_size for the runners, will be used in the runner config.toml | `number` | `0` | no |
 | <a name="input_runners_token"></a> [runners\_token](#input\_runners\_token) | Token for the runner, will be used in the runner config.toml. | `string` | `"__REPLACED_BY_USER_DATA__"` | no |
 | <a name="input_runners_use_private_address"></a> [runners\_use\_private\_address](#input\_runners\_use\_private\_address) | Restrict runners to the use of a private IP address. If `runner_agent_uses_private_address` is set to `true`(default), `runners_use_private_address` will also apply for the agent. | `bool` | `true` | no |
+| <a name="input_runners_wait_for_services_timeout"></a> [runners\_wait\_for\_services\_timeout](#input\_runners\_wait\_for\_services\_timeout) | How long to wait for Docker services. Set to `-1` to disable. Default is `30`. | `number` | `30` | no |
 | <a name="input_runners_userdata"></a> [runners\_userdata](#input\_runners\_userdata) | Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted. | `string` | `""` | no |
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |

@@ -361,6 +361,12 @@ variable "runners_output_limit" {
   default     = 4096
 }
 
+variable "runners_wait_for_services_timeout" {
+  description = "How long to wait for Docker services. Set to -1 to disable. Default is 30."
+  type        = number
+  default     = "30"
+}
+
 variable "userdata_pre_install" {
   description = "User-data script snippet to insert before GitLab runner install"
   type        = string
