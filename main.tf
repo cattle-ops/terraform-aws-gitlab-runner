@@ -133,6 +133,7 @@ locals {
       runners_pre_build_script          = var.runners_pre_build_script
       runners_post_build_script         = var.runners_post_build_script
       runners_pre_clone_script          = var.runners_pre_clone_script
+      runners_wait_for_services_timeout = var.runners_wait_for_services_timeout
       runners_request_concurrency       = var.runners_request_concurrency
       runners_output_limit              = var.runners_output_limit
       runners_check_interval            = var.runners_check_interval
