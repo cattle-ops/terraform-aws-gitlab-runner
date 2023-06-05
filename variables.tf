@@ -364,7 +364,7 @@ variable "runners_output_limit" {
 variable "runners_wait_for_services_timeout" {
   description = "How long to wait for Docker services. Set to -1 to disable. Default is 30."
   type        = number
-  default     = "30"
+  default     = 30
 }
 
 variable "userdata_pre_install" {
