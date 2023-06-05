@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.1...6.5.0) (2023-06-05)
+
+
+### Features
+
+* add support for `wait_for_services_timeout` option ([#861](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/861)) ([28c02ce](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/28c02ce66b5af3ccf4b27e02233693383e81275a))
+
 ## [6.4.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.0...6.4.1) (2023-05-11)
 
 
