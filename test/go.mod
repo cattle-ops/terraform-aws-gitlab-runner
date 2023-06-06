@@ -6,7 +6,7 @@ require (
 	github.com/gruntwork-io/terratest v0.42.0
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.8.3
-	github.com/xanzy/go-gitlab v0.83.0
+	github.com/xanzy/go-gitlab v0.84.0
 )
 
 require (
