@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gruntwork-io/terratest v0.43.0
 	github.com/joho/godotenv v1.5.1
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/xanzy/go-gitlab v0.84.0
 )
 
