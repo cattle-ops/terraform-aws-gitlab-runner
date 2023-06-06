@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.5.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.0...6.5.1) (2023-06-06)
+
+
+### Bug Fixes
+
+* wait_for_services_timeout needs to be an integer in config file ([#874](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/874)) ([8d89d91](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8d89d91d9dfb50887a77342a9c70cac31bb1cd8d))
+
 ## [6.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.1...6.5.0) (2023-06-05)
 
 
