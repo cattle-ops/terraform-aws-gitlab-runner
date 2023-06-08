@@ -612,7 +612,7 @@ variable "gitlab_runner_registration_config" {
 
   default = {
     registration_token = ""
-    type               = ""
+    type               = "" # mandatory if gitlab_runner_version >= 16.0.0
     group_id           = "" # mandatory if type is group_type
     project_id         = "" # mandatory if type is project_type
     tag_list           = ""

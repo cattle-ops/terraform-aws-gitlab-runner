@@ -47,8 +47,18 @@ fi
 
 if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
 then
-  if [[ ! "${gitlab_runner_version}" < "16.0.0" ]]
+  if [[ "${gitlab_runner_version}" < "16.0.0" ]]
   then
+    token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+      --form "token=$gitlab_runner_registration_token" \
+      --form "tag_list=${gitlab_runner_tag_list}" \
+      --form "description=${gitlab_runner_description}" \
+      --form "locked=${gitlab_runner_locked_to_project}" \
+      --form "run_untagged=${gitlab_runner_run_untagged}" \
+      --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
+      --form "access_level=${gitlab_runner_access_level}" \
+      | jq -r .token)
+  else
     runner_type_param=""
     if [ "${gitlab_runner_type}" = "group_type" ]; then
       runner_type_param='--form group_id=${gitlab_runner_group_id}'
@@ -67,16 +77,6 @@ then
       $runner_type_param \
       --form "access_level=${gitlab_runner_access_level}" \
       | jq -r '.token')
-  else
-    token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
-      --form "token=$gitlab_runner_registration_token" \
-      --form "tag_list=${gitlab_runner_tag_list}" \
-      --form "description=${gitlab_runner_description}" \
-      --form "locked=${gitlab_runner_locked_to_project}" \
-      --form "run_untagged=${gitlab_runner_run_untagged}" \
-      --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
-      --form "access_level=${gitlab_runner_access_level}" \
-      | jq -r .token)
   fi
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
 fi
