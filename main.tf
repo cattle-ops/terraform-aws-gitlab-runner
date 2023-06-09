@@ -69,13 +69,18 @@ locals {
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_gitlab_runner_registration_token_name = var.secure_parameter_store_gitlab_runner_registration_token_name
+      secure_parameter_store_gitlab_token_name                     = var.secure_parameter_store_gitlab_token_name
       secure_parameter_store_region                                = var.aws_region
       gitlab_runner_registration_token                             = lookup(var.gitlab_runner_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
+      gitlab_token                                                 = var.gitlab_token != "" ? var.gitlab_token : "__GITLAB_TOKEN_FROM_SSM__"
       gitlab_runner_description                                    = var.gitlab_runner_registration_config["description"]
       gitlab_runner_tag_list                                       = var.gitlab_runner_registration_config["tag_list"]
       gitlab_runner_locked_to_project                              = var.gitlab_runner_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                                   = var.gitlab_runner_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                                = var.gitlab_runner_registration_config["maximum_timeout"]
+      gitlab_runner_type                                           = var.gitlab_runner_registration_config["type"]
+      gitlab_runner_group_id                                       = lookup(var.gitlab_runner_registration_config, "group_id", "")
+      gitlab_runner_project_id                                     = lookup(var.gitlab_runner_registration_config, "project_id", "")
       gitlab_runner_access_level                                   = lookup(var.gitlab_runner_registration_config, "access_level", "not_protected")
       sentry_dsn                                                   = var.sentry_dsn
       public_key                                                   = var.use_fleet == true ? tls_private_key.fleet[0].public_key_openssh : ""

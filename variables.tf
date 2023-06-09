@@ -612,6 +612,9 @@ variable "gitlab_runner_registration_config" {
 
   default = {
     registration_token = ""
+    type               = "" # mandatory if gitlab_runner_version >= 16.0.0
+    group_id           = "" # mandatory if type is group_type
+    project_id         = "" # mandatory if type is project_type
     tag_list           = ""
     description        = ""
     locked_to_project  = ""
@@ -650,6 +653,18 @@ variable "enable_manage_gitlab_token" {
     condition     = anytrue([var.enable_manage_gitlab_token == null])
     error_message = "Deprecated, this variable is no longer in use and can be removed."
   }
+}
+
+variable "gitlab_token" {
+  description = "GitLab admin token used by the runners in order to register themselves if gitlab_runner_version >= 16.0.0. If not provided the token will be read from the SSM parameter store."
+  type        = string
+  default     = ""
+}
+
+variable "secure_parameter_store_gitlab_token_name" {
+  description = "The name of the SSM parameter to read the GitLab token from."
+  type        = string
+  default     = "gitlab-token"
 }
 
 variable "overrides" {
