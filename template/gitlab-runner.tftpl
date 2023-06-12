@@ -40,14 +40,11 @@ then
 fi
 
 # fetch gitlab token from SSM
-if [[ "${gitlab_token}" == "__GITLAB_TOKEN_FROM_SSM__" ]]
-then
-    gitlab_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
-fi
+gitlab_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
 
 if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
 then
-  if [[ "${gitlab_runner_version}" < "16.0.0" ]]
+  if [ "${use_new_runner_authentication_gitlab_16}" == "false" ]
   then
     token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
       --form "token=$gitlab_runner_registration_token" \
@@ -61,8 +58,14 @@ then
   else
     runner_type_param=""
     if [ "${gitlab_runner_type}" = "group_type" ]; then
+      if [ ! -z "${gitlab_runner_group_id}" ]; then
+        echo "If the runner type is group_type, you must specify a group_id".
+      fi
       runner_type_param='--form group_id=${gitlab_runner_group_id}'
     elif [ "${gitlab_runner_type}" = "project_type" ]; then
+      if [ ! -z "${gitlab_runner_project_id}" ]; then
+        echo "If the runner type is project_type, you must specify a project_id".
+      fi
       runner_type_param='--form project_id=${gitlab_runner_project_id}'
     fi
 

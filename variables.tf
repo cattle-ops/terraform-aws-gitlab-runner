@@ -655,14 +655,8 @@ variable "enable_manage_gitlab_token" {
   }
 }
 
-variable "gitlab_token" {
-  description = "GitLab admin token used by the runners in order to register themselves if gitlab_runner_version >= 16.0.0. If not provided the token will be read from the SSM parameter store."
-  type        = string
-  default     = ""
-}
-
-variable "secure_parameter_store_gitlab_token_name" {
-  description = "The name of the SSM parameter to read the GitLab token from."
+variable "secure_parameter_store_gitlab_personal_access_token_name" {
+  description = "The name of the SSM parameter to read the GitLab personal access token from. It must have the api scope enabled."
   type        = string
   default     = "gitlab-token"
 }
