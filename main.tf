@@ -15,7 +15,7 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   type  = "SecureString"
   value = "null"
 
-  kms_key_id = local.kms_key
+  key_id = local.kms_key
 
   tags = local.tags
 
@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
   type  = "SecureString"
   value = "null"
 
-  kms_key_id = local.kms_key
+  key_id = local.kms_key
 
   tags = local.tags
 
