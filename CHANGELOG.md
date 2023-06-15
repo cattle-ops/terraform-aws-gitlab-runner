@@ -1,5 +1,19 @@
 # Changelog
 
+## [6.5.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.0...6.5.1) (2023-06-06)
+
+
+### Bug Fixes
+
+* wait_for_services_timeout needs to be an integer in config file ([#874](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/874)) ([8d89d91](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8d89d91d9dfb50887a77342a9c70cac31bb1cd8d))
+
+## [6.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.1...6.5.0) (2023-06-05)
+
+
+### Features
+
+* add support for `wait_for_services_timeout` option ([#861](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/861)) ([28c02ce](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/28c02ce66b5af3ccf4b27e02233693383e81275a))
+
 ## [6.4.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.0...6.4.1) (2023-05-11)
 
 
@@ -674,7 +688,7 @@ Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migra
 - Update to Terraform 0.12
 - Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
 - Update the module from 3.10.0 to 4.0.0, next run `terraform init`
-- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+- Run `terraform apply`. This should trigger only a re-creation of the auto launch configuration and a minor change in the auto-scaling group.
 
 ### Terraform 0.11
 

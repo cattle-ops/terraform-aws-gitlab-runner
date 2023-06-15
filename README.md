@@ -18,11 +18,11 @@
 - [Resources](#resources) <!-- markdown-link-check-disable-line -->
 - [Inputs](#inputs) <!-- markdown-link-check-disable-line -->
 - [Outputs](#outputs) <!-- markdown-link-check-disable-line -->
-
+- 
 ## The module
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post
-describes the original version of the the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).
+describes the original version of the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).
 The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
 
 > 💥 BREAKING CHANGE AHEAD: Version 7 of the module rewrites the whole variable section to
@@ -38,7 +38,7 @@ The original setup of the module is based on the blog post: [Auto scale GitLab C
 > We know that this is a breaking change causing some pain, but we think it is worth it. We hope you agree. And to make the
 > transition as smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases,
 > but some minor rework might still be possible.
-> 
+>
 > Checkout [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819)
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
@@ -409,7 +409,7 @@ module "runner" {
 
   docker_machine_instance_types_fleet       = ["t3a.medium", "t3.medium", "t2.medium"]
   use_fleet                                 = true
-  key_pair_name                             = "<key_pair_name>"
+  fleet_key_pair_name                       = "<key_pair_name>"
 
   runners_name       = "docker-machine"
   runners_gitlab_url = "https://gitlab.com"
@@ -614,7 +614,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_enable_docker_machine_ssm_access"></a> [enable\_docker\_machine\_ssm\_access](#input\_enable\_docker\_machine\_ssm\_access) | Add IAM policies to the docker-machine instances to connect via the Session Manager. | `bool` | `false` | no |
 | <a name="input_enable_eip"></a> [enable\_eip](#input\_enable\_eip) | Enable the assignment of an EIP to the gitlab runner instance | `bool` | `false` | no |
 | <a name="input_enable_kms"></a> [enable\_kms](#input\_enable\_kms) | Let the module manage a KMS key, logs will be encrypted via KMS. Be-aware of the costs of an custom key. | `bool` | `false` | no |
-| <a name="input_enable_manage_gitlab_token"></a> [enable\_manage\_gitlab\_token](#input\_enable\_manage\_gitlab\_token) | (Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `null` | no |
+| <a name="input_enable_manage_gitlab_token"></a> [enable\_manage\_gitlab\_token](#input\_enable\_manage\_gitlab\_token) | (Deprecated) Boolean to enable the management of the GitLab token in SSM. If `true` the token will be stored in SSM, which means the SSM property is a terraform managed resource. If `false` the Gitlab token will be stored in the SSM by the user-data script during creation of the instance. However the SSM parameter is not managed by terraform and will remain in SSM after a `terraform destroy`. | `bool` | `null` | no |
 | <a name="input_enable_ping"></a> [enable\_ping](#input\_enable\_ping) | Allow ICMP Ping to the ec2 instances. | `bool` | `false` | no |
 | <a name="input_enable_runner_ssm_access"></a> [enable\_runner\_ssm\_access](#input\_enable\_runner\_ssm\_access) | Add IAM policies to the runner agent instance to connect via the Session Manager. | `bool` | `false` | no |
 | <a name="input_enable_runner_user_data_trace_log"></a> [enable\_runner\_user\_data\_trace\_log](#input\_enable\_runner\_user\_data\_trace\_log) | Enable bash trace for the user data script that creates the EC2 instance for the runner agent. Be aware this could log sensitive data such as you GitLab runner token. | `bool` | `true` | no |
@@ -695,6 +695,7 @@ Made with [contributors-img](https://contrib.rocks).
 | <a name="input_runners_userdata"></a> [runners\_userdata](#input\_runners\_userdata) | Cloud-init user data that will be passed to the runner ec2 instance. Available only for `docker+machine` driver. Should not be base64 encrypted. | `string` | `""` | no |
 | <a name="input_runners_volume_type"></a> [runners\_volume\_type](#input\_runners\_volume\_type) | Runner instance volume type | `string` | `"gp2"` | no |
 | <a name="input_runners_volumes_tmpfs"></a> [runners\_volumes\_tmpfs](#input\_runners\_volumes\_tmpfs) | Mount a tmpfs in runner container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram | <pre>list(object({<br>    volume  = string<br>    options = string<br>  }))</pre> | `[]` | no |
+| <a name="input_runners_wait_for_services_timeout"></a> [runners\_wait\_for\_services\_timeout](#input\_runners\_wait\_for\_services\_timeout) | How long to wait for Docker services. Set to -1 to disable. Default is 30. | `number` | `30` | no |
 | <a name="input_schedule_config"></a> [schedule\_config](#input\_schedule\_config) | Map containing the configuration of the ASG scale-out and scale-in for the runner instance. Will only be used if enable\_schedule is set to true. | `map(any)` | <pre>{<br>  "scale_in_count": 0,<br>  "scale_in_recurrence": "0 18 * * 1-5",<br>  "scale_in_time_zone": "Etc/UTC",<br>  "scale_out_count": 1,<br>  "scale_out_recurrence": "0 8 * * 1-5",<br>  "scale_out_time_zone": "Etc/UTC"<br>}</pre> | no |
 | <a name="input_secure_parameter_store_gitlab_runner_registration_token_name"></a> [secure\_parameter\_store\_gitlab\_runner\_registration\_token\_name](#input\_secure\_parameter\_store\_gitlab\_runner\_registration\_token\_name) | The name of the SSM parameter to read the GitLab Runner registration token from. | `string` | `"gitlab-runner-registration-token"` | no |
 | <a name="input_secure_parameter_store_runner_sentry_dsn"></a> [secure\_parameter\_store\_runner\_sentry\_dsn](#input\_secure\_parameter\_store\_runner\_sentry\_dsn) | The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store | `string` | `"sentry-dsn"` | no |

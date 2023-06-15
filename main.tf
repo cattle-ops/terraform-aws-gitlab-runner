@@ -16,6 +16,8 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   type  = "SecureString"
   value = "null"
 
+  key_id = local.kms_key
+
   tags = local.tags
 
   lifecycle {
@@ -27,6 +29,8 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
   name  = local.secure_parameter_store_runner_sentry_dsn
   type  = "SecureString"
   value = "null"
+
+  key_id = local.kms_key
 
   tags = local.tags
 
@@ -245,6 +249,7 @@ data "aws_ami" "runner" {
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
+  # checkov:skip=CKV_AWS_341:Hop limit > 1 needed here in case of Docker builds. Otherwise the token is invalid within Docker.
   # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
   # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
   name_prefix = "${local.name_runner_agent_instance}-"

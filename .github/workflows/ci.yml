@@ -70,7 +70,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@v6.22.2
+        uses: oxsecurity/megalinter@v7.1.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -138,7 +138,7 @@ jobs:
 
       - name: Run TFLint
         # assign necessary variables to avoid errors
-        run: "tflint --var='runner_instance={\"name_prefix\": \"a\", \"name\": \"b\"}'"
+        run: "tflint --var 'enable_managed_kms_key=true' --var='runner_instance={\"name_prefix\": \"a\", \"name\": \"b\"}'"
 
   tfsec:
     name: tfsec PR commenter

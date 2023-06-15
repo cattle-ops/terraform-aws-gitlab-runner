@@ -252,6 +252,7 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_max_instance_lifetime_seconds/max_lifetime_seconds/g' | \
                       sed 's/runner_enable_ssm_access/ssm_access/g'
                     )
+
 # add new block runners_docker_options at the end
 if [ -n "$extracted_variables" ]; then
   echo "$(head -n -1 "$converted_file")
