@@ -137,7 +137,7 @@ jobs:
         run: tflint --init
 
       - name: Run TFLint
-        run: tflint -var 'enable_kms=true'
+        run: tflint --var 'enable_kms=true'
 
   tfsec:
     name: tfsec PR commenter
