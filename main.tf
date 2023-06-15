@@ -81,7 +81,7 @@ locals {
       gitlab_runner_locked_to_project                              = var.runner_gitlab_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                                   = var.runner_gitlab_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                                = var.runner_gitlab_registration_config["maximum_timeout"]
-      gitlab_runner_access_level                                   = lookup(var.runner_gitlab_registration_config, "access_level", "not_protected")
+      gitlab_runner_access_level                                   = var.runner_gitlab_registration_config.access_level
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
       public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable

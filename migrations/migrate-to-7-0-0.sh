@@ -16,7 +16,6 @@ cp "$1" "$converted_file"
 # PR #738 chore!: remove deprecated variables
 #
 sed -i '/arn_format/d' "$converted_file"
-sed -i '/subnet_id_runners/d' "$converted_file"
 sed -i '/subnet_ids_gitlab_runner/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_hook_create/d' "$converted_file"
 sed -i '/asg_terminate_lifecycle_hook_heartbeat_timeout/d' "$converted_file"
@@ -133,7 +132,7 @@ sed 's/role_tags/runner_extra_role_tags/g' | \
 sed 's/runner_tags/runner_worker_docker_machine_extra_role_tags/g' | \
 sed 's/agent_tags/runner_extra_instance_tags/g' | \
 sed 's/enable_ping/runner_ping_enable/g' | \
-sed 's/gitlab_runner_version/runner_gitlab_runner_version/g' | \
+sed 's/[^\.]gitlab_runner_version/runner_gitlab_runner_version/g' | \
 sed 's/gitlab_runner_egress_rules/runner_extra_egress_rules/g' | \
 sed 's/gitlab_runner_security_group_ids/runner_ping_allow_from_security_groups/g' | \
 sed 's/gitlab_runner_security_group_description/runner_security_group_description/g' | \
@@ -650,12 +649,23 @@ if [ -n "$extracted_variables" ]; then
   " > x && mv x "$converted_file"
 fi
 
+# rename the subnet_id_runners variable
+sed -i 's/subnet_id_runners/subnet_id/g' "$converted_file"
+
+# remove the \" from the autoscaling periods. No longer needed as jsonencode(value) is used
+sed -i '/periods/s/\\"//g' "$converted_file"
+
 # change the module source to cattle-ops
 sed -i 's/npalm/cattle-ops/g' "$converted_file"
 
 cat <<EOT
 Not all cases are handled by this script. Please check the output file and make sure that all variables are converted correctly.
-Especially it you have comments or multiline templates in your file.
+Take some time and sort the variables again for better readability.
+
+Known issues:
+  - commented lines are not supported. Remove them.
+  - variable definitions with multiple lines are not supported. Rework manually.
+  - `subnet_id` was taken from `subnet_id_runners`. Make sure that this is correct.
 EOT
 
 echo
