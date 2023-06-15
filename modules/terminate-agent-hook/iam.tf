@@ -118,6 +118,7 @@ data "aws_iam_policy_document" "lambda" {
 
 data "aws_iam_policy_document" "spot_request_housekeeping" {
   # checkov:skip=CKV_AWS_111:I didn't found any condition to limit the access.
+  # checkov:skip=CKV_AWS_356:False positive and fixed with version 2.3.293
   statement {
     sid = "SpotRequestHousekeepingList"
 
