@@ -688,7 +688,7 @@ Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migra
 - Update to Terraform 0.12
 - Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
 - Update the module from 3.10.0 to 4.0.0, next run `terraform init`
-- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+- Run `terraform apply`. This should trigger only a re-creation of the auto launch configuration and a minor change in the auto-scaling group.
 
 ### Terraform 0.11
 
