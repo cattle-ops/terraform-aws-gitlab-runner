@@ -325,8 +325,8 @@ variable "runner_gitlab" {
     certificate        = optional(string, "")
     registration_token = optional(string, "__REPLACED_BY_USER_DATA__")
     runner_version     = optional(string, "15.8.2")
-    url                = optional(string)
-    url_clone          = optional(string)
+    url                = optional(string, "")
+    url_clone          = optional(string, "")
   })
 }
 

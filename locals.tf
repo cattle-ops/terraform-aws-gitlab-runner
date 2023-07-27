@@ -69,7 +69,7 @@ locals {
   secure_parameter_store_runner_sentry_dsn = "${var.environment}-${var.runner_sentry_secure_parameter_store_name}"
 
   # Custom names for runner agent instance, security groups, and IAM objects
-  name_runner_agent_instance = var.runner_instance.name_prefix == "" ? local.tags["Name"] : var.runner_instance.name_prefix
+  name_runner_agent_instance = var.runner_instance.name_prefix == null ? local.tags["Name"] : var.runner_instance.name_prefix
   name_sg                    = var.security_group_prefix == "" ? local.tags["Name"] : var.security_group_prefix
   name_iam_objects           = var.iam_object_prefix == "" ? local.tags["Name"] : var.iam_object_prefix
 
