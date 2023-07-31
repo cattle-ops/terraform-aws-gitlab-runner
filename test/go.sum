@@ -431,8 +431,8 @@ github.com/ulikunitz/xz v0.5.10/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0o
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+NXzzngzBKDPIqw4=
 github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgqMEUPoW2WPyhdI=
-github.com/xanzy/go-gitlab v0.88.0 h1:9GHBrxyCUNZZNuAsbJ1NbEH6XAYsKyTn6NfE0wYO5SY=
-github.com/xanzy/go-gitlab v0.88.0/go.mod h1:5ryv+MnpZStBH8I/77HuQBsMbBGANtVpLWC15qOjWAw=
+github.com/xanzy/go-gitlab v0.89.0 h1:yJuy1Pw+to/NqHzVIiopt/VApoHvGDB5SEGuRs3EJpI=
+github.com/xanzy/go-gitlab v0.89.0/go.mod h1:5ryv+MnpZStBH8I/77HuQBsMbBGANtVpLWC15qOjWAw=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
