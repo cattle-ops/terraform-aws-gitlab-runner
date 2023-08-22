@@ -3,10 +3,10 @@ module github.com/cattle-ops/terraform-aws-gitlab-runner/test
 go 1.19
 
 require (
-	github.com/gruntwork-io/terratest v0.43.6
+	github.com/gruntwork-io/terratest v0.43.12
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.8.4
-	github.com/xanzy/go-gitlab v0.86.0
+	github.com/xanzy/go-gitlab v0.90.0
 )
 
 require (

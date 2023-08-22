@@ -1,0 +1,4 @@
+skip-check:
+  # Ensure Terraform module sources use a commit hash
+  # no attack vector here as we use external modules in the examples only
+  - CKV_TF_1

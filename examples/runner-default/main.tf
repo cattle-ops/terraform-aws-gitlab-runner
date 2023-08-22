@@ -11,7 +11,7 @@ data "aws_security_group" "default" {
 # kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.0.0"
+  version = "5.1.1"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -31,7 +31,7 @@ module "vpc" {
 
 module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "5.0.0"
+  version = "5.1.1"
 
   vpc_id = module.vpc.vpc_id
 

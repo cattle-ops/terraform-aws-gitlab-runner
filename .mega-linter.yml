@@ -10,8 +10,9 @@ DISABLE_LINTERS:
   # The tables created by TfDoc are not formatted according to the standard. And there is no option to deactivate the check for a
   # section of the file.
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER
-  # CSpell does a great job. No need for a second linter.
+  # CSpell does a great job. No need for another spell checker
   - SPELL_MISSPELL
+  - SPELL_LYCHEE
   # DevSkim as it has issues ignoring files/directories, e.g. .mypy_cache
   - REPOSITORY_DEVSKIM
 
