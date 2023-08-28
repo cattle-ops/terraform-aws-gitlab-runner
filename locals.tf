@@ -89,7 +89,7 @@ locals {
     : signum(local.docker_machine_version_with_name_tag[i] - local.docker_machine_version_used[i]) * pow(10, j)
   ]
 
-  docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0
+  docker_machine_adds_name_tag            = signum(sum(local.docker_machine_version_test)) <= 0
   use_new_runner_authentication_gitlab_16 = contains(keys(var.gitlab_runner_registration_config), "type")
 }
 
