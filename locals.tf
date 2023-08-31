@@ -90,7 +90,6 @@ locals {
   ]
 
   docker_machine_adds_name_tag            = signum(sum(local.docker_machine_version_test)) <= 0
-  use_new_runner_authentication_gitlab_16 = contains(keys(var.gitlab_runner_registration_config), "type")
 }
 
 resource "local_file" "config_toml" {
