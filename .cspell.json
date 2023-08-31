@@ -21,6 +21,7 @@
     "endfor",
     "formatlist",
     "gitter",
+    "glrt",
     "godotenv",
     "golangci",
     "gruntwork",
