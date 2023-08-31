@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.5.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.1...6.5.2) (2023-08-31)
+
+
+### Bug Fixes
+
+* remove empty elements from tag list ([#936](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/936)) ([3b4a95e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/3b4a95ed75648d216f5d234b8e651f8bf2335f93))
+
 ## [6.5.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.0...6.5.1) (2023-06-06)
 
 
