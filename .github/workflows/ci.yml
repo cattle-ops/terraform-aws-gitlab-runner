@@ -22,7 +22,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: terraform init -get -backend=false -input=false
       - run: terraform fmt -recursive -check=true -write=false
 
@@ -48,7 +48,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.3.')
         run: terraform fmt -recursive -check=true -write=false
@@ -60,7 +60,7 @@ jobs:
     steps:
       # Git Checkout
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to improve performances
@@ -106,7 +106,7 @@ jobs:
     container:
       image: checkmarx/kics:v1.6.12-debian
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
       - run: kics scan -p . -o . --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
@@ -114,7 +114,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout source code
 
       - uses: actions/cache@v3
@@ -146,7 +146,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
