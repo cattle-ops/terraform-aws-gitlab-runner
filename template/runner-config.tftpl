@@ -18,23 +18,17 @@ listen_address = "${prometheus_listen_address}"
   request_concurrency = ${runners_request_concurrency}
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
-  [runners.docker]
-    tls_verify = false
-    image = "${runners_image}"
-    privileged = ${runners_privileged}
-    disable_cache = ${runners_disable_cache}
-    volumes = ["/cache"${runners_additional_volumes}]
-    extra_hosts = ${jsonencode(runners_extra_hosts)}
-    shm_size = ${runners_shm_size}
-    pull_policy = ${runners_pull_policies}
-    runtime = "${runners_docker_runtime}"
-    helper_image = "${runners_helper_image}"
-    wait_for_services_timeout = ${runners_wait_for_services_timeout}
-    ${runners_docker_services}
+
+  ${runners_docker_options}
+
+  ${runners_docker_services}
+
   [runners.docker.tmpfs]
     ${runners_volumes_tmpfs}
+
   [runners.docker.services_tmpfs]
     ${runners_services_volumes_tmpfs}
+
   [runners.cache]
     Type = "s3"
     Shared = ${shared_cache}
@@ -44,6 +38,7 @@ listen_address = "${prometheus_listen_address}"
       BucketName = "${bucket_name}"
       BucketLocation = "${aws_region}"
       Insecure = false
+
   [runners.machine]
     IdleCount = ${runners_idle_count}
     IdleTime = ${runners_idle_time}
@@ -81,4 +76,10 @@ listen_address = "${prometheus_listen_address}"
       ${docker_machine_options}
     ]
 
-${runners_machine_autoscaling}
+%{~ for config in runners_machine_autoscaling ~}
+    [[runners.machine.autoscaling]]
+    %{~ for key, value in config ~}
+      ${key} = ${value}
+      %{~ endfor ~}
+%{~ endfor ~}
+

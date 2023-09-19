@@ -1,5 +1,38 @@
 # Changelog
 
+## [7.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.2...7.0.0) (2023-09-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* group variables for better overview ([#810](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/810))
+* allow to set all docker options for the Executor ([#511](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/511))
+* add idle_count_min` and `idle_scale_factor` to Docker Machine autoscaling options ([#711](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/711))
+* remove deprecated variables ([#738](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/738))
+* remove deprecated pull policy variable ([#710](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/710))
+
+### Features
+
+* add idle_count_min` and `idle_scale_factor` to Docker Machine autoscaling options ([#711](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/711)) ([1538d48](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/1538d48ed5e3bfe37b9e2edfd40e35995bd1305b))
+* allow to set all docker options for the Executor ([#511](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/511)) ([461561e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/461561e3f33bfb4b289f81d54671f0f6ac383925))
+
+
+### Bug Fixes
+
+* add missing defaults ([#905](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/905)) ([eb44182](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/eb44182b01ec0013c01224773e54dc9d9590e966))
+* correct the bugs of major version 7 (pre-release) ([#860](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/860)) ([f236b58](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/f236b58571458fbbdcc82c25930adf255316d1e4))
+* remove deprecated pull policy variable ([#710](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/710)) ([8736ec7](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8736ec766673a95d1289a12a534de1f04faba2fc))
+
+
+### Miscellaneous Chores
+
+* remove deprecated variables ([#738](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/738)) ([676ed6a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/676ed6aa0b02f20dd071916cc91466a59541f0f6))
+
+
+### Code Refactoring
+
+* group variables for better overview ([#810](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/810)) ([c8a3b89](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/c8a3b89c46f749214461bade8e1e6d161d0ef860))
+
 ## [6.5.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.1...6.5.2) (2023-08-31)
 
 

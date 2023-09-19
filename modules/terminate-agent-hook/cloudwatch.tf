@@ -29,7 +29,8 @@ resource "aws_cloudwatch_event_target" "terminate_instances" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {
-  name              = "/aws/lambda/${var.environment}-${var.name}"
+  name = "/aws/lambda/${var.environment}-${var.name}"
+  # checkov:skip=CKV_AWS_338:There is no need to store the logs for 1+ years. They are not critical.
   retention_in_days = var.cloudwatch_logging_retention_in_days
 
   # ok as encryption can be activated by the user
