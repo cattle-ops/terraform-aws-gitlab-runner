@@ -316,7 +316,7 @@ module "runner" {
   runners_name       = "docker-default"
   runners_gitlab_url = "https://gitlab.com"
 
-  gitlab_runner_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = "my-token"
     tag_list           = "docker"
     description        = "runner default"
@@ -347,10 +347,10 @@ module "runner" {
   runners_name       = "docker-default"
   runners_gitlab_url = "https://gitlab.com"
 
-  secure_parameter_store_gitlab_personal_access_token_name = "gitlab_token_ssm"
+  runner_gitlab_access_token_secure_parameter_store_name = "gitlab_token_ssm"
 
 
-  gitlab_runner_registration_config = {
+  runner_gitlab_registration_config = {
     type               = "instance_type"
     tag_list           = "docker"
     description        = "runner default"
@@ -491,7 +491,7 @@ found in GitLab in the runner section (global, group or repo scope). Create a fi
 >The workflow is as it follow:
 >1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance_type`, `group_type` or `project_type`).
 >2. GitLab answers with a token prefixed by `glrt-` and we put it in SSM.
->3. The runner will get the config form `/etc/gitlab-runner/config.toml` and will listen for new jobs from your GitLab instance.
+>3. The runner will get the config from `/etc/gitlab-runner/config.toml` and will listen for new jobs from your GitLab instance.
 
 
 ### Run

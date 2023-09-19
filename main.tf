@@ -74,8 +74,7 @@ locals {
       secure_parameter_store_gitlab_runner_registration_token_name = var.runner_gitlab_registration_token_secure_parameter_store_name
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
-      secure_parameter_store_gitlab_runner_registration_token_name = var.secure_parameter_store_gitlab_runner_registration_token_name
-      secure_parameter_store_gitlab_token_name                     = var.secure_parameter_store_gitlab_personal_access_token_name
+      secure_parameter_store_gitlab_token_name                     = var.runner_gitlab_access_token_secure_parameter_store_name
       secure_parameter_store_region                                = data.aws_region.current.name
       gitlab_runner_registration_token                             = lookup(var.runner_gitlab_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
       gitlab_runner_description                                    = var.runner_gitlab_registration_config["description"]
@@ -91,7 +90,7 @@ locals {
       public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
-      use_new_runner_authentication_gitlab_16                      = contains(keys(var.gitlab_runner_registration_config), "type")
+      use_new_runner_authentication_gitlab_16                      = contains(keys(var.runner_gitlab_registration_config), "type")
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",

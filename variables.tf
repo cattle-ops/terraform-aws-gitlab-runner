@@ -339,6 +339,12 @@ variable "runner_gitlab_registration_token_secure_parameter_store_name" {
   default     = "gitlab-runner-registration-token"
 }
 
+variable "runner_gitlab_access_token_secure_parameter_store_name" {
+  description = "The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created."
+  type        = string
+  default     = "gitlab-runner-access-token"
+}
+
 variable "runner_gitlab_token_secure_parameter_store" {
   description = "Name of the Secure Parameter Store entry to hold the GitLab Runner token."
   type        = string
