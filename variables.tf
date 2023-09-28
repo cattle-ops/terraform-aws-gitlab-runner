@@ -722,7 +722,6 @@ variable "runner_worker_docker_machine_ec2_metadata_options" {
 variable "runner_worker_docker_machine_autoscaling_options" {
   description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
   type = list(object({
-    max_growth_rate   = optional(number)
     periods           = list(string)
     idle_count        = optional(number)
     idle_scale_factor = optional(number)
