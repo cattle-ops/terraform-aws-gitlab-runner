@@ -75,6 +75,7 @@ listen_address = "${prometheus_listen_address}"
       %{~ endif ~}
       ${docker_machine_options}
     ]
+    MaxGrowthRate = ${runners_max_growth_rate}
 
 %{~ for config in runners_machine_autoscaling ~}
     [[runners.machine.autoscaling]]

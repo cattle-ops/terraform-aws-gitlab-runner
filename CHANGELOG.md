@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.0.0...7.1.0) (2023-09-28)
+
+
+### Features
+
+* add `MaxGrowthRate` to limit the number of instances added in parallel ([#962](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/962)) ([ae6d38a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/ae6d38a93b07ccddfa19e15340a7a202e40e5961))
+
+
+### Bug Fixes
+
+* convert the fleet instance type in migration script ([#975](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/975)) ([51b2842](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/51b2842423488a8a17f903de6691dd932a5771f2))
+
 ## [7.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.2...7.0.0) (2023-09-09)
 
 
