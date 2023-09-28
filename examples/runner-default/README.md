@@ -30,7 +30,7 @@ check `.terraform-version` for the tested version.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.14.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.15.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | 2.4.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.1 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.5.1 |
@@ -54,8 +54,8 @@ check `.terraform-version` for the tested version.
 
 | Name | Type |
 |------|------|
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/availability_zones) | data source |
-| [aws_security_group.default](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/security_group) | data source |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.15.0/docs/data-sources/availability_zones) | data source |
+| [aws_security_group.default](https://registry.terraform.io/providers/hashicorp/aws/5.15.0/docs/data-sources/security_group) | data source |
 
 ## Inputs
 
