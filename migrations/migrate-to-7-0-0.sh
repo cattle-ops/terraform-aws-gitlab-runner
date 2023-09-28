@@ -521,9 +521,9 @@ extracted_variables=$(echo "$extracted_variables" | \
                       sed 's/runner_worker_docker_machine_instance_prefix/name_prefix/g'
                     )
 
-extracted_fleet_types=$(grep -E '(docker_machine_instance_types_fleet)' "$converted_file" | sed 's/docker_machine_instance_types_fleet/types/g')
+extracted_fleet_types=$(grep -E '(docker_machine_types_fleet)' "$converted_file" | sed 's/docker_machine_types_fleet/types/g')
 extracted_fleet_subnets=$(grep -E '(fleet_executor_subnet_ids)' "$converted_file" | sed 's/fleet_executor_subnet_ids/subnet_ids/g')
-sed -i '/docker_machine_instance_types_fleet/d' "$converted_file"
+sed -i '/docker_machine_types_fleet/d' "$converted_file"
 sed -i '/fleet_executor_subnet_ids/d' "$converted_file"
 
 # add new block runners_docker_options at the end
