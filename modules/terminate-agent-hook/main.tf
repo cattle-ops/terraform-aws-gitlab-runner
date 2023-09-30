@@ -35,7 +35,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   package_type     = "Zip"
   publish          = true
   role             = aws_iam_role.lambda.arn
-  runtime          = "python3.8"
+  runtime          = "python3.11"
   timeout          = local.lambda_timeout
   kms_key_arn      = var.kms_key_id
 
