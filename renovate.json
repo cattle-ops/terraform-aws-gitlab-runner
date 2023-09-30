@@ -4,5 +4,12 @@
     "config:base",
     ":semanticCommitTypeAll(chore)"
   ],
-  "ignorePaths": []
+  "ignorePaths": [],
+  "packageRules": [
+    {
+      "matchDatasources": ["terraform-provider"],
+      "groupName": "Terraform Providers",
+      "schedule": ["on sunday"]
+    }
+  ]
 }
