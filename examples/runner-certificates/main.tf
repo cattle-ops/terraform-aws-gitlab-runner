@@ -6,7 +6,7 @@ data "aws_availability_zones" "available" {
 # kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.70"
+  version = "2.78"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
