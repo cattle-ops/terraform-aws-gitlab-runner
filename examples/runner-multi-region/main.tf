@@ -84,7 +84,7 @@ module "vpc_alternate_region" {
   cidr = "10.1.0.0/16"
 
   # Have to construct the zone names here because the data source always uses the main region
-  azs            = ["${var.aws_alternate_region}a", "${var.aws_alternate_region}b", "${var.aws_alternate_region}c"]
+  azs                     = ["${var.aws_alternate_region}a", "${var.aws_alternate_region}b", "${var.aws_alternate_region}c"]
   private_subnets         = ["10.0.1.0/24"]
   public_subnets          = ["10.0.101.0/24"]
   map_public_ip_on_launch = false
