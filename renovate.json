@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "ignorePaths": [],
+  "packageRules": [
+    {
+      "matchDatasources": ["terraform-provider"],
+      "groupName": "Terraform Providers",
+      "schedule": ["on sunday"]
+    }
+  ]
+}
