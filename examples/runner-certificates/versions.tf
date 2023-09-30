@@ -8,19 +8,19 @@ terraform {
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 2"
+      version = "2.4.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "~> 3.0"
+      version = "3.2.1"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "~> 3"
+      version = "4.0.4"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.0"
+      version = "3.5.1"
     }
   }
 }
