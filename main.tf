@@ -112,6 +112,7 @@ locals {
       runners_spot_price_bid            = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
       runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
       runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+      runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
       runners_monitoring                = var.runner_worker_docker_machine_instance.monitoring
       runners_ebs_optimized             = var.runner_worker_docker_machine_instance.ebs_optimized
       runners_instance_profile          = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""

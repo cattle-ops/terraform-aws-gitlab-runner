@@ -658,6 +658,7 @@ variable "runner_worker_docker_machine_instance" {
     ebs_optimized = Enable EBS optimization for the Runner Worker.
     idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
     idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
+    max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
     monitoring = Enable detailed monitoring for the Runner Worker.
     name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
     private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
@@ -673,6 +674,7 @@ variable "runner_worker_docker_machine_instance" {
     ebs_optimized              = optional(bool, true)
     idle_count                 = optional(number, 0)
     idle_time                  = optional(number, 600)
+    max_growth_rate            = optional(number, 0)
     monitoring                 = optional(bool, false)
     name_prefix                = optional(string, "")
     private_address_only       = optional(bool, true)

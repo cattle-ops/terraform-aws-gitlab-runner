@@ -70,7 +70,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@v7.3.0
+        uses: oxsecurity/megalinter@v7.4.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -93,7 +93,7 @@ jobs:
           APPLY_FIXES_MODE: commit
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: MegaLinter reports
@@ -123,7 +123,7 @@ jobs:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@v3
+      - uses: terraform-linters/setup-tflint@v4
         name: Setup TFLint
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
