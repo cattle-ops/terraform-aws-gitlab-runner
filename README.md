@@ -51,15 +51,12 @@ The name of the runner agent and runner is set with the overrides variable. Addi
 
 ```hcl
 # ...
-overrides  = {
-  name_sg                     = ""
-  name_runner_agent_instance  = "Gitlab Runner Agent"
-  name_docker_machine_runners = "Gitlab Runner Terraform"
-  name_iam_objects = "gitlab-runner"
+runner_instance = {
+  name  = "Gitlab Runner connecting to GitLab"
 }
 
-//this doesn't work
-agent_tags = merge(local.my_tags, map("Name", "Gitlab Runner Agent"))
+# this doesn't work
+agent_tags = merge(local.my_tags, map("Name", "Gitlab Runner connecting to GitLab"))
 ```
 
 The runner supports 3 main scenarios:
@@ -159,7 +156,7 @@ can be found in your GitLab project, group, or global settings. For a generic ru
 By default the runner will be locked to the target project, not run untagged. Below is an example of the configuration map.
 
 ```hcl
-gitlab_runner_registration_config = {
+runner_gitlab_registration_config = {
   registration_token = "<registration token>"
   tag_list           = "<your tags, comma separated>"
   description        = "<some description>"
@@ -206,8 +203,8 @@ For example:
 ```hcl
   module "runner" {
     # ...
-    enable_schedule = true
-    schedule_config = {
+    runner_schedule_enable = true
+    runner_schedule_config = {
       # Configure optional scale_out scheduled action
       scale_out_recurrence = "0 8 * * 1-5"
       scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
@@ -305,18 +302,17 @@ Below is a basic examples of usages of the module. Regarding the dependencies su
 module "runner" {
   # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
   source  = "cattle-ops/gitlab-runner/aws"
+   
+  environment = "basic"
 
-  aws_region  = "eu-west-1"
-  environment = "spot-runners"
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.private_subnets
-  subnet_id_runners        = element(module.vpc.private_subnets, 0)
+   runner_gitlab = {
+      url = "https://gitlab.com" 
+   }
 
-  runners_name       = "docker-default"
-  runners_gitlab_url = "https://gitlab.com"
-
-  gitlab_runner_registration_config = {
+   runner_gitlab_registration_config = {
     registration_token = "my-token"
     tag_list           = "docker"
     description        = "runner default"
@@ -325,6 +321,9 @@ module "runner" {
     maximum_timeout    = "3600"
   }
 
+   runner_worker_docker_machine_instance = {
+      subnet_ids = module.vpc.private_subnets
+   }
 }
 ```
 
@@ -352,33 +351,35 @@ map. A simple example for this would be to set _region-specific-prefix_ to the A
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
-  source  = "cattle-ops/gitlab-runner/aws"
+   # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+   source  = "cattle-ops/gitlab-runner/aws"
 
-  aws_region  = "eu-west-1"
-  environment = "spot-runners"
+   environment = "multi-region-1"
+   iam_object_prefix = "<region-specific-prefix>-gitlab-runner-iam"
+   
+   vpc_id    = module.vpc.vpc_id
+   subnet_id = element(module.vpc.private_subnets, 0)
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.private_subnets
-  subnet_id_runners        = element(module.vpc.private_subnets, 0)
+   runner_gitlab = {
+      url = "https://gitlab.com"
+   }
 
-  runners_name       = "docker-default"
-  runners_gitlab_url = "https://gitlab.com"
+   runner_gitlab_registration_config = {
+      registration_token = "my-token"
+      tag_list           = "docker"
+      description        = "runner default"
+      locked_to_project  = "true"
+      run_untagged       = "false"
+      maximum_timeout    = "3600"
+   }
 
-  gitlab_runner_registration_config = {
-    registration_token = "my-token"
-    tag_list           = "docker"
-    description        = "runner default"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-  }
-
-  overrides = {
-    name_iam_objects = "<region-specific-prefix>-gitlab-runner-iam"
-  }
-
-  cache_bucket_prefix = "<region-specific-prefix>"
+   runner_worker_cache = {
+      bucket_prefix = "<region-specific-prefix>"
+   }
+   
+   runner_worker_docker_machine_instance = {
+      subnet_ids = module.vpc.private_subnets
+   }
 }
 ```
 
@@ -397,35 +398,39 @@ module is using consume more RAM using spot fleets. For comparison, if you launc
 
 ```hcl
 module "runner" {
-  # https://registry.terraform.io/modules/npalm/gitlab-runner/aws/
-  source  = "npalm/gitlab-runner/aws"
+   # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+   source  = "cattle-ops/gitlab-runner/aws"
 
-  aws_region  = "eu-west-3"
-  environment = "spot-runners"
+   environment = "spot-fleet"
 
-  vpc_id                    = module.vpc.vpc_id
-  subnet_id                 = module.vpc.private_subnets[0] # subnet of the agent
-  fleet_executor_subnet_ids = module.vpc.private_subnets
+   vpc_id    = module.vpc.vpc_id
+   subnet_id = element(module.vpc.private_subnets, 0)
 
-  docker_machine_instance_types_fleet       = ["t3a.medium", "t3.medium", "t2.medium"]
-  use_fleet                                 = true
-  fleet_key_pair_name                       = "<key_pair_name>"
+   runner_gitlab = {
+      url = "https://gitlab.com"
+   }
 
-  runners_name       = "docker-machine"
-  runners_gitlab_url = "https://gitlab.com"
+   runner_gitlab_registration_config = {
+      registration_token = "my-token"
+      tag_list           = "docker"
+      description        = "runner default"
+      locked_to_project  = "true"
+      run_untagged       = "false"
+      maximum_timeout    = "3600"
+   }
 
-  gitlab_runner_registration_config = {
-    registration_token = "my-token"
-    tag_list           = "docker"
-    description        = "runner default"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-  }
+   runner_worker = {
+      type = "docker+machine"
+   }
 
-  overrides = {
-    name_iam_objects = "<region-specific-prefix>-gitlab-runner-iam"
-  }
+   runner_worker_docker_machine_fleet = {
+      enable = true
+   }
+   
+   runner_worker_docker_machine_instance = {
+      types = ["t3a.medium", "t3.medium", "t2.medium"]
+      subnet_ids = module.vpc.private_subnets
+   }
 }
 ```
 
