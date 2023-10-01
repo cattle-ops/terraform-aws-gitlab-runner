@@ -89,20 +89,8 @@ agent. No auto scaling is supported.
 
 ### Terraform
 
-Ensure you have Terraform installed. The modules is based on Terraform 0.11, see `.terraform-version` for the used version. A handy
+Ensure you have Terraform installed. The module is based on Terraform 1.3, see `.terraform-version` for the used version. A handy
 tool to mange your Terraform version is [tfenv](https://github.com/kamatama41/tfenv).
-
-On macOS it is simple to install `tfenv` using `brew`.
-
-```sh
-brew install tfenv
-```
-
-Next install a Terraform version.
-
-```sh
-tfenv install <version>
-```
 
 ### AWS
 
