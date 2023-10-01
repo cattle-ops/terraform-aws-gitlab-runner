@@ -5,5 +5,6 @@
     ":semanticCommitTypeAll(chore)",
     "group:all",
     "schedule:weekly"
-  ]
+  ],
+  "ignorePaths": []
 }
