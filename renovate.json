@@ -5,13 +5,5 @@
     ":semanticCommitTypeAll(chore)",
     "group:all",
     "schedule:weekly"
-  ],
-  "ignorePaths": [],
-  "packageRules": [
-    {
-      "matchDatasources": ["terraform-provider"],
-      "groupName": "Terraform Providers",
-      "schedule": ["on sunday"]
-    }
   ]
 }
