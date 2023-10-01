@@ -3,6 +3,7 @@
 [![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Actions](https://github.com/cattle-ops/terraform-aws-gitlab-runner/workflows/CI/badge.svg)](https://github.com/cattle-ops/terraform-aws-gitlab-runner/actions)
+[![Renovate][1]](https://www.mend.io/renovate/)
 <!-- markdownlint-enable MD041/first-line-heading/first-line-h1 -->
 
 # Terraform module for GitLab auto scaling runners on AWS spot instances <!-- omit in toc -->
@@ -651,3 +652,5 @@ Made with [contributors-img](https://contrib.rocks).
 <!-- markdownlint-enable -->
 <!-- cSpell:enable -->
 <!-- markdown-link-check-enable -->
+
+[1]: https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovate
