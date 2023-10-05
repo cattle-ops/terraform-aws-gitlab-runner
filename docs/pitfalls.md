@@ -13,8 +13,8 @@ runner_instance = {
 
 # not working
 runner_instance = {
-  addtional_tags = {
-    Name = ""my-gitlab-runner-name""
+  additional_tags = {
+    Name = "my-gitlab-runner-name"
   }
 }
 ```

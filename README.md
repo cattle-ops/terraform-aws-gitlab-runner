@@ -1,4 +1,4 @@
-<!-- First line should be a H1: Badges on top please! -->
+<!-- First line should be an H1: Badges on top please! -->
 <!-- markdownlint-disable MD041/first-line-heading/first-line-h1 -->
 [![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -9,8 +9,6 @@
 # Terraform module for GitLab auto-scaling runners on AWS spot instances <!-- omit in toc -->
 
 💥 See [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819) on how to migrate to v7 smoothly.
-
-## The module
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab Runner](https://docs.gitlab.com/runner/). A blog post
 describes the original version of the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).
@@ -36,17 +34,16 @@ The runner supports 3 main scenarios:
 
    In this scenario the multiple runner agents can be created with different configuration by instantiating the module multiple times.
    Runners will scale automatically based on the configuration. The S3 cache can be shared across runners by managing the cache
-   outside of the module.
+   outside the module.
 
    ![runners-cache](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-cache.png)
 
 3. GitLab Ci docker runner
 
    In this scenario _not_ docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the
-   agent. No auto scaling is supported.
+   agent. No auto-scaling is supported.
 
    ![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
-
 
 For detailed concepts and usage please refer to [usage](docs/usage.md).
 
@@ -60,7 +57,7 @@ Thanks to all the people who already contributed!
 <!-- markdownlint-disable MD033 -->
 <a href="https://github.com/cattle-ops/terraform-aws-gitlab-runner/graphs/contributors">
   <!-- markdownlint-disable MD033 -->
-  <img src="https://contrib.rocks/image?repo=cattle-ops/terraform-aws-gitlab-runner" />
+  <img src="https://contrib.rocks/image?repo=cattle-ops/terraform-aws-gitlab-runner" alt="contributors"/>
 </a>
 
 Made with [contributors-img](https://contrib.rocks).
