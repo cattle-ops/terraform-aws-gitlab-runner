@@ -17,7 +17,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/github-script@6f00a0b667f9463337970371ccda9072ee86fb27 # ratchet:actions/github-script@v6
+      - uses: actions/github-script@1f16022c7518aad314c43abcd029895291be0f52 # ratchet:actions/github-script@v6
         with:
           # yamllint disable rule:line-length
           script: |
