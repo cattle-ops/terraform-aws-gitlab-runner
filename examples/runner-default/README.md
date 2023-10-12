@@ -13,6 +13,9 @@ This examples shows:
   - Additional security groups that are allowed access to the runner agent
   - Use of `runners.docker.services` to configure docker registry mirror (commented out - uncomment to apply)
 
+Multi region deployment is, of course, possible. Just instantiate the module multiple times with different AWS providers. In case
+you use the cache, make sure to have one cache per region.
+
 ![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
 ## Prerequisite
