@@ -155,7 +155,7 @@ module "runner" {
 
 
   runner_gitlab_registration_config = {
-    type               = "instance_type"
+    type               = "instance"
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
@@ -293,7 +293,7 @@ found in GitLab in the runner section (global, group or repo scope). Create a fi
 >GitLab >= 16.0.0 has removed the `registration_token` since they are working on a [new token architecture](https://docs.gitlab.com/ee/architecture/blueprints/runner_tokens/). This module handle these changes, you need to provide a personal access token with `api` scope for the runner to authenticate itself.
 
 >The workflow is as it follow:
->1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance_type`, `group_type` or `project_type`).
+>1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance`, `group` or `project`).
 >2. GitLab answers with a token prefixed by `glrt-` and we put it in SSM.
 >3. The runner will get the config from `/etc/gitlab-runner/config.toml` and will listen for new jobs from your GitLab instance.
 

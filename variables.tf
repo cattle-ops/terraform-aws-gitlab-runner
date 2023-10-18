@@ -303,8 +303,8 @@ variable "runner_gitlab_registration_config" {
     tag_list           = optional(string, "")
     description        = optional(string, "")
     type               = optional(string, "") # mandatory if gitlab_runner_version >= 16.0.0
-    group_id           = optional(string, "") # mandatory if type is group_type
-    project_id         = optional(string, "") # mandatory if type is project_type
+    group_id           = optional(string, "") # mandatory if type is group
+    project_id         = optional(string, "") # mandatory if type is project
     locked_to_project  = optional(string, "")
     run_untagged       = optional(string, "")
     maximum_timeout    = optional(string, "")
@@ -312,6 +312,10 @@ variable "runner_gitlab_registration_config" {
   })
 
   default = {}
+  validation {
+    condition     = contains(["group", "project", "instance", ""], var.runner_gitlab_registration_config.type)
+    error_message = "The executor currently supports `group`, `project` or `instance`."
+  }
 }
 
 variable "runner_gitlab" {
@@ -322,14 +326,16 @@ variable "runner_gitlab" {
     runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
     url = URL of the GitLab instance to connect to.
     url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
+    access_token_secure_parameter_store_name = The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
   EOT
   type = object({
-    ca_certificate     = optional(string, "")
-    certificate        = optional(string, "")
-    registration_token = optional(string, "__REPLACED_BY_USER_DATA__")
-    runner_version     = optional(string, "15.8.2")
-    url                = optional(string, "")
-    url_clone          = optional(string, "")
+    ca_certificate                           = optional(string, "")
+    certificate                              = optional(string, "")
+    registration_token                       = optional(string, "__REPLACED_BY_USER_DATA__")
+    runner_version                           = optional(string, "15.8.2")
+    url                                      = optional(string, "")
+    url_clone                                = optional(string, "")
+    access_token_secure_parameter_store_name = optional(string, "gitlab-runner-access-token")
   })
 }
 
@@ -337,12 +343,6 @@ variable "runner_gitlab_registration_token_secure_parameter_store_name" {
   description = "The name of the SSM parameter to read the GitLab Runner registration token from."
   type        = string
   default     = "gitlab-runner-registration-token"
-}
-
-variable "runner_gitlab_access_token_secure_parameter_store_name" {
-  description = "The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created."
-  type        = string
-  default     = "gitlab-runner-access-token"
 }
 
 variable "runner_gitlab_token_secure_parameter_store" {
