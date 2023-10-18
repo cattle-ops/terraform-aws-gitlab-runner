@@ -3,6 +3,7 @@
     "Statement": [
         {
             "Action": [
+                "kms:Encrypt",
                 "kms:Decrypt",
                 "kms:GenerateDataKey"
             ],

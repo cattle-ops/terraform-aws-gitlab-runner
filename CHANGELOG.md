@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.1.0...7.1.1) (2023-10-13)
+
+
+### Bug Fixes
+
+* add kms:Encrypt permission, as needed since f25a86b5 ([#1008](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1008)) ([2bea7bd](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2bea7bd878bc044075a23a12fa272bf869235277))
+
 ## [7.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.0.0...7.1.0) (2023-09-28)
 
 

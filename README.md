@@ -1,45 +1,18 @@
-<!-- First line should be a H1: Badges on top please! -->
+<!-- First line should be an H1: Badges on top please! -->
 <!-- markdownlint-disable MD041/first-line-heading/first-line-h1 -->
 [![Terraform registry](https://img.shields.io/github/v/release/cattle-ops/terraform-aws-gitlab-runner?label=Terraform%20Registry)](https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/)
 [![Gitter](https://badges.gitter.im/terraform-aws-gitlab-runner/Lobby.svg)](https://gitter.im/terraform-aws-gitlab-runner/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Actions](https://github.com/cattle-ops/terraform-aws-gitlab-runner/workflows/CI/badge.svg)](https://github.com/cattle-ops/terraform-aws-gitlab-runner/actions)
+[![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovate)](https://www.mend.io/renovate/)
 <!-- markdownlint-enable MD041/first-line-heading/first-line-h1 -->
 
-# Terraform module for GitLab auto scaling runners on AWS spot instances <!-- omit in toc -->
+# Terraform module for GitLab auto-scaling runners on AWS spot instances <!-- omit in toc -->
 
-- [The module](#the-module)
-- [Prerequisites](#prerequisites)
-- [Usage](#usage)
-- [Examples](#examples)
-- [Contributors ✨](#contributors-) <!-- markdown-link-check-disable-line -->
-- [Requirements](#requirements) <!-- markdown-link-check-disable-line -->
-- [Providers](#providers) <!-- markdown-link-check-disable-line -->
-- [Modules](#modules) <!-- markdown-link-check-disable-line -->
-- [Resources](#resources) <!-- markdown-link-check-disable-line -->
-- [Inputs](#inputs) <!-- markdown-link-check-disable-line -->
-- [Outputs](#outputs) <!-- markdown-link-check-disable-line -->
-- 
-## The module
+💥 See [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819) on how to migrate to v7 smoothly.
 
-This [Terraform](https://www.terraform.io/) modules creates a [GitLab CI runner](https://docs.gitlab.com/runner/). A blog post
+This [Terraform](https://www.terraform.io/) modules creates a [GitLab Runner](https://docs.gitlab.com/runner/). A blog post
 describes the original version of the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).
 The original setup of the module is based on the blog post: [Auto scale GitLab CI runners and save 90% on EC2 costs](https://about.gitlab.com/2017/11/23/autoscale-ci-runners/).
-
-> 💥 BREAKING CHANGE AHEAD: Version 7 of the module rewrites the whole variable section to
->    - harmonize the variable names
->    - harmonize the documentation
->    - remove deprecated variables
->    - gain a better overview of the features provided
->
-> And it also adds
->   - all possible Docker settings
->   - the `idle_scale_factor`
->
-> We know that this is a breaking change causing some pain, but we think it is worth it. We hope you agree. And to make the
-> transition as smooth as possible, we have added a migration script to the `migrations` folder. It will cover almost all cases,
-> but some minor rework might still be possible.
->
-> Checkout [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819)
 
 The runners created by the module use spot instances by default for running the builds using the `docker+machine` executor.
 
@@ -47,199 +20,30 @@ The runners created by the module use spot instances by default for running the 
 - Logs streamed to CloudWatch.
 - Runner agents registered automatically.
 
-The name of the runner agent and runner is set with the overrides variable. Adding an agent runner name tag does not work.
-
-```hcl
-# ...
-overrides  = {
-  name_sg                     = ""
-  name_runner_agent_instance  = "Gitlab Runner Agent"
-  name_docker_machine_runners = "Gitlab Runner Terraform"
-  name_iam_objects = "gitlab-runner"
-}
-
-//this doesn't work
-agent_tags = merge(local.my_tags, map("Name", "Gitlab Runner Agent"))
-```
-
 The runner supports 3 main scenarios:
 
-### GitLab CI docker-machine runner - one runner agent
+1. GitLab CI docker-machine runner - one runner agent
 
-In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html)
-using spot instances. Runners will scale automatically based on the configuration. The module creates a S3 cache by default,
-which is shared across runners (spot instances).
+   In this scenario the runner agent is running on a single EC2 node and runners are created by [docker machine](https://docs.gitlab.com/runner/configuration/autoscale.html)
+   using spot instances. Runners will scale automatically based on the configuration. The module creates a S3 cache by default,
+   which is shared across runners (spot instances).
 
-![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
+   ![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
-### GitLab CI docker-machine runner - multiple runner agents
+2. GitLab CI docker-machine runner - multiple runner agents
 
-In this scenario the multiple runner agents can be created with different configuration by instantiating the module multiple times.
-Runners will scale automatically based on the configuration. The S3 cache can be shared across runners by managing the cache
-outside of the module.
+   In this scenario the multiple runner agents can be created with different configuration by instantiating the module multiple times.
+   Runners will scale automatically based on the configuration. The S3 cache can be shared across runners by managing the cache
+   outside the module.
 
-![runners-cache](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-cache.png)
+   ![runners-cache](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-cache.png)
 
-### GitLab Ci docker runner
+3. GitLab Ci docker runner
 
-In this scenario _not_ docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the
-agent. No auto scaling is supported.
+   In this scenario _not_ docker machine is used but docker to schedule the builds. Builds will run on the same EC2 instance as the
+   agent. No auto-scaling is supported.
 
-![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
-
-## Prerequisites
-
-### Terraform
-
-Ensure you have Terraform installed. The modules is based on Terraform 0.11, see `.terraform-version` for the used version. A handy
-tool to mange your Terraform version is [tfenv](https://github.com/kamatama41/tfenv).
-
-On macOS it is simple to install `tfenv` using `brew`.
-
-```sh
-brew install tfenv
-```
-
-Next install a Terraform version.
-
-```sh
-tfenv install <version>
-```
-
-### AWS
-
-Ensure you have setup your AWS credentials. The module requires access to IAM, EC2, CloudWatch, S3 and SSM.
-
-### JQ & AWS CLI
-
-In order to be able to destroy the module, you will need to run from a host with both `jq` and `aws` installed and accessible in
-the environment.
-
-On macOS it is simple to install them using `brew`.
-
-```sh
-brew install jq awscli
-```
-
-### Service linked roles
-
-The GitLab runner EC2 instance requires the following service linked roles:
-
-- AWSServiceRoleForAutoScaling
-- AWSServiceRoleForEC2Spot
-
-By default the EC2 instance is allowed to create the required roles, but this can be disabled by setting the option
-`allow_iam_service_linked_role_creation` to `false`. If disabled you must ensure the roles exist. You can create them manually or
-via Terraform.
-
-```hcl
-resource "aws_iam_service_linked_role" "spot" {
-  aws_service_name = "spot.amazonaws.com"
-}
-
-resource "aws_iam_service_linked_role" "autoscaling" {
-  aws_service_name = "autoscaling.amazonaws.com"
-}
-```
-
-### KMS keys
-
-If a KMS key is set via `kms_key_id`, make sure that you also give proper access to the key. Otherwise, you might
-get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
-example checkout [kms-policy.json](https://github.com/cattle-ops/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
-
-### GitLab runner token configuration
-
-By default the runner is registered on initial deployment. In previous versions of this module this was a manual process. The
-manual process is still supported but will be removed in future releases. The runner token will be stored in the AWS SSM parameter
-store. See [example](examples/runner-pre-registered/) for more details.
-
-To register the runner automatically set the variable `gitlab_runner_registration_config["registration_token"]`. This token value
-can be found in your GitLab project, group, or global settings. For a generic runner you can find the token in the admin section.
-By default the runner will be locked to the target project, not run untagged. Below is an example of the configuration map.
-
-```hcl
-gitlab_runner_registration_config = {
-  registration_token = "<registration token>"
-  tag_list           = "<your tags, comma separated>"
-  description        = "<some description>"
-  locked_to_project  = "true"
-  run_untagged       = "false"
-  maximum_timeout    = "3600"
-  # ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected
-  access_level       = "<not_protected OR ref_protected>"
-}
-```
-
-The registration token can also be read in via SSM parameter store. If no registration token is passed in, the module
-will look up the token in the SSM parameter store at the location specified by `secure_parameter_store_gitlab_runner_registration_token_name`.
-
-For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will lookup the
-required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
-
-```sh
-# set the following variables, look up the variables in your Terraform config.
-# see your Terraform variables to fill in the vars below.
-aws-region=<${var.aws_region}>
-token=<runner-token-see-your-gitlab-runner>
-parameter-name=<${var.environment}>-<${var.secure_parameter_store_runner_token_key}>
-
-aws ssm put-parameter --overwrite --type SecureString  --name "${parameter-name}" --value ${token} --region "${aws-region}"
-```
-
-Once you have created the parameter, you must remove the variable `runners_token` from your config. The next time your GitLab
-runner instance is created it will look up the token from the SSM parameter store.
-
-Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be
-removed in future releases.
-
-### Auto Scaling Group
-
-#### Scheduled scaling
-
-When `enable_schedule=true`, the `schedule_config` variable can be used to scale the Auto Scaling group.
-
-Scaling may be defined with one `scale_out` scheduled action and/or one `scale_in` scheduled action.
-
-For example:
-
-```hcl
-  module "runner" {
-    # ...
-    enable_schedule = true
-    schedule_config = {
-      # Configure optional scale_out scheduled action
-      scale_out_recurrence = "0 8 * * 1-5"
-      scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
-      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
-
-      # Configure optional scale_in scheduled action
-      scale_in_recurrence  = "0 18 * * 1-5"
-      scale_in_count       = 0 # Default for min_size, desired_capacity and max_size
-      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
-    }
-  }
-```
-
-#### Instance Termination
-
-The Auto Scaling Group may be configured with a [lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
-that executes a provided Lambda function when the runner is terminated to terminate additional instances that were spawned.
-
-The use of the termination lifecycle can be toggled using the `asg_termination_lifecycle_hook_create` variable.
-
-When using this feature, a `builds/` directory relative to the root module will persist that contains the packaged Lambda function.
-
-### Access runner instance
-
-A few option are provided to access the runner instance:
-
-1. Access via the Session Manager (SSM) by setting `enable_runner_ssm_access` to `true`. The policy to allow access via SSM is not
-   very restrictive.
-2. By setting none of the above, no keys or extra policies will be attached to the instance. You can still configure you own
-   policies by attaching them to `runner_agent_role_arn`.
-
-### GitLab runner cache
+   ![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
 
 By default the module creates a cache for the runner in S3. Old objects are automatically removed via a configurable life cycle
 policy on the bucket.
@@ -510,18 +314,26 @@ To destroy the runner, run:
   terraform destroy
 ```
 
+For detailed concepts and usage please refer to [usage](docs/usage.md).
+
 ## Contributors ✨
 
-This project exists thanks to all the people who contribute.
+PRs are welcome! Please see the [contributing guide](CONTRIBUTING.md) for more details.
+
+Thanks to all the people who already contributed!
 
 <!-- this is the only option to integrate the contributors list in the README.md -->
 <!-- markdownlint-disable MD033 -->
 <a href="https://github.com/cattle-ops/terraform-aws-gitlab-runner/graphs/contributors">
   <!-- markdownlint-disable MD033 -->
-  <img src="https://contrib.rocks/image?repo=cattle-ops/terraform-aws-gitlab-runner" />
+  <img src="https://contrib.rocks/image?repo=cattle-ops/terraform-aws-gitlab-runner" alt="contributors"/>
 </a>
 
 Made with [contributors-img](https://contrib.rocks).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Module Documentation
 
@@ -534,7 +346,7 @@ Made with [contributors-img](https://contrib.rocks).
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.11 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.4.0 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 3 |
 
@@ -542,9 +354,9 @@ Made with [contributors-img](https://contrib.rocks).
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.49.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.20.1 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.4.0 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | >= 3 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.4 |
 
 ## Modules
 
