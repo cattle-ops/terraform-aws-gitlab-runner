@@ -1,15 +1,3 @@
-data "aws_caller_identity" "current" {}
-data "aws_partition" "current" {}
-data "aws_region" "current" {}
-
-data "aws_subnet" "runners" {
-  id = var.subnet_id
-}
-
-data "aws_availability_zone" "runners" {
-  name = data.aws_subnet.runners.availability_zone
-}
-
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
@@ -152,22 +140,6 @@ locals {
   )
 }
 
-data "aws_ami" "docker-machine" {
-  count = var.runner_worker.type == "docker+machine" ? 1 : 0
-
-  most_recent = "true"
-
-  dynamic "filter" {
-    for_each = var.runner_worker_docker_machine_ami_filter
-    content {
-      name   = filter.key
-      values = filter.value
-    }
-  }
-
-  owners = var.runner_worker_docker_machine_ami_owners
-}
-
 # ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
 # ignores: Auto Scaling Group With No Associated ELB --> that's simply not true, as the EC2 instance contacts GitLab. So no ELB needed here.
 # kics-scan ignore-line
@@ -233,20 +205,6 @@ resource "aws_autoscaling_schedule" "scale_out" {
   min_size               = try(var.runner_schedule_config["scale_out_min_size"], var.runner_schedule_config["scale_out_count"])
   desired_capacity       = try(var.runner_schedule_config["scale_out_desired_capacity"], var.runner_schedule_config["scale_out_count"])
   max_size               = try(var.runner_schedule_config["scale_out_max_size"], var.runner_schedule_config["scale_out_count"])
-}
-
-data "aws_ami" "runner" {
-  most_recent = "true"
-
-  dynamic "filter" {
-    for_each = var.runner_ami_filter
-    content {
-      name   = filter.key
-      values = filter.value
-    }
-  }
-
-  owners = var.runner_ami_owners
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
