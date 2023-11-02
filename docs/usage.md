@@ -22,7 +22,7 @@ AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow 
 
 >GitLab >= 16.0.0 has removed the `registration_token` since they are working on a [new token architecture](https://docs.gitlab.com/ee/architecture/blueprints/runner_tokens/). This module handle these changes, you need to provide a personal access token with `api` scope for the runner to authenticate itself.
 
->The workflow is as it follow:
+>The workflow is as follows ([migration steps](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/876)):
 >1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance`, `group` or `project`).
 >2. GitLab answers with a token prefixed by `glrt-` and we put it in SSM.
 >3. The runner will get the config from `/etc/gitlab-runner/config.toml` and will listen for new jobs from your GitLab instance.
@@ -97,11 +97,13 @@ module "runner" {
   runners_name       = "docker-default"
   runners_gitlab_url = "https://gitlab.com"
 
-  runner_gitlab_access_token_secure_parameter_store_name = "gitlab_token_ssm"
+  runner_gitlab_access_token_secure_parameter_store_name = "gitlab_access_token_ssm__name"
 
 
   runner_gitlab_registration_config = {
-    type               = "instance"
+    type               = "instance" # or "group" or "project"
+    # group_id           = 1234 # for "group"
+    # project_id         = 5678 # for "project"
     tag_list           = "docker"
     description        = "runner default"
     locked_to_project  = "true"
