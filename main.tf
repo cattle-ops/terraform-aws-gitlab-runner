@@ -76,7 +76,7 @@ locals {
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_gitlab_token_name                     = var.runner_gitlab.access_token_secure_parameter_store_name
       secure_parameter_store_region                                = data.aws_region.current.name
-      gitlab_runner_registration_token                             = lookup(var.runner_gitlab_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
+      gitlab_runner_registration_token                             = var.runner_gitlab_registration_config.registration_token
       gitlab_runner_description                                    = var.runner_gitlab_registration_config["description"]
       gitlab_runner_tag_list                                       = var.runner_gitlab_registration_config["tag_list"]
       gitlab_runner_locked_to_project                              = var.runner_gitlab_registration_config["locked_to_project"]

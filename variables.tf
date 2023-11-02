@@ -299,7 +299,7 @@ variable "runner_cloudwatch" {
 variable "runner_gitlab_registration_config" {
   description = "Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
   type = object({
-    registration_token = optional(string, "")
+    registration_token = optional(string, "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
     tag_list           = optional(string, "")
     description        = optional(string, "")
     type               = optional(string, "") # mandatory if gitlab_runner_version >= 16.0.0
