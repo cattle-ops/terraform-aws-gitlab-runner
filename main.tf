@@ -90,7 +90,7 @@ locals {
       public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
-      use_new_runner_authentication_gitlab_16                      = contains(keys(var.runner_gitlab_registration_config), "type")
+      use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
