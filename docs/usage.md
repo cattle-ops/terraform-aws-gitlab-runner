@@ -18,6 +18,15 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 this module a hard coded list of AMIs per region was provided. This list has been replaced by a search filter to find the latest
 AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow you to version lock the target AMI if needed.
 
+> 💥  **If you are using GitLab >= 16.0.0**: `registration_token` will be deprecated!
+
+>GitLab >= 16.0.0 has removed the `registration_token` since they are working on a [new token architecture](https://docs.gitlab.com/ee/architecture/blueprints/runner_tokens/). This module handle these changes, you need to provide a personal access token with `api` scope for the runner to authenticate itself.
+
+>The workflow is as follows ([migration steps](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/876)):
+>1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance`, `group` or `project`).
+>2. GitLab answers with a token prefixed by `glrt-` and we put it in SSM.
+>3. The runner will get the config from `/etc/gitlab-runner/config.toml` and will listen for new jobs from your GitLab instance.
+
 ## Install the module
 
 Run `terraform init` to initialize Terraform. Next you can run `terraform plan` to inspect the resources that will be created.
@@ -36,7 +45,7 @@ terraform destroy
 
 ## Scenarios
 
-### Scenario: Basic usage
+### Scenario: Basic usage on GitLab **< 16.0.0**
 
 Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
 
@@ -66,6 +75,42 @@ maximum_timeout    = "3600"
 runner_worker_docker_machine_instance = {
 subnet_ids = module.vpc.private_subnets
 }
+}
+```
+
+### Scenario: Basic usage on GitLab **>= 16.0.0**
+
+Below is a basic examples of usages of the module if your GitLab instance version is >= 16.0.0.
+
+```hcl
+module "runner" {
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
+
+  aws_region  = "eu-west-1"
+  environment = "spot-runners"
+
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids_gitlab_runner = module.vpc.private_subnets
+  subnet_id_runners        = element(module.vpc.private_subnets, 0)
+
+  runners_name       = "docker-default"
+  runners_gitlab_url = "https://gitlab.com"
+
+  runner_gitlab_access_token_secure_parameter_store_name = "gitlab_access_token_ssm__name"
+
+
+  runner_gitlab_registration_config = {
+    type               = "instance" # or "group" or "project"
+    # group_id           = 1234 # for "group"
+    # project_id         = 5678 # for "project"
+    tag_list           = "docker"
+    description        = "runner default"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+
 }
 ```
 
