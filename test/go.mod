@@ -1,9 +1,9 @@
 module github.com/cattle-ops/terraform-aws-gitlab-runner/test
 
-go 1.21.1
+go 1.21.3
 
 require (
-	github.com/gruntwork-io/terratest v0.46.1
+	github.com/gruntwork-io/terratest v0.46.6
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.8.4
 	github.com/xanzy/go-gitlab v0.93.2
