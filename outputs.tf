@@ -52,8 +52,3 @@ output "runner_launch_template_name" {
   description = "The name of the runner's launch template."
   value       = aws_launch_template.gitlab_runner_instance.name
 }
-
-output "runner_user_data" {
-  description = "(Deprecated) The user data of the Gitlab Runner Agent's launch template. Set `var.debug.output_runner_user_data_to_file` to true to write `user_data.sh`."
-  value       = nonsensitive(local.template_user_data)
-}
