@@ -2,3 +2,12 @@ for i in {1..7}; do
   echo "Attempt: ---- " $i
   yum -y update && break || sleep 60
 done
+
+# Install jq if it is not installed.
+if ! [ -x "$(command -v jq)" ]; then
+  for i in {1..7}
+  do
+    echo "Attempt: ---- " $i
+    yum install -y jq && break || sleep 60
+  done
+fi
