@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.1.1...7.2.0) (2023-11-07)
+
+
+### Features
+
+* add new authentication method for GitLab &gt;= 16 ([#876](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/876)) ([c870745](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/c8707454f868cc7a21aa30783c603ca822b285f3))
+
 ## [7.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.1.0...7.1.1) (2023-10-13)
 
 

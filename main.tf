@@ -62,18 +62,23 @@ locals {
       secure_parameter_store_gitlab_runner_registration_token_name = var.runner_gitlab_registration_token_secure_parameter_store_name
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
+      secure_parameter_store_gitlab_token_name                     = var.runner_gitlab.access_token_secure_parameter_store_name
       secure_parameter_store_region                                = data.aws_region.current.name
-      gitlab_runner_registration_token                             = lookup(var.runner_gitlab_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
+      gitlab_runner_registration_token                             = var.runner_gitlab_registration_config.registration_token
       gitlab_runner_description                                    = var.runner_gitlab_registration_config["description"]
       gitlab_runner_tag_list                                       = var.runner_gitlab_registration_config["tag_list"]
       gitlab_runner_locked_to_project                              = var.runner_gitlab_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                                   = var.runner_gitlab_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                                = var.runner_gitlab_registration_config["maximum_timeout"]
+      gitlab_runner_type                                           = var.runner_gitlab_registration_config["type"]
+      gitlab_runner_group_id                                       = var.runner_gitlab_registration_config["group_id"]
+      gitlab_runner_project_id                                     = var.runner_gitlab_registration_config["project_id"]
       gitlab_runner_access_level                                   = var.runner_gitlab_registration_config.access_level
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
       public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",

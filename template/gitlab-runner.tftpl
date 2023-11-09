@@ -32,16 +32,49 @@ then
   [[ "$valid_token_response" != "200" ]] && valid_token=false
 fi
 
-gitlab_runner_registration_token=${gitlab_runner_registration_token}
-# fetch registration token from SSM
-if [[ "$gitlab_runner_registration_token" == "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__" ]]
-then
-    gitlab_runner_registration_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_runner_registration_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
-fi
-
 if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
 then
-  token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+  if [ "${use_new_runner_authentication_gitlab_16}" == "true" ]
+  then
+    runner_type_param=""
+    if [ "${gitlab_runner_type}" = "group" ]; then
+      if [ -z "${gitlab_runner_group_id}" ]; then
+        echo "ERROR: If the runner type is group, you must specify a group_id".
+        exit 1
+      fi
+      runner_type_param='--form group_id=${gitlab_runner_group_id}'
+    elif [ "${gitlab_runner_type}" = "project" ]; then
+      if [ -z "${gitlab_runner_project_id}" ]; then
+        echo "ERROR: If the runner type is project_type, you must specify a project_id".
+        exit 1
+      fi
+      runner_type_param='--form project_id=${gitlab_runner_project_id}'
+    fi
+
+    # fetch gitlab token from SSM
+    gitlab_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
+
+    token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/user/runners" \
+      --header "private-token: $gitlab_token" \
+      --form "tag_list=${gitlab_runner_tag_list}" \
+      --form "description=${gitlab_runner_description}" \
+      --form "locked=${gitlab_runner_locked_to_project}" \
+      --form "run_untagged=${gitlab_runner_run_untagged}" \
+      --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
+      --form "runner_type=${gitlab_runner_type}_type" \
+      $runner_type_param \
+      --form "access_level=${gitlab_runner_access_level}" \
+      | jq -r '.token')
+  else
+    gitlab_runner_registration_token=${gitlab_runner_registration_token}
+
+    # fetch registration token from SSM
+    if [[ "$gitlab_runner_registration_token" == "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__" ]]
+    then
+      gitlab_runner_registration_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_runner_registration_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
+    fi
+
+    token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
     --form "token=$gitlab_runner_registration_token" \
     --form "tag_list=${gitlab_runner_tag_list}" \
     --form "description=${gitlab_runner_description}" \
@@ -50,6 +83,7 @@ then
     --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
     --form "access_level=${gitlab_runner_access_level}" \
     | jq -r .token)
+  fi
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --value="$token" --region "${secure_parameter_store_region}"
 fi
 
@@ -121,77 +155,40 @@ then
   docker-machine rm -y dummy-machine
   unset HOME
   unset USER
-
 fi
 
-# A small script to remove this runner from being registered with Gitlab.
-cat <<REM > /etc/rc.d/init.d/remove_gitlab_registration
+# A small script to remove this runner from being registered with Gitlab. Executed at shutdown.
+cat <<EOF > /etc/systemd/system/remove-gitlab-registration.service
+[Unit]
+Description=Remove the GitLab Runner from GitLab at shutdown
+After=network-online.target
+Wants=network-online.target
+Before=shutdown.target reboot.target halt.target kexec.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecStop=/opt/remove_gitlab_registration.sh
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+cat <<EOF > /opt/remove_gitlab_registration.sh
 #!/bin/bash
-# chkconfig: 1356 99 03
-# description: cleans up gitlab runner key
-# processname: remove_runner_key
-#              /etc/rc.d/init.d/remove_gitlab_registration
-lockfile=/var/lock/subsys/remove_gitlab_registration
+echo "Removing Gitlab Runner ..."
+aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" 2>&1
+curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1
 
-# This lockfile is necessary so that we'll run the cleanup later.
-start() {
-    logger "Setting up Runner Removal Lockfile"
-    touch \$lockfile
-}
+EOF
 
-# Overwrite token in SSM with null and remove runner from Gitlab
-stop() {
-    logger "Removing Gitlab Runner Token"
-    aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="null" 2>&1 | logger &
-    curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1 | logger &
-    retval=\$?
-    rm -f \$lockfile
-    return \$retval
-}
+chmod a+x /opt/remove_gitlab_registration.sh
+systemctl enable remove-gitlab-registration.service
 
-# Map these to start just to be redunant.
-# We don't want to run Stop outside of shutdown.
-restart() {
-  start
-}
-reload() {
-  start
-}
-
-# Do nothing - there's no status.
-status() {
-  :
-}
-
-case "\$1" in
-    start)
-        \$1
-        ;;
-    stop)
-        \$1
-        ;;
-    restart)
-        \$1
-        ;;
-    status)
-        \$1
-        ;;
-    *)
-        echo "Usage: \$0 {start|stop|status|restart}"
-        exit 2
-        ;;
-esac
-REM
-
-chmod a+x /etc/init.d/remove_gitlab_registration
-
-# Use chkconfig to link into the runlevel 0 (shutdown) directories
-# This adds "start" scripts to levels 1,3,5, and 6, and a "stop" to the others.
-# This way we'll not be assigned jobs if we're shutting down, and clean up in Gitlab.
-chkconfig --add remove_gitlab_registration
-
-# As noted above, this does nothing more than make the lockfile.
-service remove_gitlab_registration start
+# start the service. Otherwise the stop action will not be triggered at shutdown.
+service remove-gitlab-registration start
 
 if ! ( rpm -q gitlab-runner >/dev/null )
 then
