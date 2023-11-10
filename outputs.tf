@@ -57,8 +57,3 @@ output "runner_user_data" {
   description = "(Deprecated) The user data of the Gitlab Runner Agent's launch template. Set `var.debug.output_runner_user_data_to_file` to true to write `user_data.sh`."
   value       = nonsensitive(local.template_user_data)
 }
-
-output "runner_config_toml_rendered" {
-  description = "The rendered config.toml given to the Runner Manager."
-  value       = local.template_runner_config
-}
