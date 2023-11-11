@@ -153,13 +153,10 @@ jobs:
           github_token: ${{ github.token }}
 
   tests:
-    name: Run the tests
-    strategy:
-      matrix:
-        terraform: [1.3.9]
+    name: Test
     runs-on: ubuntu-latest
     container:
-      image: hashicorp/terraform:${{ matrix.terraform }}
+      image: hashicorp/terraform:1.6.4
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - run: terraform init -get -backend=false -input=false
