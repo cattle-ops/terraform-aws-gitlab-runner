@@ -159,5 +159,10 @@ jobs:
       image: hashicorp/terraform:1.6.4
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-central-1
+          role-to-assume: ${{ secrets.TERRAFORM_ADMIN_ROLE_ARN }}
       - run: terraform init -get -backend=false -input=false
       - run: terraform test
