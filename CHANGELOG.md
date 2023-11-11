@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.2.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.2.0...7.2.1) (2023-11-10)
+
+
+### Bug Fixes
+
+* delete the 'runner_config_toml_rendereded' output variable ([#1019](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1019)) ([3f7eaea](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/3f7eaea0727620097e4b1126f0a2f567f9fb2f9b))
+* run the GitLab Runner deregistration process at shutdown ([#1034](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1034)) ([68884fd](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/68884fd0eb31a5a4a113386f3108964412964f07))
+
 ## [7.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.1.1...7.2.0) (2023-11-07)
 
 
