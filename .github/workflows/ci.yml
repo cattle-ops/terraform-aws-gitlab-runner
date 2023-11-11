@@ -9,6 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  id-token: write
   contents: read
   pull-requests: write
 
@@ -157,9 +158,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:1.6.3
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Configure AWS credentials
