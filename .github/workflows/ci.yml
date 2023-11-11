@@ -107,7 +107,7 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
-      - run: kics scan -p . -o . --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
+      - run: kics scan -p . -o . --config .kics.yml --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
   tflint:
     runs-on: ubuntu-latest
