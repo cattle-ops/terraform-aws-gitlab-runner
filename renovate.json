@@ -6,5 +6,5 @@
     "group:all",
     "schedule:weekly"
   ],
-  "ignorePaths": []
+  "ignorePaths": ["**/.terraform-version"]
 }

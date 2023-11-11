@@ -18,7 +18,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Slash Command Dispatch
-        uses: peter-evans/slash-command-dispatch@60f9e79c7fd43378cf0653f00b0556663cc3044c # ratchet:peter-evans/slash-command-dispatch@v3
+        uses: peter-evans/slash-command-dispatch@ade03097a3cb6e69e3ed86210ec745493dacf6bc # ratchet:peter-evans/slash-command-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-type: pull-request

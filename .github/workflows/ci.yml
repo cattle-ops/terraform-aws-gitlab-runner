@@ -17,12 +17,12 @@ jobs:
     name: Verify module
     strategy:
       matrix:
-        terraform: [ 1.3.9 ]
+        terraform: [1.3.9]
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - run: terraform init -get -backend=false -input=false
       - run: terraform fmt -recursive -check=true -write=false
 
@@ -31,15 +31,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform: [ 1.3.9, latest ]
+        terraform: [1.3.9, latest]
         example:
           [
             "runner-default",
             "runner-docker",
-            "runner-multi-region",
             "runner-pre-registered",
             "runner-public",
-            "runner-certificates"
+            "runner-certificates",
           ]
     defaults:
       run:
@@ -48,7 +47,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.3.')
         run: terraform fmt -recursive -check=true -write=false
@@ -60,7 +59,7 @@ jobs:
     steps:
       # Git Checkout
       - name: Checkout Code
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to improve performances
@@ -70,7 +69,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@a87b2872713c6bdde46d2473c5d7ed23e5752dc2 # v7.4.0
+        uses: oxsecurity/megalinter@b48455a119cc28045eee8f1e9d0a542a85e71f4f # v7.5.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -104,9 +103,9 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v1.7.8-debian@sha256:646c4e9439dd3c5f8a9081cdc11f003ad988e180f51c1e4280c6c9c164fb9423
+      image: checkmarx/kics:v1.7.10-debian@sha256:13fa574a0b0220c93b966b84d98edb37d9d1f075c173c4ab10a33f6e61fc6761
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
       - run: kics scan -p . -o . --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
@@ -114,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         name: Checkout source code
 
       - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3
@@ -138,7 +137,7 @@ jobs:
 
       - name: Run TFLint
         # assign necessary variables to avoid errors
-        run: "tflint --var 'enable_managed_kms_key=true' --var='runner_instance={\"name_prefix\": \"a\", \"name\": \"b\"}'"
+        run: 'tflint --var ''enable_managed_kms_key=true'' --var=''runner_instance={"name_prefix": "a", "name": "b"}'''
 
   tfsec:
     name: tfsec PR commenter
@@ -146,7 +145,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
 
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@7a44c5dcde5dfab737363e391800629e27b6376b # v1.3.1

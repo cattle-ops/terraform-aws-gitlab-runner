@@ -1,14 +1,15 @@
 # Contribution guide
 
-We appreciate your thought to contribute to open source. :heart: We want to make contributing as easy as possible. You are welcome to:
+We appreciate your thought to contribute to open source. :heart: We want to make contributing as easy as possible.
+You are welcome to:
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
+- Report a bug
+- Discuss the current state of the code
+- Submit a fix
+- Propose new features
 
-We Use [Github Flow](https://guides.github.com/introduction/flow/index.html), So All Code Changes Happen Through Pull Requests
-Pull requests are the best way to propose changes to the codebase (we use [Github Flow](https://guides.github.com/introduction/flow/index.html)). We actively welcome your pull requests:
+We use [Github Flow](https://guides.github.com/introduction/flow/index.html), So all code changes happen through pull requests.
+We actively welcome your pull requests:
 
 1. Fork the repo and create your branch from `main`.
 2. If you've added code, check one of the examples.
@@ -25,7 +26,8 @@ We use the [Terraform Style conventions](https://www.terraform.io/docs/configura
 
 ## Documentation
 
-We use [pre-commit](https://pre-commit.com/) to update the Terraform inputs and outputs in the documentation via [terraform-docs](https://github.com/terraform-docs/terraform-docs). Ensure you have installed those components.
+We use [pre-commit](https://pre-commit.com/) to update the Terraform inputs and outputs in the documentation via
+[terraform-docs](https://github.com/terraform-docs/terraform-docs). Ensure you have installed those components.
 
 ## Testing
 
