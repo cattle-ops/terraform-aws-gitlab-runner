@@ -1,3 +1,4 @@
+// nolint:typecheck // how to get rid of this?
 package test
 
 import (
@@ -11,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/joho/godotenv"
-	"github.com/npalm/terraform-aws-gitlab-runner/test/config"
+	"github.com/cattle-ops/terraform-aws-gitlab-runner/test/config"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -56,7 +57,10 @@ func TestRunnerDefault(t *testing.T) {
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
 
-	git = gitlab.NewClient(nil, conf.GitlabConfig.GitlabAccessToken)
+	git, err := gitlab.NewClient(conf.GitlabConfig.GitlabAccessToken, gitlab.WithBaseURL(conf.GitlabConfig.GitlabURL))
+	if err != nil {
+      log.Fatal("Failed to create client", err)
+    }
 
 	p, _, err := git.Projects.ForkProject(conf.GitlabConfig.GitlabSampleProject, &gitlab.ForkProjectOptions{
 		Namespace: &conf.GitlabConfig.GitlabNamespace,
@@ -69,7 +73,7 @@ func TestRunnerDefault(t *testing.T) {
 	// wait a few seconds to ensure project is forked
 	time.Sleep(5 * time.Second)
 
-	// trigger pipelins
+	// trigger pipelines
 	pipeline, _, err = git.Pipelines.CreatePipeline(project.ID, &gitlab.CreatePipelineOptions{
 		Ref: &conf.GitlabConfig.GitlabSampleProjectRef,
 	})

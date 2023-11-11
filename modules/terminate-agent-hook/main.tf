@@ -5,7 +5,6 @@
 # terminating orphaned runner instances.
 # ----------------------------------------------------------------------------
 locals {
-  # cSpell:ignore filesha
   source_sha256 = filesha256("${path.module}/lambda/lambda_function.py")
 }
 
@@ -36,7 +35,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   package_type     = "Zip"
   publish          = true
   role             = aws_iam_role.lambda.arn
-  runtime          = "python3.8"
+  runtime          = "python3.11"
   timeout          = local.lambda_timeout
   kms_key_arn      = var.kms_key_id
 

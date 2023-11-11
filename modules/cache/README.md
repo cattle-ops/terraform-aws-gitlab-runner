@@ -1,18 +1,18 @@
 # Cache module
 
-This sub module creates an S3 bucket for build caches. The cache will have by default a life cycle policy the module will create a policy that can be used to access the cache.
+This sub module creates an S3 bucket for build caches. The cache will have by default a life cycle policy the module
+will create a policy that can be used to access the cache.
 
 ## Usages
 
-```
-
+```hcl
 module "cache" {
-  source      = "https://github.com/npalm/terraform-aws-gitlab-runner/tree/move-cache-to-moudle/cache"
+  source      = "https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/move-cache-to-moudle/cache"
   environment = "cache"
 }
 
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   ...
 
@@ -24,6 +24,10 @@ module "runner" {
 
 }
 ```
+
+<!-- markdownlint-disable -->
+<!-- cSpell:disable -->
+<!-- markdown-link-check-disable -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -51,7 +55,6 @@ No modules.
 |------|------|
 | [aws_iam_policy.docker_machine_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_s3_bucket.build_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
-| [aws_s3_bucket_acl.build_cache_acl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_lifecycle_configuration.build_cache_versioning](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
 | [aws_s3_bucket_logging.build_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_logging) | resource |
 | [aws_s3_bucket_public_access_block.build_cache_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
@@ -74,7 +77,7 @@ No modules.
 | <a name="input_cache_lifecycle_prefix"></a> [cache\_lifecycle\_prefix](#input\_cache\_lifecycle\_prefix) | Object key prefix identifying one or more objects to which the clean up rule applies. | `string` | `"runner/"` | no |
 | <a name="input_cache_logging_bucket"></a> [cache\_logging\_bucket](#input\_cache\_logging\_bucket) | S3 Bucket ID where the access logs to the cache bucket are stored. | `string` | `null` | no |
 | <a name="input_cache_logging_bucket_prefix"></a> [cache\_logging\_bucket\_prefix](#input\_cache\_logging\_bucket\_prefix) | Prefix within the `cache_logging_bucket`. | `string` | `null` | no |
-| <a name="input_create_cache_bucket"></a> [create\_cache\_bucket](#input\_create\_cache\_bucket) | (deprecated) If the cache should not be craeted, remove the whole module call! | `bool` | `null` | no |
+| <a name="input_create_cache_bucket"></a> [create\_cache\_bucket](#input\_create\_cache\_bucket) | (deprecated) If the cache should not be created, remove the whole module call! | `bool` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. Ensure that your Runner/Executor has access to the KMS key. | `string` | `""` | no |
 | <a name="input_name_iam_objects"></a> [name\_iam\_objects](#input\_name\_iam\_objects) | Set the name prefix of all AWS IAM resources created by this module | `string` | `""` | no |

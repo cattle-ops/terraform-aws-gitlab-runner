@@ -2,9 +2,11 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Every VPC resource should have an associated Flow Log: This is an example only. No flow logs are created.
+# kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  version = "5.1.2"
 
   name = "vpc-${var.environment}"
   cidr = "10.1.0.0/16"
@@ -27,24 +29,22 @@ module "cache" {
 module "runner" {
   source = "../../"
 
-  aws_region  = var.aws_region
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = element(module.vpc.public_subnets, 0)
   environment = var.environment
 
-  runners_use_private_address = false
+  security_group_prefix = "my-security-group"
 
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.public_subnets, 0)
+  runner_instance = {
+    name        = var.runner_name
+    name_prefix = "my-runner-agent"
+  }
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  runner_gitlab = {
+    url = var.gitlab_url
+  }
 
-  runners_name             = var.runner_name
-  runners_gitlab_url       = var.gitlab_url
-  runners_environment_vars = ["KEY=Value", "FOO=bar"]
-
-  runners_privileged         = "false"
-  runners_additional_volumes = ["/var/run/docker.sock:/var/run/docker.sock"]
-
-  gitlab_runner_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner"
     description        = "runner public - auto"
@@ -54,39 +54,44 @@ module "runner" {
     access_level       = "ref_protected"
   }
 
-  overrides = {
-    name_sg                     = "my-security-group"
-    name_runner_agent_instance  = "my-runner-agent"
-    name_docker_machine_runners = "my-runners-dm"
+  runner_worker = {
+    environment_variables = ["KEY=Value", "FOO=bar"]
   }
 
-  cache_shared = "true"
-
-  cache_bucket = {
+  runner_worker_cache = {
+    shared = "true"
     create = false
     policy = module.cache.policy_arn
     bucket = module.cache.bucket
+  }
+
+  runner_worker_docker_options = {
+    privileged = "false"
+    volumes    = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+  }
+
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
+    name_prefix          = "my-runners-dm"
   }
 }
 
 module "runner2" {
   source = "../../"
 
-  aws_region  = var.aws_region
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = element(module.vpc.public_subnets, 0)
   environment = "${var.environment}-2"
 
-  runners_use_private_address = false
+  runner_instance = {
+    name = var.runner_name
+  }
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.public_subnets
-  subnet_id_runners        = element(module.vpc.public_subnets, 0)
+  runner_gitlab = {
+    url = var.gitlab_url
+  }
 
-  docker_machine_spot_price_bid = "on-demand-price"
-
-  runners_name       = var.runner_name
-  runners_gitlab_url = var.gitlab_url
-
-  gitlab_runner_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = var.registration_token
     tag_list           = "docker_spot_runner_2"
     description        = "runner public - auto"
@@ -95,11 +100,14 @@ module "runner2" {
     maximum_timeout    = "3600"
   }
 
-  cache_shared = "true"
+  runner_worker_cache = {
+    runner_worker_shared = "true"
+    create               = false
+    policy               = module.cache.policy_arn
+    bucket               = module.cache.bucket
+  }
 
-  cache_bucket = {
-    create = false
-    policy = module.cache.policy_arn
-    bucket = module.cache.bucket
+  runner_worker_docker_machine_instance = {
+    private_address_only = false
   }
 }

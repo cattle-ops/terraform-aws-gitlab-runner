@@ -17,7 +17,8 @@
           "ec2:RequestSpotInstances",
           "ec2:CancelSpotInstanceRequests",
           "ec2:DescribeSubnets",
-          "ec2:AssociateIamInstanceProfile"
+          "ec2:AssociateIamInstanceProfile",
+          "ec2:CreateFleet"
         ],
         "Effect": "Allow",
         "Resource": "*"

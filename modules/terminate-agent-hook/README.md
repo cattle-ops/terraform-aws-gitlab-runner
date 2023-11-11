@@ -14,7 +14,7 @@ in the ASG is terminated, the lifecycle hook triggers the Lambda to
 terminate spawned runner instances with the matching parent tag and/or any "orphaned"
 instances with no running parent runner.
 
-See [issue #214](https://github.com/npalm/terraform-aws-gitlab-runner/issues/214) for
+See [issue #214](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/214) for
 discussion on the scenario this module addresses.
 
 Furthermore, all spot requests which are still open are cancelled. Otherwise they might be fulfilled later but
@@ -38,7 +38,7 @@ input variables:
 
 ```terraform
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   asg_terminate_lifecycle_hook_create         = true
 
@@ -53,11 +53,11 @@ Note the `asg_terminate_lifecycle_hook_*` variables:
 
 ```terraform
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region                    = "eu-west-1"
-  environment                   = "glrunners-dev"
-  runners_name                  = "glrunners-foo"
+  environment                   = "runners-test"
+  runners_name                  = "runners-test"
   runners_gitlab_url            = "https://code.foo.org/"
   docker_machine_instance_type	= "t3.large"
   runners_request_spot_instance = false
@@ -91,13 +91,17 @@ module "runner" {
   # for 'docker_machine_options' settings with the AWS driver
   docker_machine_options = var.docker_machine_options
 
-  # See https://github.com/npalm/terraform-aws-gitlab-runner/issues/160
-  runners_additional_volumes = ["/certs/client"]
+  # See https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/160
+  executor_docker_additional_volumes = ["/certs/client"]
 
   tags = local.common_tags
 
 }
 ```
+
+<!-- markdownlint-disable -->
+<!-- cSpell:disable -->
+<!-- markdown-link-check-disable -->
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -146,13 +150,12 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | <a name="input_asg_arn"></a> [asg\_arn](#input\_asg\_arn) | The ARN of the Auto Scaling Group to attach to. | `string` | n/a | yes |
 | <a name="input_asg_name"></a> [asg\_name](#input\_asg\_name) | The name of the Auto Scaling Group to attach to. The 'environment' will be prefixed to this. | `string` | n/a | yes |
 | <a name="input_cloudwatch_logging_retention_in_days"></a> [cloudwatch\_logging\_retention\_in\_days](#input\_cloudwatch\_logging\_retention\_in\_days) | The number of days to retain logs in CloudWatch. | `number` | `30` | no |
 | <a name="input_enable_xray_tracing"></a> [enable\_xray\_tracing](#input\_enable\_xray\_tracing) | Enables X-Ray for debugging and analysis | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as a name prefix and for tagging. | `string` | n/a | yes |
-| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | n/a | yes |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypt the resources, e.g. logs, lambda environment variables, ... | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Lambda function to create. The 'environment' will be prefixed to this. | `string` | n/a | yes |
 | <a name="input_name_docker_machine_runners"></a> [name\_docker\_machine\_runners](#input\_name\_docker\_machine\_runners) | The `Name` tag of EC2 instances created by the runner agent. | `string` | n/a | yes |
 | <a name="input_name_iam_objects"></a> [name\_iam\_objects](#input\_name\_iam\_objects) | The name to use for IAM resources - roles and policies. | `string` | `""` | no |
