@@ -9,7 +9,7 @@ Test are written in [Go](https://golang.org/). Using [Terratest](https://github.
 - [Go](https://golang.org/)
 - [dep](https://github.com/golang/dep)
 
-The following enviroment variables are required to set or add in a file `.env`.
+The following environment variables are required to set or add in a file `.env`.
 
 Sample `.env` file:
 ```

@@ -2,18 +2,12 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_region" "this" {}
-
-data "aws_security_group" "default" {
-  name   = "default"
-  vpc_id = module.vpc.vpc_id
-}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.2"
 
-  name = "vpc-${var.environment}"
+  name = "vpc-test"
   cidr = "10.0.0.0/16"
 
   azs             = [data.aws_availability_zones.available.names[0]]
@@ -24,6 +18,24 @@ module "vpc" {
   single_nat_gateway = true
 
   tags = {
-    Environment = "test"
+    Environment = "setup"
+  }
+}
+
+module "vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "3.18.1"
+
+  vpc_id = module.vpc.vpc_id
+
+  endpoints = {
+    s3 = {
+      service = "s3"
+      tags    = { Name = "s3-vpc-endpoint" }
+    }
+  }
+
+  tags = {
+    Environment = "setup"
   }
 }
