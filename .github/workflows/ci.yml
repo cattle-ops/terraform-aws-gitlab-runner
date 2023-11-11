@@ -9,7 +9,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write
   contents: read
   pull-requests: write
 
@@ -156,8 +155,9 @@ jobs:
   tests:
     name: Test
     runs-on: ubuntu-latest
-    container:
-      image: hashicorp/terraform:1.6.3
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Configure AWS credentials
@@ -165,5 +165,9 @@ jobs:
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.TERRAFORM_ADMIN_ROLE_ARN }}
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.0.0
+        with:
+          terraform_version: "1.6.3"
       - run: terraform init -get -backend=false -input=false
       - run: terraform test
