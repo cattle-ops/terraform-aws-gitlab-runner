@@ -1,22 +1,26 @@
 module "runner" {
   source = "../../../"
 
-  aws_region  = data.aws_region.this.id
   environment = "default"
 
-  vpc_id              = module.vpc.vpc_id
-  subnet_id           = element(module.vpc.private_subnets, 0)
-  metrics_autoscaling = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
 
-  runners_name             = "runner-name"
-  runners_gitlab_url       = "https://my.fancy.url/not/used"
-  enable_runner_ssm_access = true
+  runner_instance = {
+    collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
+    name                        = "runner-name"
+    ssm_access                  = true
+  }
 
-  gitlab_runner_security_group_ids = [data.aws_security_group.default.id]
+  runner_networking = {
+    security_group_ids = [data.aws_security_group.default.id]
+  }
 
-  docker_machine_spot_price_bid = "on-demand-price"
+  runner_gitlab = {
+    url = "https://my.fancy.url/not/used"
+  }
 
-  gitlab_runner_registration_config = {
+  runner_gitlab_registration_config = {
     registration_token = "some-token"
     tag_list           = "docker_spot_runner"
     description        = "runner default - auto"
