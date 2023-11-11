@@ -18,24 +18,6 @@ module "vpc" {
   single_nat_gateway = true
 
   tags = {
-    Environment = "setup"
-  }
-}
-
-module "vpc_endpoints" {
-  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "3.18.1"
-
-  vpc_id = module.vpc.vpc_id
-
-  endpoints = {
-    s3 = {
-      service = "s3"
-      tags    = { Name = "s3-vpc-endpoint" }
-    }
-  }
-
-  tags = {
-    Environment = "setup"
+    Environment = "test"
   }
 }
