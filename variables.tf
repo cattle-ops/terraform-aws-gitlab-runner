@@ -381,7 +381,7 @@ variable "runner_worker" {
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
     ssm_access = Allows to connect to the Runner Worker via SSM.
-    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
+    type = The Runner Worker type (executor) to use. Currently supports `docker+machine`, `docker` and `shell`.
   EOT
   type = object({
     environment_variables = optional(list(string), [])
@@ -394,8 +394,8 @@ variable "runner_worker" {
   default = {}
 
   validation {
-    condition     = contains(["docker+machine", "docker"], var.runner_worker.type)
-    error_message = "The executor currently supports `docker+machine` and `docker`."
+    condition     = contains(["docker+machine", "docker", "shell"], var.runner_worker.type)
+    error_message = "The supported executors are `docker+machine`, `docker` and `shell`."
   }
 }
 
