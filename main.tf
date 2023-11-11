@@ -1,15 +1,3 @@
-data "aws_caller_identity" "current" {}
-data "aws_partition" "current" {}
-data "aws_region" "current" {}
-
-data "aws_subnet" "runners" {
-  id = var.subnet_id
-}
-
-data "aws_availability_zone" "runners" {
-  name = data.aws_subnet.runners.availability_zone
-}
-
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
   name  = local.secure_parameter_store_runner_token_key
@@ -74,18 +62,23 @@ locals {
       secure_parameter_store_gitlab_runner_registration_token_name = var.runner_gitlab_registration_token_secure_parameter_store_name
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
+      secure_parameter_store_gitlab_token_name                     = var.runner_gitlab.access_token_secure_parameter_store_name
       secure_parameter_store_region                                = data.aws_region.current.name
-      gitlab_runner_registration_token                             = lookup(var.runner_gitlab_registration_config, "registration_token", "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
+      gitlab_runner_registration_token                             = var.runner_gitlab_registration_config.registration_token
       gitlab_runner_description                                    = var.runner_gitlab_registration_config["description"]
       gitlab_runner_tag_list                                       = var.runner_gitlab_registration_config["tag_list"]
       gitlab_runner_locked_to_project                              = var.runner_gitlab_registration_config["locked_to_project"]
       gitlab_runner_run_untagged                                   = var.runner_gitlab_registration_config["run_untagged"]
       gitlab_runner_maximum_timeout                                = var.runner_gitlab_registration_config["maximum_timeout"]
+      gitlab_runner_type                                           = var.runner_gitlab_registration_config["type"]
+      gitlab_runner_group_id                                       = var.runner_gitlab_registration_config["group_id"]
+      gitlab_runner_project_id                                     = var.runner_gitlab_registration_config["project_id"]
       gitlab_runner_access_level                                   = var.runner_gitlab_registration_config.access_level
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
       public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -150,22 +143,6 @@ locals {
       launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
     }
   )
-}
-
-data "aws_ami" "docker-machine" {
-  count = var.runner_worker.type == "docker+machine" ? 1 : 0
-
-  most_recent = "true"
-
-  dynamic "filter" {
-    for_each = var.runner_worker_docker_machine_ami_filter
-    content {
-      name   = filter.key
-      values = filter.value
-    }
-  }
-
-  owners = var.runner_worker_docker_machine_ami_owners
 }
 
 # ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
@@ -233,20 +210,6 @@ resource "aws_autoscaling_schedule" "scale_out" {
   min_size               = try(var.runner_schedule_config["scale_out_min_size"], var.runner_schedule_config["scale_out_count"])
   desired_capacity       = try(var.runner_schedule_config["scale_out_desired_capacity"], var.runner_schedule_config["scale_out_count"])
   max_size               = try(var.runner_schedule_config["scale_out_max_size"], var.runner_schedule_config["scale_out_count"])
-}
-
-data "aws_ami" "runner" {
-  most_recent = "true"
-
-  dynamic "filter" {
-    for_each = var.runner_ami_filter
-    content {
-      name   = filter.key
-      values = filter.value
-    }
-  }
-
-  owners = var.runner_ami_owners
 }
 
 resource "aws_launch_template" "gitlab_runner_instance" {
