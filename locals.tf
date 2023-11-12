@@ -1,4 +1,11 @@
 locals {
+  # Determine IAM role for runner instance
+  aws_iam_role_instance_name = coalesce(
+    var.runner_iam_role_name,
+    "${local.name_iam_objects}-instance"
+  )
+  aws_iam_role_instance_arn = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.aws_iam_role_instance_name}"
+
   # Convert list to a string separated and prepend by a comma
   docker_machine_options_string = format(
     ",\"amazonec2-metadata-token=${var.docker_machine_instance_metadata_options.http_tokens}\", \"amazonec2-metadata-token-response-hop-limit=${var.docker_machine_instance_metadata_options.http_put_response_hop_limit}\",%s",
@@ -36,4 +43,22 @@ locals {
     runners_machine_autoscaling = var.runners_machine_autoscaling
     }
   )
+
+  runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tpl", {
+    runners_docker_services = var.runners_docker_services
+    }
+  )
+
+  runners_pull_policies = var.runners_pull_policy != "" ? "[\"${var.runners_pull_policy}\"]" : "[\"${join("\",\"", var.runners_pull_policies)}\"]"
+
+  /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
+  # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
+  docker_machine_version_used          = split(".", split("-", var.docker_machine_version)[0])
+  docker_machine_version_with_name_tag = split(".", "0.16.2")
+  docker_machine_version_test = [
+    for i, j in reverse(range(length(local.docker_machine_version_used)))
+    : signum(local.docker_machine_version_with_name_tag[i] - local.docker_machine_version_used[i]) * pow(10, j)
+  ]
+
+  docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0
 }
