@@ -4,6 +4,9 @@ sentry_dsn = "${sentry_dsn}"
 log_format = "json"
 listen_address = "${prometheus_listen_address}"
 
+[session_server]
+${session_server_string}
+
 [[runners]]
   name = "${runners_name}"
   url = "${gitlab_url}"

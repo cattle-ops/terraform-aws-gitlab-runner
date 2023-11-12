@@ -829,6 +829,18 @@ variable "docker_machine_egress_rules" {
   }]
 }
 
+variable "session_server" {
+  description = "Enables the session server support. Requires enable_eip = true!"
+  type = object({
+    timeout           = number       # Time in seconds how long the session stays active after the job completes. (1800)
+    port              = number       # Port which is used to connect to the session server. (8093)
+    gitlab_cidr_block = list(string) # CIDR block of the Gitlab server which connects to the Gitlab Runner
+    }
+  )
+
+  default = null
+}
+
 variable "subnet_id_runners" {
   description = "Deprecated! Use subnet_id instead. List of subnets used for hosting the gitlab-runners."
   type        = string
