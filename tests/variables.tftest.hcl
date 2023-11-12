@@ -18,7 +18,7 @@ run "create" {
 
   # this is a dummy test. remove it as soon as the first real test is added
   assert {
-    condition = output.runner_role_name == "runner"
+    condition = output.runner_role_name == "test-docker-machine"
     error_message = "Plan failed"
   }
 }
