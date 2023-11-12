@@ -60,6 +60,7 @@
     "tflint",
     "tftpl",
     "tfsec",
+    "tftest",,
     "tftpl",
     "tfvars",
     "tmpfs",
