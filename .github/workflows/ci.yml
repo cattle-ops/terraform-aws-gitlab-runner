@@ -12,6 +12,9 @@ permissions:
   contents: read
   pull-requests: write
 
+env:
+  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+
 jobs:
   verify_module:
     name: Verify module
@@ -107,7 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
-      - run: kics scan -p . -o . --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
+      - run: kics scan -p . -o . --config .kics.yml --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
   tflint:
     runs-on: ubuntu-latest
@@ -151,3 +154,30 @@ jobs:
         uses: aquasecurity/tfsec-pr-commenter-action@7a44c5dcde5dfab737363e391800629e27b6376b # v1.3.1
         with:
           github_token: ${{ github.token }}
+
+  tests:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3
+        name: Cache plugin dir
+        with:
+          key: ${{ runner.os }}-terraform-plugin-cache
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
+        with:
+          aws-region: eu-central-1
+          role-to-assume: ${{ secrets.TERRAFORM_ADMIN_ROLE_ARN }}
+          role-session-name: GitHubActions
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36 # v3.0.0
+        with:
+          terraform_version: "1.6.3"
+      - run: terraform init -get -backend=false -input=false
+      - run: terraform test
