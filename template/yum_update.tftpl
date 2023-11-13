@@ -2,3 +2,10 @@ for i in {1..7}; do
   echo "Attempt: ---- " $i
   yum -y update && break || sleep 60
 done
+
+# Install additional programs needed by the scripts
+for i in {1..7}
+do
+  echo "Attempt: ---- " $i
+  yum install -y jq && break || sleep 60
+done
