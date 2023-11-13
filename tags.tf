@@ -37,6 +37,6 @@ locals {
   runner_tags = local.docker_machine_adds_name_tag ? { for k, v in local.runner_tags_merged : k => v if !contains(concat(var.suppressed_tags, ["Name"]), k) } : local.runner_tags_merged
 
   runner_tags_string = join(",", flatten([
-    for key in keys(local.runner_tags) : [key, lookup(local.runner_tags, key)]
+    for key in keys(local.runner_tags) : [key, local.runner_tags[key]]
   ]))
 }
