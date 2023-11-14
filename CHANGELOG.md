@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.2.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.2.1...7.2.2) (2023-11-14)
+
+
+### Bug Fixes
+
+* remove the deprecated runner_user_data output variable ([#1032](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1032)) ([4e22a6c](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/4e22a6c230fe29f3adb7582a636885ea753225e6))
+* retry the jq installation in case of errors ([#1033](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1033)) ([1ab5690](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/1ab56907116aafdb834d1fbba0a6a4ad20916377))
+
 ## [7.2.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.2.0...7.2.1) (2023-11-10)
 
 
