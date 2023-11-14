@@ -85,7 +85,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.24.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.25.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.4.0 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.4 |
 
@@ -226,7 +226,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 | <a name="output_runner_role_arn"></a> [runner\_role\_arn](#output\_runner\_role\_arn) | ARN of the role used for the docker machine runners. |
 | <a name="output_runner_role_name"></a> [runner\_role\_name](#output\_runner\_role\_name) | Name of the role used for the docker machine runners. |
 | <a name="output_runner_sg_id"></a> [runner\_sg\_id](#output\_runner\_sg\_id) | ID of the security group attached to the docker machine runners. |
-| <a name="output_runner_user_data"></a> [runner\_user\_data](#output\_runner\_user\_data) | (Deprecated) The user data of the Gitlab Runner Agent's launch template. Set `var.debug.output_runner_user_data_to_file` to true to write `user_data.sh`. |
 <!-- END_TF_DOCS -->
 <!-- markdownlint-enable -->
 <!-- cSpell:enable -->
