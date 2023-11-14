@@ -21,7 +21,7 @@ jobs:
           maintainer=$(grep -oE "@[a-zA-Z0-9_-]+" CODEOWNERS | shuf -n 1)
           echo "maintainer=$maintainer" >> "$GITHUB_OUTPUT"
       - name: Create comment
-        uses: actions/github-script@6b5d3eac1fb48c23fcd665e5a63baced5392d8ce # ratchet:actions/github-script@v6
+        uses: actions/github-script@ecae9eb5354bb50ec47c128d372ed4735e630703 # ratchet:actions/github-script@v6
         with:
           script: |
             // adds a comment to the PR (there is the issue API, which works work PRs too)
