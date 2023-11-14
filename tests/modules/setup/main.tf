@@ -19,6 +19,6 @@ module "vpc" {
 
   tags = {
     Environment = "test"
-    owner = "cattle-ops/terraform-aws-gitlab-runner"
+    owner       = "cattle-ops/terraform-aws-gitlab-runner"
   }
 }
