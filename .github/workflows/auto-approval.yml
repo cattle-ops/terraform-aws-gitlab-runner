@@ -4,6 +4,9 @@ name: Approve all Renovate PRs automatically
 # yamllint disable-line rule:truthy
 on: pull_request_target
 
+permissions:
+  contents: read
+
 jobs:
   auto-approve:
     runs-on: ubuntu-latest
