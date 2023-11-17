@@ -1,0 +1,20 @@
+---
+name: Approve all Renovate PRs automatically
+
+# yamllint disable-line rule:truthy
+on: pull_request_target
+
+permissions:
+  contents: read
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: github.actor == 'renovate[bot]'
+    steps:
+      # yamllint disable-line rule:comments
+      - uses: hmarr/auto-approve-action@de8ae18c173c131e182d4adf2c874d8d2308a85b # v3.1.0
+        with:
+          review-message: "Auto approved automated PR"
