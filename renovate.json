@@ -6,7 +6,7 @@
     "group:all",
     "schedule:weekly"
   ],
-  "ignorePaths": ["**/.terraform-version"]
+  "ignorePaths": ["**/.terraform-version"],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
