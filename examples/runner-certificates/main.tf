@@ -54,7 +54,7 @@ module "runner" {
   # Certificates
   ###############################################
 
-  # Public cert of my companys gitlab instance
+  # Public cert of my company's gitlab instance
   # Other public certs relating to my company.
   runner_gitlab = {
     url            = var.gitlab_url
