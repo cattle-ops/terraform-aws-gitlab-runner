@@ -29,6 +29,7 @@
     "noexec",
     "nolint",
     "npalm",
+    "platformAutomerge",
     "pylint",
     "pylintrc",
     "pyright",
@@ -58,6 +59,7 @@
   ],
   "words": [
     "aquasecurity",
+    "automerge",
     "backports",
     "blockquotes",
     "codeowners",
