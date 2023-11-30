@@ -345,12 +345,6 @@ variable "runner_gitlab_registration_token_secure_parameter_store_name" {
   default     = "gitlab-runner-registration-token"
 }
 
-variable "runner_gitlab_token_secure_parameter_store" {
-  description = "Name of the Secure Parameter Store entry to hold the GitLab Runner token."
-  type        = string
-  default     = "runner-token"
-}
-
 variable "runner_sentry_secure_parameter_store_name" {
   description = "The Sentry DSN name used to store the Sentry DSN in Secure Parameter Store"
   type        = string
