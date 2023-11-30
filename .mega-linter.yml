@@ -1,0 +1,29 @@
+---
+DISABLE_LINTERS:
+  # Has some problems reading referenced policy files. I created a separate workflow for TfLint as it creates valuable output.
+  - TERRAFORM_TFLINT
+  # Super slow linter, but useful. We disable it here and run it in parallel to Megalinter saves some minutes.
+  - REPOSITORY_KICS
+  # has issues with the Terraform code `optional` variable definitions: https://github.com/tenable/terrascan/issues/1532
+  - TERRAFORM_TERRASCAN
+  # Nice linter to report CVEs and other cool stuff. But it reports problems with the Terraform code which can't be disabled by
+  # configuration.
+  - REPOSITORY_TRIVY
+  # The tables created by TfDoc are not formatted according to the standard. And there is no option to deactivate the check for a
+  # section of the file.
+  - MARKDOWN_MARKDOWN_TABLE_FORMATTER
+  # CSpell does a great job. No need for another spell checker
+  - SPELL_MISSPELL
+  - SPELL_LYCHEE
+  # DevSkim as it has issues ignoring files/directories, e.g. .mypy_cache
+  - REPOSITORY_DEVSKIM
+
+PYTHON_PYLINT_PRE_COMMANDS:
+  # find all Python requirements and install them
+  - command: find . -name requirements.txt -exec pip install -r {} \;
+    cwd: root
+
+PYTHON_PYRIGHT_PRE_COMMANDS:
+  # find all Python requirements and install them
+  - command: find . -name requirements.txt -exec pip install -r {} \;
+    cwd: root

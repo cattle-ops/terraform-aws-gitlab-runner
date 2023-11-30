@@ -1,22 +1,25 @@
+---
 name: Update docs
 
-on:
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - release-please--branches--main
+
+permissions: read-all
 
 jobs:
   docs:
     # update docs after merge back to develop
     name: Auto update terraform docs
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4 # ratchet:actions/checkout@v3
       - name: Generate TF docs
-        uses: terraform-docs/gh-actions@v1.0.0
+        uses: terraform-docs/gh-actions@d1c99433f7a1e5003ef213d70f89aaa47cb0b675 # ratchet:terraform-docs/gh-actions@v1.0.0
         with:
           find-dir: .
           git-commit-message: "docs: auto update terraform docs"

@@ -7,15 +7,21 @@ This module is used __internally__ by the parent [_terraform\-aws\-gitlab\-runne
 ## Overview
 
 The Lambda functions evaluates an EC2 instance tag called `gitlab-runner-parent-id`, set in the
-[runner config](../../template/runner-config.tpl) by the parent module's
-[user data](../../template/gitlab-runner.tpl). Runner instances created by the runner
+[runner config](../../template/runner-config.tftpl) by the parent module's
+[user data](../../template/gitlab-runner.tftpl). Runner instances created by the runner
 will have this tag applied with the parent runner's instance ID. When the runner
 in the ASG is terminated, the lifecycle hook triggers the Lambda to
 terminate spawned runner instances with the matching parent tag and/or any "orphaned"
 instances with no running parent runner.
 
-See [issue #214](https://github.com/npalm/terraform-aws-gitlab-runner/issues/214) for
+See [issue #214](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/214) for
 discussion on the scenario this module addresses.
+
+Furthermore, all spot requests which are still open are cancelled. Otherwise they might be fulfilled later but
+without the creating instance running, these spot request are never terminated and costs incur. The problem here
+is, that no tags are added to the spot request by the docker+machine driver and we can only guess which ones belong
+to our module. The rule is, that parts of the Executor's name become part of the related SSH key which is in turn part
+of the spot request.
 
 ## Usage
 
@@ -32,7 +38,7 @@ input variables:
 
 ```terraform
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   asg_terminate_lifecycle_hook_create         = true
 
@@ -47,11 +53,11 @@ Note the `asg_terminate_lifecycle_hook_*` variables:
 
 ```terraform
 module "runner" {
-  source  = "npalm/gitlab-runner/aws"
+  source  = "cattle-ops/gitlab-runner/aws"
 
   aws_region                    = "eu-west-1"
-  environment                   = "glrunners-dev"
-  runners_name                  = "glrunners-foo"
+  environment                   = "runners-test"
+  runners_name                  = "runners-test"
   runners_gitlab_url            = "https://code.foo.org/"
   docker_machine_instance_type	= "t3.large"
   runners_request_spot_instance = false
@@ -85,13 +91,17 @@ module "runner" {
   # for 'docker_machine_options' settings with the AWS driver
   docker_machine_options = var.docker_machine_options
 
-  # See https://github.com/npalm/terraform-aws-gitlab-runner/issues/160
-  runners_additional_volumes = ["/certs/client"]
+  # See https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/160
+  executor_docker_additional_volumes = ["/certs/client"]
 
   tags = local.common_tags
 
 }
 ```
+
+<!-- markdownlint-disable -->
+<!-- cSpell:disable -->
+<!-- markdown-link-check-disable -->
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -121,8 +131,10 @@ No modules.
 | [aws_cloudwatch_event_target.terminate_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_log_group.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_iam_policy.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.spot_request_housekeeping](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.spot_request_housekeeping](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_lambda_function.terminate_runner_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
 | [aws_lambda_permission.current_version_triggers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
 | [aws_lambda_permission.unqualified_alias_triggers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
@@ -130,6 +142,7 @@ No modules.
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.spot_request_housekeeping](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
@@ -137,14 +150,14 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_arn_format"></a> [arn\_format](#input\_arn\_format) | ARN format to be used. May be changed to support deployment in GovCloud/China regions. | `string` | `"arn:aws"` | no |
 | <a name="input_asg_arn"></a> [asg\_arn](#input\_asg\_arn) | The ARN of the Auto Scaling Group to attach to. | `string` | n/a | yes |
 | <a name="input_asg_name"></a> [asg\_name](#input\_asg\_name) | The name of the Auto Scaling Group to attach to. The 'environment' will be prefixed to this. | `string` | n/a | yes |
 | <a name="input_cloudwatch_logging_retention_in_days"></a> [cloudwatch\_logging\_retention\_in\_days](#input\_cloudwatch\_logging\_retention\_in\_days) | The number of days to retain logs in CloudWatch. | `number` | `30` | no |
 | <a name="input_enable_xray_tracing"></a> [enable\_xray\_tracing](#input\_enable\_xray\_tracing) | Enables X-Ray for debugging and analysis | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as a name prefix and for tagging. | `string` | n/a | yes |
-| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the CloudWatch logs. Ensure CloudWatch has access to the provided KMS key. | `string` | n/a | yes |
+| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypt the resources, e.g. logs, lambda environment variables, ... | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Lambda function to create. The 'environment' will be prefixed to this. | `string` | n/a | yes |
+| <a name="input_name_docker_machine_runners"></a> [name\_docker\_machine\_runners](#input\_name\_docker\_machine\_runners) | The `Name` tag of EC2 instances created by the runner agent. | `string` | n/a | yes |
 | <a name="input_name_iam_objects"></a> [name\_iam\_objects](#input\_name\_iam\_objects) | The name to use for IAM resources - roles and policies. | `string` | `""` | no |
 | <a name="input_role_permissions_boundary"></a> [role\_permissions\_boundary](#input\_role\_permissions\_boundary) | An optional IAM permissions boundary to use when creating IAM roles. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to apply to resources. | `map(any)` | `{}` | no |

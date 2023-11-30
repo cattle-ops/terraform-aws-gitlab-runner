@@ -1,5 +1,167 @@
 # Changelog
 
+## [7.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.0.0...7.1.0) (2023-09-28)
+
+
+### Features
+
+* add `MaxGrowthRate` to limit the number of instances added in parallel ([#962](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/962)) ([ae6d38a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/ae6d38a93b07ccddfa19e15340a7a202e40e5961))
+
+
+### Bug Fixes
+
+* convert the fleet instance type in migration script ([#975](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/975)) ([51b2842](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/51b2842423488a8a17f903de6691dd932a5771f2))
+
+## [7.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.2...7.0.0) (2023-09-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* group variables for better overview ([#810](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/810))
+* allow to set all docker options for the Executor ([#511](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/511))
+* add idle_count_min` and `idle_scale_factor` to Docker Machine autoscaling options ([#711](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/711))
+* remove deprecated variables ([#738](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/738))
+* remove deprecated pull policy variable ([#710](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/710))
+
+### Features
+
+* add idle_count_min` and `idle_scale_factor` to Docker Machine autoscaling options ([#711](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/711)) ([1538d48](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/1538d48ed5e3bfe37b9e2edfd40e35995bd1305b))
+* allow to set all docker options for the Executor ([#511](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/511)) ([461561e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/461561e3f33bfb4b289f81d54671f0f6ac383925))
+
+
+### Bug Fixes
+
+* add missing defaults ([#905](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/905)) ([eb44182](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/eb44182b01ec0013c01224773e54dc9d9590e966))
+* correct the bugs of major version 7 (pre-release) ([#860](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/860)) ([f236b58](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/f236b58571458fbbdcc82c25930adf255316d1e4))
+* remove deprecated pull policy variable ([#710](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/710)) ([8736ec7](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8736ec766673a95d1289a12a534de1f04faba2fc))
+
+
+### Miscellaneous Chores
+
+* remove deprecated variables ([#738](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/738)) ([676ed6a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/676ed6aa0b02f20dd071916cc91466a59541f0f6))
+
+
+### Code Refactoring
+
+* group variables for better overview ([#810](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/810)) ([c8a3b89](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/c8a3b89c46f749214461bade8e1e6d161d0ef860))
+
+## [6.5.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.1...6.5.2) (2023-08-31)
+
+
+### Bug Fixes
+
+* remove empty elements from tag list ([#936](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/936)) ([3b4a95e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/3b4a95ed75648d216f5d234b8e651f8bf2335f93))
+
+## [6.5.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.5.0...6.5.1) (2023-06-06)
+
+
+### Bug Fixes
+
+* wait_for_services_timeout needs to be an integer in config file ([#874](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/874)) ([8d89d91](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8d89d91d9dfb50887a77342a9c70cac31bb1cd8d))
+
+## [6.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.1...6.5.0) (2023-06-05)
+
+
+### Features
+
+* add support for `wait_for_services_timeout` option ([#861](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/861)) ([28c02ce](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/28c02ce66b5af3ccf4b27e02233693383e81275a))
+
+## [6.4.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.4.0...6.4.1) (2023-05-11)
+
+
+### Reverts
+
+* removes the `nonsensitive` from `runner_user_data` output ([#832](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/832)) ([3481b0d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/3481b0d5ac0ba35902de4379975bb82fd6e41d5c))
+
+## [6.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.1...6.4.0) (2023-05-03)
+
+
+### Features
+
+* add option to read Gitlab Runner Registration token from SSM ([#822](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/822)) ([51d63e6](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/51d63e61f8fe30abe050e14e608f01063a4f5142))
+
+
+### Bug Fixes
+
+* disable outputting config.toml by default ([#768](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/768)) ([2cd1e44](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2cd1e447e1aa87e60afdbfd3162e1792949a1b3c))
+
+## [6.3.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.3.0...6.3.1) (2023-04-27)
+
+
+### Bug Fixes
+
+* allow s3 cache access for the "docker" runner executor ([#817](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/817)) ([a17015f](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/a17015f0fb0cbf2159b938a0b60eac31530a9eb7))
+* remove explicit aws_s3_bucket_acl ([#815](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/815)) ([5d88370](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/5d883706afb0313a098027d8320f275171ec74a7))
+
+## [6.3.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.2.0...6.3.0) (2023-04-21)
+
+
+### Features
+
+* add an IAM policy to grant the runner access to the KMS key ([#778](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/778)) ([df25b6a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/df25b6ae06b7cbbb85c089fc45a181dce0aa1e00))
+* **spotfleet:** add supports spot fleets for spot instances allowing us to use multiple instance types and AZs ([#777](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/777)) ([1bb7e11](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/1bb7e1126e5d9f2950e5931cb19d691dcf579eb7))
+
+## [6.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.2...6.2.0) (2023-03-22)
+
+
+### Features
+
+* show `config.toml` and user data in Terraform plan ([#754](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/754)) ([5b5c335](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/5b5c3354d56971786e9afe50e493fa2bde1bdbb4))
+
+## [6.1.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.1...6.1.2) (2023-03-09)
+
+
+### Bug Fixes
+
+* correctly format prefix ([#735](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/735)) ([76f2770](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/76f2770267f90fb91682d6f25b3801601ef8ff42))
+
+## [6.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.1.0...6.1.1) (2023-03-02)
+
+
+### Bug Fixes
+
+* null condition for enable_manage_gitlab_token in release v6.1.0 ([#729](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/729)) ([90a05cc](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/90a05cce95716dae73e3100b01de8cf55ce4885c))
+
+## [6.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/6.0.0...6.1.0) (2023-03-02)
+
+
+### Features
+
+* cancel spot requests ([#653](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/653)) ([f1b4f4a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/f1b4f4a227e9a02103225433aeb4a7b5ac261e4d)), closes [#493](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/493)
+* remove unused SSH keys ([#652](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/652)) ([3151807](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/31518079674cc6195e18a5bfe7641a1e50087a30)), closes [#592](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/592)
+* support self-signed certificates ([#584](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/584)) ([6c1180e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/6c1180e8645bc3685727e25f2a2e64ab8f65c2df))
+
+
+### Bug Fixes
+
+* always add policy to maintain SSM parameters ([#510](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/510)) ([59e2d6e](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/59e2d6e1a168bd5077978de7afaca50b1c49b9bf))
+
+## [6.0.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.1...6.0.0) (2023-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* switch to docker+machine from CKI project ([#697](https://github.com/npalm/terraform-aws-gitlab-runner/issues/697))
+
+### Features
+
+* add support for timezone in AWS autoscaling config ([#706](https://github.com/npalm/terraform-aws-gitlab-runner/issues/706)) ([cf91ffb](https://github.com/npalm/terraform-aws-gitlab-runner/commit/cf91ffbf6c2c1d6af5d43912663e6845e49d8112))
+
+
+### Bug Fixes
+
+* error IAM role attachement when applying the module the first ti… ([#659](https://github.com/npalm/terraform-aws-gitlab-runner/issues/659)) ([e5eeb10](https://github.com/npalm/terraform-aws-gitlab-runner/commit/e5eeb1016e0bab2d38329f5bd7c285187b5d67ea))
+* install gitlab-runner after docker+machine driver ([#704](https://github.com/npalm/terraform-aws-gitlab-runner/issues/704)) ([d5b17d0](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d5b17d060d2bc5c3187063813f081a75d6fa4e32)), closes [#703](https://github.com/npalm/terraform-aws-gitlab-runner/issues/703)
+* set correct lifecycle prefix for shared cache ([#707](https://github.com/npalm/terraform-aws-gitlab-runner/issues/707)) ([d966c72](https://github.com/npalm/terraform-aws-gitlab-runner/commit/d966c72d7bdf5907baeea49f1912d1e236ab3366))
+* switch to docker+machine from CKI project ([#697](https://github.com/npalm/terraform-aws-gitlab-runner/issues/697)) ([8c0e6b3](https://github.com/npalm/terraform-aws-gitlab-runner/commit/8c0e6b3b62fa72abe0f48862c055b448213bcab5))
+
+## [5.9.1](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.9.0...5.9.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* bump docker machine version due to bug ([#681](https://github.com/npalm/terraform-aws-gitlab-runner/issues/681)) ([08baab5](https://github.com/npalm/terraform-aws-gitlab-runner/commit/08baab5a8774ec85887995b49f73583e234ebb50))
+
 ## [5.9.0](https://github.com/npalm/terraform-aws-gitlab-runner/compare/5.8.1...5.9.0) (2023-01-12)
 
 
@@ -155,7 +317,7 @@
 
 ### ⚠ BREAKING CHANGES
 
-* The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
+* The module is upgraded to Terraform AWS provider 4.x. All new development will only support the new AWS Terraform provider. We keep a branch `terraform-aws-provider-3` to witch we welcome backports to AWS Terraform 3.x provider. Besides reviewing PR's we will do not any active checking on maintenance on this branch. We strongly advise to update your deployment to the new provider version. For more details about upgrading see the [upgrade guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/version-4-upgrade).
 * By default, AWS metadata service ((IMDSv2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html]) is enabled and required for both the agent instance and the docker machine instance. For docker machine this require the GitLab managed docker machines distribution is used. Which the module usages by default.
 
 
@@ -578,7 +740,7 @@ Migration from 0.11 to 0.12 is tested for the `runner-default` example. To migra
 - Update to Terraform 0.12
 - Migrate your Terraform code via Terraform `terraform 0.12upgrade`.
 - Update the module from 3.10.0 to 4.0.0, next run `terraform init`
-- Run `terraform apply`. This should trigger only a re-creation of the the auto launch configuration and a minor change in the auto-scaling group.
+- Run `terraform apply`. This should trigger only a re-creation of the auto launch configuration and a minor change in the auto-scaling group.
 
 ### Terraform 0.11
 

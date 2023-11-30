@@ -1,3 +1,4 @@
+---
 name: "Lint PR title"
 
 on:
@@ -9,12 +10,18 @@ on:
     branches-ignore:
       - 'release-please--branches--*'
 
+permissions: read-all
+
 jobs:
   main:
     name: Validate PR title
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      contents: read
+      statuses: write
     steps:
-      - uses: amannn/action-semantic-pull-request@v5
+      - uses: amannn/action-semantic-pull-request@47b15d52c5c30e94a17ec87eb8dd51ff5221fed9 # ratchet:amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -60,7 +67,7 @@ jobs:
           # will suggest using that commit message instead of the PR title for the
           # merge commit, and it's easy to commit this by mistake. Enable this option
           # to also validate the commit message for one commit PRs.
-          validateSingleCommit: true
+          validateSingleCommit: false
           # Related to `validateSingleCommit` you can opt-in to validate that the PR
           # title matches a single commit to avoid confusion.
           validateSingleCommitMatchesPrTitle: false

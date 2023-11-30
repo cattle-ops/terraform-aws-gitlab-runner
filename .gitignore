@@ -28,7 +28,15 @@ package*.json
 yarn.lock
 
 builds/
+debug/
 
 # exceptions for semantic release
 !.release/package*
 !.release/*.lock
+
+# VS Code
+.vscode/
+
+# Python
+.mypy_cache/
+venv/
