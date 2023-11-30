@@ -39,7 +39,6 @@ jobs:
           [
             "runner-default",
             "runner-docker",
-            "runner-multi-region",
             "runner-public",
             "runner-certificates",
           ]
