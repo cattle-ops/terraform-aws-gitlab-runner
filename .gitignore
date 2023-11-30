@@ -34,6 +34,9 @@ debug/
 !.release/package*
 !.release/*.lock
 
+# tests
+*.tfplan.json
+
 # VS Code
 .vscode/
 

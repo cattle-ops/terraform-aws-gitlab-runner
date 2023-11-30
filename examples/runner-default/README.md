@@ -13,6 +13,9 @@ This examples shows:
   - Additional security groups that are allowed access to the runner agent
   - Use of `runners.docker.services` to configure docker registry mirror (commented out - uncomment to apply)
 
+Multi region deployment is, of course, possible. Just instantiate the module multiple times with different AWS providers. In case
+you use the cache, make sure to have one cache per region.
+
 ![runners-default](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-default.png)
 
 ## Prerequisite
@@ -29,8 +32,8 @@ check `.terraform-version` for the tested version.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.15.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.25.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | 2.4.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.1 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.5.1 |
@@ -40,22 +43,22 @@ check `.terraform-version` for the tested version.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.15.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.25.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_runner"></a> [runner](#module\_runner) | ../../ | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.1.1 |
-| <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.1.1 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.1.2 |
+| <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.1.2 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.15.0/docs/data-sources/availability_zones) | data source |
-| [aws_security_group.default](https://registry.terraform.io/providers/hashicorp/aws/5.15.0/docs/data-sources/security_group) | data source |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.25.0/docs/data-sources/availability_zones) | data source |
+| [aws_security_group.default](https://registry.terraform.io/providers/hashicorp/aws/5.25.0/docs/data-sources/security_group) | data source |
 
 ## Inputs
 
