@@ -11,6 +11,7 @@
         {
             "Effect": "Allow",
             "Action": [
+                "ssm:GetParameter",
                 "ssm:GetParameters"
             ],
             "Resource": "arn:${partition}:ssm:*"
