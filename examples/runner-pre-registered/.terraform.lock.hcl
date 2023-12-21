@@ -58,7 +58,7 @@ provider "registry.terraform.io/hashicorp/aws" {
 
 provider "registry.terraform.io/hashicorp/local" {
   version     = "2.4.1"
-  constraints = ">= 2.4.1, 2.4.0"
+  constraints = "2.4.1"
   hashes = [
     "h1:63QuZh4ooIKCRgUeMW7XFvluzGm29NyNiDzmU7TmkIk=",
     "h1:7lfUMKAsu/HRUUs02tJxBle9XvSuNKkpTOqcFqMe5JI=",
