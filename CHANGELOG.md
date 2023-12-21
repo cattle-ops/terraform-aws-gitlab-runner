@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.2.3](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.2.2...v7.2.3) (2023-12-21)
+
+
+### Bug Fixes
+
+* add missing GetParameter policy ([#1058](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1058)) ([e1071fa](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/e1071fa81a52d151bb39c60c92b194526417c576))
+
 ## [7.2.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.2.1...7.2.2) (2023-11-14)
 
 
