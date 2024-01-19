@@ -54,48 +54,59 @@ Note the `asg_terminate_lifecycle_hook_*` variables:
 ```terraform
 module "runner" {
   source  = "cattle-ops/gitlab-runner/aws"
-
-  aws_region                    = "eu-west-1"
+  
   environment                   = "runners-test"
-  runners_name                  = "runners-test"
-  runners_gitlab_url            = "https://code.foo.org/"
-  docker_machine_instance_type	= "t3.large"
-  runners_request_spot_instance = false
-  runners_machine_autoscaling   = var.runners_machine_autoscaling
 
-  vpc_id                   = data.aws_vpc.current.id
-  subnet_ids_gitlab_runner = [data.aws_subnet.runner_a.id, data.aws_subnet.runner_b.id]
-  subnet_id_runners        = data.aws_subnet.runner.id
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = data.aws_subnet.runner.id
 
-  asg_max_instance_lifetime                   = 604800
-  asg_terminate_lifecycle_hook_create         = true
+  runner_gitlab = {
+    url = "https://gitlab.com"
+    access_token_secure_parameter_store_name = aws_ssm_parameter.gitlab_registration_token.value
+  }
 
-  permissions_boundary              = "FooOrg-Permissions-Boundary"
-  runners_iam_instance_profile_name = "foo-gitlab-runner-profile"
-  runner_iam_policy_arns            = [data.aws_iam_policy.sas_full_rights.arn]
+  runner_instance = {
+    name       = "runners-test"
+    max_lifetime_seconds = 604800
+  }
 
-  cache_bucket_prefix   = var.environment
-  cache_shared          = true
-  cache_expiration_days = 90
+  runner_worker_docker_machine_instance = {
+    types = ["t3.large"]
+  }
 
-  gitlab_runner_registration_config = {
-    registration_token = aws_ssm_parameter.gitlab_runner_registration_token.value
-    tag_list           = var.runners_tag_list
-    description        = var.runners_description
+  runner_worker_docker_machine_instance_spot = {
+    enable = false
+  }
+
+  runner_worker_docker_machine_role = {
+    profile_name = foo-gitlab-runner-profile
+    policy_arns  = [data.aws_iam_policy.sas_full_rights.arn]
+  }
+  
+  runner_worker_docker_machine_autoscaling_options = var.runners_machine_autoscaling
+
+  runner_worker_cache = {
+    shared = true
+    bucket_prefix = var.environment
+    expiration_days = 90
+  }
+
+  runner_gitlab_registration_config = {
+    type               = "instance" # or "group" or "project"
+    # group_id           = 1234 # for "group"
+    # project_id         = 5678 # for "project"
+    tag_list           = "docker"
+    description        = "runner default"
     locked_to_project  = "true"
     run_untagged       = "false"
-    maximum_timeout    = "7200"
+    maximum_timeout    = "3600"
   }
 
   # Refer to https://docs.docker.com/machine/drivers/aws/#options
   # for 'docker_machine_options' settings with the AWS driver
-  docker_machine_options = var.docker_machine_options
-
-  # See https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/160
-  executor_docker_additional_volumes = ["/certs/client"]
-
+  runner_worker_docker_options = var.docker_machine_options
+  
   tags = local.common_tags
-
 }
 ```
 

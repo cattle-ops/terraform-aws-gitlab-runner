@@ -51,30 +51,30 @@ Below is a basic examples of usages of the module. Regarding the dependencies su
 
 ```hcl
 module "runner" {
-# https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
-source  = "cattle-ops/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
-environment = "basic"
+  environment = "basic"
 
-vpc_id    = module.vpc.vpc_id
-subnet_id = element(module.vpc.private_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
 
-runner_gitlab = {
-url = "https://gitlab.com"
-}
+  runner_gitlab = {
+    url = "https://gitlab.com"
+  }
 
-runner_gitlab_registration_config = {
-registration_token = "my-token"
-tag_list           = "docker"
-description        = "runner default"
-locked_to_project  = "true"
-run_untagged       = "false"
-maximum_timeout    = "3600"
-}
+  runner_gitlab_registration_config = {
+    registration_token = "my-token"
+    tag_list           = "docker"
+    description        = "runner default"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
 
-runner_worker_docker_machine_instance = {
-subnet_ids = module.vpc.private_subnets
-}
+  runner_worker_docker_machine_instance = {
+    subnet_ids = module.vpc.private_subnets
+  }
 }
 ```
 
@@ -90,16 +90,18 @@ module "runner" {
   aws_region  = "eu-west-1"
   environment = "spot-runners"
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids_gitlab_runner = module.vpc.private_subnets
-  subnet_id_runners        = element(module.vpc.private_subnets, 0)
-
-  runners_name       = "docker-default"
-  runners_gitlab_url = "https://gitlab.com"
-
-  runner_gitlab_access_token_secure_parameter_store_name = "gitlab_access_token_ssm__name"
-
-
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
+   
+  runner_instance = {
+    name       = "docker-default"      
+  }
+   
+  runner_gitlab = {
+    url = "https://gitlab.com"
+    access_token_secure_parameter_store_name = "gitlab_access_token_ssm_name"
+  }
+   
   runner_gitlab_registration_config = {
     type               = "instance" # or "group" or "project"
     # group_id           = 1234 # for "group"
@@ -122,35 +124,35 @@ map. A simple example for this would be to set _region-specific-prefix_ to the A
 
 ```hcl
 module "runner" {
-# https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
-source  = "cattle-ops/gitlab-runner/aws"
-
-environment = "multi-region-1"
-iam_object_prefix = "<region-specific-prefix>-gitlab-runner-iam"
-
-vpc_id    = module.vpc.vpc_id
-subnet_id = element(module.vpc.private_subnets, 0)
-
-runner_gitlab = {
-url = "https://gitlab.com"
-}
-
-runner_gitlab_registration_config = {
-registration_token = "my-token"
-tag_list           = "docker"
-description        = "runner default"
-locked_to_project  = "true"
-run_untagged       = "false"
-maximum_timeout    = "3600"
-}
-
-runner_worker_cache = {
-bucket_prefix = "<region-specific-prefix>"
-}
-
-runner_worker_docker_machine_instance = {
-subnet_ids = module.vpc.private_subnets
-}
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
+   
+  environment = "multi-region-1"
+  iam_object_prefix = "<region-specific-prefix>-gitlab-runner-iam"
+   
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
+   
+  runner_gitlab = {
+    url = "https://gitlab.com"
+  }
+   
+  runner_gitlab_registration_config = {
+    registration_token = "my-token"
+    tag_list           = "docker"
+    description        = "runner default"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
+   
+   runner_worker_cache = {
+     bucket_prefix = "<region-specific-prefix>"
+   }
+   
+   runner_worker_docker_machine_instance = {
+     subnet_ids = module.vpc.private_subnets
+   }
 }
 ```
 
@@ -169,39 +171,39 @@ module is using consume more RAM using spot fleets. For comparison, if you launc
 
 ```hcl
 module "runner" {
-# https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
-source  = "cattle-ops/gitlab-runner/aws"
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
 
-environment = "spot-fleet"
+  environment = "spot-fleet"
 
-vpc_id    = module.vpc.vpc_id
-subnet_id = element(module.vpc.private_subnets, 0)
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
 
-runner_gitlab = {
-url = "https://gitlab.com"
-}
+  runner_gitlab = {
+    url = "https://gitlab.com"
+ }
 
-runner_gitlab_registration_config = {
-registration_token = "my-token"
-tag_list           = "docker"
-description        = "runner default"
-locked_to_project  = "true"
-run_untagged       = "false"
-maximum_timeout    = "3600"
-}
+  runner_gitlab_registration_config = {
+    registration_token = "my-token"
+    tag_list           = "docker"
+    description        = "runner default"
+    locked_to_project  = "true"
+    run_untagged       = "false"
+    maximum_timeout    = "3600"
+  }
 
-runner_worker = {
-type = "docker+machine"
-}
+  runner_worker = {
+    type = "docker+machine"
+  }
 
-runner_worker_docker_machine_fleet = {
-enable = true
-}
+  runner_worker_docker_machine_fleet = {
+    enable = true
+  }
 
-runner_worker_docker_machine_instance = {
-types = ["t3a.medium", "t3.medium", "t2.medium"]
-subnet_ids = module.vpc.private_subnets
-}
+  runner_worker_docker_machine_instance = {
+    types = ["t3a.medium", "t3.medium", "t2.medium"]
+    subnet_ids = module.vpc.private_subnets
+  }
 }
 ```
 
@@ -298,21 +300,21 @@ Scaling may be defined with one `scale_out_*` scheduled action and/or one `scale
 For example:
 
 ```hcl
-  module "runner" {
-    # ...
-    runner_schedule_enable = true
-    runner_schedule_config = {
-      # Configure optional scale_out scheduled action
-      scale_out_recurrence = "0 8 * * 1-5"
-      scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
-      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
+module "runner" {
+  # ...
+  runner_schedule_enable = true
+  runner_schedule_config = {
+    # Configure optional scale_out scheduled action
+    scale_out_recurrence = "0 8 * * 1-5"
+    scale_out_count      = 1 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
 
-      # Configure optional scale_in scheduled action
-      scale_in_recurrence  = "0 18 * * 1-5"
-      scale_in_count       = 0 # Default for min_size, desired_capacity and max_size
-      # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
-    }
+    # Configure optional scale_in scheduled action
+    scale_in_recurrence  = "0 18 * * 1-5"
+    scale_in_count       = 0 # Default for min_size, desired_capacity and max_size
+    # Override using: scale_out_min_size, scale_out_desired_capacity, scale_out_max_size
   }
+}
 ```
 
 #### Instance Termination
