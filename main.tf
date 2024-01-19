@@ -330,6 +330,8 @@ resource "aws_launch_template" "fleet_gitlab_runner" {
     ebs {
       volume_size = var.runner_worker_docker_machine_instance.root_size
       volume_type = var.runner_worker_docker_machine_instance.volume_type
+      iops        = contains(["gp3", "io1", "io2"], var.runner_worker_docker_machine_instance.volume_type) ? var.runner_worker_docker_machine_instance.volume_iops : null
+      throughput  = var.runner_worker_docker_machine_instance.volume_type == "gp3" ? var.runner_worker_docker_machine_instance.volume_throughput : null
     }
   }
 

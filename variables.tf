@@ -666,7 +666,9 @@ variable "runner_worker_docker_machine_instance" {
     start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
-    volume_type = The type of volume to use for the Runner Worker.
+    volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported.
+    volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
+    volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
   EOT
   type = object({
     destroy_after_max_builds   = optional(number, 0)
@@ -683,6 +685,8 @@ variable "runner_worker_docker_machine_instance" {
     subnet_ids                 = optional(list(string), [])
     types                      = optional(list(string), ["m5.large"])
     volume_type                = optional(string, "gp2")
+    volume_throughput          = optional(number, 125)
+    volume_iops                = optional(number, 3000)
   })
   default = {
   }
@@ -695,6 +699,11 @@ variable "runner_worker_docker_machine_instance" {
   validation {
     condition     = var.runner_worker_docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance.name_prefix))
     error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
+  }
+
+  validation {
+    condition     = contains(["gp2", "gp3", "io1", "io2"], var.runner_worker_docker_machine_instance.volume_type)
+    error_message = "Supported volume types: gp2, gp3, io1 and io2"
   }
 }
 
