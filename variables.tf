@@ -243,7 +243,7 @@ variable "runner_enable_asg_recreation" {
 }
 
 variable "runner_schedule_config" {
-  description = "Map containing the configuration of the ASG scale-out and scale-in for the Runner. Will only be used if `agent_schedule_enable` is set to `true`. "
+  description = "Map containing the configuration of the ASG scale-out and scale-in for the Runner. Will only be used if `runner_schedule_enable` is set to `true`. "
   type        = map(any)
   default = {
     # Configure optional scale_out scheduled action
