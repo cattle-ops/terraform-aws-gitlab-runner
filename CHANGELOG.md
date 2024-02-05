@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/v7.2.3...v7.3.0) (2024-01-29)
+
+
+### Features
+
+* support setting throughput and iops for ebs volumes ([#1063](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1063)) ([796856a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/796856ade61947751b4efcd1123761250e17111a))
+
 ## [7.2.3](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.2.2...v7.2.3) (2023-12-21)
 
 
