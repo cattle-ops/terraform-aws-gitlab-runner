@@ -113,7 +113,6 @@ locals {
       runners_executor                  = var.runner_worker.type
       runners_limit                     = var.runner_worker.max_jobs
       runners_concurrent                = var.runner_manager.maximum_concurrent_jobs
-      runners_pull_policies             = local.runners_pull_policies
       runners_idle_count                = var.runner_worker_docker_machine_instance.idle_count
       runners_idle_time                 = var.runner_worker_docker_machine_instance.idle_time
       runners_max_builds                = local.runners_max_builds_string
