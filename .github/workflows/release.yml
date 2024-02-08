@@ -27,7 +27,6 @@ jobs:
       - name: Release
         uses: google-github-actions/release-please-action@cc61a07e2da466bebbc19b3a7dd01d6aecb20d1e # ratchet:google-github-actions/release-please-action@v3
         with:
-          release-type: terraform-module
           token: ${{ steps.token.outputs.token }}
-          include-v-in-tag: false
-          signoff: "Niek Palm <dev.npalm@gmail.com>"
+          config-file: ".github/.release-please-config.json"
+          manifest-file: ".github/.release-please-manifest.json"
