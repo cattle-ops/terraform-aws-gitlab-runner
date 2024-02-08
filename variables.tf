@@ -557,15 +557,15 @@ variable "runner_worker_docker_options" {
     disable_cache = "false"
     image         = "docker:18.03.1-ce"
     privileged    = "true"
-    pull_policy   = "always"
+    pull_policy   = ["always"]
     shm_size      = 0
     tls_verify    = "false"
     volumes       = ["/cache"]
   }
-  
+
   validation {
     condition     = length(var.runner_worker_docker_options.pull_policies) == 0
-    error_message = "pull_policies is not supported. Use pull_policy instead."
+    error_message = "pull_policies is not supported. Use pull_policy instead. It's a list of strings. Default value is [\"always\"]"
   }
 }
 
