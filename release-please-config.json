@@ -1,4 +1,5 @@
 {
+  "release-type": "terraform-module,
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
