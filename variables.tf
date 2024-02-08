@@ -563,6 +563,7 @@ variable "runner_worker_docker_options" {
     volumes       = ["/cache"]
   }
 
+  # to be removed after 2024-12-31. Just to make the migration to the correct variable name easier
   validation {
     condition     = length(var.runner_worker_docker_options.pull_policies) == 0
     error_message = "pull_policies is not supported. Use pull_policy instead. It's a list of strings. Default value is [\"always\"]"
