@@ -64,7 +64,7 @@ then
     if [[ "$token" == null ]]
         message = $(echo response | jq -r '.message // .error_description')
         if [[ "$message" != null ]]
-            echo "ERROR: API call returned $message".
+            echo "ERROR: Couldn't register the Runner. GitLab API call returned $message".
             exit 1
         fi
     fi
