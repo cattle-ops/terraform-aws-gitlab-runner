@@ -54,7 +54,7 @@ locals {
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = merge({
-      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes"
+      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes" && key != "pull_policies"
       }, {
       volumes = local.runners_volumes
     })
