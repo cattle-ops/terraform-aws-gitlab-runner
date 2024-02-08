@@ -29,5 +29,4 @@ jobs:
         with:
           release-type: terraform-module
           token: ${{ steps.token.outputs.token }}
-          include-v-in-tag: false
-          signoff: "Niek Palm <dev.npalm@gmail.com>"
+          manifest-file: ".github/.release-please-manifest.json"
