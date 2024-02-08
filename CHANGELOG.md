@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/v7.3.0...7.3.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* remove `v` in tags to enable automatic push to Terraform registry ([#1081](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1081)) ([29da6ed](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/29da6ed50af18e5a99289aea708ed56619788a69)), closes [#1048](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1048)
+
 ## [7.3.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/v7.2.3...v7.3.0) (2024-01-29)
 
 
