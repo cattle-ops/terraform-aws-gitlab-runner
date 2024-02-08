@@ -562,6 +562,11 @@ variable "runner_worker_docker_options" {
     tls_verify    = "false"
     volumes       = ["/cache"]
   }
+  
+  validation {
+    condition     = length(var.runner_worker_docker_options.pull_policies) == 0
+    error_message = "pull_policies is not supported. Use pull_policy instead."
+  }
 }
 
 /*
