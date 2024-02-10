@@ -538,8 +538,7 @@ variable "runner_worker_docker_options" {
     oom_kill_disable             = optional(bool)
     oom_score_adjust             = optional(number)
     privileged                   = optional(bool, true)
-    pull_policies                = optional(list(string), [])
-    pull_policy                  = optional(list(string), ["always"])
+    pull_policies                = optional(list(string), ["always"])
     runtime                      = optional(string)
     security_opt                 = optional(list(string))
     shm_size                     = optional(number, 0)
@@ -558,16 +557,10 @@ variable "runner_worker_docker_options" {
     disable_cache = "false"
     image         = "docker:18.03.1-ce"
     privileged    = "true"
-    pull_policy   = ["always"]
+    pull_policies = ["always"]
     shm_size      = 0
     tls_verify    = "false"
     volumes       = ["/cache"]
-  }
-
-  # to be removed after 2024-12-31. Just to make the migration to the correct variable name easier
-  validation {
-    condition     = length(var.runner_worker_docker_options.pull_policies) == 0
-    error_message = "pull_policies is not supported. Use pull_policy instead. It's a list of strings. Default value is [\"always\"]"
   }
 }
 

@@ -56,8 +56,9 @@ locals {
     options = merge({
       for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes" && key != "pull_policies"
       }, {
-      volumes = local.runners_volumes
-    })
+        pull_policy = var.runner_worker_docker_options.pull_policies
+        volumes = local.runners_volumes
+      })
     }
   )
 
