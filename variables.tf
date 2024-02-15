@@ -557,7 +557,7 @@ variable "runner_worker_docker_options" {
     disable_cache = "false"
     image         = "docker:18.03.1-ce"
     privileged    = "true"
-    pull_policy   = "always"
+    pull_policies = ["always"]
     shm_size      = 0
     tls_verify    = "false"
     volumes       = ["/cache"]

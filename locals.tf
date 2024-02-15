@@ -54,9 +54,10 @@ locals {
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = merge({
-      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes"
+      for key, value in var.runner_worker_docker_options : key => value if value != null && key != "volumes" && key != "pull_policies"
       }, {
-      volumes = local.runners_volumes
+      pull_policy = var.runner_worker_docker_options.pull_policies
+      volumes     = local.runners_volumes
     })
     }
   )
@@ -79,8 +80,6 @@ locals {
     runners_docker_services = var.runner_worker_docker_services
     }
   )
-
-  runners_pull_policies = "[\"${join("\",\"", var.runner_worker_docker_options.pull_policies)}\"]"
 
   /* determines if the docker machine executable adds the Name tag automatically (versions >= 0.16.2) */
   # make sure to skip pre-release stuff in the semver by ignoring everything after "-"
