@@ -60,10 +60,10 @@ then
       $runner_type_param \
       --form "access_level=${gitlab_runner_access_level}")
 
-    token=$(echo response | jq -r '.token')
+    token=$(echo $response | jq -r '.token')
     if [[ "$token" == null ]]
     then
-        message=$(echo response | jq -r '.message // .error_description')
+        message=$(echo $response | jq -r '.message // .error_description')
         if [[ "$message" != null ]]
         then
             echo "ERROR: Couldn't register the Runner. GitLab API call returned $message".
