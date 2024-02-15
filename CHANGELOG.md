@@ -1,5 +1,18 @@
 # Changelog
 
+## [7.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.3.1...7.4.0) (2024-02-15)
+
+
+### Features
+
+* error checking for initial API token call ([#1080](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1080)) ([6b3740a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/6b3740a5c63a539e844a89ec810e949d3d1bfca6))
+
+
+### Bug Fixes
+
+* rename `pull_policies` to `pull_policy` in `config.toml` ([#1084](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1084)) ([df39014](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/df39014d8eaacd0535c3cd4ab9e60899a708eea5))
+* repair errors in startup shell script ([#1087](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1087)) ([9b7c465](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/9b7c4653d71eaa8470c343083c8dfe05ff9c8911))
+
 ## [7.3.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/v7.3.0...7.3.1) (2024-02-08)
 
 
