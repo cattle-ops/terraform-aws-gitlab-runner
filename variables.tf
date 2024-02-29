@@ -521,6 +521,7 @@ variable "runner_worker_docker_options" {
     disable_entrypoint_overwrite = optional(bool)
     dns                          = optional(list(string))
     dns_search                   = optional(list(string))
+    enable_ipv6 = optional(bool)
     extra_hosts                  = optional(list(string))
     gpus                         = optional(string)
     helper_image                 = optional(string)
