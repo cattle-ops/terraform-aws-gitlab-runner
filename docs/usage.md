@@ -361,6 +361,29 @@ policy.
 }
 ```
 
+## IPv6 setup
+
+1. Configure the subnets to support IPv6. Otherwise your instances do not get an IPv6 address.
+2. Prepare your Runner with the following configuration which enables the IPv6 support for Docker:
+```
+  module "gitlab_runner" {
+    runner_worker_docker_options = {
+      enable_ipv6 = true
+    }
+  
+     runner_worker_docker_machine_ec2_options = [
+       "engine-opt=ipv6=true",
+       "engine-opt=ip6tables=true",
+       "engine-opt=experimental=true",
+     ]
+   }
+ ```
+3. Enable the feature flag `FF_NETWORK_PER_BUILD` in GitLab.
+
+Further documentation:
+- [Docker](https://docs.docker.com/config/daemon/ipv6/)
+- [GitLab](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/36994)
+
 ## Removing the module
 
 As the module creates a number of resources during runtime (key pairs and spot instance requests), it needs a special
