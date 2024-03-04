@@ -106,7 +106,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v1.7.12-debian@sha256:e9647d5dcf1e3ea819141de28f0eabfd24088b99fa02f737e31efb44d52d3828
+      image: checkmarx/kics:v1.7.13-debian@sha256:21140f3e8b0247ea4a514270b5645c29ee341e211b8e11c5b659c5d1069d7b30
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
@@ -119,7 +119,7 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         name: Checkout source code
 
-      - uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
+      - uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
@@ -164,7 +164,7 @@ jobs:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
+      - uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4
         name: Cache plugin dir
         with:
           key: ${{ runner.os }}-terraform-plugin-cache
