@@ -79,6 +79,7 @@ locals {
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
+      runner_service_stop_timeout                                  = var.runner_worker_graceful_terminate.job_timeout
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -641,6 +642,10 @@ module "terminate_agent_hook" {
   name_docker_machine_runners          = local.runner_tags_merged["Name"]
   role_permissions_boundary            = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
   kms_key_id                           = local.kms_key
+  graceful_terminate_enabled           = var.runner_worker_graceful_terminate.enabled
+  graceful_terminate_timeout           = var.runner_worker_graceful_terminate.timeout
+  sqs_max_receive_count                = ceil(var.runner_worker_graceful_terminate.timeout / var.runner_worker_graceful_terminate.retry_period) + 1
+  sqs_visibility_timeout               = var.runner_worker_graceful_terminate.retry_period
 
   tags = local.tags
 }

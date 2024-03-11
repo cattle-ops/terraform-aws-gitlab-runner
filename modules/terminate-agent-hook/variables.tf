@@ -60,3 +60,24 @@ variable "enable_xray_tracing" {
   type        = bool
   default     = false
 }
+
+variable "graceful_terminate_enabled" {
+  description = "Whether to graceful terminate is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "graceful_terminate_timeout" {
+  description = "Time in seconds to wait for lifecycle complete action before continuing termination."
+  type        = number
+}
+
+variable "sqs_visibility_timeout" {
+  description = "Time in seconds that a message will be invisible for after being consumed."
+  type        = number
+}
+
+variable "sqs_max_receive_count" {
+  description = "Number of times a message can be consumed before it's placed in the DLQ."
+  type        = number
+}

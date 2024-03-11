@@ -750,6 +750,17 @@ variable "runner_worker_docker_machine_autoscaling_options" {
   default = []
 }
 
+variable "runner_worker_graceful_terminate" {
+  description = "Gracefully terminate Runner Worker, by waiting a set amount of time for running jobs to finish before termination."
+  type = object({
+    enabled      = optional(bool, false)
+    timeout      = optional(number, 1800)
+    retry_period = optional(number, 300)
+    job_timeout  = optional(number, 3600)
+  })
+  default = {}
+}
+
 variable "debug" {
   description = <<-EOT
     trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.

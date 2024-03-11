@@ -201,6 +201,15 @@ then
   yum install gitlab-runner-${gitlab_runner_version} -y
 fi
 
+# set timeout for runner service to wait before stopping
+mkdir /etc/systemd/system/gitlab-runner.service.d
+cat <<EOF > /etc/systemd/system/gitlab-runner.service.d/kill.conf
+[Service]
+# Time to wait before stopping the service in seconds
+TimeoutStopSec=${runner_service_stop_timeout}
+KillSignal=SIGQUIT
+EOF
+
 ${post_install}
 
 chkconfig gitlab-runner on
