@@ -26,6 +26,8 @@ if [[ ! "$json_token" =~ ^\{.* ]]; then
   json_token="{\"token\": \"$json_token\", \"usage_counter\": 1}"
 
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
+
+  echo "GitLab Runner token converted into new JSON format"
 else
   token=$(echo $json_token | jq -r '.token')
 fi
