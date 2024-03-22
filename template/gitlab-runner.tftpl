@@ -23,7 +23,7 @@ json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_tok
 # TODO 2024-03-22: this conversion can be removed as soon as all callers switched to version 7.4.1+
 if [[ ! "$json_token" =~ ^\{.* ]]; then
   # plain text token -> convert to JSON and store
-  json_token="{\"token\": \"$token\", \"usage_counter\": 1}"
+  json_token="{\"token\": \"$json_token\", \"usage_counter\": 1}"
 
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
 else
