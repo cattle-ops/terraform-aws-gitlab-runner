@@ -221,6 +221,12 @@ if [[ $deregister_runner == "true" ]]; then
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="{\"token\": \"null\", \"in_use_counter\": 0}" 2>&1
   curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1
 else
+  usage_counter=$(echo $json_token | jq -r .usage_counter)
+  usage_counter=$(($usage_counter-1))
+  json_token=$(echo $json_token | jq ".usage_counter = $usage_count er")
+
+  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
+
   echo "Token still in use. GitLab Runner not removed from GitLab."
 fi
 EOF
