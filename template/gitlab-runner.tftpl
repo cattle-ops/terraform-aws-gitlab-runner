@@ -223,7 +223,7 @@ if [[ $deregister_runner == "true" ]]; then
 else
   usage_counter=$(echo $json_token | jq -r .usage_counter)
   usage_counter=$(($usage_counter-1))
-  json_token=$(echo $json_token | jq ".usage_counter = $usage_count er")
+  json_token=$(echo $json_token | jq ".usage_counter = $usage_counter")
 
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
 
