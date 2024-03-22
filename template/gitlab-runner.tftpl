@@ -30,7 +30,6 @@ else
   token=$(echo $json_token | jq -r '.token')
 fi
 
-if
 valid_token=true
 if [[ "$token" != "null" ]]
 then
@@ -100,7 +99,7 @@ then
     --form "access_level=${gitlab_runner_access_level}" \
     | jq -r .token)
   fi
-  
+
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" \
     --value="{\"token\": \"$token\", \"usage_counter\": 1}" --region "${secure_parameter_store_region}"
 fi
