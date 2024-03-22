@@ -207,6 +207,7 @@ cat <<EOF > /etc/systemd/system/gitlab-runner.service.d/kill.conf
 [Service]
 # Time to wait before stopping the service in seconds
 TimeoutStopSec=${runner_service_stop_timeout}
+# according to the GitLab Runner docs, this initiates a graceful shutdown of the service
 KillSignal=SIGQUIT
 EOF
 

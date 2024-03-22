@@ -45,7 +45,9 @@ The runner supports 3 main scenarios:
 
    ![runners-docker](https://github.com/cattle-ops/terraform-aws-gitlab-runner/raw/main/assets/images/runner-docker.png)
 
-For detailed concepts and usage please refer to [usage](docs/usage.md).
+For detailed information on usage please refer to [usage](docs/usage.md).
+
+Key concepts for module developers are explained in [concepts](docs/concepts.md). 
 
 ## Contributors ✨
 
