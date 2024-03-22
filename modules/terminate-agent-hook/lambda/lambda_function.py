@@ -326,8 +326,13 @@ def handler(event, context):
     :param context: see https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
     """
 
-    # if graceful terminate is enabled then the event will be in SQS message format
-    # else the event will be in cloudwatch format
+    # if graceful terminate is enabled, then a SQS queue is created to
+    # accept messages from the ASG lifecycle hook and trigger this lambda,
+    # so the event received by this lambda will be in SQS message format
+    #
+    # if graceful terminate is disabled then a cloudwatch event rule for
+    # the ASG lifecycle hook is created to trigger this lambda, so the
+    # event received by this lambda will be in cloudwatch event format
     if os.environ['GRACEFUL_TERMINATE_ENABLED'] == "true":
         message = json.loads(event['Records'][0]['body'])
 
