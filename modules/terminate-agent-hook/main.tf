@@ -36,14 +36,17 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   publish          = true
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.11"
-  timeout          = local.lambda_timeout
+  timeout          = var.graceful_terminate_enabled ? local.graceful_terminate_lambda_timeout : local.lambda_timeout
   kms_key_arn      = var.kms_key_id
 
   tags = var.tags
 
   environment {
     variables = {
-      NAME_EXECUTOR_INSTANCE = var.name_docker_machine_runners
+      NAME_EXECUTOR_INSTANCE     = var.name_docker_machine_runners
+      GRACEFUL_TERMINATE_ENABLED = var.graceful_terminate_enabled
+      DOCUMENT_NAME              = var.graceful_terminate_enabled ? aws_ssm_document.stop_gitlab_runner[0].name : null
+      SQS_MAX_RECEIVE_COUNT      = var.sqs_max_receive_count
     }
   }
 
@@ -56,27 +59,52 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   }
 }
 
+resource "aws_autoscaling_lifecycle_hook" "terminate_instances" {
+
+  name                    = "${var.environment}-${var.name}"
+  autoscaling_group_name  = var.asg_name
+  default_result          = "CONTINUE"
+  heartbeat_timeout       = var.graceful_terminate_enabled ? var.graceful_terminate_timeout : local.lambda_timeout + 20 # allow some extra time for cold starts
+  lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
+  notification_target_arn = var.graceful_terminate_enabled ? aws_sqs_queue.graceful_terminate_queue[0].arn : null
+  role_arn                = var.graceful_terminate_enabled ? aws_iam_role.asg_lifecycle[0].arn : null
+}
+
+# use cloudwatch event trigger when graceful terminate is disabled
+
 resource "aws_lambda_permission" "current_version_triggers" {
+  count = var.graceful_terminate_enabled ? 0 : 1
+
   function_name = aws_lambda_function.terminate_runner_instances.function_name
   qualifier     = aws_lambda_function.terminate_runner_instances.version
   statement_id  = "TerminateInstanceEvent"
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.terminate_instances.arn
+  source_arn    = aws_cloudwatch_event_rule.terminate_instances[0].arn
 }
 
 resource "aws_lambda_permission" "unqualified_alias_triggers" {
+  count = var.graceful_terminate_enabled ? 0 : 1
+
   function_name = aws_lambda_function.terminate_runner_instances.function_name
   statement_id  = "TerminateInstanceEventUnqualified"
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.terminate_instances.arn
+  source_arn    = aws_cloudwatch_event_rule.terminate_instances[0].arn
 }
 
-resource "aws_autoscaling_lifecycle_hook" "terminate_instances" {
-  name                   = "${var.environment}-${var.name}"
-  autoscaling_group_name = var.asg_name
-  default_result         = "CONTINUE"
-  heartbeat_timeout      = local.lambda_timeout + 20 # allow some extra time for cold starts
-  lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
+# use SQS trigger when graceful terminate is enabled
+
+resource "aws_lambda_function_event_invoke_config" "graceful_terminate" {
+  count = var.graceful_terminate_enabled ? 1 : 0
+
+  function_name          = aws_lambda_function.terminate_runner_instances.function_name
+  maximum_retry_attempts = 0
+}
+
+resource "aws_lambda_event_source_mapping" "graceful_terminate" {
+  count = var.graceful_terminate_enabled ? 1 : 0
+
+  event_source_arn = aws_sqs_queue.graceful_terminate_queue[0].arn
+  function_name    = aws_lambda_function.terminate_runner_instances.arn
 }

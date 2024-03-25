@@ -10,10 +10,103 @@ https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some di
 This is rudimentary and doesn't check if a build runner has a current job.
 """
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, WaiterError
 import json
 import os
 import sys
+
+
+def check_runner_running(client, instance_id):
+    """
+    Checks if the runner instance is running.
+    :param client: the boto3 ec2 client
+    :param instance_id: the ID of the runner instance
+    :return: true or false, whether the runner instance is running
+    """
+    print(json.dumps({
+        "Level": "info",
+        "Message": "Looking for running runner instance..."
+    }))
+    try:
+        reservations = client.describe_instances(InstanceIds=[instance_id], Filters=[
+            {
+                "Name": "instance-state-name",
+                "Values": ["running", "pending"],
+            }
+        ]).get("Reservations")
+    except ClientError as error:
+        print(json.dumps({
+            "Level": "error",
+            "Message": "Failed to lookup runner instance"
+        }))
+        raise error
+
+    if len(reservations) > 0:
+        print(json.dumps({
+            "Level": "info",
+            "Message": "Runner instance still running"
+        }))
+        return True
+
+    print(json.dumps({
+        "Level": "info",
+        "Message": "Runner instance already terminated"
+    }))
+    return False
+
+
+def stop_runner_service(client, instance_id):
+    """
+    Stops the gitlab-runner service on the runner instance using SSM command.
+    The command may fail if the gitlab-runner service has jobs running, in
+    which case the function will error and be re-tried by SQS.
+    :param client: the boto3 SSM client
+    :param instance_id: the ID of the runner instance
+    """
+    print(json.dumps({
+        "Level": "info",
+        "Message": "Stopping gitlab-runner service..."
+    }))
+
+    try:
+        initial_response = client.send_command(DocumentName=os.environ['DOCUMENT_NAME'],
+            Comment="Stop gitlab-runner service, and check whether it's stopped.",
+            InstanceIds=[instance_id]
+        )
+    except ClientError as error:
+        print(json.dumps({
+            "Level": "error",
+            "Message": "Failed to send SSM command"
+        }))
+        raise error
+    
+    command_id = initial_response['Command']['CommandId']
+
+    try:
+        waiter = client.get_waiter('command_executed')
+        waiter.wait(
+            CommandId=command_id,
+            InstanceId=instance_id,
+            WaiterConfig={
+                "Delay": 3,
+                "MaxAttempts": 10
+            }
+        )
+        command_response = client.get_command_invocation(CommandId=command_id, InstanceId=instance_id)
+    except WaiterError as error:
+        print(json.dumps({
+            "Level": "error",
+            "Message": "Failure waiting for command to be successful"
+        }))
+        raise error
+
+    if command_response['Status'] == "Success":
+        print(json.dumps({
+            "Level": "info",
+            "Message": f"gitlab-runner service stopped, SSM command response: {command_response}"
+        }))
+    else:
+        raise RuntimeError(f"ERROR: gitlab-runner service not stopped, SSM command response: {command_response}")
 
 
 def ec2_list(client, **args):
@@ -232,18 +325,94 @@ def handler(event, context):
     :param event: see https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html#gettingstarted-concepts-event
     :param context: see https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
     """
-    event_detail = event['detail']
 
-    if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
-        sys.exit()
+    # if graceful terminate is enabled, then a SQS queue is created to
+    # accept messages from the ASG lifecycle hook and trigger this lambda,
+    # so the event received by this lambda will be in SQS message format
+    #
+    # if graceful terminate is disabled then a cloudwatch event rule for
+    # the ASG lifecycle hook is created to trigger this lambda, so the
+    # event received by this lambda will be in cloudwatch event format
+    if os.environ['GRACEFUL_TERMINATE_ENABLED'] == "true":
+        message = json.loads(event['Records'][0]['body'])
 
-    client = boto3.client("ec2", region_name=event['region'])
+        region = event['Records'][0]['awsRegion']
+        instance_id = message.get("EC2InstanceId")
 
+        if instance_id is None:
+            no_instance_id_msg = "No instance ID, skipping"
+            print(json.dumps({
+                "Level": "info",
+                "Message": no_instance_id_msg
+            }))
+            return no_instance_id_msg
+
+        ec2_client = boto3.client("ec2", region_name=region)
+        ssm_client = boto3.client("ssm", region_name=region)
+        as_client = boto3.client("autoscaling", region_name=region)
+
+        try:
+            if check_runner_running(ec2_client, instance_id):
+                stop_runner_service(ssm_client, instance_id)
+
+                print(json.dumps({
+                    "Level": "info",
+                    "Message": "Completing lifecycle action..."
+                }))
+                lifecycle_action_response = as_client.complete_lifecycle_action(
+                    AutoScalingGroupName=message['AutoScalingGroupName'],
+                    LifecycleHookName=message['LifecycleHookName'],
+                    LifecycleActionToken=message['LifecycleActionToken'],
+                    LifecycleActionResult="CONTINUE"
+                )
+
+                print(json.dumps({
+                    "Level": "info",
+                    "Message": f"CompleteLifecycleAction Successful, response: {lifecycle_action_response}"
+                }))
+        # catch everything here and log it
+        # pylint: disable=broad-exception-caught
+        except Exception as ex:
+            print(json.dumps({
+                "Level": "exception",
+                "Exception": str(ex)
+            }))
+
+            # if the gitlab-runner service fails to be stopped, the function can error out and the SQS
+            # message will go back to the queue to be retried, up to a set amount of times
+            message_receive_count = int(event['Records'][0]['attributes']['ApproximateReceiveCount'])
+            max_receive_count = int(os.environ['SQS_MAX_RECEIVE_COUNT'])
+
+            print(json.dumps({
+                "Level": "info",
+                "Message": f"Graceful termination retry count: {message_receive_count}/{max_receive_count}"
+            }))
+            if message_receive_count < max_receive_count:
+                print(json.dumps({
+                    "Level": "info",
+                    "Message": "Graceful termination will be retried in next function run"
+                }))
+                sys.exit(1)
+            else:
+                print(json.dumps({
+                    "Level": "info",
+                    "Message": "Reached max received count, continuing with instance termination"
+                }))
+    else:
+        event_detail = event['detail']
+        instance_id = event_detail['EC2InstanceId']
+        region = event['region']
+
+        if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
+            sys.exit()
+        
+        ec2_client = boto3.client("ec2", region_name=region)
+    
     # make sure that no new instances are created
-    cancel_active_spot_requests(ec2_client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
+    cancel_active_spot_requests(ec2_client=ec2_client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
 
     # find the executors connected to this agent and terminate them as well
-    _terminate_list = ec2_list(client=client, parent=event_detail['EC2InstanceId'])
+    _terminate_list = ec2_list(client=ec2_client, parent=instance_id)
 
     if len(_terminate_list) > 0:
         print(json.dumps({
@@ -251,7 +420,7 @@ def handler(event, context):
             "Message": f"Terminating instances {', '.join(_terminate_list)}"
         }))
         try:
-            client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
+            ec2_client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
 
             print(json.dumps({
                 "Level": "info",
@@ -270,7 +439,7 @@ def handler(event, context):
             "Message": "No instances to terminate."
         }))
 
-    remove_unused_ssh_key_pairs(client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
+    remove_unused_ssh_key_pairs(client=ec2_client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
 
     return "Housekeeping done"
 

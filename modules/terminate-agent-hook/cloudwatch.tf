@@ -6,6 +6,8 @@
 # ----------------------------------------------------------------------------
 
 resource "aws_cloudwatch_event_rule" "terminate_instances" {
+  count = var.graceful_terminate_enabled ? 0 : 1
+
   name        = "${var.environment}-${var.name}"
   description = "Trigger GitLab runner instance lifecycle hook on termination."
 
@@ -23,7 +25,9 @@ EOF
 }
 
 resource "aws_cloudwatch_event_target" "terminate_instances" {
-  rule      = aws_cloudwatch_event_rule.terminate_instances.name
+  count = var.graceful_terminate_enabled ? 0 : 1
+
+  rule      = aws_cloudwatch_event_rule.terminate_instances[0].name
   target_id = "${var.environment}-TriggerTerminateLambda"
   arn       = aws_lambda_function.terminate_runner_instances.arn
 }
