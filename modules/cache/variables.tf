@@ -91,3 +91,8 @@ variable "kms_key_id" {
   type        = string
   default     = ""
 }
+
+variable "create_aws_s3_bucket_public_access_block" {
+  type    = bool
+  default = true
+}

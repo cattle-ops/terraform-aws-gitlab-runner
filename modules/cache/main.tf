@@ -95,6 +95,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "build_cache_encry
 
 # block public access to S3 cache bucket
 resource "aws_s3_bucket_public_access_block" "build_cache_policy" {
+  count = var.create_aws_s3_bucket_public_access_block ? 1 : 0
+
   bucket = aws_s3_bucket.build_cache.id
 
   block_public_acls       = true

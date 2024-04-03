@@ -421,18 +421,19 @@ variable "runner_worker_cache" {
     versioning = Boolean used to enable versioning on the cache bucket. Requires `create = true`.
   EOT
   type = object({
-    access_log_bucket_id     = optional(string, null)
-    access_log_bucket_prefix = optional(string, null)
-    authentication_type      = optional(string, "iam")
-    bucket                   = optional(string, "")
-    bucket_prefix            = optional(string, "")
-    create                   = optional(bool, true)
-    expiration_days          = optional(number, 1)
-    include_account_id       = optional(bool, true)
-    policy                   = optional(string, "")
-    random_suffix            = optional(bool, false)
-    shared                   = optional(bool, false)
-    versioning               = optional(bool, false)
+    access_log_bucket_id                     = optional(string, null)
+    access_log_bucket_prefix                 = optional(string, null)
+    authentication_type                      = optional(string, "iam")
+    bucket                                   = optional(string, "")
+    bucket_prefix                            = optional(string, "")
+    create                                   = optional(bool, true)
+    expiration_days                          = optional(number, 1)
+    include_account_id                       = optional(bool, true)
+    policy                                   = optional(string, "")
+    random_suffix                            = optional(bool, false)
+    shared                                   = optional(bool, false)
+    versioning                               = optional(bool, false)
+    create_aws_s3_bucket_public_access_block = optional(bool, true)
   })
   default = {}
 }
@@ -764,4 +765,9 @@ variable "debug" {
     write_runner_user_data_to_file = optional(bool, false)
   })
   default = {}
+}
+
+variable "create_aws_s3_bucket_public_access_block" {
+  type    = bool
+  default = true
 }

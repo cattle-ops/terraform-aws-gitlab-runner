@@ -392,6 +392,8 @@ module "cache" {
   kms_key_id = local.kms_key
 
   name_iam_objects = local.name_iam_objects
+
+  create_aws_s3_bucket_public_access_block = var.runner_worker_cache.create_aws_s3_bucket_public_access_block
 }
 
 ################################################################################
