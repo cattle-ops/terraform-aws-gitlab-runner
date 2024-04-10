@@ -18,7 +18,7 @@ sed -i.bak s/__PARENT_TAG__/$PARENT_TAG/g /etc/gitlab-runner/config.toml
 ${pre_install_certificates}
 
 # fetch Runner token from SSM and validate it
-json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -cr ".Parameters[0].Value" | tr -d '\r\n')
 
 # TODO 2024-03-22: this conversion can be removed as soon as all callers switched to version 7.4.1+
 if [[ ! "$json_token" =~ ^\{.* ]]; then
@@ -32,7 +32,7 @@ else
   # increment the usage_counter as we are using the token now
   usage_counter=$(echo $json_token | jq -r .usage_counter)
   usage_counter=$(($usage_counter+1))
-  json_token=$(echo $json_token | jq ".usage_counter = $usage_counter")
+  json_token=$(echo $json_token | jq -c ".usage_counter = $usage_counter")
 
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
 
@@ -202,24 +202,19 @@ WantedBy=multi-user.target
 
 EOF
 
-cat <<EOF > /opt/remove_gitlab_registration.sh
+cat <<'EOF' > /opt/remove_gitlab_registration.sh
 #!/bin/bash
-json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters | .[0] | .Value")
+json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters[0].Value" | tr -d '\r\n')
 deregister_runner=true
 
-# for  module versions >7.4.1 the token is JSON
-if [[ "$json_token" =~ ^\{.* ]]; then
-  usage_counter=$(echo $json_token | jq -r .usage_counter)
+usage_counter=$(echo $json_token | jq -r .usage_counter)
 
-  # ensure that the token is not in use by another Runner
-  if [[ $usage_counter -gt 1 ]]; then
-    deregister_runner=false
-    token="not needed"
-  else
-    token=$(echo $json_token | jq -r .token)
-  fi
+# ensure that the token is not in use by another Runner
+if [[ $usage_counter -gt 1 ]]; then
+  deregister_runner=false
+  token="not needed"
 else
-  token=$json_token
+  token=$(echo $json_token | jq -r .token)
 fi
 
 if [[ $deregister_runner == "true" ]]; then
@@ -230,12 +225,13 @@ if [[ $deregister_runner == "true" ]]; then
 else
   usage_counter=$(echo $json_token | jq -r .usage_counter)
   usage_counter=$(($usage_counter-1))
-  json_token=$(echo $json_token | jq ".usage_counter = $usage_counter")
+  json_token=$(echo $json_token | jq -c ".usage_counter = $usage_counter")
 
   aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
 
   echo "Token still in use. GitLab Runner not removed from GitLab."
 fi
+
 EOF
 
 chmod a+x /opt/remove_gitlab_registration.sh
