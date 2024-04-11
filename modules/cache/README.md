@@ -77,6 +77,7 @@ No modules.
 | <a name="input_cache_lifecycle_prefix"></a> [cache\_lifecycle\_prefix](#input\_cache\_lifecycle\_prefix) | Object key prefix identifying one or more objects to which the clean up rule applies. | `string` | `"runner/"` | no |
 | <a name="input_cache_logging_bucket"></a> [cache\_logging\_bucket](#input\_cache\_logging\_bucket) | S3 Bucket ID where the access logs to the cache bucket are stored. | `string` | `null` | no |
 | <a name="input_cache_logging_bucket_prefix"></a> [cache\_logging\_bucket\_prefix](#input\_cache\_logging\_bucket\_prefix) | Prefix within the `cache_logging_bucket`. | `string` | `null` | no |
+| <a name="input_create_aws_s3_bucket_public_access_block"></a> [create\_aws\_s3\_bucket\_public\_access\_block](#input\_create\_aws\_s3\_bucket\_public\_access\_block) | Enable the creation of the public access block for the cache bucket. | `bool` | `true` | no |
 | <a name="input_create_cache_bucket"></a> [create\_cache\_bucket](#input\_create\_cache\_bucket) | (deprecated) If the cache should not be created, remove the whole module call! | `bool` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as prefix and for tagging. | `string` | n/a | yes |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypted the resources. Ensure that your Runner/Executor has access to the KMS key. | `string` | `""` | no |
