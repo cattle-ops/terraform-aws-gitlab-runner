@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.4.0...7.5.0) (2024-04-11)
+
+
+### Features
+
+* add field `create_aws_s3_bucket_public_access_block` to variable `runner_worker_cache` ([#1105](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1105)) ([aa93e76](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/aa93e768a1e2d414197feea1330ff3290f65dbb2))
+
+
+### Bug Fixes
+
+* do not deregister GitLab tokens which are still in use ([#1102](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1102)) ([9cdab00](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/9cdab00b636bd1e32cfe4550e2420b9e02f9cfe2))
+
 ## [7.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.3.1...7.4.0) (2024-02-15)
 
 
