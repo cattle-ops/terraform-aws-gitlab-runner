@@ -91,3 +91,9 @@ variable "kms_key_id" {
   type        = string
   default     = ""
 }
+
+variable "create_aws_s3_bucket_public_access_block" {
+  description = "Enable the creation of the public access block for the cache bucket."
+  type        = bool
+  default     = true
+}

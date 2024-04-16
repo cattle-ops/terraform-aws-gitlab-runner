@@ -413,6 +413,7 @@ variable "runner_worker_cache" {
     bucket = Name of the cache bucket. Requires `create = false`.
     bucket_prefix = Prefix for s3 cache bucket name. Requires `create = true`.
     create = Boolean used to enable or disable the creation of the cache bucket.
+    create_aws_s3_bucket_public_access_block = Boolean used to enable or disable the creation of the public access block for the cache bucket. Useful when organizations do not allow the creation of public access blocks on individual buckets (e.g. public access is blocked on all buckets at the organization level).
     expiration_days = Number of days before cache objects expire. Requires `create = true`.
     include_account_id = Boolean used to include the account id in the cache bucket name. Requires `create = true`.
     policy = Policy to use for the cache bucket. Requires `create = false`.
@@ -421,18 +422,19 @@ variable "runner_worker_cache" {
     versioning = Boolean used to enable versioning on the cache bucket. Requires `create = true`.
   EOT
   type = object({
-    access_log_bucket_id     = optional(string, null)
-    access_log_bucket_prefix = optional(string, null)
-    authentication_type      = optional(string, "iam")
-    bucket                   = optional(string, "")
-    bucket_prefix            = optional(string, "")
-    create                   = optional(bool, true)
-    expiration_days          = optional(number, 1)
-    include_account_id       = optional(bool, true)
-    policy                   = optional(string, "")
-    random_suffix            = optional(bool, false)
-    shared                   = optional(bool, false)
-    versioning               = optional(bool, false)
+    access_log_bucket_id                     = optional(string, null)
+    access_log_bucket_prefix                 = optional(string, null)
+    authentication_type                      = optional(string, "iam")
+    bucket                                   = optional(string, "")
+    bucket_prefix                            = optional(string, "")
+    create                                   = optional(bool, true)
+    create_aws_s3_bucket_public_access_block = optional(bool, true)
+    expiration_days                          = optional(number, 1)
+    include_account_id                       = optional(bool, true)
+    policy                                   = optional(string, "")
+    random_suffix                            = optional(bool, false)
+    shared                                   = optional(bool, false)
+    versioning                               = optional(bool, false)
   })
   default = {}
 }

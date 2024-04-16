@@ -13,7 +13,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.5.2 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.7.1 |
 
 ## Resources
 
