@@ -392,7 +392,7 @@ variable "runner_worker" {
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
     ssm_access = Allows to connect to the Runner Worker via SSM.
-    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
+    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
   EOT
   type = object({
     environment_variables = optional(list(string), [])
@@ -405,7 +405,7 @@ variable "runner_worker" {
   default = {}
 
   validation {
-    condition     = contains(["docker+machine", "docker"], var.runner_worker.type)
+    condition     = contains(["docker+machine", "docker", "docker-autoscaler"], var.runner_worker.type)
     error_message = "The executor currently supports `docker+machine` and `docker`."
   }
 }
@@ -593,6 +593,55 @@ variable "runner_worker_docker_machine_fleet" {
   default = {
     enable = false
   }
+}
+
+variable "runner_worker_docker_autoscaler" {
+  description = <<-EOT
+    fleeting_plugin_version = The version of aws fleeting plugin 
+    connector_config_user = User to connect to worker machine
+    key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
+    max_use_count = Max job number that can run on a worker
+  EOT
+  type = object({
+    fleeting_plugin_version = optional(string, "0.4.0")
+    connector_config_user   = optional(string, "ec2-user")
+    key_pair_name           = optional(string, "runner-worker-key")
+    max_use_count           = optional(number, 100)
+  })
+  default = {}
+}
+
+variable "runner_worker_docker_autoscaler_asg" {
+  description = <<-EOT
+    enable_mixed_instances_policy = Make use of autoscaling-group mixed_instances_policy capacities to leverage pools and spot instances.
+    health_check_grace_period = Time (in seconds) after instance comes into service before checking health
+    health_check_type = Controls how health checking is done. Values are - EC2 and ELB
+    on_demand_base_capacity = Absolute minimum amount of desired capacity that must be fulfilled by on-demand instances.
+    on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
+    spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions
+    spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
+    override_instance_types = List to override the instance type in the Launch Template. Allow to spread spot instances on several types, to reduce interruptions
+    sg_ingresses = Extra security group rule for workers
+  EOT
+  type = object({
+    enable_mixed_instances_policy            = optional(bool, false)
+    health_check_grace_period                = optional(number, 300)
+    health_check_type                        = optional(string, "EC2")
+    on_demand_base_capacity                  = optional(number, 0)
+    on_demand_percentage_above_base_capacity = optional(number, 100)
+    spot_allocation_strategy                 = optional(string, "lowest-price")
+    spot_instance_pools                      = optional(number, 2)
+    override_instance_types                  = optional(list(string), [])
+    load_balancers                           = optional(list(string), [])
+    sg_ingresses = optional(list(object({
+      description = string
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = list(string)
+    })), [])
+  })
+  default = {}
 }
 
 variable "runner_worker_docker_machine_role" {

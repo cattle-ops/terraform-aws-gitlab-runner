@@ -27,7 +27,7 @@ data "aws_ami" "runner" {
 }
 
 data "aws_ami" "docker-machine" {
-  count = var.runner_worker.type == "docker+machine" ? 1 : 0
+  count = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
 
   most_recent = "true"
 

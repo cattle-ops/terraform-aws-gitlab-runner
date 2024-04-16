@@ -46,6 +46,7 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
+      aws_region                                                   = data.aws_region.current.name
       gitlab_runner_version                                        = var.runner_gitlab.runner_version
       docker_machine_version                                       = var.runner_install.docker_machine_version
       docker_machine_download_url                                  = var.runner_install.docker_machine_download_url
@@ -81,6 +82,53 @@ locals {
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
       user_data_trace_log                                          = var.debug.trace_runner_user_data
+      fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
+  })
+
+  template_runner_docker_machine = templatefile("${path.module}/template/runner-docker-machine-config.tftpl",
+    {
+      runners_idle_count     = var.runner_worker_docker_machine_instance.idle_count
+      runners_idle_time      = var.runner_worker_docker_machine_instance.idle_time
+      runners_max_builds     = local.runners_max_builds_string
+      docker_machine_name    = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
+      runners_instance_types = var.runner_worker_docker_machine_instance.types
+      aws_region             = data.aws_region.current.name
+      runners_aws_zone       = data.aws_availability_zone.runners.name_suffix
+      runners_userdata       = var.runner_worker_docker_machine_instance.start_script
+
+      runners_vpc_id           = var.vpc_id
+      runners_subnet_id        = var.subnet_id
+      runners_subnet_ids       = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : [var.subnet_id]
+      runners_instance_profile = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+
+      runners_use_private_address_only = var.runner_worker_docker_machine_instance.private_address_only
+      runners_use_private_address      = !var.runner_worker_docker_machine_instance.private_address_only
+      runners_request_spot_instance    = var.runner_worker_docker_machine_instance_spot.enable
+      runners_spot_price_bid           = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
+      runners_security_group_name      = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+
+      runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
+      runners_ebs_optimized             = var.runner_worker_docker_machine_instance.ebs_optimized
+      runners_monitoring                = var.runner_worker_docker_machine_instance.monitoring
+      runners_iam_instance_profile_name = var.runner_worker_docker_machine_role.profile_name
+      runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
+      runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
+      runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      use_fleet                         = var.runner_worker_docker_machine_fleet.enable
+      launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
+      docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
+      runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
+  })
+
+  template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
+    {
+      docker_autoscaling_name       = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
+      connector_config_user         = var.runner_worker_docker_autoscaler.connector_config_user
+      runners_capacity_per_instance = 1
+      runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
+      runners_max_instances         = var.runner_worker.max_jobs
+      runners_idle_count            = var.runner_worker_docker_machine_instance.idle_count
+      runners_idle_time             = format("%dm%ds", floor(var.runner_worker_docker_machine_instance.idle_time / 60), var.runner_worker_docker_machine_instance.idle_time % 60)
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -94,54 +142,29 @@ locals {
         # Convert key from snake_case to PascalCase which is the casing for this section.
         join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
       }]
-      runners_vpc_id                    = var.vpc_id
-      runners_subnet_id                 = var.subnet_id
-      runners_subnet_ids                = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : [var.subnet_id]
-      runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
-      runners_instance_types            = var.runner_worker_docker_machine_instance.types
-      runners_spot_price_bid            = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
-      runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
-      runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
-      runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
-      runners_monitoring                = var.runner_worker_docker_machine_instance.monitoring
-      runners_ebs_optimized             = var.runner_worker_docker_machine_instance.ebs_optimized
-      runners_instance_profile          = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-      docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
-      docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
-      runners_name                      = var.runner_instance.name
-      runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
-      runners_token                     = var.runner_gitlab.registration_token
-      runners_userdata                  = var.runner_worker_docker_machine_instance.start_script
-      runners_executor                  = var.runner_worker.type
-      runners_limit                     = var.runner_worker.max_jobs
-      runners_concurrent                = var.runner_manager.maximum_concurrent_jobs
-      runners_idle_count                = var.runner_worker_docker_machine_instance.idle_count
-      runners_idle_time                 = var.runner_worker_docker_machine_instance.idle_time
-      runners_max_builds                = local.runners_max_builds_string
-      runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
-      runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
-      runners_iam_instance_profile_name = var.runner_worker_docker_machine_role.profile_name
-      runners_use_private_address_only  = var.runner_worker_docker_machine_instance.private_address_only
-      runners_use_private_address       = !var.runner_worker_docker_machine_instance.private_address_only
-      runners_request_spot_instance     = var.runner_worker_docker_machine_instance_spot.enable
-      runners_environment_vars          = jsonencode(var.runner_worker.environment_variables)
-      runners_pre_build_script          = var.runner_worker_gitlab_pipeline.pre_build_script
-      runners_post_build_script         = var.runner_worker_gitlab_pipeline.post_build_script
-      runners_pre_clone_script          = var.runner_worker_gitlab_pipeline.pre_clone_script
-      runners_request_concurrency       = var.runner_worker.request_concurrency
-      runners_output_limit              = var.runner_worker.output_limit
-      runners_check_interval            = var.runner_manager.gitlab_check_interval
-      runners_volumes_tmpfs             = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_services_volumes_tmpfs    = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_docker_services           = local.runners_docker_services
-      runners_docker_options            = local.runners_docker_options_toml
-      bucket_name                       = local.bucket_name
-      shared_cache                      = var.runner_worker_cache.shared
-      sentry_dsn                        = var.runner_manager.sentry_dsn
-      prometheus_listen_address         = var.runner_manager.prometheus_listen_address
-      auth_type                         = var.runner_worker_cache.authentication_type
-      use_fleet                         = var.runner_worker_docker_machine_fleet.enable
-      launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
+      runners_name                   = var.runner_instance.name
+      runners_token                  = var.runner_gitlab.registration_token
+      runners_executor               = var.runner_worker.type
+      runners_limit                  = var.runner_worker.max_jobs
+      runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
+      runners_environment_vars       = jsonencode(var.runner_worker.environment_variables)
+      runners_pre_build_script       = var.runner_worker_gitlab_pipeline.pre_build_script
+      runners_post_build_script      = var.runner_worker_gitlab_pipeline.post_build_script
+      runners_pre_clone_script       = var.runner_worker_gitlab_pipeline.pre_clone_script
+      runners_request_concurrency    = var.runner_worker.request_concurrency
+      runners_output_limit           = var.runner_worker.output_limit
+      runners_check_interval         = var.runner_manager.gitlab_check_interval
+      runners_volumes_tmpfs          = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_services_volumes_tmpfs = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_docker_services        = local.runners_docker_services
+      runners_docker_options         = local.runners_docker_options_toml
+      bucket_name                    = local.bucket_name
+      shared_cache                   = var.runner_worker_cache.shared
+      sentry_dsn                     = var.runner_manager.sentry_dsn
+      prometheus_listen_address      = var.runner_manager.prometheus_listen_address
+      auth_type                      = var.runner_worker_cache.authentication_type
+      runners_docker_autoscaler      = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
+      runners_docker_machine         = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""
     }
   )
 }
@@ -306,11 +329,27 @@ resource "tls_private_key" "fleet" {
   rsa_bits  = 4096
 }
 
+resource "tls_private_key" "autoscaler" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 resource "aws_key_pair" "fleet" {
   count = var.runner_worker_docker_machine_fleet.enable == true && var.runner_worker.type == "docker+machine" ? 1 : 0
 
   key_name   = "${var.environment}-${var.runner_worker_docker_machine_fleet.key_pair_name}"
   public_key = tls_private_key.fleet[0].public_key_openssh
+
+  tags = local.tags
+}
+
+resource "aws_key_pair" "autoscaler" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+  key_name   = "${var.environment}-${var.runner_worker_docker_autoscaler.key_pair_name}"
+  public_key = tls_private_key.autoscaler[0].public_key_openssh
 
   tags = local.tags
 }
@@ -470,11 +509,34 @@ resource "aws_iam_policy" "instance_docker_machine_policy" {
   tags = local.tags
 }
 
+resource "aws_iam_policy" "instance_docker_autoscaler_policy" {
+  count = var.runner_worker.type == "docker-autoscaler" && var.runner_role.create_role_profile ? 1 : 0
+
+  name        = "${local.name_iam_objects}-docker-autoscaler"
+  path        = "/"
+  description = "Policy for docker autoscaler."
+  policy = templatefile("${path.module}/policies/instance-docker-autoscaler-policy.json",
+    {
+      aws_region           = data.aws_region.current.name
+      autoscalger_asg_arn  = aws_autoscaling_group.autoscaler[0].arn
+      autoscalger_asg_name = aws_autoscaling_group.autoscaler[0].name
+  })
+
+  tags = local.tags
+}
+
 resource "aws_iam_role_policy_attachment" "instance_docker_machine_policy" {
   count = var.runner_worker.type == "docker+machine" && var.runner_role.create_role_profile ? 1 : 0
 
   role       = aws_iam_role.instance[0].name
   policy_arn = aws_iam_policy.instance_docker_machine_policy[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "instance_docker_autoscaler_policy" {
+  count = var.runner_worker.type == "docker-autoscaler" && var.runner_role.create_role_profile ? 1 : 0
+
+  role       = aws_iam_role.instance[0].name
+  policy_arn = aws_iam_policy.instance_docker_autoscaler_policy[0].arn
 }
 
 ################################################################################
@@ -532,7 +594,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
-  count                = var.runner_worker.type == "docker+machine" ? 1 : 0
+  count                = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.runner_worker_docker_machine_role.assume_role_policy_json) > 0 ? var.runner_worker_docker_machine_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
@@ -543,7 +605,7 @@ resource "aws_iam_role" "docker_machine" {
 
 
 resource "aws_iam_instance_profile" "docker_machine" {
-  count = var.runner_worker.type == "docker+machine" ? 1 : 0
+  count = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
   name  = "${local.name_iam_objects}-docker-machine"
   role  = aws_iam_role.docker_machine[0].name
   tags  = local.tags
