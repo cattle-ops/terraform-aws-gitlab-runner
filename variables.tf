@@ -297,7 +297,7 @@ variable "runner_cloudwatch" {
 }
 
 variable "runner_gitlab_registration_config" {
-  description = "(deprecated, repalced by runner_gitlab.preregistered_runner_token_ssm_parameter_name) Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
+  description = "(deprecated, replaced by runner_gitlab.preregistered_runner_token_ssm_parameter_name) Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
   type = object({
     registration_token = optional(string, "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__") # deprecated, removed in 8.0.0
     tag_list           = optional(string, "")                                       # deprecated, removed in 8.0.0
