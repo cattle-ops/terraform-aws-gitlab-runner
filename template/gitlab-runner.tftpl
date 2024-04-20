@@ -17,103 +17,113 @@ sed -i.bak s/__PARENT_TAG__/$PARENT_TAG/g /etc/gitlab-runner/config.toml
 
 ${pre_install_certificates}
 
-# fetch Runner token from SSM and validate it
-json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -cr ".Parameters[0].Value" | tr -d '\r\n')
+# TODO remove the "else" block after v8.0.0
+if [[ "${preregistered_runner_token_ssm_parameter_name}" != "" ]]; then
+  # this is the new standard registration method: the runner is already registered in GitLab and the token is stored in SSM
+  preregistered_runner_token=$(aws ssm get-parameter --name "${preregistered_runner_token_ssm_parameter_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
 
-# TODO 2024-03-22: this conversion can be removed as soon as all callers switched to version 7.4.1+
-if [[ ! "$json_token" =~ ^\{.* ]]; then
-  # plain text token -> convert to JSON and store
-  json_token="{\"token\": \"$json_token\", \"usage_counter\": 1}"
+  sed -i.bak s/__REPLACED_BY_USER_DATA__/$preregistered_runner_token/g /etc/gitlab-runner/config.toml
 
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
-
-  echo "GitLab Runner token converted into new JSON format"
+  # TODO after v8.0.0: this logic can be removed. We can insert the token directly into the config.toml
 else
-  # increment the usage_counter as we are using the token now
-  usage_counter=$(echo $json_token | jq -r .usage_counter)
-  usage_counter=$(($usage_counter+1))
-  json_token=$(echo $json_token | jq -c ".usage_counter = $usage_counter")
+    # fetch Runner token from SSM and validate it
+    json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -cr ".Parameters[0].Value" | tr -d '\r\n')
 
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
+    # TODO 2024-03-22: this conversion can be removed as soon as all callers switched to version 7.4.1+
+    if [[ ! "$json_token" =~ ^\{.* ]]; then
+      # plain text token -> convert to JSON and store
+      json_token="{\"token\": \"$json_token\", \"usage_counter\": 1}"
 
-  token=$(echo $json_token | jq -r '.token')
-fi
+      aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
 
-valid_token=true
-if [[ "$token" != "null" ]]
-then
-  valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
-  [[ "$valid_token_response" != "200" ]] && valid_token=false
-fi
+      echo "GitLab Runner token converted into new JSON format"
+    else
+      # increment the usage_counter as we are using the token now
+      usage_counter=$(echo $json_token | jq -r .usage_counter)
+      usage_counter=$(($usage_counter+1))
+      json_token=$(echo $json_token | jq -c ".usage_counter = $usage_counter")
 
-if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
-then
-  if [ "${use_new_runner_authentication_gitlab_16}" == "true" ]
-  then
-    runner_type_param=""
-    if [ "${gitlab_runner_type}" = "group" ]; then
-      if [ -z "${gitlab_runner_group_id}" ]; then
-        echo "ERROR: If the runner type is group, you must specify a group_id".
-        exit 1
-      fi
-      runner_type_param='--form group_id=${gitlab_runner_group_id}'
-    elif [ "${gitlab_runner_type}" = "project" ]; then
-      if [ -z "${gitlab_runner_project_id}" ]; then
-        echo "ERROR: If the runner type is project_type, you must specify a project_id".
-        exit 1
-      fi
-      runner_type_param='--form project_id=${gitlab_runner_project_id}'
+      aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
+
+      token=$(echo $json_token | jq -r '.token')
     fi
 
-    # fetch gitlab token from SSM
-    gitlab_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
-
-    response=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/user/runners" \
-      --header "private-token: $gitlab_token" \
-      --form "tag_list=${gitlab_runner_tag_list}" \
-      --form "description=${gitlab_runner_description}" \
-      --form "locked=${gitlab_runner_locked_to_project}" \
-      --form "run_untagged=${gitlab_runner_run_untagged}" \
-      --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
-      --form "runner_type=${gitlab_runner_type}_type" \
-      $runner_type_param \
-      --form "access_level=${gitlab_runner_access_level}")
-
-    token=$(echo $response | jq -r '.token')
-    if [[ "$token" == null ]]
+    valid_token=true
+    if [[ "$token" != "null" ]]
     then
-        message=$(echo $response | jq -r '.message // .error_description')
-        if [[ "$message" != null ]]
-        then
-            echo "ERROR: Couldn't register the Runner. GitLab API call returned $message".
+      valid_token_response=$(curl -s -o /dev/null -w "%%{response_code}" ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners/verify" --form "token=$token" )
+      [[ "$valid_token_response" != "200" ]] && valid_token=false
+    fi
+
+    if [[ "${runners_token}" == "__REPLACED_BY_USER_DATA__" && "$token" == "null" ]] || [[ "$valid_token" == "false" ]]
+    then
+      if [ "${use_new_runner_authentication_gitlab_16}" == "true" ]
+      then
+        runner_type_param=""
+        if [ "${gitlab_runner_type}" = "group" ]; then
+          if [ -z "${gitlab_runner_group_id}" ]; then
+            echo "ERROR: If the runner type is group, you must specify a group_id".
             exit 1
+          fi
+          runner_type_param='--form group_id=${gitlab_runner_group_id}'
+        elif [ "${gitlab_runner_type}" = "project" ]; then
+          if [ -z "${gitlab_runner_project_id}" ]; then
+            echo "ERROR: If the runner type is project_type, you must specify a project_id".
+            exit 1
+          fi
+          runner_type_param='--form project_id=${gitlab_runner_project_id}'
         fi
+
+        # fetch gitlab token from SSM
+        gitlab_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
+
+        response=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/user/runners" \
+          --header "private-token: $gitlab_token" \
+          --form "tag_list=${gitlab_runner_tag_list}" \
+          --form "description=${gitlab_runner_description}" \
+          --form "locked=${gitlab_runner_locked_to_project}" \
+          --form "run_untagged=${gitlab_runner_run_untagged}" \
+          --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
+          --form "runner_type=${gitlab_runner_type}_type" \
+          $runner_type_param \
+          --form "access_level=${gitlab_runner_access_level}")
+
+        token=$(echo $response | jq -r '.token')
+        if [[ "$token" == null ]]
+        then
+            message=$(echo $response | jq -r '.message // .error_description')
+            if [[ "$message" != null ]]
+            then
+                echo "ERROR: Couldn't register the Runner. GitLab API call returned $message".
+                exit 1
+            fi
+        fi
+      else
+        gitlab_runner_registration_token=${gitlab_runner_registration_token}
+
+        # fetch registration token from SSM
+        if [[ "$gitlab_runner_registration_token" == "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__" ]]
+        then
+          gitlab_runner_registration_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_runner_registration_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
+        fi
+
+        token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
+        --form "token=$gitlab_runner_registration_token" \
+        --form "tag_list=${gitlab_runner_tag_list}" \
+        --form "description=${gitlab_runner_description}" \
+        --form "locked=${gitlab_runner_locked_to_project}" \
+        --form "run_untagged=${gitlab_runner_run_untagged}" \
+        --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
+        --form "access_level=${gitlab_runner_access_level}" \
+        | jq -r .token)
+      fi
+
+      aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" \
+        --value="{\"token\": \"$token\", \"usage_counter\": 1}" --region "${secure_parameter_store_region}"
     fi
-  else
-    gitlab_runner_registration_token=${gitlab_runner_registration_token}
 
-    # fetch registration token from SSM
-    if [[ "$gitlab_runner_registration_token" == "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__" ]]
-    then
-      gitlab_runner_registration_token=$(aws ssm get-parameter --name "${secure_parameter_store_gitlab_runner_registration_token_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
-    fi
-
-    token=$(curl ${curl_cacert} --request POST -L "${runners_gitlab_url}/api/v4/runners" \
-    --form "token=$gitlab_runner_registration_token" \
-    --form "tag_list=${gitlab_runner_tag_list}" \
-    --form "description=${gitlab_runner_description}" \
-    --form "locked=${gitlab_runner_locked_to_project}" \
-    --form "run_untagged=${gitlab_runner_run_untagged}" \
-    --form "maximum_timeout=${gitlab_runner_maximum_timeout}" \
-    --form "access_level=${gitlab_runner_access_level}" \
-    | jq -r .token)
-  fi
-
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" \
-    --value="{\"token\": \"$token\", \"usage_counter\": 1}" --region "${secure_parameter_store_region}"
+    sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 fi
-
-sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 
 if [[ "${use_fleet}" == "true" ]]
 then
@@ -202,43 +212,47 @@ WantedBy=multi-user.target
 
 EOF
 
-cat <<'EOF' > /opt/remove_gitlab_registration.sh
-#!/bin/bash
-json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters[0].Value" | tr -d '\r\n')
-deregister_runner=true
+# TODO remove the following block after v8.0.0
+# no longer needed as we use preregistered runners
+if [[ "${preregistered_runner_token_ssm_parameter_name}" == "" ]]; then
+    cat <<'EOF' > /opt/remove_gitlab_registration.sh
+    #!/bin/bash
+    json_token=$(aws ssm get-parameters --names "${secure_parameter_store_runner_token_key}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameters[0].Value" | tr -d '\r\n')
+    deregister_runner=true
 
-usage_counter=$(echo $json_token | jq -r .usage_counter)
+    usage_counter=$(echo $json_token | jq -r .usage_counter)
 
-# ensure that the token is not in use by another Runner
-if [[ $usage_counter -gt 1 ]]; then
-  deregister_runner=false
-  token="not needed"
-else
-  token=$(echo $json_token | jq -r .token)
+    # ensure that the token is not in use by another Runner
+    if [[ $usage_counter -gt 1 ]]; then
+      deregister_runner=false
+      token="not needed"
+    else
+      token=$(echo $json_token | jq -r .token)
+    fi
+
+    if [[ $deregister_runner == "true" ]]; then
+      echo "Removing Gitlab Runner ..."
+
+      aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="{\"token\": \"null\", \"usage_counter\": 0}" 2>&1
+      curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1
+    else
+      usage_counter=$(echo $json_token | jq -r .usage_counter)
+      usage_counter=$(($usage_counter-1))
+      json_token=$(echo $json_token | jq -c ".usage_counter = $usage_counter")
+
+      aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
+
+      echo "Token still in use. GitLab Runner not removed from GitLab."
+    fi
+
+    EOF
+
+    chmod a+x /opt/remove_gitlab_registration.sh
+    systemctl enable remove-gitlab-registration.service
+
+    # start the service. Otherwise the stop action will not be triggered at shutdown.
+    service remove-gitlab-registration start
 fi
-
-if [[ $deregister_runner == "true" ]]; then
-  echo "Removing Gitlab Runner ..."
-
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="{\"token\": \"null\", \"usage_counter\": 0}" 2>&1
-  curl -sS ${curl_cacert} --request DELETE "${runners_gitlab_url}/api/v4/runners" --form "token=$token" 2>&1
-else
-  usage_counter=$(echo $json_token | jq -r .usage_counter)
-  usage_counter=$(($usage_counter-1))
-  json_token=$(echo $json_token | jq -c ".usage_counter = $usage_counter")
-
-  aws ssm put-parameter --overwrite --type SecureString  --name "${secure_parameter_store_runner_token_key}" --region "${secure_parameter_store_region}" --value="$json_token" 2>&1
-
-  echo "Token still in use. GitLab Runner not removed from GitLab."
-fi
-
-EOF
-
-chmod a+x /opt/remove_gitlab_registration.sh
-systemctl enable remove-gitlab-registration.service
-
-# start the service. Otherwise the stop action will not be triggered at shutdown.
-service remove-gitlab-registration start
 
 if ! ( rpm -q gitlab-runner >/dev/null )
 then

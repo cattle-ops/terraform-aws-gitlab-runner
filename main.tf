@@ -59,6 +59,7 @@ locals {
       post_install                                                 = var.runner_install.post_install_script
       runners_gitlab_url                                           = var.runner_gitlab.url
       runners_token                                                = var.runner_gitlab.registration_token
+      preregistered_runner_token_ssm_parameter_name = var.runner_gitlab.preregistered_runner_token_ssm_parameter_name
       secure_parameter_store_gitlab_runner_registration_token_name = var.runner_gitlab_registration_token_secure_parameter_store_name
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
