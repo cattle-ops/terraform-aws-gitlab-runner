@@ -42,11 +42,6 @@ module "vpc_endpoints" {
   }
 }
 
-resource "aws_ssm_parameter" "gitlab_runner_token" {
-  name  = "/gitlab/runner/registration-token"
-  type  = "SecureString"
-  value = "better set this manually and use a data statement here!"
-}
 
 module "runner" {
   source = "../../"
@@ -64,7 +59,7 @@ module "runner" {
   # Other public certs relating to my company.
   runner_gitlab = {
     url                                           = var.gitlab_url
-    preregistered_runner_token_ssm_parameter_name = aws_ssm_parameter.gitlab_runner_token.name
+    preregistered_runner_token_ssm_parameter_name = var.preregistered_runner_token_ssm_parameter_name
 
     certificate    = file("${path.module}/my_gitlab_instance_cert.crt")
     ca_certificate = file("${path.module}/my_company_ca_cert_bundle.crt")
