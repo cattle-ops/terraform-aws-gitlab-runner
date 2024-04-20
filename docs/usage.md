@@ -20,7 +20,9 @@ AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow 
 
 > 💥  **If you are using GitLab >= 16.0.0**: `registration_token` will be deprecated!
 
->GitLab >= 16.0.0 has removed the `registration_token` since they are working on a [new token architecture](https://docs.gitlab.com/ee/architecture/blueprints/runner_tokens/). This module handle these changes, you need to provide a personal access token with `api` scope for the runner to authenticate itself.
+>GitLab >= 16.0.0 has removed the `registration_token` since they are working on a [new token architecture](https://docs.gitlab.com/ee/architecture/blueprints/runner_tokens/).
+> This module handle these changes, you need to provide a personal access token with `api` scope for the runner to authenticate
+> itself.
 
 >The workflow is as follows ([migration steps](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/876)):
 >1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance`, `group` or `project`).

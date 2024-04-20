@@ -318,6 +318,8 @@ variable "runner_gitlab_registration_config" {
   }
 }
 
+# baee238e-1921-4801-9c3f-79ae1d7b2cbc: we don't have secrets here
+# kics-scan ignore-line
 variable "runner_gitlab" {
   description = <<-EOT
     ca_certificate = Trusted CA certificate bundle (PEM format).
