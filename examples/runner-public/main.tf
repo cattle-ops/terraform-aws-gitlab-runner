@@ -26,6 +26,12 @@ module "cache" {
   environment = var.environment
 }
 
+resource "aws_ssm_parameter" "gitlab_runner_token" {
+  name  = "/gitlab/runner/registration-token"
+  type  = "SecureString"
+  value = "better set this manually and use a data statement here!"
+}
+
 module "runner" {
   source = "../../"
 
@@ -42,16 +48,8 @@ module "runner" {
 
   runner_gitlab = {
     url = var.gitlab_url
-  }
 
-  runner_gitlab_registration_config = {
-    registration_token = var.registration_token
-    tag_list           = "docker_spot_runner"
-    description        = "runner public - auto"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-    access_level       = "ref_protected"
+    preregistered_runner_token_ssm_parameter_name = aws_ssm_parameter.gitlab_runner_token.name
   }
 
   runner_worker = {
@@ -89,15 +87,8 @@ module "runner2" {
 
   runner_gitlab = {
     url = var.gitlab_url
-  }
 
-  runner_gitlab_registration_config = {
-    registration_token = var.registration_token
-    tag_list           = "docker_spot_runner_2"
-    description        = "runner public - auto"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
+    preregistered_runner_token_ssm_parameter_name = aws_ssm_parameter.gitlab_runner_token.name
   }
 
   runner_worker_cache = {
