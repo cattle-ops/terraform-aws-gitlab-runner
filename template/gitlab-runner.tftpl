@@ -245,7 +245,7 @@ if [[ "${preregistered_runner_token_ssm_parameter_name}" == "" ]]; then
       echo "Token still in use. GitLab Runner not removed from GitLab."
     fi
 
-    EOF
+EOF
 
     chmod a+x /opt/remove_gitlab_registration.sh
     systemctl enable remove-gitlab-registration.service
