@@ -38,12 +38,6 @@ module "vpc_endpoints" {
   }
 }
 
-resource "aws_ssm_parameter" "gitlab_runner_token" {
-  name  = "/gitlab/runner/registration-token"
-  type  = "SecureString"
-  value = "better set this manually and use a data statement here!"
-}
-
 module "runner" {
   source = "../../"
 
@@ -63,7 +57,7 @@ module "runner" {
   runner_gitlab = {
     url = var.gitlab_url
 
-    preregistered_runner_token_ssm_parameter_name = aws_ssm_parameter.gitlab_runner_token.name
+    preregistered_runner_token_ssm_parameter_name = var.preregistered_runner_token_ssm_parameter_name
   }
 
   runner_worker = {

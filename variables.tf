@@ -329,6 +329,7 @@ variable "runner_gitlab" {
     url = URL of the GitLab instance to connect to.
     url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
     access_token_secure_parameter_store_name = (deprecated) The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
+    preregistered_runner_token_ssm_parameter_name = The name of the SSM parameter to read the preregistered GitLab Runner token from.
   EOT
   type = object({
     ca_certificate                                = optional(string, "")
