@@ -318,12 +318,12 @@ variable "runner_gitlab_registration_config" {
   }
 }
 
+# baee238e-1921-4801-9c3f-79ae1d7b2cbc: we don't have secrets here
+# kics-scan ignore-block
 variable "runner_gitlab" {
   description = <<-EOT
     ca_certificate = Trusted CA certificate bundle (PEM format).
     certificate = Certificate of the GitLab instance to connect to (PEM format).
-# baee238e-1921-4801-9c3f-79ae1d7b2cbc: we don't have secrets here
-# kics-scan ignore-line
     registration_token = (deprecated, This is replaced by the `registration_token` in `runner_gitlab_registration_config`.) Registration token to use to register the Runner.
     runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
     url = URL of the GitLab instance to connect to.
