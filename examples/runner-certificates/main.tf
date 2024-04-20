@@ -63,7 +63,7 @@ module "runner" {
   # Public cert of my company's gitlab instance
   # Other public certs relating to my company.
   runner_gitlab = {
-    url            = var.gitlab_url
+    url                                           = var.gitlab_url
     preregistered_runner_token_ssm_parameter_name = aws_ssm_parameter.gitlab_runner_token.name
 
     certificate    = file("${path.module}/my_gitlab_instance_cert.crt")
