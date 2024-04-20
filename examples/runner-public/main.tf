@@ -82,7 +82,7 @@ module "runner2" {
   runner_gitlab = {
     url = var.gitlab_url
 
-    preregistered_runner_token_ssm_parameter_name = aws_ssm_parameter.gitlab_runner_token.name
+    preregistered_runner_token_ssm_parameter_name = var.preregistered_runner_token_ssm_parameter_name
   }
 
   runner_worker_cache = {
