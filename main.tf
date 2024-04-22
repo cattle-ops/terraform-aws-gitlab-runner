@@ -635,15 +635,16 @@ resource "aws_iam_role_policy_attachment" "eip" {
 module "terminate_agent_hook" {
   source = "./modules/terminate-agent-hook"
 
-  name                                 = var.runner_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.runner_terminate_ec2_lifecycle_hook_name
-  environment                          = var.environment
-  asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
-  asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
-  cloudwatch_logging_retention_in_days = var.runner_cloudwatch.retention_days
-  name_iam_objects                     = local.name_iam_objects
-  name_docker_machine_runners          = local.runner_tags_merged["Name"]
-  role_permissions_boundary            = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
-  kms_key_id                           = local.kms_key
+  name                                   = var.runner_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.runner_terminate_ec2_lifecycle_hook_name
+  environment                            = var.environment
+  asg_arn                                = aws_autoscaling_group.gitlab_runner_instance.arn
+  asg_name                               = aws_autoscaling_group.gitlab_runner_instance.name
+  cloudwatch_logging_retention_in_days   = var.runner_cloudwatch.retention_days
+  name_iam_objects                       = local.name_iam_objects
+  name_docker_machine_runners            = local.runner_tags_merged["Name"]
+  role_permissions_boundary              = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
+  kms_key_id                             = local.kms_key
+  asg_hook_terminating_heartbeat_timeout = local.runner_worker_graceful_terminate_timeout_duration
 
   tags = local.tags
 }

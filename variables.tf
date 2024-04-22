@@ -381,6 +381,7 @@ variable "runner_worker" {
     For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
 
     environment_variables = List of environment variables to add to the Runner Worker (environment).
+    graceful_terminate_timeout_duration = Amount of time to wait for GitLab Runner to finish picked up jobs. Defaults to the `maximum_timeout` configured + `5m`. Maximum allowed is `7200` (2 hours)
     max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
@@ -388,12 +389,13 @@ variable "runner_worker" {
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
   EOT
   type = object({
-    environment_variables = optional(list(string), [])
-    max_jobs              = optional(number, 0)
-    output_limit          = optional(number, 4096)
-    request_concurrency   = optional(number, 1)
-    ssm_access            = optional(bool, false)
-    type                  = optional(string, "docker+machine")
+    environment_variables               = optional(list(string), [])
+    graceful_terminate_timeout_duration = optional(number, null)
+    max_jobs                            = optional(number, 0)
+    output_limit                        = optional(number, 4096)
+    request_concurrency                 = optional(number, 1)
+    ssm_access                          = optional(bool, false)
+    type                                = optional(string, "docker+machine")
   })
   default = {}
 

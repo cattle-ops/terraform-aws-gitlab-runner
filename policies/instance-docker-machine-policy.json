@@ -18,7 +18,9 @@
           "ec2:CancelSpotInstanceRequests",
           "ec2:DescribeSubnets",
           "ec2:AssociateIamInstanceProfile",
-          "ec2:CreateFleet"
+          "ec2:CreateFleet",
+          "autoscaling:CompleteLifecycleAction",
+          "autoscaling:DescribeLifecycleHooks"
         ],
         "Effect": "Allow",
         "Resource": "*"

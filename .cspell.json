@@ -53,6 +53,7 @@
     "tftpl",
     "tfvars",
     "tmpfs",
+    "tonumber",
     "trivy",
     "userns",
     "xanzy",

@@ -60,3 +60,14 @@ variable "enable_xray_tracing" {
   type        = bool
   default     = false
 }
+
+variable "asg_hook_terminating_heartbeat_timeout" {
+  description = "Duration the ASG should stay in the Terminating:Wait state."
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = var.asg_hook_terminating_heartbeat_timeout >= 30 && var.asg_hook_terminating_heartbeat_timeout <= 7200
+    error_message = "AWS only supports heartbeat timeout in the range of 30 to 7200."
+  }
+}
