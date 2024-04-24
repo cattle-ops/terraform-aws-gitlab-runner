@@ -56,15 +56,8 @@ module "runner" {
 
   runner_gitlab = {
     url = var.gitlab_url
-  }
 
-  runner_gitlab_registration_config = {
-    registration_token = var.registration_token
-    tag_list           = "docker_runner"
-    description        = "runner docker - auto"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
+    preregistered_runner_token_ssm_parameter_name = var.preregistered_runner_token_ssm_parameter_name
   }
 
   runner_worker = {

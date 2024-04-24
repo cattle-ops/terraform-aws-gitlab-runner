@@ -54,8 +54,9 @@ module "runner" {
   }
 
   runner_gitlab = {
-    url                = var.gitlab_url
-    registration_token = var.runner_token
+    url = var.gitlab_url
+
+    preregistered_runner_token_ssm_parameter_name = var.preregistered_runner_token_ssm_parameter_name
   }
 
   # working 9 to 5 :)

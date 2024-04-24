@@ -22,8 +22,7 @@ variable "gitlab_url" {
   default     = "https://gitlab.com"
 }
 
-variable "registration_token" {
-  description = "Gitlab runner registration token"
+variable "preregistered_runner_token_ssm_parameter_name" {
+  description = "The name of the SSM parameter to read the preregistered GitLab Runner token from."
   type        = string
-  default     = "something"
 }

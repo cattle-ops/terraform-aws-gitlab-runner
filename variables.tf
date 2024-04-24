@@ -297,18 +297,18 @@ variable "runner_cloudwatch" {
 }
 
 variable "runner_gitlab_registration_config" {
-  description = "Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
+  description = "(deprecated, replaced by runner_gitlab.preregistered_runner_token_ssm_parameter_name) Configuration used to register the Runner. See the README for an example, or reference the examples in the examples directory of this repo. There is also a good GitLab documentation available at: https://docs.gitlab.com/ee/ci/runners/configure_runners.html"
   type = object({
-    registration_token = optional(string, "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__")
-    tag_list           = optional(string, "")
-    description        = optional(string, "")
-    type               = optional(string, "") # mandatory if gitlab_runner_version >= 16.0.0
-    group_id           = optional(string, "") # mandatory if type is group
-    project_id         = optional(string, "") # mandatory if type is project
-    locked_to_project  = optional(string, "")
-    run_untagged       = optional(string, "")
-    maximum_timeout    = optional(string, "")
-    access_level       = optional(string, "not_protected") # this is the only mandatory field calling the GitLab get token for executor operation
+    registration_token = optional(string, "__GITLAB_REGISTRATION_TOKEN_FROM_SSM__") # deprecated, removed in 8.0.0
+    tag_list           = optional(string, "")                                       # deprecated, removed in 8.0.0
+    description        = optional(string, "")                                       # deprecated, removed in 8.0.0
+    type               = optional(string, "")                                       # mandatory if gitlab_runner_version >= 16.0.0 # deprecated, removed in 8.0.0
+    group_id           = optional(string, "")                                       # mandatory if type is group # deprecated, removed in 8.0.0
+    project_id         = optional(string, "")                                       # mandatory if type is project # deprecated, removed in 8.0.0
+    locked_to_project  = optional(string, "")                                       # deprecated, removed in 8.0.0
+    run_untagged       = optional(string, "")                                       # deprecated, removed in 8.0.0
+    maximum_timeout    = optional(string, "")                                       # deprecated, removed in 8.0.0
+    access_level       = optional(string, "not_protected")                          # this is the only mandatory field calling the GitLab get token for executor operation # deprecated, removed in 8.0.0
   })
 
   default = {}
@@ -318,29 +318,33 @@ variable "runner_gitlab_registration_config" {
   }
 }
 
+# baee238e-1921-4801-9c3f-79ae1d7b2cbc: we don't have secrets here
+# kics-scan ignore-block
 variable "runner_gitlab" {
   description = <<-EOT
     ca_certificate = Trusted CA certificate bundle (PEM format).
     certificate = Certificate of the GitLab instance to connect to (PEM format).
-    registration_token = Registration token to use to register the Runner. Do not use. This is replaced by the `registration_token` in `runner_gitlab_registration_config`.
+    registration_token = (deprecated, This is replaced by the `registration_token` in `runner_gitlab_registration_config`.) Registration token to use to register the Runner.
     runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
     url = URL of the GitLab instance to connect to.
     url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
-    access_token_secure_parameter_store_name = The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
+    access_token_secure_parameter_store_name = (deprecated) The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
+    preregistered_runner_token_ssm_parameter_name = The name of the SSM parameter to read the preregistered GitLab Runner token from.
   EOT
   type = object({
-    ca_certificate                           = optional(string, "")
-    certificate                              = optional(string, "")
-    registration_token                       = optional(string, "__REPLACED_BY_USER_DATA__")
-    runner_version                           = optional(string, "15.8.2")
-    url                                      = optional(string, "")
-    url_clone                                = optional(string, "")
-    access_token_secure_parameter_store_name = optional(string, "gitlab-runner-access-token")
+    ca_certificate                                = optional(string, "")
+    certificate                                   = optional(string, "")
+    registration_token                            = optional(string, "__REPLACED_BY_USER_DATA__") # deprecated, removed in 8.0.0
+    runner_version                                = optional(string, "15.8.2")
+    url                                           = optional(string, "")
+    url_clone                                     = optional(string, "")
+    access_token_secure_parameter_store_name      = optional(string, "gitlab-runner-access-token") # deprecated, removed in 8.0.0
+    preregistered_runner_token_ssm_parameter_name = optional(string, "")
   })
 }
 
 variable "runner_gitlab_registration_token_secure_parameter_store_name" {
-  description = "The name of the SSM parameter to read the GitLab Runner registration token from."
+  description = "(deprecated, replaced by runner_gitlab.preregistered_runner_token_ssm_parameter_name) The name of the SSM parameter to read the GitLab Runner registration token from."
   type        = string
   default     = "gitlab-runner-registration-token"
 }

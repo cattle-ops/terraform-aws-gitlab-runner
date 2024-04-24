@@ -5,12 +5,12 @@ Common pitfalls are documented in [pitfalls.md](pitfalls.md).
 ## Configuration
 
 The examples are configured with defaults that should work in general. The examples are in general configured for the
-region Ireland `eu-west-1`. The only parameter that needs to be provided is the GitLab are the registration token and the
-URL of your GitLab instance. The token can be found in GitLab in the runner section (global, group or repo scope).
-Create a file `terraform.tfvars` and the registration token.
+region Ireland `eu-west-1`. The only parameter that needs to be provided is the name of a SSM parameter holding the Runner
+registration token and the URL of your GitLab instance. The Runner token is created in GitLab during the Runner registration process.
+Create a file `terraform.tfvars` and put the Runner registration token in the SSM parameter.
 
 ```hcl
-registration_token = "MY_TOKEN"
+preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
 gitlab_url   = "https://my.gitlab.instance/"
 ```
 
@@ -18,14 +18,9 @@ The base image used to host the GitLab Runner agent is the latest available Amaz
 this module a hard coded list of AMIs per region was provided. This list has been replaced by a search filter to find the latest
 AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow you to version lock the target AMI if needed.
 
-> 💥  **If you are using GitLab >= 16.0.0**: `registration_token` will be deprecated!
-
->GitLab >= 16.0.0 has removed the `registration_token` since they are working on a [new token architecture](https://docs.gitlab.com/ee/architecture/blueprints/runner_tokens/). This module handle these changes, you need to provide a personal access token with `api` scope for the runner to authenticate itself.
-
->The workflow is as follows ([migration steps](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/876)):
->1. The runner make an API call (with the access token) to create a new runner on GitLab depending on its type (`instance`, `group` or `project`).
->2. GitLab answers with a token prefixed by `glrt-` and we put it in SSM.
->3. The runner will get the config from `/etc/gitlab-runner/config.toml` and will listen for new jobs from your GitLab instance.
+The Runner uses a token to register with GitLab. This token is stored in the AWS SSM parameter store. The token has to be created
+manually in GitLab and stored in the SSM parameter store. All other registration methods are deprecated and will be removed in
+v8.0.0.
 
 ## Install the module
 
@@ -45,40 +40,7 @@ terraform destroy
 
 ## Scenarios
 
-### Scenario: Basic usage on GitLab **< 16.0.0**
-
-Below is a basic examples of usages of the module. Regarding the dependencies such as a VPC, have a look at the [default example](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/runner-default).
-
-```hcl
-module "runner" {
-  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
-  source  = "cattle-ops/gitlab-runner/aws"
-
-  environment = "basic"
-
-  vpc_id    = module.vpc.vpc_id
-  subnet_id = element(module.vpc.private_subnets, 0)
-
-  runner_gitlab = {
-    url = "https://gitlab.com"
-  }
-
-  runner_gitlab_registration_config = {
-    registration_token = "my-token"
-    tag_list           = "docker"
-    description        = "runner default"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-  }
-
-  runner_worker_docker_machine_instance = {
-    subnet_ids = module.vpc.private_subnets
-  }
-}
-```
-
-### Scenario: Basic usage on GitLab **>= 16.0.0**
+### Scenario: Basic usage
 
 Below is a basic examples of usages of the module if your GitLab instance version is >= 16.0.0.
 
@@ -99,20 +61,9 @@ module "runner" {
    
   runner_gitlab = {
     url = "https://gitlab.com"
-    access_token_secure_parameter_store_name = "gitlab_access_token_ssm_name"
+     
+    preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
   }
-   
-  runner_gitlab_registration_config = {
-    type               = "instance" # or "group" or "project"
-    # group_id           = 1234 # for "group"
-    # project_id         = 5678 # for "project"
-    tag_list           = "docker"
-    description        = "runner default"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-  }
-
 }
 ```
 
@@ -135,15 +86,8 @@ module "runner" {
    
   runner_gitlab = {
     url = "https://gitlab.com"
-  }
-   
-  runner_gitlab_registration_config = {
-    registration_token = "my-token"
-    tag_list           = "docker"
-    description        = "runner default"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
+
+    preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
   }
    
    runner_worker_cache = {
@@ -181,16 +125,9 @@ module "runner" {
 
   runner_gitlab = {
     url = "https://gitlab.com"
- }
 
-  runner_gitlab_registration_config = {
-    registration_token = "my-token"
-    tag_list           = "docker"
-    description        = "runner default"
-    locked_to_project  = "true"
-    run_untagged       = "false"
-    maximum_timeout    = "3600"
-  }
+    preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
+ }
 
   runner_worker = {
     type = "docker+machine"
@@ -242,52 +179,6 @@ resource "aws_iam_service_linked_role" "autoscaling" {
 If a KMS key is set via `kms_key_id`, make sure that you also give proper access to the key. Otherwise, you might
 get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
 example checkout [kms-policy.json](https://github.com/cattle-ops/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
-
-### GitLab runner token configuration
-
-By default, the runner is registered on initial deployment. In previous versions of this module this was a manual process. The
-manual process is still supported but will be removed in future releases. The runner token will be stored in the AWS SSM parameter
-store. See [example](../examples/runner-pre-registered) for more details.
-
-To register the runner automatically set the variable `gitlab_runner_registration_config["registration_token"]`. This token value
-can be found in your GitLab project, group, or global settings. For a generic runner you can find the token in the admin section.
-By default, the runner will be locked to the target project and not run untagged jobs. Below is an example of the configuration map.
-
-```hcl
-runner_gitlab_registration_config = {
-  registration_token = "<registration token>"
-  tag_list           = "<your tags, comma separated>"
-  description        = "<some description>"
-  locked_to_project  = "true"
-  run_untagged       = "false"
-  maximum_timeout    = "3600"
-  # ref_protected runner will only run on pipelines triggered on protected branches. Defaults to not_protected
-  access_level       = "<not_protected OR ref_protected>"
-}
-```
-
-The registration token can also be read in via SSM parameter store. If no registration token is passed in, the module
-will look up the token in the SSM parameter store at the location specified by
-`runner_gitlab_registration_token_secure_parameter_store_name`.
-
-For migration to the new setup simply add the runner token to the parameter store. Once the runner is started it will look up the
-required values via the parameter store. If the value is `null` a new runner will be registered and a new token created/stored.
-
-```sh
-# set the following variables, look up the variables in your Terraform config.
-# see your Terraform variables to fill in the vars below.
-aws-region=<${var.aws_region}>
-token=<runner-token-see-your-gitlab-runner>
-parameter-name=<${var.environment}>-<${var.secure_parameter_store_runner_token_key}>
-
-aws ssm put-parameter --overwrite --type SecureString  --name "${parameter-name}" --value ${token} --region "${aws-region}"
-```
-
-Once you have created the parameter, you must remove the variable `runner_gitlab.registration_token` from your config. The next
-time your GitLab runner instance is created it will look up the token from the SSM parameter store.
-
-Finally, the runner still supports the manual runner creation. No changes are required. Please keep in mind that this setup will be
-removed in future releases.
 
 ### Auto Scaling Group
 

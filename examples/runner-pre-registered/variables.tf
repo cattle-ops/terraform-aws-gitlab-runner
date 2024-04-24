@@ -20,8 +20,8 @@ variable "gitlab_url" {
   type        = string
 }
 
-variable "runner_token" {
-  description = "Token for the runner, will be used in the runner config.toml"
+variable "preregistered_runner_token_ssm_parameter_name" {
+  description = "The name of the SSM parameter to read the preregistered GitLab Runner token from."
   type        = string
 }
 
