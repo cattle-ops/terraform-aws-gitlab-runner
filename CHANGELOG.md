@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.6.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.5.0...7.6.0) (2024-05-01)
+
+
+### Features
+
+* add option to use a pre-registered Runner ([#1115](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1115)) ([9153a3a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/9153a3ac74b6b83e5ef408ff81696eb1d8b88a4d))
+
 ## [7.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.4.0...7.5.0) (2024-04-11)
 
 
