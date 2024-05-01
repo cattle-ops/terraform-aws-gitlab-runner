@@ -174,10 +174,15 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
     version = aws_launch_template.gitlab_runner_instance.latest_version
   }
 
+  instance_maintenance_policy {
+    max_healthy_percentage = 110
+    min_healthy_percentage = 100
+  }
+
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      min_healthy_percentage = 0
+      min_healthy_percentage = 100
     }
     triggers = ["tag"]
   }
@@ -627,6 +632,14 @@ resource "aws_iam_role_policy_attachment" "eip" {
 
   role       = var.runner_role.create_role_profile ? aws_iam_role.instance[0].name : local.aws_iam_role_instance_name
   policy_arn = aws_iam_policy.eip[0].arn
+}
+
+resource "aws_autoscaling_lifecycle_hook" "wait_for_gitlab_runner" {
+  name                   = "${var.environment}-wait-for-gitlab-runner-up"
+  autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
+  default_result         = "CONTINUE"
+  heartbeat_timeout      = 300
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
 }
 
 ################################################################################
