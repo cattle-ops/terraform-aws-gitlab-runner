@@ -278,32 +278,32 @@ cat <<'EOF' > /opt/monitor_runner.sh
 
 # Fetch instance ID since we need it for the lifecycle hook actions.
 imds_token=$(curl -sSf -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/instance-id")
-region=$(curl -s -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/placement/region")
+instance_id=$(curl -sSf -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/instance-id")
+region=$(curl -sSf -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/placement/region")
 
 # Function to send complete-lifecycle-action
 send_complete_lifecycle_action() {
     echo "Sending complete-lifecycle-action for instance $instance_id..."
 
     if [ -z "$region" ]; then
-    echo "Failed to retrieve AWS region."
-    exit 1
+      echo "Failed to retrieve AWS region."
+      exit 1
     fi
     echo "Current AWS Region: $region"
 
     # Retrieve the Auto Scaling Group name associated with the instance
     asg_name=$(aws --region $region ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=aws:autoscaling:groupName" --query 'Tags[].Value' --output text)
     if [ -z "$asg_name" ]; then
-    echo "Failed to retrieve Auto Scaling Group name."
-    exit 1
+      echo "Failed to retrieve Auto Scaling Group name."
+      exit 1
     fi
     echo "Auto Scaling Group Name: $asg_name"
 
     # Retrieve the lifecycle hook names associated with the Auto Scaling Group
-    lifecycle_hooks=$(aws --region $region autoscaling describe-lifecycle-hooks --auto-scaling-group-name $asg_name --query "LifecycleHooks[*].LifecycleHookName" --output text)
+    lifecycle_hooks=$(aws --region $region autoscaling describe-lifecycle-hooks --auto-scaling-group-name $asg_name --query "LifecycleHooks[?LifecycleTransition=='autoscaling:EC2_INSTANCE_TERMINATING'].LifecycleHookName" --output text)
     if [ -z "$lifecycle_hooks" ]; then
-    echo "No lifecycle hooks found for Auto Scaling Group: $asg_name"
-    exit 1
+      echo "No lifecycle hooks found for Auto Scaling Group: $asg_name"
+      exit 1
     fi
     echo "Lifecycle Hooks: $lifecycle_hooks"
 
@@ -312,20 +312,20 @@ send_complete_lifecycle_action() {
     sleep 10
 
     for hook_name in $lifecycle_hooks; do
-    echo "Completing lifecycle action for hook: $hook_name"
+      echo "Completing lifecycle action for hook: $hook_name"
 
-    aws autoscaling complete-lifecycle-action \
-        --lifecycle-hook-name $hook_name \
-        --auto-scaling-group-name $asg_name \
-        --lifecycle-action-result CONTINUE \
-        --instance-id $instance_id \
-        --region $region
+      aws autoscaling complete-lifecycle-action \
+          --lifecycle-hook-name $hook_name \
+          --auto-scaling-group-name $asg_name \
+          --lifecycle-action-result CONTINUE \
+          --instance-id $instance_id \
+          --region $region
 
-    if [ $? -eq 0 ]; then
-        echo "Lifecycle action completed successfully for hook: $hook_name"
-    else
-        echo "Failed to complete lifecycle action for hook: $hook_name"
-    fi
+      if [ $? -eq 0 ]; then
+          echo "Lifecycle action completed successfully for hook: $hook_name"
+      else
+          echo "Failed to complete lifecycle action for hook: $hook_name"
+      fi
     done
 }
 
@@ -336,8 +336,6 @@ monitor_process() {
         sleep 5
         status=$(systemctl is-active gitlab-runner.service)
         if [ "$status" = "inactive" ] || [ "$status" = "failed" ]; then
-          # TODO: maybe also Docker Machine Cleanup here?
-          # Currently the Lambda is resposible for this.
           echo "GitLab Runner service $status. Proceeding with cleanup."
           send_complete_lifecycle_action
         else
