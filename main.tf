@@ -598,7 +598,20 @@ resource "aws_iam_policy" "ssm" {
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
-  policy      = file("${path.module}/policies/instance-secure-parameter-role-policy.json")
+  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.tftpl", {
+    read_resource_arns = compact([
+      aws_ssm_parameter.runner_sentry_dsn.name,
+      var.runner_gitlab_registration_token_secure_parameter_store_name,
+      var.runner_gitlab.access_token_secure_parameter_store_name,
+      var.runner_gitlab.preregistered_runner_token_ssm_parameter_name,
+      aws_ssm_parameter.runner_registration_token.name
+    ])
+    write_resource_arns = [aws_ssm_parameter.runner_registration_token.arn]
+
+    account_id = data.aws_caller_identity.current.account_id
+    partition = data.aws_partition.current.partition
+    region = data.aws_region.current.name
+  })
 
   tags = local.tags
 }
