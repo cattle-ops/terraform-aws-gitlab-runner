@@ -598,7 +598,7 @@ resource "aws_iam_policy" "ssm" {
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
-  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { partition = data.aws_partition.current.partition })
+  policy      = file("${path.module}/policies/instance-secure-parameter-role-policy.json")
 
   tags = local.tags
 }

@@ -4,17 +4,11 @@
         {
             "Effect": "Allow",
             "Action": [
-                "ssm:PutParameter"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
+                "ssm:PutParameter",
                 "ssm:GetParameter",
                 "ssm:GetParameters"
             ],
-            "Resource": "arn:${partition}:ssm:*"
+            "Resource": "*"
         }
     ]
 }
