@@ -606,7 +606,7 @@ resource "aws_iam_policy" "ssm" {
       var.runner_gitlab.preregistered_runner_token_ssm_parameter_name,
       aws_ssm_parameter.runner_registration_token.name
     ])
-    write_resource_arns = [aws_ssm_parameter.runner_registration_token.arn]
+    write_resource_arns = [aws_ssm_parameter.runner_registration_token.name]
 
     account_id = data.aws_caller_identity.current.account_id
     partition = data.aws_partition.current.partition
