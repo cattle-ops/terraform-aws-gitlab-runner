@@ -62,7 +62,7 @@ variable "enable_xray_tracing" {
 }
 
 variable "asg_hook_terminating_heartbeat_timeout" {
-  description = "Duration the ASG should stay in the Terminating:Wait state."
+  description = "Duration in seconds the ASG should stay in the Terminating:Wait state."
   type        = number
   default     = 30
 
