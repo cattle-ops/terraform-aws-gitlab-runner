@@ -357,7 +357,9 @@ main() {
         # Monitor the existence of the Runner process
         monitor_process
     else
-        echo "Instance target lifecycle state is $target_lifecycle_state. No action required."
+        if [ "${user_data_trace_log}" = "true" ]; then
+            echo "Instance target lifecycle state is $target_lifecycle_state. No action required."
+        fi
     fi
 }
 
