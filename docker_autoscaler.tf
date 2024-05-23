@@ -112,12 +112,13 @@ resource "aws_launch_template" "this" {
   lifecycle {
     create_before_destroy = true
   }
-
 }
 
 #########################################
 # Autoscaling group with launch template
 #########################################
+# false positive, tags are created with "dynamic" block
+# kics-scan ignore-line
 resource "aws_autoscaling_group" "autoscaler" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
