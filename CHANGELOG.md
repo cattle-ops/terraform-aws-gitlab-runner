@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.6.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.6.0...7.6.1) (2024-05-10)
+
+
+### Bug Fixes
+
+* use a valid policy for ssm access ([#1124](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1124)) ([fec8c8a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/fec8c8a8d729f8d6076a38d8b063f1e14f4aa518))
+
 ## [7.6.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.5.0...7.6.0) (2024-05-01)
 
 

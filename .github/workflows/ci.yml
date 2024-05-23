@@ -106,7 +106,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.0.0-debian@sha256:e2e85cbe859bc0067ed8bbdcfa76496586fbc5d4597de8dd1db60ffd40c4601e
+      image: checkmarx/kics:v2.0.1-debian@sha256:ff5a5e927b4d68f60c5a9a9d130a21d509037a55f85895a75539154e1bed0105
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
@@ -176,7 +176,7 @@ jobs:
           role-to-assume: ${{ secrets.TERRAFORM_ADMIN_ROLE_ARN }}
           role-session-name: GitHubActions
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@97f030cf6dc0b4f5e0da352c7bca9cca34579800 # v3.1.0
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8 # v3.1.1
         with:
           terraform_version: "1.6.3"
       - run: terraform init -get -backend=false -input=false

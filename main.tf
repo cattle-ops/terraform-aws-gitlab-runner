@@ -599,11 +599,38 @@ resource "aws_eip" "gitlab_runner" {
 ################################################################################
 ### AWS Systems Manager access to store runner token once registered
 ################################################################################
+data "aws_iam_policy_document" "ssm" {
+  statement {
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+    ]
+    resources = [
+      for name in compact(
+        [
+          aws_ssm_parameter.runner_sentry_dsn.name,
+          var.runner_gitlab_registration_token_secure_parameter_store_name,
+          var.runner_gitlab.access_token_secure_parameter_store_name,
+          var.runner_gitlab.preregistered_runner_token_ssm_parameter_name,
+          aws_ssm_parameter.runner_registration_token.name
+        ]
+      ) : "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${name}"
+    ]
+  }
+
+  statement {
+    actions = ["ssm:PutParameter"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${aws_ssm_parameter.runner_registration_token.name}"
+    ]
+  }
+}
+
 resource "aws_iam_policy" "ssm" {
   name        = "${local.name_iam_objects}-ssm"
   path        = "/"
   description = "Policy for runner token param access via SSM"
-  policy      = templatefile("${path.module}/policies/instance-secure-parameter-role-policy.json", { partition = data.aws_partition.current.partition })
+  policy      = data.aws_iam_policy_document.ssm.json
 
   tags = local.tags
 }
