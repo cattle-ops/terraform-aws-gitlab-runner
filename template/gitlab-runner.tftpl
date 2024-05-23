@@ -331,17 +331,19 @@ send_complete_lifecycle_action() {
 
 # Function to monitor the existence of the Runner process
 monitor_process() {
-    while true; do
-        systemctl --no-block stop gitlab-runner.service
-        sleep 5
+      systemctl --no-block stop gitlab-runner.service
+
+      while true; do
+        # it usually takes a while to complete the jobs, so don't poll too often
+        sleep 30
+
         status=$(systemctl is-active gitlab-runner.service)
         if [ "$status" = "inactive" ] || [ "$status" = "failed" ]; then
           echo "GitLab Runner service $status. Proceeding with cleanup."
           send_complete_lifecycle_action
         else
-          echo "GitLab Runner Serivce still running, sleeping..."
+          echo "GitLab Runner Service still running, sleeping..."
         fi
-        sleep 5
     done
 }
 
