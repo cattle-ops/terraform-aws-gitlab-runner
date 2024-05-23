@@ -1,3 +1,8 @@
+#
+# This file is responsible for creating the resources needed to run the docker autoscaler plugin from GitLab. It replaces the
+# outdated docker+machine driver. The docker+machine driver is a legacy driver that is no longer maintained by GitLab.
+#
+
 resource "aws_security_group" "docker_autoscaler" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
