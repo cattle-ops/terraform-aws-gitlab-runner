@@ -80,7 +80,7 @@ locals {
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
-      user_data_trace_log = var.debug.trace_runner_user_data
+      user_data_trace_log                                          = var.debug.trace_runner_user_data
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
