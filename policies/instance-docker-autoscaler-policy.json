@@ -7,7 +7,7 @@
                 "autoscaling:SetDesiredCapacity",
                 "autoscaling:TerminateInstanceInAutoScalingGroup"
             ],
-            "Resource": "${autoscalger_asg_arn}"
+            "Resource": "${autoscaler_asg_arn}"
         },
         {
             "Effect": "Allow",
@@ -26,7 +26,7 @@
             "Resource": "arn:aws:ec2:${aws_region}:*:instance/*",
             "Condition": {
                 "StringEquals": {
-                    "ec2:ResourceTag/aws:autoscaling:groupName": "${autoscalger_asg_name}"
+                    "ec2:ResourceTag/aws:autoscaling:groupName": "${autoscaler_asg_name}"
                 }
             }
         }

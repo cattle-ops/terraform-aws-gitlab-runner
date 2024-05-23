@@ -518,8 +518,8 @@ resource "aws_iam_policy" "instance_docker_autoscaler_policy" {
   policy = templatefile("${path.module}/policies/instance-docker-autoscaler-policy.json",
     {
       aws_region           = data.aws_region.current.name
-      autoscalger_asg_arn  = aws_autoscaling_group.autoscaler[0].arn
-      autoscalger_asg_name = aws_autoscaling_group.autoscaler[0].name
+      autoscaler_asg_arn  = aws_autoscaling_group.autoscaler[0].arn
+      autoscaler_asg_name = aws_autoscaling_group.autoscaler[0].name
   })
 
   tags = local.tags
