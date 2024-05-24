@@ -662,6 +662,7 @@ resource "aws_iam_role_policy_attachment" "eip" {
   policy_arn = aws_iam_policy.eip[0].arn
 }
 
+# We wait for 5 minutes until we set an EC2 instance to status `InService` so it has time to provision itself and it's configured capacity.
 resource "aws_autoscaling_lifecycle_hook" "wait_for_gitlab_runner" {
   name                   = "${var.environment}-wait-for-gitlab-runner-up"
   autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name

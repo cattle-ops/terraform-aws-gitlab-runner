@@ -370,8 +370,8 @@ variable "runner_terminate_ec2_lifecycle_hook_name" {
 
 variable "runner_terminate_ec2_lifecycle_timeout_duration" {
   description = "Amount of time in seconds to wait for GitLab Runner to finish picked up jobs. Defaults to the `maximum_timeout` configured + `5m`. Maximum allowed is `7200` (2 hours)"
-  type = number
-  default = null
+  type        = number
+  default     = null
 }
 
 variable "runner_terraform_timeout_delete_asg" {
@@ -395,12 +395,12 @@ variable "runner_worker" {
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
   EOT
   type = object({
-    environment_variables               = optional(list(string), [])
-    max_jobs                            = optional(number, 0)
-    output_limit                        = optional(number, 4096)
-    request_concurrency                 = optional(number, 1)
-    ssm_access                          = optional(bool, false)
-    type                                = optional(string, "docker+machine")
+    environment_variables = optional(list(string), [])
+    max_jobs              = optional(number, 0)
+    output_limit          = optional(number, 4096)
+    request_concurrency   = optional(number, 1)
+    ssm_access            = optional(bool, false)
+    type                  = optional(string, "docker+machine")
   })
   default = {}
 
