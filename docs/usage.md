@@ -144,6 +144,79 @@ module "runner" {
 }
 ```
 
+### Scenario: Use of Docker autoscaler
+
+As docker machine is no longer maintained by docker, gitlab recently developed docker_autoscaler to replace docker machine (still in beta). An option is available to test it out. It reuses the arguments int he docker-machine block arguments and create an autoscaling groupthat will be supplied to docker-autoscaler.
+
+Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
+
+```
+# Install docker
+# Add Docker's official GPG key:
+apt-get update
+apt-get install -y ca-certificates curl
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+usermod -aG docker ubuntu
+```
+
+#### Configuration example
+
+```hcl
+module "runner" {
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
+
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
+
+  runner_gitlab = {
+    tag_list = "runner_worker"
+    type     = "instance"
+    url      = "https://gitlab.com"
+
+    preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
+  }
+  
+  runner_manager = {
+    maximum_concurrent_jobs   = 5
+  }
+
+  runner_worker = {
+    max_jobs            = 5
+    request_concurrency = 5
+    type                = "docker_autoscaler"
+  }
+
+  runner_worker_docker_autoscaler_asg = {
+    on_demand_percentage_above_base_capacity = 0
+    enable_mixed_instances_policy            = true
+  }
+
+  runner_worker_docker_autoscaler = {
+    connector_config_user = "ubuntu"
+  }
+
+  runner_worker_docker_machine_instance = {
+    idle_time   = 600
+    subnet_ids  = vpc.private_subnets_ids
+    types       = ["t3a.medium", "t3.medium"]
+    volume_type = "gp3"
+  }
+
+}
+```
+
 ## Examples
 
 A few [examples](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
