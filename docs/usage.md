@@ -217,7 +217,7 @@ This process is allocated a maximum of five minutes.
 - Once provisioning is complete, a signal is sent to the current instance, setting it to the `terminating:wait` state.
 - This signal triggers the monitor_runner.sh systemd service, which sends a SIGQUIT signal to the GitLab Runner process,
 initiating a graceful shutdown.
-- The maximum allowed time for the shutdown process is defined by the runner_terminate_ec2_lifecycle_timeout_duration variable.
+- The maximum allowed time for the shutdown process is defined by the `runner_terminate_ec2_lifecycle_timeout_duration` variable.
 
 The diagram below illustrates this process.
 
