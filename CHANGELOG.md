@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.7.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.6.1...7.7.0) (2024-05-29)
+
+
+### Features
+
+* implement graceful shutdown of GitLab Runner ([#1117](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1117)) ([d2e2224](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/d2e22249bb5e68f98309012f2ccd58741657eff9))
+
 ## [7.6.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.6.0...7.6.1) (2024-05-10)
 
 
