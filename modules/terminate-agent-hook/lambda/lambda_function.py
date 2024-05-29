@@ -234,9 +234,6 @@ def handler(event, context):
     """
     event_detail = event['detail']
 
-    if event_detail['LifecycleTransition'] != "autoscaling:EC2_INSTANCE_TERMINATING":
-        sys.exit()
-
     client = boto3.client("ec2", region_name=event['region'])
 
     # make sure that no new instances are created

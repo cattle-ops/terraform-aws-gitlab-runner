@@ -12,7 +12,7 @@ resource "aws_cloudwatch_event_rule" "terminate_instances" {
   event_pattern = <<EOF
 {
   "source": ["aws.autoscaling"],
-  "detail-type": ["EC2 Instance-terminate Lifecycle Action"],
+  "detail-type": ["EC2 Instance Terminate Successful", "EC2 Instance Terminate Unsuccessful"],
   "detail": {
     "AutoScalingGroupName": ["${var.asg_name}"]
   }

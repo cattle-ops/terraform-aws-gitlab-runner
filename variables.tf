@@ -361,9 +361,16 @@ variable "runner_sentry_secure_parameter_store_name" {
   default     = "sentry-dsn"
 }
 
+# TODO Group these variables in an object to reduce the number of variables
 variable "runner_terminate_ec2_lifecycle_hook_name" {
   description = "Specifies a custom name for the ASG terminate lifecycle hook and related resources."
   type        = string
+  default     = null
+}
+
+variable "runner_terminate_ec2_lifecycle_timeout_duration" {
+  description = "Amount of time in seconds to wait for GitLab Runner to finish picked up jobs. Defaults to the `maximum_timeout` configured + `5m`. Maximum allowed is `7200` (2 hours)"
+  type        = number
   default     = null
 }
 

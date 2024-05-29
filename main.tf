@@ -80,6 +80,7 @@ locals {
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
       private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
+      user_data_trace_log                                          = var.debug.trace_runner_user_data
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -174,10 +175,15 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
     version = aws_launch_template.gitlab_runner_instance.latest_version
   }
 
+  instance_maintenance_policy {
+    max_healthy_percentage = 110
+    min_healthy_percentage = 100
+  }
+
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      min_healthy_percentage = 0
+      min_healthy_percentage = 100
     }
     triggers = ["tag"]
   }
@@ -656,21 +662,31 @@ resource "aws_iam_role_policy_attachment" "eip" {
   policy_arn = aws_iam_policy.eip[0].arn
 }
 
+# We wait for 5 minutes until we set an EC2 instance to status `InService` so it has time to provision itself and it's configured capacity.
+resource "aws_autoscaling_lifecycle_hook" "wait_for_gitlab_runner" {
+  name                   = "${var.environment}-wait-for-gitlab-runner-up"
+  autoscaling_group_name = aws_autoscaling_group.gitlab_runner_instance.name
+  default_result         = "CONTINUE"
+  heartbeat_timeout      = 300
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+}
+
 ################################################################################
 ### Lambda function triggered as soon as an agent is terminated.
 ################################################################################
 module "terminate_agent_hook" {
   source = "./modules/terminate-agent-hook"
 
-  name                                 = var.runner_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.runner_terminate_ec2_lifecycle_hook_name
-  environment                          = var.environment
-  asg_arn                              = aws_autoscaling_group.gitlab_runner_instance.arn
-  asg_name                             = aws_autoscaling_group.gitlab_runner_instance.name
-  cloudwatch_logging_retention_in_days = var.runner_cloudwatch.retention_days
-  name_iam_objects                     = local.name_iam_objects
-  name_docker_machine_runners          = local.runner_tags_merged["Name"]
-  role_permissions_boundary            = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
-  kms_key_id                           = local.kms_key
+  name                                   = var.runner_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.runner_terminate_ec2_lifecycle_hook_name
+  environment                            = var.environment
+  asg_arn                                = aws_autoscaling_group.gitlab_runner_instance.arn
+  asg_name                               = aws_autoscaling_group.gitlab_runner_instance.name
+  cloudwatch_logging_retention_in_days   = var.runner_cloudwatch.retention_days
+  name_iam_objects                       = local.name_iam_objects
+  name_docker_machine_runners            = local.runner_tags_merged["Name"]
+  role_permissions_boundary              = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
+  kms_key_id                             = local.kms_key
+  asg_hook_terminating_heartbeat_timeout = local.runner_worker_graceful_terminate_timeout_duration
 
   tags = local.tags
 }

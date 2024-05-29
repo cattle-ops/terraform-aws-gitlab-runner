@@ -54,14 +54,14 @@ module "runner" {
 
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.private_subnets, 0)
-   
+
   runner_instance = {
-    name       = "docker-default"      
+    name       = "docker-default"
   }
-   
+
   runner_gitlab = {
     url = "https://gitlab.com"
-     
+
     preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
   }
 }
@@ -77,23 +77,23 @@ map. A simple example for this would be to set _region-specific-prefix_ to the A
 module "runner" {
   # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
   source  = "cattle-ops/gitlab-runner/aws"
-   
+
   environment = "multi-region-1"
   iam_object_prefix = "<region-specific-prefix>-gitlab-runner-iam"
-   
+
   vpc_id    = module.vpc.vpc_id
   subnet_id = element(module.vpc.private_subnets, 0)
-   
+
   runner_gitlab = {
     url = "https://gitlab.com"
 
     preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
   }
-   
+
    runner_worker_cache = {
      bucket_prefix = "<region-specific-prefix>"
    }
-   
+
    runner_worker_docker_machine_instance = {
      subnet_ids = module.vpc.private_subnets
    }
@@ -208,14 +208,39 @@ module "runner" {
 }
 ```
 
-#### Instance Termination
+#### Graceful termination / Zero Downtime deployment
 
-The Auto Scaling Group may be configured with a [lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
-that executes a provided Lambda function when the runner is terminated to terminate additional instances that were spawned.
+This module supports zero-downtime deployments by following a structured process:
 
-The use of the termination lifecycle can be toggled using the `runner_enable_asg_recreation` variable.
+- The new instance is first set to the `pending` state, allowing it to provision both GitLab Runner and its configured capacity.
+This process is allocated a maximum of five minutes.
+- Once provisioning is complete, a signal is sent to the current instance, setting it to the `terminating:wait` state.
+- This signal triggers the monitor_runner.sh systemd service, which sends a SIGQUIT signal to the GitLab Runner process,
+initiating a graceful shutdown.
+- The maximum allowed time for the shutdown process is defined by the `runner_terminate_ec2_lifecycle_timeout_duration` variable.
 
-When using this feature, a `builds/` directory relative to the root module will persist that contains the packaged Lambda function.
+The diagram below illustrates this process.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant ASG as Autoscaling Group
+    participant CI as Current Instance
+    participant NI as New Instance
+    ASG->>NI: Provision New Instance (status: Pending)
+    Note over NI: Install GitLab Runner <br/>and provision capacity<br/>(5m grace period)
+    ASG->>NI: Set status to InService
+    ASG->>CI: Set status to Terminating:Wait
+    CI->>CI: Graceful terminate:<br/>Stop picking up new jobs,<br/>Finish current jobs<br/>assigned to this Runner
+    CI->>ASG: Send complete-lifecycle-action
+    ASG->>CI: Set status to Terminating:Proceed
+    Note over CI: Instance is terminated:<br/>Cleanup Lambda is triggered
+```
+
+The Auto Scaling Group is configured with a [lifecycle hook](https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html)
+that executes a provided Lambda function when the runner is terminated to terminate additional instances that were
+provisioned by the Docker Machine executor. a `builds/` directory relative to the root module persists that
+contains the packaged Lambda function.
 
 ### Access the Runner instance
 

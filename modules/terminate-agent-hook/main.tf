@@ -36,7 +36,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   publish          = true
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.11"
-  timeout          = local.lambda_timeout
+  timeout          = 30
   kms_key_arn      = var.kms_key_id
 
   tags = var.tags
@@ -77,6 +77,6 @@ resource "aws_autoscaling_lifecycle_hook" "terminate_instances" {
   name                   = "${var.environment}-${var.name}"
   autoscaling_group_name = var.asg_name
   default_result         = "CONTINUE"
-  heartbeat_timeout      = local.lambda_timeout + 20 # allow some extra time for cold starts
+  heartbeat_timeout      = var.asg_hook_terminating_heartbeat_timeout
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
 }
