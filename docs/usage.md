@@ -150,7 +150,7 @@ As docker machine is no longer maintained by docker, gitlab recently developed d
 
 Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
 
-```
+```bash
 # Install docker
 # Add Docker's official GPG key:
 apt-get update
