@@ -146,7 +146,7 @@ module "runner" {
 
 ### Scenario: Use of Docker autoscaler
 
-As docker machine is no longer maintained by docker, gitlab recently developed docker_autoscaler to replace docker machine (still in beta). An option is available to test it out. It reuses the arguments int he docker-machine block arguments and create an autoscaling groupthat will be supplied to docker-autoscaler.
+As docker machine is no longer maintained by docker, gitlab recently developed docker autoscaler to replace docker machine (still in beta). An option is available to test it out.
 
 Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
 
@@ -201,17 +201,17 @@ module "runner" {
   runner_worker_docker_autoscaler_asg = {
     on_demand_percentage_above_base_capacity = 0
     enable_mixed_instances_policy            = true
+    idle_time                                = 600
+    subnet_ids                               = vpc.private_subnets_ids
+    types                                    = ["t3a.medium", "t3.medium"]
+    volume_type                              = "gp3"
+    private_address_only                     = true
+    ebs_optimized                            = true
+    root_size                                = 40
   }
 
   runner_worker_docker_autoscaler = {
     connector_config_user = "ubuntu"
-  }
-
-  runner_worker_docker_machine_instance = {
-    idle_time   = 600
-    subnet_ids  = vpc.private_subnets_ids
-    types       = ["t3a.medium", "t3.medium"]
-    volume_type = "gp3"
   }
 
 }
