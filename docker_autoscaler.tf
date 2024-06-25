@@ -61,33 +61,33 @@ resource "aws_launch_template" "this" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
   name          = "${local.name_runner_agent_instance}-worker-launch-template"
-  user_data     = base64gzip(var.runner_worker_docker_machine_instance.start_script)
-  image_id      = data.aws_ami.docker-machine[0].id
-  instance_type = var.runner_worker_docker_machine_instance.types[0]
+  user_data     = base64gzip(var.runner_worker_docker_autoscaler_asg.start_script)
+  image_id      = data.aws_ami.docker-autoscaler[0].id
+  instance_type = var.runner_worker_docker_autoscaler_asg.types[0]
   key_name      = aws_key_pair.autoscaler[0].key_name
-  ebs_optimized = var.runner_worker_docker_machine_instance.ebs_optimized
+  ebs_optimized = var.runner_worker_docker_autoscaler_asg.ebs_optimized
 
   monitoring {
-    enabled = var.runner_worker_docker_machine_instance.monitoring
+    enabled = var.runner_worker_docker_autoscaler_asg.monitoring
   }
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.docker_machine[0].name
+    name = aws_iam_instance_profile.docker_autoscaler[0].name
   }
 
   network_interfaces {
     security_groups             = [aws_security_group.docker_autoscaler[0].id]
-    associate_public_ip_address = !var.runner_worker_docker_machine_instance.private_address_only
+    associate_public_ip_address = !var.runner_worker_docker_autoscaler_asg.private_address_only
   }
 
   block_device_mappings {
     device_name = "/dev/sda1"
 
     ebs {
-      volume_size = var.runner_worker_docker_machine_instance.root_size
-      volume_type = var.runner_worker_docker_machine_instance.volume_type
-      iops        = contains(["gp3", "io1", "io2"], var.runner_worker_docker_machine_instance.volume_type) ? var.runner_worker_docker_machine_instance.volume_iops : null
-      throughput  = var.runner_worker_docker_machine_instance.volume_type == "gp3" ? var.runner_worker_docker_machine_instance.volume_throughput : null
+      volume_size = var.runner_worker_docker_autoscaler_asg.root_size
+      volume_type = var.runner_worker_docker_autoscaler_asg.volume_type
+      iops        = contains(["gp3", "io1", "io2"], var.runner_worker_docker_autoscaler_asg.volume_type) ? var.runner_worker_docker_autoscaler_asg.volume_iops : null
+      throughput  = var.runner_worker_docker_autoscaler_asg.volume_type == "gp3" ? var.runner_worker_docker_autoscaler_asg.volume_throughput : null
     }
   }
 
@@ -104,8 +104,8 @@ resource "aws_launch_template" "this" {
   tags = local.tags
 
   metadata_options {
-    http_tokens                 = var.runner_worker_docker_machine_ec2_metadata_options.http_tokens
-    http_put_response_hop_limit = var.runner_worker_docker_machine_ec2_metadata_options.http_put_response_hop_limit
+    http_tokens                 = var.runner_worker_docker_autoscaler_asg.http_tokens
+    http_put_response_hop_limit = var.runner_worker_docker_autoscaler_asg.http_put_response_hop_limit
     instance_metadata_tags      = "enabled"
   }
 
@@ -147,7 +147,7 @@ resource "aws_autoscaling_group" "autoscaler" {
           version            = aws_launch_template.this[0].latest_version
         }
         dynamic "override" {
-          for_each = var.runner_worker_docker_machine_instance.types
+          for_each = var.runner_worker_docker_autoscaler_asg.types
           content {
             instance_type = override.value
           }
@@ -156,11 +156,21 @@ resource "aws_autoscaling_group" "autoscaler" {
     }
   }
 
+  dynamic "instance_refresh" {
+    for_each = var.runner_worker_docker_autoscaler_asg.upgrade_strategy == "rolling" ? [1] : []
+    content {
+      strategy = "Rolling"
+      preferences {
+        min_healthy_percentage = var.runner_worker_docker_autoscaler_asg.instance_refresh_min_healthy_percentage
+      }
+      triggers = var.runner_worker_docker_autoscaler_asg.instance_refresh_triggers
+    }
+  }
 
-  vpc_zone_identifier       = var.runner_worker_docker_machine_instance.subnet_ids
+  vpc_zone_identifier       = var.runner_worker_docker_autoscaler_asg.subnet_ids
   max_size                  = var.runner_worker.max_jobs
   min_size                  = 0 # Will be overwrite by runner idle count
-  desired_capacity          = var.runner_worker_docker_machine_instance.idle_count
+  desired_capacity          = var.runner_worker_docker_autoscaler_asg.idle_count
   health_check_grace_period = var.runner_worker_docker_autoscaler_asg.health_check_grace_period
   health_check_type         = var.runner_worker_docker_autoscaler_asg.health_check_type
   force_delete              = true

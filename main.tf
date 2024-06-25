@@ -127,8 +127,8 @@ locals {
       runners_capacity_per_instance = 1
       runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
       runners_max_instances         = var.runner_worker.max_jobs
-      runners_idle_count            = var.runner_worker_docker_machine_instance.idle_count
-      runners_idle_time             = format("%dm%ds", floor(var.runner_worker_docker_machine_instance.idle_time / 60), var.runner_worker_docker_machine_instance.idle_time % 60)
+      runners_idle_count            = var.runner_worker_docker_autoscaler_asg.idle_count
+      runners_idle_time             = format("%dm%ds", floor(var.runner_worker_docker_autoscaler_asg.idle_time / 60), var.runner_worker_docker_machine_instance.idle_time % 60)
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
@@ -141,37 +141,12 @@ locals {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.
         join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
-      }]
-      runners_vpc_id                    = var.vpc_id
-      runners_subnet_id                 = var.subnet_id
-      runners_subnet_ids                = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : [var.subnet_id]
-      runners_aws_zone                  = data.aws_availability_zone.runners.name_suffix
-      runners_instance_types            = var.runner_worker_docker_machine_instance.types
-      runners_spot_price_bid            = var.runner_worker_docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
-      runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
-      runners_security_group_name       = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
-      runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
-      runners_monitoring                = var.runner_worker_docker_machine_instance.monitoring
-      runners_ebs_optimized             = var.runner_worker_docker_machine_instance.ebs_optimized
-      runners_instance_profile          = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-      docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
-      docker_machine_name               = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
+      }] 
       runners_name                      = var.runner_instance.name
-      runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")
       runners_token                     = var.runner_gitlab.registration_token
-      runners_userdata                  = var.runner_worker_docker_machine_instance.start_script
       runners_executor                  = var.runner_worker.type
       runners_limit                     = var.runner_worker.max_jobs
       runners_concurrent                = var.runner_manager.maximum_concurrent_jobs
-      runners_idle_count                = var.runner_worker_docker_machine_instance.idle_count
-      runners_idle_time                 = var.runner_worker_docker_machine_instance.idle_time
-      runners_max_builds                = local.runners_max_builds_string
-      runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
-      runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
-      runners_iam_instance_profile_name = var.runner_worker_docker_machine_role.profile_name
-      runners_use_private_address_only  = var.runner_worker_docker_machine_instance.private_address_only
-      runners_use_private_address       = !var.runner_worker_docker_machine_instance.private_address_only
-      runners_request_spot_instance     = var.runner_worker_docker_machine_instance_spot.enable
       runners_environment_vars          = jsonencode(var.runner_worker.environment_variables)
       runners_pre_build_script          = var.runner_worker_gitlab_pipeline.pre_build_script
       runners_post_build_script         = var.runner_worker_gitlab_pipeline.post_build_script
@@ -188,8 +163,6 @@ locals {
       sentry_dsn                        = var.runner_manager.sentry_dsn
       prometheus_listen_address         = var.runner_manager.prometheus_listen_address
       auth_type                         = var.runner_worker_cache.authentication_type
-      use_fleet                         = var.runner_worker_docker_machine_fleet.enable
-      launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
       runners_docker_autoscaler         = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
       runners_docker_machine            = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""
     }
@@ -623,7 +596,7 @@ resource "aws_iam_role_policy_attachment" "docker_machine_cache_instance" {
 ### docker machine instance policy
 ################################################################################
 resource "aws_iam_role" "docker_machine" {
-  count                = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
+  count                = var.runner_worker.type == "docker+machine" ? 1 : 0
   name                 = "${local.name_iam_objects}-docker-machine"
   assume_role_policy   = length(var.runner_worker_docker_machine_role.assume_role_policy_json) > 0 ? var.runner_worker_docker_machine_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
@@ -631,12 +604,26 @@ resource "aws_iam_role" "docker_machine" {
   tags = local.tags
 }
 
-
-
 resource "aws_iam_instance_profile" "docker_machine" {
-  count = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" ? 1 : 0
   name  = "${local.name_iam_objects}-docker-machine"
   role  = aws_iam_role.docker_machine[0].name
+  tags  = local.tags
+}
+
+resource "aws_iam_role" "docker_autoscaler" {
+  count                = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  name                 = "${local.name_iam_objects}-docker-autoscaler"
+  assume_role_policy   = length(var.runner_worker_docker_autoscaler_role.assume_role_policy_json) > 0 ? var.runner_worker_docker_autoscaler_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
+  permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
+
+  tags = local.tags
+}
+
+resource "aws_iam_instance_profile" "docker_autoscaler" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  name  = "${local.name_iam_objects}-docker-autoscaler"
+  role  = aws_iam_role.docker_autoscaler[0].name
   tags  = local.tags
 }
 
@@ -650,6 +637,13 @@ resource "aws_iam_role_policy_attachment" "docker_machine_user_defined_policies"
   policy_arn = var.runner_worker_docker_machine_role.policy_arns[count.index]
 }
 
+resource "aws_iam_role_policy_attachment" "docker_autoscaler_user_defined_policies" {
+  count = var.runner_worker.type == "docker-autoscaler" ? length(var.runner_worker_docker_autoscaler_role.policy_arns) : 0
+
+  role       = aws_iam_role.docker_autoscaler[0].name
+  policy_arn = var.runner_worker_docker_autoscaler_role.policy_arns[count.index]
+}
+
 ################################################################################
 resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_managed" {
   count = (var.runner_worker.type == "docker+machine" && var.runner_worker.ssm_access) ? 1 : 0
@@ -658,7 +652,12 @@ resource "aws_iam_role_policy_attachment" "docker_machine_session_manager_aws_ma
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "docker_autoscaler_session_manager_aws_managed" {
+  count = (var.runner_worker.type == "docker-autoscaler" && var.runner_worker.ssm_access) ? 1 : 0
 
+  role       = aws_iam_role.docker_autoscaler[0].name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
 
 ################################################################################
 ### Service linked policy, optional
