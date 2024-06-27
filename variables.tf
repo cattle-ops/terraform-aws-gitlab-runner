@@ -135,7 +135,7 @@ variable "runner_instance" {
 }
 
 variable "runner_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 2023 image."
+  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1, 2 or 2023 image."
   type        = map(list(string))
 
   default = {
