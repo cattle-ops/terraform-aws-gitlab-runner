@@ -135,11 +135,11 @@ variable "runner_instance" {
 }
 
 variable "runner_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1 or 2 image."
+  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1, 2 or 2023 image."
   type        = map(list(string))
 
   default = {
-    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
+    name = ["al2023-ami-2023*-x86_64"]
   }
 }
 
