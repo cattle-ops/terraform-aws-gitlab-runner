@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.8.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.7.0...7.8.0) (2024-06-30)
+
+
+### Features
+
+* use Amazon Linux 2023 for runner manager instance ([#1138](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1138)) ([0412b6d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/0412b6d03046448108c4e806d4637da809cd319a))
+
 ## [7.7.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.6.1...7.7.0) (2024-05-29)
 
 
