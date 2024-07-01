@@ -1,0 +1,18 @@
+# Autoscaler config
+  [runners.autoscaler]
+    plugin = "fleeting-plugin-aws"
+
+    capacity_per_instance = ${runners_capacity_per_instance}
+    max_use_count = ${runners_max_use_count}
+    max_instances = ${runners_max_instances}
+
+    [runners.autoscaler.plugin_config] # plugin specific configuration (see plugin documentation)
+      name = "${docker_autoscaling_name}"     # AWS Autoscaling Group name
+
+    [runners.autoscaler.connector_config]
+      username          = "${connector_config_user}"
+      use_external_addr = true
+
+    [[runners.autoscaler.policy]]
+      idle_count = ${runners_idle_count}
+      idle_time = "${runners_idle_time}"
