@@ -25,7 +25,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - run: terraform init -get -backend=false -input=false
       - run: terraform fmt -recursive -check=true -write=false
 
@@ -50,7 +50,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.3.')
         run: terraform fmt -recursive -check=true -write=false
@@ -62,7 +62,7 @@ jobs:
     steps:
       # Git Checkout
       - name: Checkout Code
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to improve performances
@@ -72,7 +72,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@03986e6993ccf699a22451118520680b438e7d2a # v7.11.1
+        uses: oxsecurity/megalinter@bacb5f8674e3730b904ca4d20c8bd477bc51b1a7 # v7.13.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -96,7 +96,7 @@ jobs:
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
         if: ${{ success() || failure() }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: MegaLinter reports
           path: |
@@ -106,9 +106,9 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.0.1-debian@sha256:ff5a5e927b4d68f60c5a9a9d130a21d509037a55f85895a75539154e1bed0105
+      image: checkmarx/kics:v2.1.1-debian@sha256:ec7ebd7876e300cf58160cd5f1c78c5dbf1b697006be90cd8b13f495dc233c9b
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
       - run: kics scan -p . -o . --config .kics.yml --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
         name: Checkout source code
 
       - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
@@ -148,7 +148,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@7a44c5dcde5dfab737363e391800629e27b6376b # v1.3.1
@@ -163,7 +163,7 @@ jobs:
       contents: read
     if: ${{ !github.event.pull_request.head.repo.fork }}
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
         name: Cache plugin dir
         with:
