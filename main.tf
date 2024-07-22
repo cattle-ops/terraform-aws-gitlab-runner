@@ -616,14 +616,14 @@ data "aws_iam_policy_document" "ssm" {
           var.runner_gitlab.preregistered_runner_token_ssm_parameter_name,
           aws_ssm_parameter.runner_registration_token.name
         ]
-      ) : "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${name}"
+      ) : "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${trimprefix(name, "/")}"
     ]
   }
 
   statement {
     actions = ["ssm:PutParameter"]
     resources = [
-      "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${aws_ssm_parameter.runner_registration_token.name}"
+      "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${trimprefix(aws_ssm_parameter.runner_registration_token.name, "/")}"
     ]
   }
 }
