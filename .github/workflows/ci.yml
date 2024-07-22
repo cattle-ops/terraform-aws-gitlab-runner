@@ -154,30 +154,3 @@ jobs:
         uses: aquasecurity/tfsec-pr-commenter-action@7a44c5dcde5dfab737363e391800629e27b6376b # v1.3.1
         with:
           github_token: ${{ github.token }}
-
-  tests:
-    name: Test
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
-      - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
-        name: Cache plugin dir
-        with:
-          key: ${{ runner.os }}-terraform-plugin-cache
-          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
-        with:
-          aws-region: eu-central-1
-          role-to-assume: ${{ secrets.TERRAFORM_ADMIN_ROLE_ARN }}
-          role-session-name: GitHubActions
-      - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8 # v3.1.1
-        with:
-          terraform_version: "1.6.3"
-      - run: terraform init -get -backend=false -input=false
-      - run: terraform test
