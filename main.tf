@@ -118,6 +118,7 @@ locals {
       runners_idle_count                = var.runner_worker_docker_machine_instance.idle_count
       runners_idle_time                 = var.runner_worker_docker_machine_instance.idle_time
       runners_max_builds                = local.runners_max_builds_string
+      runners_root_device_name          = var.runner_worker_docker_machine_instance.root_device_name
       runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
       runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
       runners_iam_instance_profile_name = var.runner_worker_docker_machine_role.profile_name
@@ -331,7 +332,7 @@ resource "aws_launch_template" "fleet_gitlab_runner" {
     enabled = var.runner_worker_docker_machine_instance.monitoring
   }
   block_device_mappings {
-    device_name = "/dev/sda1"
+    device_name = var.runner_worker_docker_machine_instance.root_device_name
 
     ebs {
       volume_size = var.runner_worker_docker_machine_instance.root_size
@@ -615,14 +616,14 @@ data "aws_iam_policy_document" "ssm" {
           var.runner_gitlab.preregistered_runner_token_ssm_parameter_name,
           aws_ssm_parameter.runner_registration_token.name
         ]
-      ) : "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${name}"
+      ) : "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${trimprefix(name, "/")}"
     ]
   }
 
   statement {
     actions = ["ssm:PutParameter"]
     resources = [
-      "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${aws_ssm_parameter.runner_registration_token.name}"
+      "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${trimprefix(aws_ssm_parameter.runner_registration_token.name, "/")}"
     ]
   }
 }
