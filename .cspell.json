@@ -55,6 +55,7 @@
     "tfvars",
     "tmpfs",
     "tonumber",
+    "trimprefix",
     "trivy",
     "userns",
     "xanzy",
