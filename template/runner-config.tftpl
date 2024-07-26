@@ -14,7 +14,9 @@ listen_address = "${prometheus_listen_address}"
   environment = ${runners_environment_vars}
   pre_build_script = ${runners_pre_build_script}
   post_build_script = ${runners_post_build_script}
+  # GitLab Runner < 17, otherwise use pre_get_sources_script
   pre_clone_script = ${runners_pre_clone_script}
+  pre_get_sources_script = ${runners_pre_clone_script}
   request_concurrency = ${runners_request_concurrency}
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
