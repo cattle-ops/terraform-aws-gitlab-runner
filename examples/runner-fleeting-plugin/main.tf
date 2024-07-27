@@ -105,6 +105,10 @@ module "runner" {
     max_growth_rate                          = 10
   }
 
+  runner_worker_docker_options = {
+    volumes      = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+  }
+
   tags = {
     "tf-aws-gitlab-runner:example"           = "runner-default"
     "tf-aws-gitlab-runner:instancelifecycle" = "spot:yes"
