@@ -597,7 +597,7 @@ variable "runner_worker_docker_machine_fleet" {
 
 variable "runner_worker_docker_autoscaler" {
   description = <<-EOT
-    fleeting_plugin_version = The version of aws fleeting plugin 
+    fleeting_plugin_version = The version of aws fleeting plugin
     connector_config_user = User to connect to worker machine
     key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
     max_use_count = Max job number that can run on a worker
@@ -666,7 +666,6 @@ variable "runner_worker_docker_autoscaler_asg" {
     on_demand_percentage_above_base_capacity = optional(number, 100)
     spot_allocation_strategy                 = optional(string, "lowest-price")
     spot_instance_pools                      = optional(number, 2)
-    override_instance_types                  = optional(list(string), [])
     load_balancers                           = optional(list(string), [])
     upgrade_strategy                         = optional(string, "rolling")
     instance_refresh_min_healthy_percentage  = optional(number, 90)
