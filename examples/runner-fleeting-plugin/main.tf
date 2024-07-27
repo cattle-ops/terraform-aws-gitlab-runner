@@ -105,6 +105,23 @@ module "runner" {
     max_growth_rate                          = 10
   }
 
+  runner_worker_docker_autoscaler_autoscaling_options = [
+    {
+      periods      = ["* * * * * * *"]
+      timezone     = "Europe/Berlin"
+      idle_count   = 0
+      idle_time    = "0s"
+      scale_factor = 2
+    },
+    {
+      periods      = ["* * 7-19 * * mon-fri *"]
+      timezone     = "Europe/Berlin"
+      idle_count   = 3
+      idle_time    = "30m"
+      scale_factor = 2
+    }
+  ]
+
   runner_worker_docker_options = {
     volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
   }

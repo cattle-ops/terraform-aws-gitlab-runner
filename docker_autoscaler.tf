@@ -171,8 +171,8 @@ resource "aws_autoscaling_group" "autoscaler" {
 
   vpc_zone_identifier       = var.runner_worker_docker_autoscaler_asg.subnet_ids
   max_size                  = var.runner_worker.max_jobs
-  min_size                  = 0 # Will be overwrite by runner idle count
-  desired_capacity          = var.runner_worker_docker_autoscaler_asg.idle_count
+  min_size                  = 0
+  desired_capacity          = 0 # managed by the fleeting plugin
   health_check_grace_period = var.runner_worker_docker_autoscaler_asg.health_check_grace_period
   health_check_type         = var.runner_worker_docker_autoscaler_asg.health_check_type
   force_delete              = true
@@ -184,5 +184,14 @@ resource "aws_autoscaling_group" "autoscaler" {
       value               = tag.value
       propagate_at_launch = true
     }
+  }
+
+  lifecycle {
+    # do not change these values as we would immediately scale up/down, which is not wanted
+    ignore_changes = [
+      desired_capacity,
+      min_size,
+      max_size
+    ]
   }
 }

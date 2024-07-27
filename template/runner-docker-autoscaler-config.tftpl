@@ -13,6 +13,10 @@
       username          = "${connector_config_user}"
       use_external_addr = false
 
+%{~ for config in runners_autoscaling ~}
     [[runners.autoscaler.policy]]
-      idle_count = ${runners_idle_count}
-      idle_time = "${runners_idle_time}"
+    %{~ for key, value in config ~}
+      ${key} = ${value}
+      %{~ endfor ~}
+%{~ endfor ~}
+

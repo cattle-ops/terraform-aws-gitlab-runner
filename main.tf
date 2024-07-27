@@ -127,8 +127,11 @@ locals {
       runners_capacity_per_instance = 1
       runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
       runners_max_instances         = var.runner_worker.max_jobs
-      runners_idle_count            = var.runner_worker_docker_autoscaler_asg.idle_count
-      runners_idle_time             = format("%dm%ds", floor(var.runner_worker_docker_autoscaler_asg.idle_time / 60), var.runner_worker_docker_machine_instance.idle_time % 60)
+      runners_autoscaling = [for config in var.runner_worker_docker_autoscaler_autoscaling_options : {
+        for key, value in config :
+        # Convert key from snake_case to PascalCase which is the casing for this section.
+        join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
+      }]
   })
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",

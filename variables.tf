@@ -667,8 +667,6 @@ variable "runner_worker_docker_autoscaler_asg" {
     enable_mixed_instances_policy            = optional(bool, false)
     health_check_grace_period                = optional(number, 300)
     health_check_type                        = optional(string, "EC2")
-    idle_count                               = optional(number, 0)
-    idle_time                                = optional(number, 600)
     instance_refresh_min_healthy_percentage  = optional(number, 90)
     instance_refresh_triggers                = optional(list(string), [])
     max_growth_rate                          = optional(number, 0)
@@ -890,6 +888,19 @@ variable "runner_worker_docker_machine_autoscaling_options" {
     idle_count_min    = optional(number)
     idle_time         = optional(number)
     timezone          = optional(string, "UTC")
+  }))
+  default = []
+}
+
+variable "runner_worker_docker_autoscaler_autoscaling_options" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersautoscalerpolicy-sections"
+  type = list(object({
+    periods            = list(string)
+    timezone           = optional(string, "UTC")
+    idle_count         = optional(number)
+    idle_time          = optional(string)
+    scale_factor       = optional(number)
+    scale_factor_limit = optional(number, 0)
   }))
   default = []
 }
