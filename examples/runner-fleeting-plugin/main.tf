@@ -91,7 +91,7 @@ module "runner" {
   }
 
   runner_worker_docker_autoscaler_instance = {
-    monitroing = true
+    monitoring = true
   }
 
   runner_worker_docker_autoscaler_asg = {
@@ -106,7 +106,7 @@ module "runner" {
   }
 
   runner_worker_docker_options = {
-    volumes      = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+    volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
   }
 
   tags = {
