@@ -59,6 +59,7 @@
     "tfvars",
     "tmpfs",
     "tonumber",
+    "trimprefix",
     "trivy",
     "usermod",
     "userns",

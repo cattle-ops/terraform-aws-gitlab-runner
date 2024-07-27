@@ -1,5 +1,26 @@
 # Changelog
 
+## [7.9.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.8.0...7.9.0) (2024-07-22)
+
+
+### Features
+
+* add support for configuring runner worker root device name ([#1140](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1140)) ([a1f8266](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/a1f8266e2301f6adc4674c9958f21e2dadf9dd1b))
+
+
+### Bug Fixes
+
+* increase timeout for EC2 termination lambda ([#1156](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1156)) ([2bf6d3d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2bf6d3d864aba78b371535fa28daebc8644ac00f))
+* remove leading `/` from SSM parameter names in policy ARNs ([#1146](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1146)) ([beea51d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/beea51d804a1ee4d8e5d1bcbedc438e0a940db11))
+* use existing Runner package for Amazon Linux 2023 as default ([#1155](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1155)) ([c001183](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/c001183b802f3355c3b9f2b335cbf7c16428a8cd))
+
+## [7.8.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.7.0...7.8.0) (2024-06-30)
+
+
+### Features
+
+* use Amazon Linux 2023 for runner manager instance ([#1138](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1138)) ([0412b6d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/0412b6d03046448108c4e806d4637da809cd319a))
+
 ## [7.7.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.6.1...7.7.0) (2024-05-29)
 
 

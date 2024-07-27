@@ -135,11 +135,11 @@ variable "runner_instance" {
 }
 
 variable "runner_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1 or 2 image."
+  description = "List of maps used to create the AMI filter for the Runner AMI. Must resolve to an Amazon Linux 1, 2 or 2023 image."
   type        = map(list(string))
 
   default = {
-    name = ["amzn2-ami-hvm-2.*-x86_64-ebs"]
+    name = ["al2023-ami-2023*-x86_64"]
   }
 }
 
@@ -325,7 +325,7 @@ variable "runner_gitlab" {
     ca_certificate = Trusted CA certificate bundle (PEM format).
     certificate = Certificate of the GitLab instance to connect to (PEM format).
     registration_token = (deprecated, This is replaced by the `registration_token` in `runner_gitlab_registration_config`.) Registration token to use to register the Runner.
-    runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases).
+    runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases). Make sure that it is available for your AMI. See https://packages.gitlab.com/app/runner/gitlab-runner/search?dist=amazon%2F2023&filter=rpms&page=1&q=
     url = URL of the GitLab instance to connect to.
     url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
     access_token_secure_parameter_store_name = (deprecated) The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
@@ -335,7 +335,7 @@ variable "runner_gitlab" {
     ca_certificate                                = optional(string, "")
     certificate                                   = optional(string, "")
     registration_token                            = optional(string, "__REPLACED_BY_USER_DATA__") # deprecated, removed in 8.0.0
-    runner_version                                = optional(string, "15.8.2")
+    runner_version                                = optional(string, "16.0.3")
     url                                           = optional(string, "")
     url_clone                                     = optional(string, "")
     access_token_secure_parameter_store_name      = optional(string, "gitlab-runner-access-token") # deprecated, removed in 8.0.0
@@ -795,6 +795,7 @@ variable "runner_worker_docker_machine_instance" {
     monitoring = Enable detailed monitoring for the Runner Worker.
     name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
     private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
+    root_device_name = The name of the root volume for the Runner Worker.
     root_size = The size of the root volume for the Runner Worker.
     start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
@@ -813,6 +814,7 @@ variable "runner_worker_docker_machine_instance" {
     monitoring                 = optional(bool, false)
     name_prefix                = optional(string, "")
     private_address_only       = optional(bool, true)
+    root_device_name           = optional(string, "/dev/sda1")
     root_size                  = optional(number, 8)
     start_script               = optional(string, "")
     subnet_ids                 = optional(list(string), [])
