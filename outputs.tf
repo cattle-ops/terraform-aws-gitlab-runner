@@ -25,12 +25,12 @@ output "runner_agent_role_name" {
 
 output "runner_role_arn" {
   description = "ARN of the role used for the docker machine runners."
-  value       = length(aws_iam_role.docker_machine) > 0 ? aws_iam_role.docker_machine[0].arn : null
+  value       = length(aws_iam_role.docker_machine) > 0 ? aws_iam_role.docker_machine[0].arn : (length(aws_iam_role.docker_autoscaler) > 0 ? aws_iam_role.docker_autoscaler[0].arn : null)
 }
 
 output "runner_role_name" {
   description = "Name of the role used for the docker machine runners."
-  value       = length(aws_iam_role.docker_machine) > 0 ? aws_iam_role.docker_machine[0].name : null
+  value       = length(aws_iam_role.docker_machine) > 0 ? aws_iam_role.docker_machine[0].name : (length(aws_iam_role.docker_autoscaler) > 0 ? aws_iam_role.docker_autoscaler[0].name : null
 }
 
 output "runner_agent_sg_id" {
