@@ -122,7 +122,7 @@ resource "aws_launch_template" "this" {
 resource "aws_autoscaling_group" "autoscaler" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  name = "${local.name_runner_agent_instance}-asg"
+  name               = "${local.name_runner_agent_instance}-asg"
   capacity_rebalance = false
 
   dynamic "launch_template" {

@@ -627,17 +627,17 @@ variable "runner_worker_docker_autoscaler_instance" {
 EOT
 
   type = object({
-    ebs_optimized                            = optional(bool, true)
-    http_tokens                              = optional(string, "required")
-    http_put_response_hop_limit              = optional(number, 2)
-    monitoring                               = optional(bool, false)
-    private_address_only                     = optional(bool, true)
-    root_device_name                         = optional(string, "/dev/sda1")
-    root_size                                = optional(number, 8)
-    start_script                             = optional(string, "")
-    volume_type                              = optional(string, "gp2")
-    volume_throughput                        = optional(number, 125)
-    volume_iops                              = optional(number, 3000)
+    ebs_optimized               = optional(bool, true)
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 2)
+    monitoring                  = optional(bool, false)
+    private_address_only        = optional(bool, true)
+    root_device_name            = optional(string, "/dev/sda1")
+    root_size                   = optional(number, 8)
+    start_script                = optional(string, "")
+    volume_type                 = optional(string, "gp2")
+    volume_throughput           = optional(number, 125)
+    volume_iops                 = optional(number, 3000)
   })
   default = {}
 }
