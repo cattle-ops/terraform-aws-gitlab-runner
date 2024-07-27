@@ -177,8 +177,6 @@ resource "aws_autoscaling_group" "autoscaler" {
   health_check_type         = var.runner_worker_docker_autoscaler_asg.health_check_type
   force_delete              = true
 
-  load_balancers = var.runner_worker_docker_autoscaler_asg.load_balancers
-
   dynamic "tag" {
     for_each = local.tags
     content {
