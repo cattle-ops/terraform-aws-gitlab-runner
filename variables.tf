@@ -642,46 +642,42 @@ EOT
 
 variable "runner_worker_docker_autoscaler_asg" {
   description = <<-EOT
-    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
-    subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
-    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
-    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
-    max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
-    profile_name = profile_name = Name of the IAM profile to attach to the Runner Workers.
     enable_mixed_instances_policy = Make use of autoscaling-group mixed_instances_policy capacities to leverage pools and spot instances.
     health_check_grace_period = Time (in seconds) after instance comes into service before checking health
     health_check_type = Controls how health checking is done. Values are - EC2 and ELB
-    on_demand_base_capacity = Absolute minimum amount of desired capacity that must be fulfilled by on-demand instances.
-    on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
-    spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions
-    spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
-    override_instance_types = List to override the instance type in the Launch Template. Allow to spread spot instances on several types, to reduce interruptions
-    upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'
+    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
+    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
     instance_refresh_min_healthy_percentage = The amount of capacity in the Auto Scaling group that must remain healthy during an instance refresh to allow the operation to continue, as a percentage of the desired capacity of the Auto Scaling group.
     instance_refresh_triggers = Set of additional property names that will trigger an Instance Refresh. A refresh will always be triggered by a change in any of launch_configuration, launch_template, or mixed_instances_policy.
+    max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
+    on_demand_base_capacity = Absolute minimum amount of desired capacity that must be fulfilled by on-demand instances.
+    on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
+    override_instance_types = List to override the instance type in the Launch Template. Allow to spread spot instances on several types, to reduce interruptions
+    profile_name = profile_name = Name of the IAM profile to attach to the Runner Workers.
     sg_ingresses = Extra security group rule for workers
+    spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions
+    spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
+    subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
+    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
+    upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'
   EOT
   type = object({
-    idle_count                               = optional(number, 0)
-    idle_time                                = optional(number, 600)
-    max_growth_rate                          = optional(number, 0)
-
-
-
-    subnet_ids                               = optional(list(string), [])
-    types                                    = optional(list(string), ["m5.large"])
-
-    profile_name                             = optional(string, "")
     enable_mixed_instances_policy            = optional(bool, false)
     health_check_grace_period                = optional(number, 300)
     health_check_type                        = optional(string, "EC2")
-    on_demand_base_capacity                  = optional(number, 0)
-    on_demand_percentage_above_base_capacity = optional(number, 100)
-    spot_allocation_strategy                 = optional(string, "lowest-price")
-    spot_instance_pools                      = optional(number, 2)
-    upgrade_strategy                         = optional(string, "rolling")
+    idle_count                               = optional(number, 0)
+    idle_time                                = optional(number, 600)
     instance_refresh_min_healthy_percentage  = optional(number, 90)
     instance_refresh_triggers                = optional(list(string), [])
+    max_growth_rate                          = optional(number, 0)
+    on_demand_base_capacity                  = optional(number, 0)
+    on_demand_percentage_above_base_capacity = optional(number, 100)
+    profile_name                             = optional(string, "")
+    spot_allocation_strategy                 = optional(string, "lowest-price")
+    spot_instance_pools                      = optional(number, 2)
+    subnet_ids                               = optional(list(string), [])
+    types                                    = optional(list(string), ["m5.large"])
+    upgrade_strategy                         = optional(string, "rolling")
     sg_ingresses = optional(list(object({
       description = string
       from_port   = number
