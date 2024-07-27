@@ -611,22 +611,41 @@ variable "runner_worker_docker_autoscaler" {
   default = {}
 }
 
-variable "runner_worker_docker_autoscaler_asg" {
+variable "runner_worker_docker_autoscaler_instance" {
   description = <<-EOT
-    monitoring = Enable detailed monitoring for the Runner Worker.
-    start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
-    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
     ebs_optimized = Enable EBS optimization for the Runner Worker.
+    http_tokens = Whether or not the metadata service requires session tokens
+    http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
+    monitoring = Enable detailed monitoring for the Runner Worker.
+    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default),
     root_size = The size of the root volume for the Runner Worker.
+    start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
     volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported
     volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
     volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
-    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default),
+EOT
+
+  type = object({
+    ebs_optimized                            = optional(bool, true)
+    http_tokens                              = optional(string, "required")
+    http_put_response_hop_limit              = optional(number, 2)
+    monitoring                               = optional(bool, false)
+    private_address_only                     = optional(bool, true)
+    root_size                                = optional(number, 8)
+    start_script                             = optional(string, "")
+    volume_type                              = optional(string, "gp2")
+    volume_throughput                        = optional(number, 125)
+    volume_iops                              = optional(number, 3000)
+  })
+  default = {}
+}
+
+variable "runner_worker_docker_autoscaler_asg" {
+  description = <<-EOT
+    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
     idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
     idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
-    http_tokens = Whether or not the metadata service requires session tokens
-    http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
     max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
     profile_name = profile_name = Name of the IAM profile to attach to the Runner Workers.
     enable_mixed_instances_policy = Make use of autoscaling-group mixed_instances_policy capacities to leverage pools and spot instances.
@@ -646,18 +665,12 @@ variable "runner_worker_docker_autoscaler_asg" {
     idle_count                               = optional(number, 0)
     idle_time                                = optional(number, 600)
     max_growth_rate                          = optional(number, 0)
-    monitoring                               = optional(bool, false)
-    private_address_only                     = optional(bool, true)
-    root_size                                = optional(number, 8)
-    start_script                             = optional(string, "")
+
+
+
     subnet_ids                               = optional(list(string), [])
     types                                    = optional(list(string), ["m5.large"])
-    volume_type                              = optional(string, "gp2")
-    volume_throughput                        = optional(number, 125)
-    volume_iops                              = optional(number, 3000)
-    http_tokens                              = optional(string, "required")
-    http_put_response_hop_limit              = optional(number, 2)
-    ebs_optimized                            = optional(bool, true)
+
     profile_name                             = optional(string, "")
     enable_mixed_instances_policy            = optional(bool, false)
     health_check_grace_period                = optional(number, 300)
@@ -666,7 +679,6 @@ variable "runner_worker_docker_autoscaler_asg" {
     on_demand_percentage_above_base_capacity = optional(number, 100)
     spot_allocation_strategy                 = optional(string, "lowest-price")
     spot_instance_pools                      = optional(number, 2)
-    load_balancers                           = optional(list(string), [])
     upgrade_strategy                         = optional(string, "rolling")
     instance_refresh_min_healthy_percentage  = optional(number, 90)
     instance_refresh_triggers                = optional(list(string), [])

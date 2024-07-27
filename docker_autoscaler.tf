@@ -61,14 +61,14 @@ resource "aws_launch_template" "this" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
   name          = "${local.name_runner_agent_instance}-worker-launch-template"
-  user_data     = base64gzip(var.runner_worker_docker_autoscaler_asg.start_script)
+  user_data     = base64gzip(var.runner_worker_docker_autoscaler_instance.start_script)
   image_id      = data.aws_ami.docker-autoscaler[0].id
-  instance_type = var.runner_worker_docker_autoscaler_asg.types[0]
+  instance_type = var.runner_worker_docker_autoscaler_instance.types[0]
   key_name      = aws_key_pair.autoscaler[0].key_name
-  ebs_optimized = var.runner_worker_docker_autoscaler_asg.ebs_optimized
+  ebs_optimized = var.runner_worker_docker_autoscaler_instance.ebs_optimized
 
   monitoring {
-    enabled = var.runner_worker_docker_autoscaler_asg.monitoring
+    enabled = var.runner_worker_docker_autoscaler_instance.monitoring
   }
 
   iam_instance_profile {
@@ -77,17 +77,17 @@ resource "aws_launch_template" "this" {
 
   network_interfaces {
     security_groups             = [aws_security_group.docker_autoscaler[0].id]
-    associate_public_ip_address = !var.runner_worker_docker_autoscaler_asg.private_address_only
+    associate_public_ip_address = !var.runner_worker_docker_autoscaler_instance.private_address_only
   }
 
   block_device_mappings {
     device_name = "/dev/sda1"
 
     ebs {
-      volume_size = var.runner_worker_docker_autoscaler_asg.root_size
-      volume_type = var.runner_worker_docker_autoscaler_asg.volume_type
-      iops        = contains(["gp3", "io1", "io2"], var.runner_worker_docker_autoscaler_asg.volume_type) ? var.runner_worker_docker_autoscaler_asg.volume_iops : null
-      throughput  = var.runner_worker_docker_autoscaler_asg.volume_type == "gp3" ? var.runner_worker_docker_autoscaler_asg.volume_throughput : null
+      volume_size = var.runner_worker_docker_autoscaler_instance.root_size
+      volume_type = var.runner_worker_docker_autoscaler_instance.volume_type
+      iops        = contains(["gp3", "io1", "io2"], var.runner_worker_docker_autoscaler_instance.volume_type) ? var.runner_worker_docker_autoscaler_instance.volume_iops : null
+      throughput  = var.runner_worker_docker_autoscaler_instance.volume_type == "gp3" ? var.runner_worker_docker_autoscaler_instance.volume_throughput : null
     }
   }
 
@@ -104,8 +104,8 @@ resource "aws_launch_template" "this" {
   tags = local.tags
 
   metadata_options {
-    http_tokens                 = var.runner_worker_docker_autoscaler_asg.http_tokens
-    http_put_response_hop_limit = var.runner_worker_docker_autoscaler_asg.http_put_response_hop_limit
+    http_tokens                 = var.runner_worker_docker_autoscaler_instance.http_tokens
+    http_put_response_hop_limit = var.runner_worker_docker_autoscaler_instance.http_put_response_hop_limit
     instance_metadata_tags      = "enabled"
   }
 
