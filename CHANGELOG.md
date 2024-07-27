@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.10.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.9.0...7.10.0) (2024-07-26)
+
+
+### Features
+
+* add `pre_get_sources_script` for GitLab Runner 17+ ([#1158](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1158)) ([7d675a0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/7d675a0aea4c44d5da20c49c68b014a6fff5a94e))
+
 ## [7.9.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.8.0...7.9.0) (2024-07-22)
 
 
