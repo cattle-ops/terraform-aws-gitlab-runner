@@ -618,6 +618,7 @@ variable "runner_worker_docker_autoscaler_instance" {
     http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
     monitoring = Enable detailed monitoring for the Runner Worker.
     private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default),
+    root_device_name = The name of the root volume for the Runner Worker.
     root_size = The size of the root volume for the Runner Worker.
     start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
     volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported
@@ -631,6 +632,7 @@ EOT
     http_put_response_hop_limit              = optional(number, 2)
     monitoring                               = optional(bool, false)
     private_address_only                     = optional(bool, true)
+    root_device_name                         = optional(string, "/dev/sda1")
     root_size                                = optional(number, 8)
     start_script                             = optional(string, "")
     volume_type                              = optional(string, "gp2")

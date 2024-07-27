@@ -81,7 +81,7 @@ resource "aws_launch_template" "this" {
   }
 
   block_device_mappings {
-    device_name = "/dev/sda1"
+    device_name = var.runner_worker_docker_autoscaler_instance.root_device_name
 
     ebs {
       volume_size = var.runner_worker_docker_autoscaler_instance.root_size
