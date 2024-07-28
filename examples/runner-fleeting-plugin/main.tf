@@ -107,14 +107,14 @@ module "runner" {
 
   runner_worker_docker_autoscaler_autoscaling_options = [
     {
-      periods      = ["* * * * * * *"]
+      periods      = ["* * * * *"]
       timezone     = "Europe/Berlin"
       idle_count   = 0
       idle_time    = "0s"
       scale_factor = 2
     },
     {
-      periods      = ["* * 7-19 * * mon-fri *"]
+      periods      = ["* 7-19 * * mon-fri"]
       timezone     = "Europe/Berlin"
       idle_count   = 3
       idle_time    = "30m"

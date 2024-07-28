@@ -122,8 +122,9 @@ resource "aws_launch_template" "this" {
 resource "aws_autoscaling_group" "autoscaler" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  name               = "${local.name_runner_agent_instance}-asg"
-  capacity_rebalance = false
+  name                  = "${local.name_runner_agent_instance}-asg"
+  capacity_rebalance    = false
+  protect_from_scale_in = true
 
   dynamic "launch_template" {
     for_each = var.runner_worker_docker_autoscaler_asg.enable_mixed_instances_policy ? [] : [1]
