@@ -1,0 +1,47 @@
+{
+  "variables": {
+    "aws_region": "eu-west-3",
+    "instance_type": "t3.micro",
+    "ssh_username": "ec2-user",
+    "vpc_id": "",
+    "subnet_id": "",
+    "docker_registry_mirror": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `aws_region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "name": "al2023-ami-2023.*-kernel-6.1-x86_64",
+          "architecture": "x86_64",
+          "virtualization-type": "hvm",
+          "root-device-type": "ebs"
+        },
+        "owners": ["137112412989"],
+        "most_recent": true
+      },
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ami_name": "amazon-linux-2023-with-docker",
+      "ami_description": "Amazon Linux 2023 with Docker installed",
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum update -y",
+        "sudo yum install -y docker",
+        "sudo systemctl start docker",
+        "sudo systemctl enable docker",
+        "sudo usermod -aG docker ec2-user",
+        "{{if user `docker_registry_mirror`}}sudo mkdir -p /etc/docker{{end}}",
+        "{{if user `docker_registry_mirror`}}echo '{\"registry-mirrors\": [\"{{user `docker_registry_mirror`}}\"] }' | sudo tee /etc/docker/daemon.json{{end}}",
+        "{{if user `docker_registry_mirror`}}sudo systemctl restart docker{{end}}"
+      ]
+    }
+  ]
+}
