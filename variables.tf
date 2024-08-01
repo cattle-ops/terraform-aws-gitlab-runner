@@ -603,7 +603,7 @@ variable "runner_worker_docker_autoscaler" {
     max_use_count = Max job number that can run on a worker
   EOT
   type = object({
-    fleeting_plugin_version = optional(string, "0.4.0")
+    fleeting_plugin_version = optional(string, "1.0.0")
     connector_config_user   = optional(string, "ec2-user")
     key_pair_name           = optional(string, "runner-worker-key")
     max_use_count           = optional(number, 100)
@@ -647,8 +647,6 @@ variable "runner_worker_docker_autoscaler_asg" {
     enable_mixed_instances_policy = Make use of autoscaling-group mixed_instances_policy capacities to leverage pools and spot instances.
     health_check_grace_period = Time (in seconds) after instance comes into service before checking health
     health_check_type = Controls how health checking is done. Values are - EC2 and ELB
-    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
-    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
     instance_refresh_min_healthy_percentage = The amount of capacity in the Auto Scaling group that must remain healthy during an instance refresh to allow the operation to continue, as a percentage of the desired capacity of the Auto Scaling group.
     instance_refresh_triggers = Set of additional property names that will trigger an Instance Refresh. A refresh will always be triggered by a change in any of launch_configuration, launch_template, or mixed_instances_policy.
     max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
