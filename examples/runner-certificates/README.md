@@ -33,7 +33,7 @@ Create a PEM-encoded `.crt` file containing the public certificate of your Gitla
 ```hcl
 module {
   # ...
-  # Public cert of my companys gitlab instance
+  # Public cert of my company's gitlab instance
   runner_gitlab = {
     certificate = file("${path.module}/my_gitlab_instance_cert.crt")
   }  
