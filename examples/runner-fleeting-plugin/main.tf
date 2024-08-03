@@ -71,6 +71,10 @@ module "runner" {
     preregistered_runner_token_ssm_parameter_name = var.preregistered_runner_token_ssm_parameter_name
   }
 
+  runner_worker = {
+    type = "docker-autoscaler"
+  }
+
   runner_worker_gitlab_pipeline = {
     pre_build_script  = <<EOT
         '''
@@ -82,12 +86,12 @@ module "runner" {
   }
 
   runner_worker_docker_autoscaler = {
-    fleeting_plugin_version = "0.4.0"
+    fleeting_plugin_version = "1.0.0"
   }
 
-  runner_worker_docker_autoscaler_ami_owners = ["591542846629"]
+  runner_worker_docker_autoscaler_ami_owners = ["591542846629"] # FIXME Change to your AWS account ID
   runner_worker_docker_autoscaler_ami_filter = {
-    name = ["al2023-ami-ecs-hvm-2023.0.20240723-kernel-6.1-x86_64"]
+    name = ["al2023-ami-ecs-hvm-2023.0.20240723-kernel-6.1-x86_64"] # FIXME Change to your AMI name
   }
 
   runner_worker_docker_autoscaler_instance = {
@@ -97,8 +101,6 @@ module "runner" {
   runner_worker_docker_autoscaler_asg = {
     subnet_ids                               = module.vpc.private_subnets
     types                                    = ["t3a.micro", "t3a.small", "t3.micro", "t3.small"]
-    idle_count                               = 3
-    idle_time                                = 1800
     enable_mixed_instances_policy            = true
     on_demand_base_capacity                  = 1
     on_demand_percentage_above_base_capacity = 0

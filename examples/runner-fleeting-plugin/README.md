@@ -12,6 +12,8 @@ This examples shows:
 Multi region deployment is, of course, possible. Just instantiate the module multiple times with different AWS providers. In case
 you use the cache, make sure to have one cache per region.
 
+Attention: You have to built your own AMI before. See the [README.md](../../packer_images/README.md) for more information.
+
 ## Prerequisite
 
 The Terraform version is managed using [tfenv](https://github.com/Zordrak/tfenv). If you are not using `tfenv` please
