@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.11.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.10.0...7.11.0) (2024-08-03)
+
+
+### Features
+
+* add docker autoscaler executor ([#1118](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1118)) ([8aaad0c](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8aaad0c5e006405ea47f1f4593b3478de324b96f))
+
 ## [7.10.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.9.0...7.10.0) (2024-07-26)
 
 
