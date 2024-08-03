@@ -1,0 +1,49 @@
+{
+  "variables": {
+    "aws_region": "eu-west-3",
+    "instance_type": "t3.micro",
+    "ssh_username": "ubuntu",
+    "vpc_id": "",
+    "subnet_id": "",
+    "docker_registry_mirror": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `aws_region`}}",
+      "source_ami_filter": {
+		"filters" : {
+		  "name"                : "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*",
+		  "root-device-type"    : "ebs",
+		  "virtualization-type" : "hvm"
+		},
+		"most_recent" : true,
+		"owners"      : ["099720109477"]
+	  },
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ami_name": "ubuntu-with-docker",
+      "ami_description": "Ubuntu with Docker installed",
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update",
+        "sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common",
+        "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+        "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+        "sudo apt-get update",
+        "sudo apt-get install -y docker-ce",
+        "sudo usermod -aG docker ubuntu",
+        "{{if user `docker_registry_mirror`}}sudo mkdir -p /etc/docker{{end}}",
+        "{{if user `docker_registry_mirror`}}echo '{\"registry-mirrors\": [\"{{user `docker_registry_mirror`}}\"] }' | sudo tee /etc/docker/daemon.json{{end}}",
+        "{{if user `docker_registry_mirror`}}sudo systemctl restart docker{{end}}"
+      ]
+    }
+  ]
+}
+

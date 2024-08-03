@@ -193,6 +193,40 @@ then
   unset USER
 fi
 
+if [[ "${runners_executor}" == "docker-autoscaler" ]]; then
+  echo "installing docker"
+  yum install docker -y
+  usermod -a -G docker ec2-user
+  service docker start
+
+  echo "Installing Docker fleeting plugin"
+  # Determine architecture
+  if [[ "$(uname -m)" == "x86_64" ]]; then
+    ARCH="amd64"
+  elif [[ "$(uname -m)" == "i686" ]]; then
+    ARCH="386"
+  elif [[ "$(uname -m)" == "armv7l" ]]; then
+    ARCH="arm"
+  elif [[ "$(uname -m)" == "aarch64" ]]; then
+    ARCH="arm64"
+  else
+    echo "Unsupported architecture"
+    exit 1
+  fi
+  
+  wget "https://gitlab.com/gitlab-org/fleeting/plugins/aws/-/releases/v${fleeting_plugin_version}/downloads/fleeting-plugin-aws-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH"
+  chmod +x fleeting-plugin-aws-*
+  mv fleeting-plugin-aws-* /bin/fleeting-plugin-aws
+
+  mkdir ~/.aws
+  cat <<EOF > ~/.aws/config
+[default]
+region = "${aws_region}"
+
+EOF
+
+fi
+
 # A small script to remove this runner from being registered with Gitlab. Executed at shutdown.
 cat <<EOF > /etc/systemd/system/remove-gitlab-registration.service
 [Unit]

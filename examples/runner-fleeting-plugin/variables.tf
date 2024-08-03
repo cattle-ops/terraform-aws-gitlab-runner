@@ -6,18 +6,20 @@ variable "aws_region" {
 
 variable "environment" {
   description = "A name that identifies the environment, will used as prefix and for tagging."
-  default     = "ci-runners"
   type        = string
+  default     = "runners-default"
 }
 
 variable "runner_name" {
   description = "Name of the runner, will be used in the runner config.toml"
   type        = string
+  default     = "default-auto"
 }
 
 variable "gitlab_url" {
   description = "URL of the gitlab instance to connect to."
   type        = string
+  default     = "https://gitlab.com"
 }
 
 variable "preregistered_runner_token_ssm_parameter_name" {
@@ -26,7 +28,7 @@ variable "preregistered_runner_token_ssm_parameter_name" {
 }
 
 variable "timezone" {
-  description = "Timezone that will be set for the runner."
+  description = "Name of the timezone that the runner will be used in."
   type        = string
   default     = "Europe/Amsterdam"
 }

@@ -392,7 +392,7 @@ variable "runner_worker" {
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
     ssm_access = Allows to connect to the Runner Worker via SSM.
-    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker`.
+    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
   EOT
   type = object({
     environment_variables = optional(list(string), [])
@@ -405,7 +405,7 @@ variable "runner_worker" {
   default = {}
 
   validation {
-    condition     = contains(["docker+machine", "docker"], var.runner_worker.type)
+    condition     = contains(["docker+machine", "docker", "docker-autoscaler"], var.runner_worker.type)
     error_message = "The executor currently supports `docker+machine` and `docker`."
   }
 }
@@ -595,7 +595,115 @@ variable "runner_worker_docker_machine_fleet" {
   }
 }
 
+variable "runner_worker_docker_autoscaler" {
+  description = <<-EOT
+    fleeting_plugin_version = The version of aws fleeting plugin
+    connector_config_user = User to connect to worker machine
+    key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
+    max_use_count = Max job number that can run on a worker
+  EOT
+  type = object({
+    fleeting_plugin_version = optional(string, "1.0.0")
+    connector_config_user   = optional(string, "ec2-user")
+    key_pair_name           = optional(string, "runner-worker-key")
+    max_use_count           = optional(number, 100)
+  })
+  default = {}
+}
+
+variable "runner_worker_docker_autoscaler_instance" {
+  description = <<-EOT
+    ebs_optimized = Enable EBS optimization for the Runner Worker.
+    http_tokens = Whether or not the metadata service requires session tokens
+    http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
+    monitoring = Enable detailed monitoring for the Runner Worker.
+    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default),
+    root_device_name = The name of the root volume for the Runner Worker.
+    root_size = The size of the root volume for the Runner Worker.
+    start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
+    volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported
+    volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
+    volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
+EOT
+
+  type = object({
+    ebs_optimized               = optional(bool, true)
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 2)
+    monitoring                  = optional(bool, false)
+    private_address_only        = optional(bool, true)
+    root_device_name            = optional(string, "/dev/sda1")
+    root_size                   = optional(number, 8)
+    start_script                = optional(string, "")
+    volume_type                 = optional(string, "gp2")
+    volume_throughput           = optional(number, 125)
+    volume_iops                 = optional(number, 3000)
+  })
+  default = {}
+}
+
+variable "runner_worker_docker_autoscaler_asg" {
+  description = <<-EOT
+    enable_mixed_instances_policy = Make use of autoscaling-group mixed_instances_policy capacities to leverage pools and spot instances.
+    health_check_grace_period = Time (in seconds) after instance comes into service before checking health
+    health_check_type = Controls how health checking is done. Values are - EC2 and ELB
+    instance_refresh_min_healthy_percentage = The amount of capacity in the Auto Scaling group that must remain healthy during an instance refresh to allow the operation to continue, as a percentage of the desired capacity of the Auto Scaling group.
+    instance_refresh_triggers = Set of additional property names that will trigger an Instance Refresh. A refresh will always be triggered by a change in any of launch_configuration, launch_template, or mixed_instances_policy.
+    max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
+    on_demand_base_capacity = Absolute minimum amount of desired capacity that must be fulfilled by on-demand instances.
+    on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
+    override_instance_types = List to override the instance type in the Launch Template. Allow to spread spot instances on several types, to reduce interruptions
+    profile_name = profile_name = Name of the IAM profile to attach to the Runner Workers.
+    sg_ingresses = Extra security group rule for workers
+    spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions
+    spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
+    subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
+    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
+    upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'
+  EOT
+  type = object({
+    enable_mixed_instances_policy            = optional(bool, false)
+    health_check_grace_period                = optional(number, 300)
+    health_check_type                        = optional(string, "EC2")
+    instance_refresh_min_healthy_percentage  = optional(number, 90)
+    instance_refresh_triggers                = optional(list(string), [])
+    max_growth_rate                          = optional(number, 0)
+    on_demand_base_capacity                  = optional(number, 0)
+    on_demand_percentage_above_base_capacity = optional(number, 100)
+    profile_name                             = optional(string, "")
+    spot_allocation_strategy                 = optional(string, "lowest-price")
+    spot_instance_pools                      = optional(number, 2)
+    subnet_ids                               = optional(list(string), [])
+    types                                    = optional(list(string), ["m5.large"])
+    upgrade_strategy                         = optional(string, "rolling")
+    sg_ingresses = optional(list(object({
+      description = string
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = list(string)
+    })), [])
+  })
+  default = {}
+}
+
 variable "runner_worker_docker_machine_role" {
+  description = <<-EOT
+    additional_tags = Map of tags that will be added to the Runner Worker.
+    assume_role_policy_json = Assume role policy for the Runner Worker.
+    policy_arns = List of ARNs of IAM policies to attach to the Runner Workers.
+    profile_name    = Name of the IAM profile to attach to the Runner Workers.
+  EOT
+  type = object({
+    additional_tags         = optional(map(string), {})
+    assume_role_policy_json = optional(string, "")
+    policy_arns             = optional(list(string), [])
+    profile_name            = optional(string, "")
+  })
+  default = {}
+}
+
+variable "runner_worker_docker_autoscaler_role" {
   description = <<-EOT
     additional_tags = Map of tags that will be added to the Runner Worker.
     assume_role_policy_json = Assume role policy for the Runner Worker.
@@ -654,7 +762,24 @@ variable "runner_worker_docker_machine_ami_filter" {
   }
 }
 
+variable "runner_worker_docker_autoscaler_ami_filter" {
+  description = "List of maps used to create the AMI filter for the Runner Worker."
+  type        = map(list(string))
+
+  default = {
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+}
+
 variable "runner_worker_docker_machine_ami_owners" {
+  description = "The list of owners used to select the AMI of the Runner Worker."
+  type        = list(string)
+
+  # Canonical
+  default = ["099720109477"]
+}
+
+variable "runner_worker_docker_autoscaler_ami_owners" {
   description = "The list of owners used to select the AMI of the Runner Worker."
   type        = list(string)
 
@@ -761,6 +886,19 @@ variable "runner_worker_docker_machine_autoscaling_options" {
     idle_count_min    = optional(number)
     idle_time         = optional(number)
     timezone          = optional(string, "UTC")
+  }))
+  default = []
+}
+
+variable "runner_worker_docker_autoscaler_autoscaling_options" {
+  description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersautoscalerpolicy-sections"
+  type = list(object({
+    periods            = list(string)
+    timezone           = optional(string, "UTC")
+    idle_count         = optional(number)
+    idle_time          = optional(string)
+    scale_factor       = optional(number)
+    scale_factor_limit = optional(number, 0)
   }))
   default = []
 }

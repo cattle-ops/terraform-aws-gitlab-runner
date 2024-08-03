@@ -1,0 +1,37 @@
+[runners.machine]
+    IdleCount = ${runners_idle_count}
+    IdleTime = ${runners_idle_time}
+    ${runners_max_builds}
+    MachineDriver = "amazonec2"
+    MachineName = "${docker_machine_name}"
+    MachineOptions = [
+      %{~ for instance_type in runners_instance_types ~}
+      "amazonec2-instance-type=${instance_type}",
+      %{~ endfor ~}
+      "amazonec2-region=${aws_region}",
+      "amazonec2-zone=${runners_aws_zone}",
+      "amazonec2-vpc-id=${runners_vpc_id}",
+      %{~ for subnet_id in runners_subnet_ids ~}
+      "amazonec2-subnet-id=${subnet_id}",
+      %{~ endfor ~}
+      "amazonec2-private-address-only=${runners_use_private_address_only}",
+      "amazonec2-use-private-address=${runners_use_private_address}",
+      "amazonec2-request-spot-instance=${runners_request_spot_instance}",
+      %{~ if runners_spot_price_bid != "" ~}"amazonec2-spot-price=${runners_spot_price_bid}",%{~ endif ~}
+      "amazonec2-security-group=${runners_security_group_name}",
+      "amazonec2-tags=${join(",", compact([runners_tags, "__PARENT_TAG__"]))}",
+      "amazonec2-use-ebs-optimized-instance=${runners_ebs_optimized}",
+      "amazonec2-monitoring=${runners_monitoring}",
+      "amazonec2-iam-instance-profile=%{ if runners_iam_instance_profile_name != "" }${runners_iam_instance_profile_name}%{ else }${runners_instance_profile}%{ endif ~}",
+      "amazonec2-root-size=${runners_root_size}",
+      "amazonec2-volume-type=${runners_volume_type}",
+      "amazonec2-userdata=%{~ if runners_userdata != "" ~}/etc/gitlab-runner/runners_userdata.sh%{~ endif ~}",
+      "amazonec2-ami=${runners_ami}"
+      %{~ if use_fleet == true ~}
+      ,"amazonec2-ssh-keypath=/root/.ssh/id_rsa",
+      "amazonec2-use-fleet=${use_fleet}",
+      "amazonec2-launch-template=${launch_template}"
+      %{~ endif ~}
+      ${docker_machine_options}
+    ]
+    MaxGrowthRate = ${runners_max_growth_rate}
