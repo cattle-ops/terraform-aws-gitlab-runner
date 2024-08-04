@@ -92,7 +92,7 @@ locals {
 
   docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0
 
-  runner_worker_graceful_terminate_timeout_duration = (var.runner_terminate_ec2_lifecycle_timeout_duration == null
+  runner_worker_graceful_terminate_heartbeat_timeout = (var.runner_terminate_ec2_lifecycle_timeout_duration == null
     ? min(7200, tonumber(coalesce(var.runner_gitlab_registration_config.maximum_timeout, 0)) + 300)
   : var.runner_terminate_ec2_lifecycle_timeout_duration)
 }
