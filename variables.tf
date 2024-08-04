@@ -380,6 +380,12 @@ variable "runner_terraform_timeout_delete_asg" {
   type        = string
 }
 
+variable "runner_terminate_ec2_timeout_duration" {
+  description = "Timeout in seconds for the graceful terminate worker Lambda function."
+  type        = number
+  default     = 90
+}
+
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */

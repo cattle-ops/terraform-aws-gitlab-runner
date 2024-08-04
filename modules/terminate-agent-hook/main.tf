@@ -36,7 +36,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   publish          = true
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.11"
-  timeout          = 90
+  timeout          = var.timeout
   kms_key_arn      = var.kms_key_id
 
   tags = var.tags

@@ -27,6 +27,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "timeout" {
+  description = "Timeout in seconds for the Lambda function."
+  type        = number
+  default     = 90
+}
+
 variable "role_permissions_boundary" {
   description = "An optional IAM permissions boundary to use when creating IAM roles."
   type        = string
