@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.12.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.11.0...7.12.0) (2024-08-04)
+
+
+### Features
+
+* make the graceful terminate Lambda timeout configurable ([#1164](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1164)) ([b821913](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/b821913dee0fbfa13eb016e228368ead1d7487f0)), closes [#1149](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1149)
+
 ## [7.11.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.10.0...7.11.0) (2024-08-03)
 
 
