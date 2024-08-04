@@ -22,6 +22,11 @@ if [[ "${preregistered_runner_token_ssm_parameter_name}" != "" ]]; then
   # this is the new standard registration method: the runner is already registered in GitLab and the token is stored in SSM
   preregistered_runner_token=$(aws ssm get-parameter --name "${preregistered_runner_token_ssm_parameter_name}" --with-decryption --region "${secure_parameter_store_region}" | jq -r ".Parameter | .Value")
 
+  if [ -z "$preregistered_runner_token" ]; then
+    echo "ERROR: The preregistered runner token is not available in SSM."
+    exit 1
+  fi
+
   sed -i.bak s/__REPLACED_BY_USER_DATA__/$preregistered_runner_token/g /etc/gitlab-runner/config.toml
 
   # TODO after v8.0.0: this logic can be removed. We can insert the token directly into the config.toml
@@ -213,7 +218,7 @@ if [[ "${runners_executor}" == "docker-autoscaler" ]]; then
     echo "Unsupported architecture"
     exit 1
   fi
-  
+
   wget "https://gitlab.com/gitlab-org/fleeting/plugins/aws/-/releases/v${fleeting_plugin_version}/downloads/fleeting-plugin-aws-$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH"
   chmod +x fleeting-plugin-aws-*
   mv fleeting-plugin-aws-* /bin/fleeting-plugin-aws
@@ -367,7 +372,7 @@ send_complete_lifecycle_action() {
 monitor_process() {
       systemctl --no-block stop gitlab-runner.service
       sleep 5 # grace period to allow GitLab Runner to shutdown
-      
+
       while true; do
         status=$(systemctl is-active gitlab-runner.service)
         if [ "$status" = "inactive" ] || [ "$status" = "failed" ]; then
