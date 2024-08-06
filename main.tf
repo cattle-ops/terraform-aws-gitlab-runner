@@ -130,7 +130,7 @@ locals {
       runners_autoscaling = [for config in var.runner_worker_docker_autoscaler_autoscaling_options : {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.
-        join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
+        key => jsonencode(value) if value != null
       }]
   })
 
