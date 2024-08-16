@@ -611,11 +611,11 @@ variable "runner_worker_docker_autoscaler" {
     update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
   EOT
   type = object({
-    fleeting_plugin_version = optional(string, "1.0.0")
-    connector_config_user   = optional(string, "ec2-user")
-    key_pair_name           = optional(string, "runner-worker-key")
-    max_use_count           = optional(number, 100)
-    update_interval         = optional(string, "1m")
+    fleeting_plugin_version        = optional(string, "1.0.0")
+    connector_config_user          = optional(string, "ec2-user")
+    key_pair_name                  = optional(string, "runner-worker-key")
+    max_use_count                  = optional(number, 100)
+    update_interval                = optional(string, "1m")
     update_interval_when_expecting = optional(string, "2s")
   })
   default = {}

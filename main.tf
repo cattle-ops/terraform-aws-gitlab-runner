@@ -128,7 +128,7 @@ locals {
       runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
       runners_max_instances         = var.runner_worker.max_jobs
 
-      runners_update_interval       = var.runner_worker_docker_autoscaler.update_interval
+      runners_update_interval                = var.runner_worker_docker_autoscaler.update_interval
       runners_update_interval_when_expecting = var.runner_worker_docker_autoscaler.update_interval_when_expecting
 
       runners_autoscaling = [for config in var.runner_worker_docker_autoscaler_autoscaling_options : {
