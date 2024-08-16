@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.13.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.12.1...7.13.0) (2024-08-16)
+
+
+### Features
+
+* add `update_interval` and `update_interval_when_expecting` ([#1173](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1173)) ([6d04322](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/6d043222f540d1e0a7032c15ac95fd928535ca39))
+
 ## [7.12.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.12.0...7.12.1) (2024-08-06)
 
 
