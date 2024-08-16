@@ -607,12 +607,16 @@ variable "runner_worker_docker_autoscaler" {
     connector_config_user = User to connect to worker machine
     key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
     max_use_count = Max job number that can run on a worker
+    update_interval = The interval to check with the fleeting plugin for instance updates.
+    update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
   EOT
   type = object({
     fleeting_plugin_version = optional(string, "1.0.0")
     connector_config_user   = optional(string, "ec2-user")
     key_pair_name           = optional(string, "runner-worker-key")
     max_use_count           = optional(number, 100)
+    update_interval         = optional(string, "1m")
+    update_interval_when_expecting = optional(string, "2s")
   })
   default = {}
 }
