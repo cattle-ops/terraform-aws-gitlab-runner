@@ -139,7 +139,7 @@ For **user images**, you must:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.60.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.61.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | 2.5.1 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.2 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | 3.6.2 |
@@ -149,21 +149,21 @@ For **user images**, you must:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.60.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.61.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_runner"></a> [runner](#module\_runner) | ../../ | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.9.0 |
-| <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.9.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.12.0 |
+| <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.12.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.60.0/docs/data-sources/availability_zones) | data source |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.61.0/docs/data-sources/availability_zones) | data source |
 
 ## Inputs
 

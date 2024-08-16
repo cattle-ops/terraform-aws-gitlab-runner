@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.12.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.12.0...7.12.1) (2024-08-06)
+
+
+### Bug Fixes
+
+* use correct names for autoscaler policies configuration ([#1167](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1167)) ([8b31986](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/8b3198673529596cf8f2731003496163d4dc4fbc))
+
 ## [7.12.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.11.0...7.12.0) (2024-08-04)
 
 

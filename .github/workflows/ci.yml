@@ -96,7 +96,7 @@ jobs:
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
         if: ${{ success() || failure() }}
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4
         with:
           name: MegaLinter reports
           path: |
@@ -106,7 +106,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.1.1-debian@sha256:ec7ebd7876e300cf58160cd5f1c78c5dbf1b697006be90cd8b13f495dc233c9b
+      image: checkmarx/kics:v2.1.2-debian@sha256:3d82e5eb0bd868f5ea749edaf72f9bd39790820eea57323880fed89585323cf2
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
