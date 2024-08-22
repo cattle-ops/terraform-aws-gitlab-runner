@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.13.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.13.0...7.13.1) (2024-08-22)
+
+
+### Bug Fixes
+
+* add `"` to the new `update_interval_*` options of the autoscaler ([#1177](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1177)) ([e792256](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/e792256b46ccdc8532560bf2e10cf60468744a76)), closes [#1176](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1176)
+
 ## [7.13.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.12.1...7.13.0) (2024-08-16)
 
 
