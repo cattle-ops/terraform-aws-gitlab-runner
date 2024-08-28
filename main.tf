@@ -183,7 +183,7 @@ locals {
 resource "aws_autoscaling_group" "gitlab_runner_instance" {
   # TODO Please explain how `agent_enable_asg_recreation` works
   name                      = var.runner_enable_asg_recreation ? "${aws_launch_template.gitlab_runner_instance.name}-asg" : "${var.environment}-as-group"
-  vpc_zone_identifier       = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : [var.subnet_id]
+  vpc_zone_identifier       = length(var.runner_worker_docker_machine_instance.subnet_ids) > 0 ? var.runner_worker_docker_machine_instance.subnet_ids : length(var.runner_worker_docker_autoscaler_asg.subnet_ids) > 0 ? var.runner_worker_docker_autoscaler_asg.subnet_ids : [var.subnet_id]
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
