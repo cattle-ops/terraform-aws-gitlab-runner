@@ -670,6 +670,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
     upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'
+    enabled_metrics = List of metrics to collect.
   EOT
   type = object({
     enable_mixed_instances_policy            = optional(bool, false)
@@ -686,6 +687,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     subnet_ids                               = optional(list(string), [])
     types                                    = optional(list(string), ["m5.large"])
     upgrade_strategy                         = optional(string, "rolling")
+    enabled_metrics                          = optional(list(string), [])
     sg_ingresses = optional(list(object({
       description = string
       from_port   = number
