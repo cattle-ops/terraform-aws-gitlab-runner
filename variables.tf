@@ -606,6 +606,7 @@ variable "runner_worker_docker_autoscaler" {
     fleeting_plugin_version = The version of aws fleeting plugin
     connector_config_user = User to connect to worker machine
     key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
+    capacity_per_instance = The number of jobs that can be executed concurrently by a single instance.
     max_use_count = Max job number that can run on a worker
     update_interval = The interval to check with the fleeting plugin for instance updates.
     update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
