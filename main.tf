@@ -124,7 +124,7 @@ locals {
     {
       docker_autoscaling_name       = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
       connector_config_user         = var.runner_worker_docker_autoscaler.connector_config_user
-      runners_capacity_per_instance = 1
+      runners_capacity_per_instance = var.runner_worker_docker_autoscaler.capacity_per_instance
       runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
       runners_max_instances         = var.runner_worker.max_jobs
 
