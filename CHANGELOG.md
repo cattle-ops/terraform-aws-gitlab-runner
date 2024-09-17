@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.14.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.13.1...7.14.0) (2024-09-17)
+
+
+### Features
+
+* allow more than one job per instance ([#1184](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1184)) ([f7f2ea2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/f7f2ea20025ce422dddf4b9e126aebbb920f4cc1))
+
+
+### Bug Fixes
+
+* autoscaler asg subnets and add possibility to enable metrics for asg ([#1182](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1182)) ([3335b81](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/3335b814fda36f65ae8b779ebb926ca115c9fbd4))
+
 ## [7.13.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.13.0...7.13.1) (2024-08-22)
 
 
