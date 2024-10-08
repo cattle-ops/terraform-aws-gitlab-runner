@@ -262,7 +262,7 @@ variable "runner_schedule_config" {
 
 variable "runner_install" {
   description = <<-EOT
-    amazon_ecr_credentials_helper = Install amazon-ecr-credential-helper inside `userdata_pre_install` script
+    amazon_ecr_credential_helper = Install amazon-ecr-credential-helper inside `userdata_pre_install` script
     docker_machine_download_url = URL to download docker machine binary. If not set, the docker machine version will be used to download the binary.
     docker_machine_version = By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases
     pre_install_script = Script to run before installing the Runner
