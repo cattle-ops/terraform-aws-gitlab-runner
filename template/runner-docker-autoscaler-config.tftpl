@@ -9,7 +9,7 @@
     max_use_count = ${runners_max_use_count}
     max_instances = ${runners_max_instances}
 
-    instance_ready_command = ${runners_instance_ready_command}
+    instance_ready_command="${runners_instance_ready_command}"
 
     [runners.autoscaler.plugin_config] # plugin specific configuration (see plugin documentation)
       name = "${docker_autoscaling_name}"     # AWS Autoscaling Group name
