@@ -620,7 +620,7 @@ variable "runner_worker_docker_autoscaler" {
     max_use_count                  = optional(number, 100)
     update_interval                = optional(string, "1m")
     update_interval_when_expecting = optional(string, "2s")
-    instance_ready_command         = optional(string)
+    instance_ready_command         = optional(string, "")
   })
   default = {}
 }
