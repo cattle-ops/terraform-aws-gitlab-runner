@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.15.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.14.0...7.15.0) (2024-10-09)
+
+
+### Features
+
+* add autoscaler runner instance ready command option ([#1190](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1190)) ([a6fccc1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/a6fccc111279cf57c3bd4726189ca0a75c3b17c8))
+
 ## [7.14.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.13.1...7.14.0) (2024-09-17)
 
 
