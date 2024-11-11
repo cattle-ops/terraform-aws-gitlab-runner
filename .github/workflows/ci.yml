@@ -125,7 +125,7 @@ jobs:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@19a52fbac37dacb22a09518e4ef6ee234f2d4987 # v4
+      - uses: terraform-linters/setup-tflint@8093687ecc9dcbfa88d07c103ad4176739a7287e # v4
         name: Setup TFLint
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
