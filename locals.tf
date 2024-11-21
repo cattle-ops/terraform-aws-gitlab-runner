@@ -95,6 +95,8 @@ locals {
   runner_worker_graceful_terminate_heartbeat_timeout = (var.runner_terminate_ec2_lifecycle_timeout_duration == null
     ? min(7200, tonumber(coalesce(var.runner_gitlab_registration_config.maximum_timeout, 0)) + 300)
   : var.runner_terminate_ec2_lifecycle_timeout_duration)
+
+  kms_key_arn = local.provided_kms_key == "" && var.enable_managed_kms_key ? aws_kms_key.default[0].arn : local.provided_kms_key
 }
 
 resource "local_file" "config_toml" {

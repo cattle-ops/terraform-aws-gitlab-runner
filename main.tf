@@ -4,7 +4,7 @@ resource "aws_ssm_parameter" "runner_registration_token" {
   type  = "SecureString"
   value = "null"
 
-  key_id = local.kms_key
+  key_id = local.kms_key_arn
 
   tags = local.tags
 
@@ -118,6 +118,7 @@ locals {
       launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
+      runners_volume_kms_key =
   })
 
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
@@ -445,7 +446,7 @@ module "cache" {
   cache_logging_bucket                 = var.runner_worker_cache.access_log_bucket_id
   cache_logging_bucket_prefix          = var.runner_worker_cache.access_log_bucket_prefix
 
-  kms_key_id = local.kms_key
+  kms_key_id = local.kms_key_arn
 
   name_iam_objects = local.name_iam_objects
 
@@ -485,7 +486,7 @@ resource "aws_iam_policy" "instance_kms_policy" {
   description = "Allow runner instance the ability to use the KMS key."
   policy = templatefile("${path.module}/policies/instance-kms-policy.json",
     {
-      kms_key_arn = var.enable_managed_kms_key && var.kms_key_id == "" ? aws_kms_key.default[0].arn : var.kms_key_id
+      kms_key_arn = local.kms_key_arn
     }
   )
 

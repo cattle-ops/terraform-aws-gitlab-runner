@@ -31,6 +31,8 @@
       ,"amazonec2-ssh-keypath=/root/.ssh/id_rsa",
       "amazonec2-use-fleet=${use_fleet}",
       "amazonec2-launch-template=${launch_template}"
+      "amazonec2-volume-encrypted=true",
+      "amazonec2-volume-kms-key=${runners_volume_kms_key}",
       %{~ endif ~}
       ${docker_machine_options}
     ]
