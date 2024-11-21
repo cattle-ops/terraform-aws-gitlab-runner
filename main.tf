@@ -18,7 +18,7 @@ resource "aws_ssm_parameter" "runner_sentry_dsn" {
   type  = "SecureString"
   value = "null"
 
-  key_id = local.kms_key
+  key_id = local.kms_key_arn
 
   tags = local.tags
 
@@ -118,7 +118,7 @@ locals {
       launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
-      runners_volume_kms_key = local.kms_key_arn
+      runners_volume_kms_key            = local.kms_key_arn
   })
 
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
@@ -787,7 +787,7 @@ module "terminate_agent_hook" {
   name_iam_objects                       = local.name_iam_objects
   name_docker_machine_runners            = local.runner_tags_merged["Name"]
   role_permissions_boundary              = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
-  kms_key_id                             = local.kms_key
+  kms_key_id                             = local.kms_key_arn
   asg_hook_terminating_heartbeat_timeout = local.runner_worker_graceful_terminate_heartbeat_timeout
 
   tags = local.tags
