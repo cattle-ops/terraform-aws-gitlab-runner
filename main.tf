@@ -118,7 +118,7 @@ locals {
       launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_max_growth_rate           = var.runner_worker_docker_machine_instance.max_growth_rate
-      runners_volume_kms_key =
+      runners_volume_kms_key = local.kms_key_arn
   })
 
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
