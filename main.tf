@@ -388,6 +388,8 @@ resource "aws_launch_template" "fleet_gitlab_runner" {
       volume_type = var.runner_worker_docker_machine_instance.volume_type
       iops        = contains(["gp3", "io1", "io2"], var.runner_worker_docker_machine_instance.volume_type) ? var.runner_worker_docker_machine_instance.volume_iops : null
       throughput  = var.runner_worker_docker_machine_instance.volume_type == "gp3" ? var.runner_worker_docker_machine_instance.volume_throughput : null
+      encrypted = true
+      kms_key_id = local.kms_key_arn
     }
   }
 
