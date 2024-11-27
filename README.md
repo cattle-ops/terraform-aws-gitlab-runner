@@ -9,6 +9,7 @@
 # Terraform module for GitLab auto-scaling runners on AWS spot instances <!-- omit in toc -->
 
 💥 See [issue 819](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/819) on how to migrate to v7 smoothly.
+💥 See [pr 1204](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/1204) on how to migrate to v8 smoothly.
 
 This [Terraform](https://www.terraform.io/) modules creates a [GitLab Runner](https://docs.gitlab.com/runner/). A blog post
 describes the original version of the runner. See the post at [040code](https://040code.github.io/2017/12/09/runners-on-the-spot/).

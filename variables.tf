@@ -273,7 +273,7 @@ variable "runner_install" {
   type = object({
     amazon_ecr_credential_helper = optional(bool, false)
     docker_machine_download_url  = optional(string, "")
-    docker_machine_version       = optional(string, "0.16.2-gitlab.19-cki.2")
+    docker_machine_version       = optional(string, "0.16.2-gitlab.19-cki.5")
     pre_install_script           = optional(string, "")
     post_install_script          = optional(string, "")
     start_script                 = optional(string, "")
