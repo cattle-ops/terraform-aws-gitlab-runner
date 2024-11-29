@@ -614,7 +614,7 @@ resource "aws_iam_role" "docker_machine" {
   assume_role_policy   = length(var.runner_worker_docker_machine_role.assume_role_policy_json) > 0 ? var.runner_worker_docker_machine_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
-  tags = local.tags
+  tags = merge(local.tags, var.runner_worker_docker_machine_role.additional_tags)
 }
 
 resource "aws_iam_instance_profile" "docker_machine" {
@@ -630,7 +630,7 @@ resource "aws_iam_role" "docker_autoscaler" {
   assume_role_policy   = length(var.runner_worker_docker_autoscaler_role.assume_role_policy_json) > 0 ? var.runner_worker_docker_autoscaler_role.assume_role_policy_json : templatefile("${path.module}/policies/instance-role-trust-policy.json", {})
   permissions_boundary = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
 
-  tags = local.tags
+  tags = merge(local.tags, var.runner_worker_docker_autoscaler_role.additional_tags)
 }
 
 resource "aws_iam_instance_profile" "docker_autoscaler" {
