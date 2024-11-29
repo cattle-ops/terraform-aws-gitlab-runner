@@ -97,9 +97,12 @@ resource "aws_launch_template" "this" {
     resource_type = "instance"
     tags          = local.tags
   }
-
   tag_specifications {
     resource_type = "volume"
+    tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "network-interface"
     tags          = local.tags
   }
 
