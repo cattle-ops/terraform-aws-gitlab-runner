@@ -1,5 +1,16 @@
 # Changelog
 
+## [8.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.15.0...8.0.0) (2024-11-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* update docker machine and encrypt all EBS ([#1204](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1204))
+
+### Features
+
+* update docker machine and encrypt all EBS ([#1204](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1204)) ([7bfe8f7](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/7bfe8f7841b760c247c556a2de43f8e203e86912))
+
 ## [7.15.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.14.0...7.15.0) (2024-10-09)
 
 
