@@ -308,6 +308,10 @@ resource "aws_launch_template" "gitlab_runner_instance" {
     resource_type = "volume"
     tags          = local.tags
   }
+  tag_specifications {
+    resource_type = "network-interface"
+    tags          = local.tags
+  }
   dynamic "tag_specifications" {
     for_each = var.runner_instance.spot_price == null || var.runner_instance.spot_price == "" ? [] : ["spot"]
     content {
@@ -409,6 +413,17 @@ resource "aws_launch_template" "fleet_gitlab_runner" {
   tag_specifications {
     resource_type = "volume"
     tags          = local.tags
+  }
+  tag_specifications {
+    resource_type = "network-interface"
+    tags          = local.tags
+  }
+  dynamic "tag_specifications" {
+    for_each = var.runner_worker_docker_machine_instance_spot.enable == false ? [] : ["spot"]
+    content {
+      resource_type = "spot-instances-request"
+      tags          = local.tags
+    }
   }
 
   tags = local.tags
