@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.0.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.0.0...8.0.1) (2024-11-29)
+
+
+### Bug Fixes
+
+* add additional tags to the worker role ([#1210](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1210)) ([0fe1617](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/0fe1617b6e47f0e195319113a91f7019b874a6d2))
+* add missing `tag_specifications` for launch templates ([#1212](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1212)) ([28f06af](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/28f06af680be5e8d20355d95c6b7bc23b4c7d3c6)), closes [#1207](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1207)
+
 ## [8.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.15.0...8.0.0) (2024-11-27)
 
 
