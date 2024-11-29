@@ -418,13 +418,7 @@ resource "aws_launch_template" "fleet_gitlab_runner" {
     resource_type = "network-interface"
     tags          = local.tags
   }
-  dynamic "tag_specifications" {
-    for_each = var.runner_worker_docker_machine_instance_spot.enable == false ? [] : ["spot"]
-    content {
-      resource_type = "spot-instances-request"
-      tags          = local.tags
-    }
-  }
+  # tag_specifications for spot-instances-request do not work. Instance creation fails.
 
   tags = local.tags
 
