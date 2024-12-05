@@ -113,7 +113,7 @@ locals {
       runners_iam_instance_profile_name = var.runner_worker_docker_machine_role.profile_name
       runners_root_size                 = var.runner_worker_docker_machine_instance.root_size
       runners_volume_type               = var.runner_worker_docker_machine_instance.volume_type
-      runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker-machine[0].id : ""
+      runners_ami                       = var.runner_worker.type == "docker+machine" ? data.aws_ami.docker_machine[0].id : ""
       use_fleet                         = var.runner_worker_docker_machine_fleet.enable
       launch_template                   = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
@@ -376,7 +376,7 @@ resource "aws_launch_template" "fleet_gitlab_runner" {
   name_prefix = "${local.name_runner_agent_instance}-worker-"
 
   key_name               = aws_key_pair.fleet[0].key_name
-  image_id               = data.aws_ami.docker-machine[0].id
+  image_id               = data.aws_ami.docker_machine[0].id
   user_data              = base64gzip(var.runner_worker_docker_machine_instance.start_script)
   instance_type          = var.runner_worker_docker_machine_instance.types[0] # it will be override by the fleet
   update_default_version = true
