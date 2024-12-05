@@ -150,9 +150,9 @@ variable "runner_ami_owners" {
 }
 
 variable "runner_ami_id" {
-    description = "The AMI ID of the Runner instance."
-    type        = string
-    default     = ""
+  description = "The AMI ID of the Runner instance."
+  type        = string
+  default     = ""
 }
 
 variable "runner_networking" {
@@ -794,8 +794,8 @@ variable "runner_worker_docker_machine_ami_owners" {
 
 variable "runner_worker_docker_machine_ami_id" {
   description = "The ID of the AMI to use for the Runner Worker (docker-machine)."
-    type        = string
-  default = ""
+  type        = string
+  default     = ""
 }
 
 variable "runner_worker_docker_autoscaler_ami_filter" {
