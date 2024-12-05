@@ -149,6 +149,12 @@ variable "runner_ami_owners" {
   default     = ["amazon"]
 }
 
+variable "runner_ami_id" {
+  description = "The AMI ID of the Runner instance."
+  type        = string
+  default     = ""
+}
+
 variable "runner_networking" {
   description = <<-EOT
     allow_incoming_ping = Allow ICMP Ping to the Runner. Specify `allow_incoming_ping_security_group_ids` too!
@@ -770,16 +776,7 @@ variable "runner_worker_docker_machine_security_group_description" {
 }
 
 variable "runner_worker_docker_machine_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Runner Worker."
-  type        = map(list(string))
-
-  default = {
-    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
-}
-
-variable "runner_worker_docker_autoscaler_ami_filter" {
-  description = "List of maps used to create the AMI filter for the Runner Worker."
+  description = "List of maps used to create the AMI filter for the Runner Worker (docker-machine)."
   type        = map(list(string))
 
   default = {
@@ -788,19 +785,40 @@ variable "runner_worker_docker_autoscaler_ami_filter" {
 }
 
 variable "runner_worker_docker_machine_ami_owners" {
-  description = "The list of owners used to select the AMI of the Runner Worker."
+  description = "The list of owners used to select the AMI of the Runner Worker (docker-machine)."
   type        = list(string)
 
   # Canonical
   default = ["099720109477"]
 }
 
+variable "runner_worker_docker_machine_ami_id" {
+  description = "The ID of the AMI to use for the Runner Worker (docker-machine)."
+  type        = string
+  default     = ""
+}
+
+variable "runner_worker_docker_autoscaler_ami_filter" {
+  description = "List of maps used to create the AMI filter for the Runner Worker (autoscaler)."
+  type        = map(list(string))
+
+  default = {
+    name = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+}
+
 variable "runner_worker_docker_autoscaler_ami_owners" {
-  description = "The list of owners used to select the AMI of the Runner Worker."
+  description = "The list of owners used to select the AMI of the Runner Worker (autoscaler)."
   type        = list(string)
 
   # Canonical
   default = ["099720109477"]
+}
+
+variable "runner_worker_docker_autoscaler_ami_id" {
+  description = "The ID of the AMI to use for the Runner Worker (autoscaler)."
+  type        = string
+  default     = ""
 }
 
 variable "runner_worker_docker_machine_instance" {
