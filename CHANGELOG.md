@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.0.1...8.1.0) (2024-12-05)
+
+
+### Features
+
+* add variables to specify the AMI ids ([#1214](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1214)) ([7f47bdb](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/7f47bdbd080b098ee5a3a984826b87224879d784))
+
 ## [8.0.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.0.0...8.0.1) (2024-11-29)
 
 
