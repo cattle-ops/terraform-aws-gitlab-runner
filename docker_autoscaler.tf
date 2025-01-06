@@ -6,9 +6,47 @@
 resource "aws_security_group" "docker_autoscaler" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  description = "Docker autoscaler security group"
+  name_prefix = "${local.name_sg}-docker-autoscaler"
   vpc_id      = var.vpc_id
-  name        = "${local.name_sg}-docker-autoscaler"
+  description = "Docker-autoscaler security group"
+
+  dynamic "egress" {
+    for_each = var.runner_worker_docker_autoscaler_egress_rules
+    iterator = each
+
+    content {
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
+      cidr_blocks = each.value.cidr_blocks
+      # ok, there is no problem with outgoing data to the internet. It's a user setting
+      # tfsec:ignore:aws-ec2-no-public-egress-sgr
+      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
+      prefix_list_ids  = each.value.prefix_list_ids
+      from_port        = each.value.from_port
+      protocol         = each.value.protocol
+      security_groups  = each.value.security_groups
+      self            = each.value.self
+      to_port          = each.value.to_port
+      description      = each.value.description
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = var.runner_worker_docker_autoscaler_ingress_rules
+    iterator = each
+
+    content {
+      cidr_blocks      = each.value.cidr_blocks
+      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
+      prefix_list_ids  = each.value.prefix_list_ids
+      from_port        = each.value.from_port
+      protocol         = each.value.protocol
+      security_groups  = each.value.security_groups
+      self            = each.value.self
+      to_port          = each.value.to_port
+      description      = each.value.description
+    }
+  }
 
   tags = merge(
     local.tags,
@@ -18,40 +56,16 @@ resource "aws_security_group" "docker_autoscaler" {
   )
 }
 
-resource "aws_security_group_rule" "autoscaler_egress" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
-
-  description       = "All egress traffic docker autoscaler"
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = join("", aws_security_group.docker_autoscaler[*].id)
-}
-
 resource "aws_security_group_rule" "autoscaler_ingress" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  description              = "All ingress traffic from runner security group"
+  description              = "Allow Ingress traffic within runner mananger and docker-autoscaler workers security groups"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.runner.id
   security_group_id        = join("", aws_security_group.docker_autoscaler[*].id)
-}
-
-resource "aws_security_group_rule" "extra_autoscaler_ingress" {
-  count = var.runner_worker.type == "docker-autoscaler" ? length(var.runner_worker_docker_autoscaler_asg.sg_ingresses) : 0
-
-  description       = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].description
-  type              = "ingress"
-  from_port         = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].from_port
-  to_port           = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].to_port
-  protocol          = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].protocol
-  cidr_blocks       = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].cidr_blocks
-  security_group_id = join("", aws_security_group.docker_autoscaler[*].id)
 }
 
 ####################################

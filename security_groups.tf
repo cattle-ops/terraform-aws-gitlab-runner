@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "runner_ping_group" {
 
 resource "aws_security_group" "docker_machine" {
   # checkov:skip=CKV2_AWS_5:Security group is used within an template and assigned to the docker machines
-  count = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
   name_prefix = "${local.name_sg}-docker-machine"
   vpc_id      = var.vpc_id
