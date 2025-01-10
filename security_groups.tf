@@ -37,7 +37,7 @@ resource "aws_security_group" "runner" {
   )
 }
 
-resource "aws_vpc_security_group_egress_rule" "autoscaler_egress" {
+resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscaler_egress" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
   security_group_id        = aws_security_group.runner.id
