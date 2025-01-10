@@ -57,6 +57,17 @@ resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler" {
   cidr_ipv6 = each.value.ipv6_cidr_block
 }
 
+resource "aws_vpc_security_group_ingress_rule" "autoscaler_ingress" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+  security_group_id        = aws_security_group.docker_autoscaler[0].id
+  from_port                = 0
+  to_port                  = 0
+  ip_protocol              = "-1"
+  description              = "All ingress traffic within Runner Manager and Docker-autoscaler workers security group"
+  referenced_security_group_id = aws_security_group.runner.id
+}
+
 ####################################
 ###### Launch template Workers #####
 ####################################
