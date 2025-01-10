@@ -22,40 +22,21 @@ resource "aws_security_group" "docker_autoscaler" {
   )
 }
 
-# Base security group
-resource "aws_security_group" "docker_autoscaler" {
-  count       = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
-  name_prefix = "${local.name_sg}-docker-autoscaler"
-  vpc_id      = var.vpc_id
-  description = "Docker-autoscaler security group"
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = format("%s", local.name_sg)
-    },
-  )
-}
-
 # Egress rules
 resource "aws_vpc_security_group_egress_rule" "docker_autoscaler" {
   for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_egress_rules : {}
 
   security_group_id = aws_security_group.docker_autoscaler[0].id
 
-  # Required fields
   from_port   = each.value.from_port
   to_port     = each.value.to_port
   ip_protocol = each.value.protocol
 
-  # Optional fields - only set if defined
   description                  = each.value.description
-  prefix_list_id               = each.value.prefix_list_id != "" ? each.value.prefix_list_id : null
+  prefix_list_id               = each.value.prefix_list_id
   referenced_security_group_id = each.value.security_group
-
-  # Handle CIDR blocks - convert empty strings to null to avoid errors
-  cidr_ipv4 = each.value.cidr_block != "" ? each.value.cidr_block : null
-  cidr_ipv6 = each.value.ipv6_cidr_block != "" ? each.value.ipv6_cidr_block : null
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
 }
 
 # Ingress rules
@@ -64,19 +45,16 @@ resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler" {
 
   security_group_id = aws_security_group.docker_autoscaler[0].id
 
-  # Required fields
   from_port   = each.value.from_port
   to_port     = each.value.to_port
   ip_protocol = each.value.protocol
 
-  # Optional fields - only set if defined
   description                  = each.value.description
-  prefix_list_id               = each.value.prefix_list_id != "" ? each.value.prefix_list_id : null
+  prefix_list_id               = each.value.prefix_list_id
   referenced_security_group_id = each.value.security_group
 
-  # Handle CIDR blocks - convert empty strings to null to avoid errors
-  cidr_ipv4 = each.value.cidr_block != "" ? each.value.cidr_block : null
-  cidr_ipv6 = each.value.ipv6_cidr_block != "" ? each.value.ipv6_cidr_block : null
+  cidr_ipv4 = each.value.cidr_block
+  cidr_ipv6 = each.value.ipv6_cidr_block
 }
 
 ####################################
