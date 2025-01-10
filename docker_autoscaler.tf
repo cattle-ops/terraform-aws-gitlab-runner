@@ -64,7 +64,7 @@ resource "aws_vpc_security_group_ingress_rule" "autoscaler_ingress" {
   from_port                = 0
   to_port                  = 0
   ip_protocol              = "-1"
-  description              = "All ingress traffic within Runner Manager and Docker-autoscaler workers security group"
+  description              = "Allow ALL Ingress traffic between Runner Manager and Docker-autoscaler workers security group"
   referenced_security_group_id = aws_security_group.runner.id
 }
 
