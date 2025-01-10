@@ -736,45 +736,88 @@ variable "runner_worker_docker_autoscaler_role" {
 variable "runner_worker_docker_autoscaler_ingress_rules" {
   description = "List of ingress rules for the Docker-autoscaler Runner workers"
   type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
+    cidr_block      = string
+    ipv6_cidr_block = string
+    prefix_list_id  = string
+    from_port       = number
+    protocol        = string # Will be converted to ip_protocol
+    security_group  = string
+    to_port         = number
+    description     = string
   }))
-  default = []
+  default = [] # Empty map as per original empty list default
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
+      can(regex("^[-1|tcp|udp|icmp|icmpv6]", rule.protocol))
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
+      (rule.cidr_blocks != "") ||
+      (rule.ipv6_cidr_blocks != "") ||
+      (rule.prefix_list_ids != "") ||
+      (rule.security_group != null && rule.security_group != "")
+    ])
+    error_message = "At least one destination (cidr_blocks, ipv6_cidr_blocks, prefix_list_ids, or security_group) must be specified for each rule."
+  }
 }
 
 variable "runner_worker_docker_autoscaler_egress_rules" {
   description = "List of egress rules for the Docker-autoscaler Runner workers"
   type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
+    cidr_block      = string
+    ipv6_cidr_block = string
+    prefix_list_id  = string
+    from_port       = number
+    protocol        = string # Will be converted to ip_protocol
+    security_group  = string
+    to_port         = number
+    description     = string
   }))
   default = [
     {
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = null
-      from_port        = 0
-      protocol         = "-1"
-      security_groups  = null
-      self             = null
-      to_port          = 0
-      description      = "Allow all egress traffic for Docker-autoscaler runner workers."
+      cidr_blocks    = "0.0.0.0/0"
+      prefix_list_id = ""
+      from_port      = 443
+      protocol       = "tcp"
+      security_group = null
+      to_port        = 443
+      description    = "Allow HTTPS egress traffic to all destinations."
+    },
+    {
+      ipv6_cidr_blocks = "::/0"
+      prefix_list_id   = ""
+      from_port        = 443
+      protocol         = "tcp"
+      security_group   = null
+      to_port          = 443
+      description      = "Allow HTTPS egress traffic to all destinations."
     }
   ]
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_docker_autoscaler_egress_rules) :
+      can(regex("^[-1|tcp|udp|icmp|icmpv6]", rule.protocol))
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_docker_autoscaler_egress_rules) :
+      (rule.cidr_blocks != "") ||
+      (rule.ipv6_cidr_blocks != "") ||
+      (rule.prefix_list_ids != "") ||
+      (rule.security_group != null && rule.security_group != "")
+    ])
+    error_message = "At least one destination (cidr_blocks, ipv6_cidr_blocks, prefix_list_ids, or security_group) must be specified for each rule."
+  }
 }
 
 variable "runner_worker_docker_machine_extra_egress_rules" {

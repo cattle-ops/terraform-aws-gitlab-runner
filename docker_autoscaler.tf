@@ -3,50 +3,16 @@
 # outdated docker+machine driver. The docker+machine driver is a legacy driver that is no longer maintained by GitLab.
 #
 
-resource "aws_security_group" "docker_autoscaler" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+########################################
+###### Security Group and SG rules #####
+########################################
 
+# Base security group
+resource "aws_security_group" "docker_autoscaler" {
+  count       = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
   name_prefix = "${local.name_sg}-docker-autoscaler"
   vpc_id      = var.vpc_id
   description = "Docker-autoscaler security group"
-
-  dynamic "egress" {
-    for_each = var.runner_worker_docker_autoscaler_egress_rules
-    iterator = each
-
-    content {
-      # ok, there is no problem with outgoing data to the internet. It's a user setting
-      # tfsec:ignore:aws-ec2-no-public-egress-sgr
-      cidr_blocks = each.value.cidr_blocks
-      # ok, there is no problem with outgoing data to the internet. It's a user setting
-      # tfsec:ignore:aws-ec2-no-public-egress-sgr
-      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
-      prefix_list_ids  = each.value.prefix_list_ids
-      from_port        = each.value.from_port
-      protocol         = each.value.protocol
-      security_groups  = each.value.security_groups
-      self             = each.value.self
-      to_port          = each.value.to_port
-      description      = each.value.description
-    }
-  }
-
-  dynamic "ingress" {
-    for_each = var.runner_worker_docker_autoscaler_ingress_rules
-    iterator = each
-
-    content {
-      cidr_blocks      = each.value.cidr_blocks
-      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
-      prefix_list_ids  = each.value.prefix_list_ids
-      from_port        = each.value.from_port
-      protocol         = each.value.protocol
-      security_groups  = each.value.security_groups
-      self             = each.value.self
-      to_port          = each.value.to_port
-      description      = each.value.description
-    }
-  }
 
   tags = merge(
     local.tags,
@@ -56,16 +22,61 @@ resource "aws_security_group" "docker_autoscaler" {
   )
 }
 
-resource "aws_security_group_rule" "autoscaler_ingress" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+# Base security group
+resource "aws_security_group" "docker_autoscaler" {
+  count       = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  name_prefix = "${local.name_sg}-docker-autoscaler"
+  vpc_id      = var.vpc_id
+  description = "Docker-autoscaler security group"
 
-  description              = "Allow Ingress traffic within runner manager and docker-autoscaler workers security groups"
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.runner.id
-  security_group_id        = join("", aws_security_group.docker_autoscaler[*].id)
+  tags = merge(
+    local.tags,
+    {
+      "Name" = format("%s", local.name_sg)
+    },
+  )
+}
+
+# Egress rules
+resource "aws_vpc_security_group_egress_rule" "docker_autoscaler" {
+  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_egress_rules : {}
+
+  security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  # Required fields
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  # Optional fields - only set if defined
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id != "" ? each.value.prefix_list_id : null
+  referenced_security_group_id = each.value.security_group
+
+  # Handle CIDR blocks - convert empty strings to null to avoid errors
+  cidr_ipv4 = each.value.cidr_block != "" ? each.value.cidr_block : null
+  cidr_ipv6 = each.value.ipv6_cidr_block != "" ? each.value.ipv6_cidr_block : null
+}
+
+# Ingress rules
+resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler" {
+  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_ingress_rules : {}
+
+  security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  # Required fields
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  # Optional fields - only set if defined
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id != "" ? each.value.prefix_list_id : null
+  referenced_security_group_id = each.value.security_group
+
+  # Handle CIDR blocks - convert empty strings to null to avoid errors
+  cidr_ipv4 = each.value.cidr_block != "" ? each.value.cidr_block : null
+  cidr_ipv6 = each.value.ipv6_cidr_block != "" ? each.value.ipv6_cidr_block : null
 }
 
 ####################################
