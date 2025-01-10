@@ -25,7 +25,7 @@ resource "aws_security_group" "docker_autoscaler" {
       from_port        = each.value.from_port
       protocol         = each.value.protocol
       security_groups  = each.value.security_groups
-      self            = each.value.self
+      self             = each.value.self
       to_port          = each.value.to_port
       description      = each.value.description
     }
@@ -42,7 +42,7 @@ resource "aws_security_group" "docker_autoscaler" {
       from_port        = each.value.from_port
       protocol         = each.value.protocol
       security_groups  = each.value.security_groups
-      self            = each.value.self
+      self             = each.value.self
       to_port          = each.value.to_port
       description      = each.value.description
     }
@@ -59,7 +59,7 @@ resource "aws_security_group" "docker_autoscaler" {
 resource "aws_security_group_rule" "autoscaler_ingress" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  description              = "Allow Ingress traffic within runner mananger and docker-autoscaler workers security groups"
+  description              = "Allow Ingress traffic within runner manager and docker-autoscaler workers security groups"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
