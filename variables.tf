@@ -734,8 +734,8 @@ variable "runner_worker_docker_autoscaler_role" {
 }
 
 variable "runner_worker_docker_autoscaler_ingress_rules" {
-  description = "List of ingress rules for the Docker-autoscaler Runner workers"
-  type = list(object({
+  description = "Set of ingress rules for the Docker-autoscaler Runner workers"
+  type = set(object({
     cidr_block      = optional(string, null)
     ipv6_cidr_block = optional(string, null)
     prefix_list_id  = optional(string, null)
@@ -768,8 +768,8 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
 }
 
 variable "runner_worker_docker_autoscaler_egress_rules" {
-  description = "List of egress rules for the Docker-autoscaler Runner workers"
-  type = list(object({
+  description = "Set of egress rules for the Docker-autoscaler Runner workers"
+  type = set(object({
     cidr_block      = optional(string, null)
     ipv6_cidr_block = optional(string, null)
     prefix_list_id  = optional(string, null)
