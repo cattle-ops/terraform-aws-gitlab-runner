@@ -749,7 +749,7 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in var.runner_worker_docker_autoscaler_egress_rules :
+      for rule in var.runner_worker_docker_autoscaler_ingress_rules :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
