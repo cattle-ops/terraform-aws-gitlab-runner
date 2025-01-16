@@ -22,26 +22,9 @@ resource "aws_security_group" "docker_autoscaler" {
   )
 }
 
-# Egress rules
-resource "aws_vpc_security_group_egress_rule" "docker_autoscaler" {
-  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_egress_rules : {}
-
-  security_group_id = aws_security_group.docker_autoscaler[0].id
-
-  from_port   = each.value.from_port
-  to_port     = each.value.to_port
-  ip_protocol = each.value.protocol
-
-  description                  = each.value.description
-  prefix_list_id               = each.value.prefix_list_id
-  referenced_security_group_id = each.value.security_group
-  cidr_ipv4                    = each.value.cidr_block
-  cidr_ipv6                    = each.value.ipv6_cidr_block
-}
-
 # Ingress rules
 resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler" {
-  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_ingress_rules : {}
+  for_each = var.runner_worker.type == "docker-autoscaler" ? { for idx, rule in var.docker_autoscaler_ingress_rules : idx => rule } : {}
 
   security_group_id = aws_security_group.docker_autoscaler[0].id
 
@@ -55,6 +38,23 @@ resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler" {
 
   cidr_ipv4 = each.value.cidr_block
   cidr_ipv6 = each.value.ipv6_cidr_block
+}
+
+# Egress rules
+resource "aws_vpc_security_group_egress_rule" "docker_autoscaler" {
+  for_each = var.runner_worker.type == "docker-autoscaler" ? { for idx, rule in var.docker_autoscaler_egress_rules : idx => rule } : {}
+
+  security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.security_group
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
 }
 
 resource "aws_vpc_security_group_ingress_rule" "autoscaler_ingress" {
