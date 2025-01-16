@@ -734,22 +734,30 @@ variable "runner_worker_docker_autoscaler_role" {
 }
 
 variable "runner_worker_docker_autoscaler_ingress_rules" {
-  description = "Set of ingress rules for the Docker-autoscaler Runner workers"
-  type = set(object({
+  description = "Map of ingress rules for the Docker-autoscaler Runner workers"
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
     cidr_block      = optional(string, null)
     ipv6_cidr_block = optional(string, null)
     prefix_list_id  = optional(string, null)
-    from_port       = optional(number, null)
-    protocol        = string # Will be converted to ip_protocol
     security_group  = optional(string, null)
-    to_port         = optional(number, null)
-    description     = string
   }))
-  default = [] # Empty list as per original empty list default
+  default = {
+    allow_http = {
+      from_port    = 80
+      to_port      = 80
+      protocol     = "tcp"
+      description  = "Allow HTTP inbound"
+      cidr_block   = "0.0.0.0/0"
+    }
+  }
 
   validation {
     condition = alltrue([
-      for rule in var.runner_worker_docker_autoscaler_ingress_rules :
+      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -757,54 +765,48 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in var.runner_worker_docker_autoscaler_ingress_rules :
+      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||
       (rule.security_group != null)
     ])
-    error_message = "At least one destination (cidr_block, ipv6_cidr_block, prefix_list_id, or security_group) must be specified for each rule."
+    error_message = "At least one destination must be specified."
   }
 }
 
 variable "runner_worker_docker_autoscaler_egress_rules" {
-  description = "Set of egress rules for the Docker-autoscaler Runner workers"
-  type = set(object({
+  description = "Map of egress rules for the Docker-autoscaler Runner workers"
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
     cidr_block      = optional(string, null)
     ipv6_cidr_block = optional(string, null)
     prefix_list_id  = optional(string, null)
-    from_port       = optional(number, null)
-    protocol        = string
     security_group  = optional(string, null)
-    to_port         = optional(number, null)
-    description     = string
   }))
-  default = [
-    {
+  default = {
+    allow_https_ipv4 = {
       cidr_block      = "0.0.0.0/0"
-      ipv6_cidr_block = null
-      prefix_list_id  = null
       from_port       = 443
       protocol        = "tcp"
-      security_group  = null
       to_port         = 443
-      description     = "Allow HTTPS egress traffic to all destinations."
+      description     = "Allow HTTPS egress traffic"
     },
-    {
-      cidr_block      = null
+    allow_https_ipv6 = {
       ipv6_cidr_block = "::/0"
-      prefix_list_id  = null
       from_port       = 443
       protocol        = "tcp"
-      security_group  = null
       to_port         = 443
-      description     = "Allow HTTPS egress traffic to all destinations."
+      description     = "Allow HTTPS egress traffic (IPv6)"
     }
-  ]
+  }
 
   validation {
     condition = alltrue([
-      for rule in var.runner_worker_docker_autoscaler_egress_rules :
+      for rule in values(var.runner_worker_docker_autoscaler_egress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -812,13 +814,13 @@ variable "runner_worker_docker_autoscaler_egress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in var.runner_worker_docker_autoscaler_egress_rules :
+      for rule in values(var.runner_worker_docker_autoscaler_egress_rules) :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||
       (rule.security_group != null)
     ])
-    error_message = "At least one destination (cidr_block, ipv6_cidr_block, prefix_list_id, or security_group) must be specified for each rule."
+    error_message = "At least one destination must be specified."
   }
 }
 
