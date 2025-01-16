@@ -745,14 +745,7 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
     prefix_list_id  = optional(string, null)
     security_group  = optional(string, null)
   }))
-  default = {
-    allow_http = {
-      from_port    = 80
-      to_port      = 80
-      protocol     = "tcp"
-      description  = "Allow HTTP inbound"
-      cidr_block   = "0.0.0.0/0"
-    }
+  default = {}
   }
 
   validation {
