@@ -746,7 +746,6 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
     security_group  = optional(string, null)
   }))
   default = {}
-  }
 
   validation {
     condition = alltrue([
