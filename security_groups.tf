@@ -37,6 +37,18 @@ resource "aws_security_group" "runner" {
   )
 }
 
+# Uncomment the following block after migrating the aws_security_group.runner SG rules into aws_vpc_security_group_*_rule resources
+# resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscaler_egress" {
+#   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+#   security_group_id            = aws_security_group.runner.id
+#   from_port                    = 0
+#   to_port                      = 0
+#   ip_protocol                  = "-1"
+#   description                  = "Allow ALL Egress traffic between Runner Manager and Docker-autoscaler workers security group"
+#   referenced_security_group_id = aws_security_group.docker_autoscaler[0].id
+# }
+
 ########################################
 ## Security group IDs to runner agent ##
 ########################################
@@ -66,7 +78,7 @@ resource "aws_security_group_rule" "runner_ping_group" {
 
 resource "aws_security_group" "docker_machine" {
   # checkov:skip=CKV2_AWS_5:Security group is used within an template and assigned to the docker machines
-  count = contains(["docker+machine", "docker-autoscaler"], var.runner_worker.type) ? 1 : 0
+  count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
   name_prefix = "${local.name_sg}-docker-machine"
   vpc_id      = var.vpc_id
