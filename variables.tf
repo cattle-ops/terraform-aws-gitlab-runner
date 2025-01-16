@@ -736,28 +736,28 @@ variable "runner_worker_docker_autoscaler_role" {
 variable "runner_worker_docker_autoscaler_ingress_rules" {
   description = "List of ingress rules for the Docker-autoscaler Runner workers"
   type = list(object({
-    cidr_block      = string
-    ipv6_cidr_block = string
-    prefix_list_id  = string
-    from_port       = number
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    from_port       = optional(number, null)
     protocol        = string # Will be converted to ip_protocol
-    security_group  = string
-    to_port         = number
+    security_group  = optional(string, null)
+    to_port         = optional(number, null)
     description     = string
   }))
-  default = [] # Empty map as per original empty list default
+  default = [] # Empty list as per original empty list default
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
-      can(regex("^[-1|tcp|udp|icmp|icmpv6]", rule.protocol))
+      for rule in var.runner_worker_docker_autoscaler_ingress_rules :
+      can(regex("^[-1|tcp|udp|icmp|icmpv6]$", rule.protocol))
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
   }
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
+      for rule in var.runner_worker_docker_autoscaler_ingress_rules :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||
@@ -773,11 +773,11 @@ variable "runner_worker_docker_autoscaler_egress_rules" {
     cidr_block      = optional(string, null)
     ipv6_cidr_block = optional(string, null)
     prefix_list_id  = optional(string, null)
-    from_port       = number
+    from_port       = optional(number, null)
     protocol        = string
     security_group  = optional(string, null)
-    to_port         = number
-    description     = optional(string, null)
+    to_port         = optional(number, null)
+    description     = string
   }))
   default = [
     {
