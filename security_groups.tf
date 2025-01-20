@@ -37,6 +37,19 @@ resource "aws_security_group" "runner" {
   )
 }
 
+resource "aws_security_group_rule" "runner_manager_to_docker_autoscaler_egress" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  security_group_id        = aws_security_group.runner.id
+  source_security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  description = "Allow ALL Egress traffic between Runner Manager and Docker-autoscaler workers security group"
+}
+
 # Uncomment the following block after migrating the aws_security_group.runner SG rules into aws_vpc_security_group_*_rule resources
 # resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscaler_egress" {
 #   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
