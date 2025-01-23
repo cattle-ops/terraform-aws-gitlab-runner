@@ -25,11 +25,11 @@ resource "aws_vpc_security_group_ingress_rule" "runner_manager" {
   to_port     = each.value.to_port
   ip_protocol = each.value.protocol
 
-  description              = each.value.description
-  prefix_list_id           = each.value.prefix_list_id
-  source_security_group_id = each.value.security_group
-  cidr_blocks              = each.value.cidr_block != null ? [each.value.cidr_block] : null
-  ipv6_cidr_blocks         = each.value.ipv6_cidr_block != null ? [each.value.ipv6_cidr_block] : null
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.security_group
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
 }
 
 resource "aws_vpc_security_group_egress_rule" "runner_manager" {
@@ -41,11 +41,11 @@ resource "aws_vpc_security_group_egress_rule" "runner_manager" {
   to_port     = each.value.to_port
   ip_protocol = each.value.protocol
 
-  description              = each.value.description
-  prefix_list_id           = each.value.prefix_list_id
-  source_security_group_id = each.value.security_group
-  cidr_blocks              = each.value.cidr_block != null ? [each.value.cidr_block] : null
-  ipv6_cidr_blocks         = each.value.ipv6_cidr_block != null ? [each.value.ipv6_cidr_block] : null
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.security_group
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
 }
 
 resource "aws_security_group_rule" "runner_manager_to_docker_autoscaler_egress" {
