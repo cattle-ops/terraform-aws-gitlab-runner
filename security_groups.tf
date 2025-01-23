@@ -8,33 +8,44 @@ resource "aws_security_group" "runner" {
   vpc_id      = var.vpc_id
   description = var.runner_networking.security_group_description
 
-  dynamic "egress" {
-    for_each = var.runner_networking_egress_rules
-    iterator = each
-
-    content {
-      # ok, there is no problem with outgoing data to the internet. It's a user setting
-      # tfsec:ignore:aws-ec2-no-public-egress-sgr
-      cidr_blocks = each.value.cidr_blocks
-      # ok, there is no problem with outgoing data to the internet. It's a user setting
-      # tfsec:ignore:aws-ec2-no-public-egress-sgr
-      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
-      prefix_list_ids  = each.value.prefix_list_ids
-      from_port        = each.value.from_port
-      protocol         = each.value.protocol
-      security_groups  = each.value.security_groups
-      self             = each.value.self
-      to_port          = each.value.to_port
-      description      = each.value.description
-    }
-  }
-
   tags = merge(
     local.tags,
     {
       "Name" = format("%s", local.name_sg)
     },
   )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "runner_manager" {
+  for_each = var.runner_manager_ingress_rules
+
+  security_group_id = aws_security_group.runner.id
+
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  description              = each.value.description
+  prefix_list_id           = each.value.prefix_list_id
+  source_security_group_id = each.value.security_group
+  cidr_blocks              = each.value.cidr_block != null ? [each.value.cidr_block] : null
+  ipv6_cidr_blocks         = each.value.ipv6_cidr_block != null ? [each.value.ipv6_cidr_block] : null
+}
+
+resource "aws_vpc_security_group_egress_rule" "runner_manager" {
+  for_each = var.runner_manager_egress_rules
+
+  security_group_id = aws_security_group.runner.id
+
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  description              = each.value.description
+  prefix_list_id           = each.value.prefix_list_id
+  source_security_group_id = each.value.security_group
+  cidr_blocks              = each.value.cidr_block != null ? [each.value.cidr_block] : null
+  ipv6_cidr_blocks         = each.value.ipv6_cidr_block != null ? [each.value.ipv6_cidr_block] : null
 }
 
 resource "aws_security_group_rule" "runner_manager_to_docker_autoscaler_egress" {
@@ -97,33 +108,25 @@ resource "aws_security_group" "docker_machine" {
   vpc_id      = var.vpc_id
   description = var.runner_worker_docker_machine_security_group_description
 
-  dynamic "egress" {
-    for_each = var.runner_worker_docker_machine_extra_egress_rules
-    iterator = each
-
-    content {
-      # ok, there is no problem with outgoing data to the internet. It's a user setting
-      # tfsec:ignore:aws-ec2-no-public-egress-sgr
-      cidr_blocks = each.value.cidr_blocks
-      # ok, there is no problem with outgoing data to the internet. It's a user setting
-      # tfsec:ignore:aws-ec2-no-public-egress-sgr
-      ipv6_cidr_blocks = each.value.ipv6_cidr_blocks
-      prefix_list_ids  = each.value.prefix_list_ids
-      from_port        = each.value.from_port
-      protocol         = each.value.protocol
-      security_groups  = each.value.security_groups
-      self             = each.value.self
-      to_port          = each.value.to_port
-      description      = each.value.description
-    }
-  }
-
   tags = merge(
     local.tags,
     {
       "Name" = format("%s", local.name_sg)
     },
   )
+}
+
+resource "aws_vpc_security_group_egress_rule" "docker_machine_egress" {
+  for_each = var.runner_worker_docker_machine_extra_egress_rules
+
+  security_group_id = aws_security_group.docker_machine[0].id
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  cidr_blocks       = each.value.cidr_blocks
+  ipv6_cidr_blocks  = each.value.ipv6_cidr_blocks
+  prefix_list_ids   = each.value.prefix_list_ids
+  description       = each.value.description
 }
 
 ########################################

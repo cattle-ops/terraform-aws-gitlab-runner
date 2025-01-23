@@ -171,32 +171,87 @@ variable "runner_networking" {
   default = {}
 }
 
-variable "runner_networking_egress_rules" {
-  description = "List of egress rules for the Runner."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
+variable "runner_manager_ingress_rules" {
+  description = "Map of Ingress rules for the Runner Manager security group."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
   }))
-  default = [
-    {
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = null
-      from_port        = 0
-      protocol         = "-1"
-      security_groups  = null
-      self             = null
-      to_port          = 0
-      description      = null
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_manager_ingress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_manager_ingress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }
+}
+
+variable "runner_manager_egress_rules" {
+  description = "Map of Egress rules for the Runner Manager security group."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+  default = {
+    allow_https_ipv4 = {
+      cidr_block      = "0.0.0.0/0"
+      from_port       = 443
+      protocol        = "tcp"
+      to_port         = 443
+      description     = "Allow HTTPS egress traffic"
+    },
+    allow_https_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 443
+      protocol        = "tcp"
+      to_port         = 443
+      description     = "Allow HTTPS egress traffic (IPv6)"
     }
-  ]
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_manager_egress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_manager_egress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }  
 }
 
 variable "runner_role" {
