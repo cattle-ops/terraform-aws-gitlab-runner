@@ -219,11 +219,11 @@ variable "runner_manager_egress_rules" {
   }))
   default = {
     allow_https_ipv4 = {
-      cidr_block      = "0.0.0.0/0"
-      from_port       = 443
-      protocol        = "tcp"
-      to_port         = 443
-      description     = "Allow HTTPS egress traffic"
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 443
+      protocol    = "tcp"
+      to_port     = 443
+      description = "Allow HTTPS egress traffic"
     },
     allow_https_ipv6 = {
       ipv6_cidr_block = "::/0"
@@ -251,7 +251,7 @@ variable "runner_manager_egress_rules" {
       (rule.security_group != null)
     ])
     error_message = "At least one destination must be specified."
-  }  
+  }
 }
 
 variable "runner_role" {
@@ -836,11 +836,11 @@ variable "runner_worker_docker_autoscaler_egress_rules" {
   }))
   default = {
     allow_https_ipv4 = {
-      cidr_block      = "0.0.0.0/0"
-      from_port       = 443
-      protocol        = "tcp"
-      to_port         = 443
-      description     = "Allow HTTPS egress traffic"
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 443
+      protocol    = "tcp"
+      to_port     = 443
+      description = "Allow HTTPS egress traffic"
     },
     allow_https_ipv6 = {
       ipv6_cidr_block = "::/0"
