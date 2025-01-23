@@ -113,7 +113,7 @@ resource "aws_security_group" "docker_machine" {
       to_port          = each.value.to_port
       description      = each.value.description
     }
-  }  
+  }
 
   tags = merge(
     local.tags,
@@ -121,7 +121,7 @@ resource "aws_security_group" "docker_machine" {
       "Name" = format("%s", local.name_sg)
     },
   )
-}gp
+}
 
 ########################################
 ## Runner agent to docker-machine     ##
