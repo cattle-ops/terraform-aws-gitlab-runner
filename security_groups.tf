@@ -121,20 +121,7 @@ resource "aws_security_group" "docker_machine" {
       "Name" = format("%s", local.name_sg)
     },
   )
-}
-
-resource "aws_vpc_security_group_egress_rule" "docker_machine_egress" {
-  for_each = var.runner_worker_docker_machine_extra_egress_rules
-
-  security_group_id = aws_security_group.docker_machine[0].id
-  from_port         = each.value.from_port
-  to_port           = each.value.to_port
-  protocol          = each.value.protocol
-  cidr_blocks       = each.value.cidr_blocks
-  ipv6_cidr_blocks  = each.value.ipv6_cidr_blocks
-  prefix_list_ids   = each.value.prefix_list_ids
-  description       = each.value.description
-}
+}gp
 
 ########################################
 ## Runner agent to docker-machine     ##
