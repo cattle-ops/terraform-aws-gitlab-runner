@@ -84,7 +84,7 @@
     "rebalance",
     "signoff",
     "typecheck",
-    "userdata",
+    "userdata"
   ],
   "flagWords": []
 }
