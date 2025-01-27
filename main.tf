@@ -77,9 +77,10 @@ locals {
       gitlab_runner_project_id                                     = var.runner_gitlab_registration_config["project_id"]
       gitlab_runner_access_level                                   = var.runner_gitlab_registration_config.access_level
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
-      public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
+      public_key                                                   = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].public_key_openssh : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
-      private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      private_key                                                  = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].private_key_pem : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      use_private_key                                              = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler"
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
       user_data_trace_log                                          = var.debug.trace_runner_user_data
       fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
