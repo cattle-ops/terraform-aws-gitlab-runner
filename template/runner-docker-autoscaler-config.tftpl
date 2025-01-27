@@ -18,7 +18,7 @@
       username          = "${connector_config_user}"
       use_external_addr = false
       %{~ if use_private_key ~}
-      key_path = /root/.ssh/id_rsa
+      key_path = "/root/.ssh/id_rsa"
       %{~ endif ~}
 
 %{~ for config in runners_autoscaling ~}
