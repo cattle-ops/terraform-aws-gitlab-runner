@@ -130,7 +130,7 @@ else
     sed -i.bak s/__REPLACED_BY_USER_DATA__/$token/g /etc/gitlab-runner/config.toml
 fi
 
-if [[ "${use_fleet}" == "true" || "${use_private_key}" == "true" ]]
+if [[ "${use_private_key}" == "true" ]]
 then
   echo "${public_key}" > /root/.ssh/id_rsa.pub
   echo "${private_key}" > /root/.ssh/id_rsa
