@@ -395,6 +395,8 @@ variable "runner_terminate_ec2_timeout_duration" {
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */
+# false positive, use_private_key is not a secret
+# kics-scan ignore-line
 variable "runner_worker" {
   description = <<-EOT
     For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
