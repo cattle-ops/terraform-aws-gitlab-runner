@@ -135,6 +135,8 @@ locals {
 
       runners_instance_ready_command = var.runner_worker_docker_autoscaler.instance_ready_command
 
+      use_private_key = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler"
+
       runners_autoscaling = [for config in var.runner_worker_docker_autoscaler_autoscaling_options : {
         for key, value in config :
         # Convert key from snake_case to PascalCase which is the casing for this section.
