@@ -171,7 +171,7 @@ variable "runner_networking" {
   default = {}
 }
 
-variable "runner_manager_ingress_rules" {
+variable "runner_ingress_rules" {
   description = "Map of Ingress rules for the Runner Manager security group."
   type = map(object({
     from_port       = optional(number, null)
@@ -187,7 +187,7 @@ variable "runner_manager_ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_manager_ingress_rules) :
+      for rule in values(var.runner_ingress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -195,7 +195,7 @@ variable "runner_manager_ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_manager_ingress_rules) :
+      for rule in values(var.runner_ingress_rules) :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||
@@ -205,7 +205,7 @@ variable "runner_manager_ingress_rules" {
   }
 }
 
-variable "runner_manager_egress_rules" {
+variable "runner_egress_rules" {
   description = "Map of Egress rules for the Runner Manager security group."
   type = map(object({
     from_port       = optional(number, null)
@@ -236,7 +236,7 @@ variable "runner_manager_egress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_manager_egress_rules) :
+      for rule in values(var.runner_egress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -244,7 +244,7 @@ variable "runner_manager_egress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_manager_egress_rules) :
+      for rule in values(var.runner_egress_rules) :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||

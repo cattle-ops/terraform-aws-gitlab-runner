@@ -17,7 +17,7 @@ resource "aws_security_group" "runner" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "runner_manager" {
-  for_each = var.runner_manager_ingress_rules
+  for_each = var.runner_ingress_rules
 
   security_group_id = aws_security_group.runner.id
 
@@ -33,7 +33,7 @@ resource "aws_vpc_security_group_ingress_rule" "runner_manager" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "runner_manager" {
-  for_each = var.runner_manager_egress_rules
+  for_each = var.runner_egress_rules
 
   security_group_id = aws_security_group.runner.id
 
