@@ -77,9 +77,9 @@ locals {
       gitlab_runner_project_id                                     = var.runner_gitlab_registration_config["project_id"]
       gitlab_runner_access_level                                   = var.runner_gitlab_registration_config.access_level
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
-      public_key                                                   = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
-      use_fleet                                                    = var.runner_worker_docker_machine_fleet.enable
-      private_key                                                  = var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      public_key                                                   = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].public_key_openssh : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
+      private_key                                                  = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].private_key_pem : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
+      use_private_key                                              = var.runner_worker_docker_machine_fleet.enable || (var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler")
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
       user_data_trace_log                                          = var.debug.trace_runner_user_data
       fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
@@ -133,6 +133,8 @@ locals {
       runners_update_interval_when_expecting = var.runner_worker_docker_autoscaler.update_interval_when_expecting
 
       runners_instance_ready_command = var.runner_worker_docker_autoscaler.instance_ready_command
+
+      use_private_key = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler"
 
       runners_autoscaling = [for config in var.runner_worker_docker_autoscaler_autoscaling_options : {
         for key, value in config :
