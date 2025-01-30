@@ -794,8 +794,8 @@ variable "runner_worker_docker_autoscaler_role" {
   default = {}
 }
 
-variable "runner_worker_docker_autoscaler_ingress_rules" {
-  description = "Map of ingress rules for the Docker-autoscaler Runner workers"
+variable "runner_worker_ingress_rules" {
+  description = "Map of ingress rules for the Runner workers"
   type = map(object({
     from_port       = optional(number, null)
     to_port         = optional(number, null)
@@ -810,7 +810,7 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
+      for rule in values(var.runner_worker_ingress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -818,7 +818,7 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_worker_docker_autoscaler_ingress_rules) :
+      for rule in values(var.runner_worker_ingress_rules) :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||
@@ -828,8 +828,8 @@ variable "runner_worker_docker_autoscaler_ingress_rules" {
   }
 }
 
-variable "runner_worker_docker_autoscaler_egress_rules" {
-  description = "Map of egress rules for the Docker-autoscaler Runner workers"
+variable "runner_worker_egress_rules" {
+  description = "Map of egress rules for the Runner workers"
   type = map(object({
     from_port       = optional(number, null)
     to_port         = optional(number, null)
@@ -844,22 +844,22 @@ variable "runner_worker_docker_autoscaler_egress_rules" {
     allow_https_ipv4 = {
       cidr_block  = "0.0.0.0/0"
       from_port   = 443
-      protocol    = "tcp"
       to_port     = 443
-      description = "Allow HTTPS egress traffic"
+      protocol    = "tcp"
+      description = "Allow HTTPS egress traffic to all destinations (IPv4)"
     },
     allow_https_ipv6 = {
       ipv6_cidr_block = "::/0"
       from_port       = 443
-      protocol        = "tcp"
       to_port         = 443
-      description     = "Allow HTTPS egress traffic (IPv6)"
+      protocol        = "tcp"
+      description     = "Allow HTTPS egress traffic to all destinations (IPv6)"
     }
   }
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_worker_docker_autoscaler_egress_rules) :
+      for rule in values(var.runner_worker_egress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -867,7 +867,7 @@ variable "runner_worker_docker_autoscaler_egress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.runner_worker_docker_autoscaler_egress_rules) :
+      for rule in values(var.runner_worker_egress_rules) :
       (rule.cidr_block != null) ||
       (rule.ipv6_cidr_block != null) ||
       (rule.prefix_list_id != null) ||
@@ -875,34 +875,6 @@ variable "runner_worker_docker_autoscaler_egress_rules" {
     ])
     error_message = "At least one destination must be specified."
   }
-}
-
-variable "runner_worker_docker_machine_extra_egress_rules" {
-  description = "List of egress rules for the Runner Workers."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
-  }))
-  default = [
-    {
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = null
-      from_port        = 0
-      protocol         = "-1"
-      security_groups  = null
-      self             = null
-      to_port          = 0
-      description      = "Allow all egress traffic for Runner Workers."
-    }
-  ]
 }
 
 variable "runner_worker_docker_machine_security_group_description" {

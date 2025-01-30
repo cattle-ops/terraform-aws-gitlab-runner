@@ -24,7 +24,7 @@ resource "aws_security_group" "docker_autoscaler" {
 
 # Ingress rules
 resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_ingress" {
-  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_ingress_rules : {}
+  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_ingress_rules : {}
 
   security_group_id = aws_security_group.docker_autoscaler[0].id
 
@@ -52,7 +52,7 @@ resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_internal_traff
 
 # Egress rules
 resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
-  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_docker_autoscaler_egress_rules : {}
+  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_egress_rules : {}
 
   security_group_id = aws_security_group.docker_autoscaler[0].id
 
