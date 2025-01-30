@@ -71,15 +71,14 @@ resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscal
 ########################################
 
 # Allow ICMP traffic from allowed security group IDs to gitlab-runner agent instances
-resource "aws_security_group_rule" "runner_ping_group" {
+resource "aws_vpc_security_group_ingress_rule" "runner_ping_group" {
   count = length(var.runner_networking.allow_incoming_ping_security_group_ids) > 0 && var.runner_networking.allow_incoming_ping ? length(var.runner_networking.allow_incoming_ping_security_group_ids) : 0
 
-  type      = "ingress"
   from_port = -1
   to_port   = -1
-  protocol  = "icmp"
+  ip_protocol  = "icmp"
 
-  source_security_group_id = element(var.runner_networking.allow_incoming_ping_security_group_ids, count.index)
+  referenced_security_group_id = element(var.runner_networking.allow_incoming_ping_security_group_ids, count.index)
   security_group_id        = aws_security_group.runner.id
 
   description = format(
