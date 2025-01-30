@@ -396,6 +396,8 @@ variable "runner_terminate_ec2_timeout_duration" {
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */
 variable "runner_worker" {
+  # false positive, use_private_key is not a secret
+  # kics-scan ignore-line
   description = <<-EOT
     For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
 
@@ -405,8 +407,6 @@ variable "runner_worker" {
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
     ssm_access = Allows to connect to the Runner Worker via SSM.
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
-    # false positive, use_private_key is not a secret
-    # kics-scan ignore-line
     use_private_key = Use a private key to connect the Runner Manager to the Runner Workers. Ignored when fleeting is enabled (defaults to `true`).
   EOT
   type = object({
