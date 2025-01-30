@@ -395,8 +395,6 @@ variable "runner_terminate_ec2_timeout_duration" {
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */
-# false positive, use_private_key is not a secret
-# kics-scan ignore-line
 variable "runner_worker" {
   description = <<-EOT
     For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
@@ -414,6 +412,8 @@ variable "runner_worker" {
     output_limit          = optional(number, 4096)
     request_concurrency   = optional(number, 1)
     ssm_access            = optional(bool, false)
+    # false positive, use_private_key is not a secret
+    # kics-scan ignore-line
     type                  = optional(string, "docker+machine")
     use_private_key       = optional(bool, false)
   })
