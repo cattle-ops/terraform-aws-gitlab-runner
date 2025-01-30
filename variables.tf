@@ -412,9 +412,9 @@ variable "runner_worker" {
     output_limit          = optional(number, 4096)
     request_concurrency   = optional(number, 1)
     ssm_access            = optional(bool, false)
+    type                  = optional(string, "docker+machine")
     # false positive, use_private_key is not a secret
     # kics-scan ignore-line
-    type                  = optional(string, "docker+machine")
     use_private_key       = optional(bool, false)
   })
   default = {}
