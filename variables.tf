@@ -405,7 +405,7 @@ variable "runner_worker" {
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
     ssm_access = Allows to connect to the Runner Worker via SSM.
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
-    use_private_key = Use a private key to connect to the Runner Worker. Do not enable for fleeting.
+    use_private_key = Use a private key to connect the Runner Manager to the Runner Workers. Ignored when fleeting is enabled (defaults to `true`).
   EOT
   type = object({
     environment_variables = optional(list(string), [])
