@@ -30,6 +30,8 @@ resource "aws_vpc_security_group_ingress_rule" "runner" {
   referenced_security_group_id = each.value.security_group
   cidr_ipv4                    = each.value.cidr_block
   cidr_ipv6                    = each.value.ipv6_cidr_block
+
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_egress_rule" "runner" {
@@ -46,17 +48,22 @@ resource "aws_vpc_security_group_egress_rule" "runner" {
   referenced_security_group_id = each.value.security_group
   cidr_ipv4                    = each.value.cidr_block
   cidr_ipv6                    = each.value.ipv6_cidr_block
+
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscaler_egress" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  security_group_id            = aws_security_group.runner.id
+  security_group_id = aws_security_group.runner.id
+
   from_port                    = 0
   to_port                      = 0
   ip_protocol                  = "-1"
   description                  = "Allow ALL Egress traffic between Runner Manager and Docker-autoscaler workers security group"
   referenced_security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  tags = local.tags
 }
 
 ########################################
@@ -152,6 +159,8 @@ resource "aws_vpc_security_group_egress_rule" "runner" {
   referenced_security_group_id = each.value.security_group
   cidr_ipv4                    = each.value.cidr_block
   cidr_ipv6                    = each.value.ipv6_cidr_block
+
+  tags = local.tags
 }
 
 ########################################
@@ -162,11 +171,11 @@ resource "aws_vpc_security_group_egress_rule" "runner" {
 resource "aws_vpc_security_group_ingress_rule" "docker_machine_docker_runner" {
   count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
-  security_group_id        = aws_security_group.docker_machine[0].id
+  security_group_id = aws_security_group.docker_machine[0].id
 
-  from_port = 2376
-  to_port   = 2376
-  ip_protocol  = "tcp"
+  from_port   = 2376
+  to_port     = 2376
+  ip_protocol = "tcp"
 
   referenced_security_group_id = aws_security_group.runner.id
 
@@ -193,11 +202,11 @@ locals {
 resource "aws_vpc_security_group_ingress_rule" "docker_machine_ssh_runner" {
   count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
-  security_group_id        = aws_security_group.docker_machine[0].id
+  security_group_id = aws_security_group.docker_machine[0].id
 
-  from_port = 22
-  to_port   = 22
-  ip_protocol  = "tcp"
+  from_port   = 22
+  to_port     = 22
+  ip_protocol = "tcp"
 
   referenced_security_group_id = aws_security_group.runner.id
 
@@ -206,17 +215,19 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_ssh_runner" {
     aws_security_group.runner.id,
     aws_security_group.docker_machine[0].name
   )
+
+  tags = local.tags
 }
 
 # Allow ICMP traffic from gitlab-runner agent instances and security group IDs to docker-machine instances
 resource "aws_vpc_security_group_ingress_rule" "docker_machine_ping_runner" {
   count = var.runner_worker.type == "docker+machine" ? length(local.security_groups_ping) : 0
 
-  security_group_id        = aws_security_group.docker_machine[0].id
+  security_group_id = aws_security_group.docker_machine[0].id
 
-  from_port = -1
-  to_port   = -1
-  ip_protocol  = "icmp"
+  from_port   = -1
+  to_port     = -1
+  ip_protocol = "icmp"
 
   referenced_security_group_id = element(local.security_groups_ping, count.index)
 
@@ -225,6 +236,8 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_ping_runner" {
     element(local.security_groups_ping, count.index),
     aws_security_group.docker_machine[0].name
   )
+
+  tags = local.tags
 }
 
 ########################################
@@ -237,9 +250,9 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_docker_self" {
 
   security_group_id = aws_security_group.docker_machine[0].id
 
-  from_port = 2376
-  to_port   = 2376
-  ip_protocol  = "tcp"
+  from_port   = 2376
+  to_port     = 2376
+  ip_protocol = "tcp"
 
   referenced_security_group_id = aws_security_group.docker_machine[0].id
 
@@ -247,6 +260,8 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_docker_self" {
     "Allow docker-machine traffic within group %s on port 2376",
     aws_security_group.docker_machine[0].name,
   )
+
+  tags = local.tags
 }
 
 # Allow SSH traffic from docker-machine instances to docker-machine instances on port 22
@@ -255,15 +270,17 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_ssh_self" {
 
   security_group_id = aws_security_group.docker_machine[0].id
 
-  from_port = 22
-  to_port   = 22
-  ip_protocol  = "tcp"
+  from_port                    = 22
+  to_port                      = 22
+  ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.docker_machine[0].id
 
   description = format(
     "Allow SSH traffic within group %s on port 22",
     aws_security_group.docker_machine[0].name,
   )
+
+  tags = local.tags
 }
 
 # Allow ICMP traffic from docker-machine instances to docker-machine instances
@@ -272,12 +289,14 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_ping_self" {
 
   security_group_id = aws_security_group.docker_machine[0].id
 
-  from_port = -1
-  to_port   = -1
-  ip_protocol  = "icmp"
+  from_port   = -1
+  to_port     = -1
+  ip_protocol = "icmp"
 
   description = format(
     "Allow ICMP traffic within group %s",
     aws_security_group.docker_machine[0].name,
   )
+
+  tags = local.tags
 }
