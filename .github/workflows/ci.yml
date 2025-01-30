@@ -73,6 +73,10 @@ jobs:
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
         uses: oxsecurity/megalinter@f90c800040e4f84800700b27b2394d3eecc1fdad # v8.4.0
+        permissions:
+          contents: write
+          issues: write
+          pull-requests: write
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -88,7 +92,6 @@ jobs:
           MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
           # it's an auto-generated file
           MARKDOWN_MARKDOWN_LINK_CHECK_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
-          PAT: ${{ secrets.GITHUB_TOKEN }}
           # automatically commit fixes to the feature branch
           APPLY_FIXES: all
           APPLY_FIXES_EVENT: pull_request
