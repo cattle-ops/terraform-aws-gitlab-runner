@@ -191,9 +191,7 @@ resource "aws_autoscaling_group" "autoscaler" {
   lifecycle {
     # do not change these values as we would immediately scale up/down, which is not wanted
     ignore_changes = [
-      desired_capacity,
-      min_size,
-      max_size
+      desired_capacity
     ]
   }
 }
