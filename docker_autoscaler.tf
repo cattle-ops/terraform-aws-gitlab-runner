@@ -187,4 +187,13 @@ resource "aws_autoscaling_group" "autoscaler" {
       propagate_at_launch = true
     }
   }
+
+  lifecycle {
+    # do not change these values as we would immediately scale up/down, which is not wanted
+    ignore_changes = [
+      desired_capacity,
+      min_size,
+      max_size
+    ]
+  }
 }
