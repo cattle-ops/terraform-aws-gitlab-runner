@@ -66,6 +66,18 @@ resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscal
   tags = local.tags
 }
 
+resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_machine_egress" {
+  count = var.runner_worker.type == "docker+machine" ? 1 : 0
+
+  security_group_id = aws_security_group.runner.id
+
+  ip_protocol                  = "-1"
+  description                  = "Allow ALL Egress traffic between Runner Manager and Docker-machine workers security group"
+  referenced_security_group_id = aws_security_group.docker_machine[0].id
+
+  tags = local.tags
+}
+
 ########################################
 ## Security group IDs to runner agent ##
 ########################################
