@@ -82,6 +82,7 @@ resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_machine_
 
 # Allow ICMP traffic from allowed security group IDs to gitlab-runner agent instances
 resource "aws_vpc_security_group_ingress_rule" "runner_ping_group" {
+  # checkov:skip=CKV_AWS_277:False positive. ICMP traffic has no ports.
   count = length(var.runner_networking.allow_incoming_ping_security_group_ids) > 0 && var.runner_networking.allow_incoming_ping ? length(var.runner_networking.allow_incoming_ping_security_group_ids) : 0
 
   from_port   = -1
@@ -212,6 +213,7 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_ssh_runner" {
 
 # Allow ICMP traffic from gitlab-runner agent instances and security group IDs to docker-machine instances
 resource "aws_vpc_security_group_ingress_rule" "docker_machine_ping_runner" {
+  # checkov:skip=CKV_AWS_277:False positive. ICMP traffic has no ports.
   count = var.runner_worker.type == "docker+machine" ? length(local.security_groups_ping) : 0
 
   security_group_id = aws_security_group.docker_machine[0].id
@@ -276,6 +278,7 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine_ssh_self" {
 
 # Allow ICMP traffic from docker-machine instances to docker-machine instances
 resource "aws_vpc_security_group_ingress_rule" "docker_machine_ping_self" {
+  # checkov:skip=CKV_AWS_277:False positive. ICMP traffic has no ports.
   count = (var.runner_worker.type == "docker+machine" && var.runner_networking.allow_incoming_ping) ? 1 : 0
 
   security_group_id = aws_security_group.docker_machine[0].id
