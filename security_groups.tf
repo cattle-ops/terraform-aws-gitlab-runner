@@ -57,8 +57,6 @@ resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscal
 
   security_group_id = aws_security_group.runner.id
 
-  from_port                    = 0
-  to_port                      = 0
   ip_protocol                  = "-1"
   description                  = "Allow ALL Egress traffic between Runner Manager and Docker-autoscaler workers security group"
   referenced_security_group_id = aws_security_group.docker_autoscaler[0].id
