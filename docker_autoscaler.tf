@@ -3,12 +3,16 @@
 # outdated docker+machine driver. The docker+machine driver is a legacy driver that is no longer maintained by GitLab.
 #
 
-resource "aws_security_group" "docker_autoscaler" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+########################################
+###### Security Group and SG rules #####
+########################################
 
-  description = "Docker autoscaler security group"
+# Base security group
+resource "aws_security_group" "docker_autoscaler" {
+  count       = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  name_prefix = "${local.name_sg}-docker-autoscaler"
   vpc_id      = var.vpc_id
-  name        = "${local.name_sg}-docker-autoscaler"
+  description = "Docker-autoscaler security group"
 
   tags = merge(
     local.tags,
@@ -18,40 +22,49 @@ resource "aws_security_group" "docker_autoscaler" {
   )
 }
 
-resource "aws_security_group_rule" "autoscaler_egress" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+# Ingress rules
+resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_ingress" {
+  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_ingress_rules : {}
 
-  description       = "All egress traffic docker autoscaler"
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = join("", aws_security_group.docker_autoscaler[*].id)
+  security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.security_group
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
 }
 
-resource "aws_security_group_rule" "autoscaler_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_internal_traffic" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
-  description              = "All ingress traffic from runner security group"
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.runner.id
-  security_group_id        = join("", aws_security_group.docker_autoscaler[*].id)
+  security_group_id            = aws_security_group.docker_autoscaler[0].id
+  from_port                    = -1
+  to_port                      = -1
+  ip_protocol                  = "-1"
+  description                  = "Allow ALL Ingress traffic between Runner Manager and Docker-autoscaler workers security group"
+  referenced_security_group_id = aws_security_group.runner.id
 }
 
-resource "aws_security_group_rule" "extra_autoscaler_ingress" {
-  count = var.runner_worker.type == "docker-autoscaler" ? length(var.runner_worker_docker_autoscaler_asg.sg_ingresses) : 0
+# Egress rules
+resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
+  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_egress_rules : {}
 
-  description       = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].description
-  type              = "ingress"
-  from_port         = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].from_port
-  to_port           = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].to_port
-  protocol          = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].protocol
-  cidr_blocks       = var.runner_worker_docker_autoscaler_asg.sg_ingresses[count.index].cidr_blocks
-  security_group_id = join("", aws_security_group.docker_autoscaler[*].id)
+  security_group_id = aws_security_group.docker_autoscaler[0].id
+
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.security_group
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
 }
 
 ####################################
