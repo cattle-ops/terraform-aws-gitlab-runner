@@ -85,62 +85,6 @@ locals {
       fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
   })
 
-  template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
-    {
-      docker_autoscaling_name       = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
-      connector_config_user         = var.runner_worker_docker_autoscaler.connector_config_user
-      runners_capacity_per_instance = var.runner_worker_docker_autoscaler.capacity_per_instance
-      runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
-      runners_max_instances         = var.runner_worker.max_jobs
-
-      runners_update_interval                = var.runner_worker_docker_autoscaler.update_interval
-      runners_update_interval_when_expecting = var.runner_worker_docker_autoscaler.update_interval_when_expecting
-
-      runners_instance_ready_command = var.runner_worker_docker_autoscaler.instance_ready_command
-
-      use_private_key = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler"
-
-      runners_autoscaling = [for config in var.runner_worker_docker_autoscaler_autoscaling_options : {
-        for key, value in config :
-        # Convert key from snake_case to PascalCase which is the casing for this section.
-        key => jsonencode(value) if value != null
-      }]
-  })
-
-  template_runner_worker_config = templatefile("${path.module}/template/runner-worker-config.tftpl",
-    {
-      aws_region       = data.aws_region.current.name
-      gitlab_url       = var.runner_gitlab.url
-      gitlab_clone_url = var.runner_gitlab.url_clone
-      tls_ca_file      = length(var.runner_gitlab.certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
-      runners_machine_autoscaling = [for config in var.runner_worker_docker_machine_autoscaling_options : {
-        for key, value in config :
-        # Convert key from snake_case to PascalCase which is the casing for this section.
-        join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
-      }]
-
-      runners_name                   = var.runner_instance.name
-      runners_token                  = var.runner_gitlab.registration_token
-      runners_executor               = var.runner_worker.type
-      runners_limit                  = var.runner_worker.max_jobs
-      runners_environment_vars       = jsonencode(var.runner_worker.environment_variables)
-      runners_pre_build_script       = var.runner_worker_gitlab_pipeline.pre_build_script
-      runners_post_build_script      = var.runner_worker_gitlab_pipeline.post_build_script
-      runners_pre_clone_script       = var.runner_worker_gitlab_pipeline.pre_clone_script
-      runners_request_concurrency    = var.runner_worker.request_concurrency
-      runners_output_limit           = var.runner_worker.output_limit
-      runners_volumes_tmpfs          = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_services_volumes_tmpfs = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_docker_services        = local.runners_docker_services
-      runners_docker_options         = local.runners_docker_options_toml
-      bucket_name                    = local.bucket_name
-      shared_cache                   = var.runner_worker_cache.shared
-      auth_type                      = var.runner_worker_cache.authentication_type
-      runners_docker_autoscaler      = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
-      runners_docker_machine         = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""
-    }
-  )
-
   template_runner_config = templatefile("runner-agent.tftpl",
     {
       prometheus_listen_address      = var.runner_manager.prometheus_listen_address
@@ -148,9 +92,24 @@ locals {
       runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
       sentry_dsn                     = var.runner_manager.sentry_dsn
 
-      runners = [local.template_runner_worker_config]
+      runners = [module.runner.runner_config]
     }
   )
+}
+
+module "runner" {
+  source = "./modules/runner-config"
+
+  kms_key_arn = local.kms_key_arn
+  cache_bucket_name = local.bucket_name
+  docker_autoscaler_asg_name = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
+  docker_machine_runner_name = local.runner_tags_merged["Name"]
+  docker_machine_availability_zone_name = data.aws_availability_zone.runners.name_suffix
+  docker_machine_instance_profile_name = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+  docker_machine_security_group_name = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+  docker_machine_ami_id = data.aws_ami.docker_machine_by_filter[0].id
+  docker_machine_fleet_launch_template_name = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
+  docker_machine_tags = local.runner_tags_merged
 }
 
 # ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
