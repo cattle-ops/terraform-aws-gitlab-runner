@@ -171,32 +171,87 @@ variable "runner_networking" {
   default = {}
 }
 
-variable "runner_networking_egress_rules" {
-  description = "List of egress rules for the Runner."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
+variable "runner_ingress_rules" {
+  description = "Map of Ingress rules for the Runner Manager security group."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
   }))
-  default = [
-    {
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = null
-      from_port        = 0
-      protocol         = "-1"
-      security_groups  = null
-      self             = null
-      to_port          = 0
-      description      = null
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_ingress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_ingress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }
+}
+
+variable "runner_egress_rules" {
+  description = "Map of Egress rules for the Runner Manager security group."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+  default = {
+    allow_https_ipv4 = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 443
+      protocol    = "tcp"
+      to_port     = 443
+      description = "Allow HTTPS egress traffic"
+    },
+    allow_https_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 443
+      protocol        = "tcp"
+      to_port         = 443
+      description     = "Allow HTTPS egress traffic (IPv6)"
     }
-  ]
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_egress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_egress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }
 }
 
 variable "runner_role" {
@@ -434,11 +489,11 @@ variable "runner_worker_cache" {
     cache. To use the same cache across multiple Runner Worker disable the creation of the cache and provide a policy and
     bucket name. See the public runner example for more details."
 
-    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnerscaches3-section
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnerscaches3-section.
 
     access_log_bucker_id = The ID of the bucket where the access logs are stored.
     access_log_bucket_prefix = The bucket prefix for the access logs.
-    authentication_type = A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'
+    authentication_type = A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'.
     bucket = Name of the cache bucket. Requires `create = false`.
     bucket_prefix = Prefix for s3 cache bucket name. Requires `create = true`.
     create = Boolean used to enable or disable the creation of the cache bucket.
@@ -615,11 +670,11 @@ variable "runner_worker_docker_machine_fleet" {
 
 variable "runner_worker_docker_autoscaler" {
   description = <<-EOT
-    fleeting_plugin_version = The version of aws fleeting plugin
-    connector_config_user = User to connect to worker machine
+    fleeting_plugin_version = The version of aws fleeting plugin.
+    connector_config_user = User to connect to worker machine.
     key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
     capacity_per_instance = The number of jobs that can be executed concurrently by a single instance.
-    max_use_count = Max job number that can run on a worker
+    max_use_count = Max job number that can run on a worker.
     update_interval = The interval to check with the fleeting plugin for instance updates.
     update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
     instance_ready_command = Executes this command on each instance provisioned by the autoscaler to ensure that it is ready for use. A failure results in the instance being removed.
@@ -640,14 +695,14 @@ variable "runner_worker_docker_autoscaler" {
 variable "runner_worker_docker_autoscaler_instance" {
   description = <<-EOT
     ebs_optimized = Enable EBS optimization for the Runner Worker.
-    http_tokens = Whether or not the metadata service requires session tokens
+    http_tokens = Whether or not the metadata service requires session tokens.
     http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
     monitoring = Enable detailed monitoring for the Runner Worker.
     private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default),
     root_device_name = The name of the root volume for the Runner Worker.
     root_size = The size of the root volume for the Runner Worker.
     start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
-    volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported
+    volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported.
     volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
     volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
 EOT
@@ -670,25 +725,25 @@ EOT
 
 variable "runner_worker_docker_autoscaler_asg" {
   description = <<-EOT
+    enabled_metrics = List of metrics to collect.
     enable_mixed_instances_policy = Make use of autoscaling-group mixed_instances_policy capacities to leverage pools and spot instances.
-    health_check_grace_period = Time (in seconds) after instance comes into service before checking health
-    health_check_type = Controls how health checking is done. Values are - EC2 and ELB
+    health_check_grace_period = Time (in seconds) after instance comes into service before checking health.
+    health_check_type = Controls how health checking is done. Values are - EC2 and ELB.
     instance_refresh_min_healthy_percentage = The amount of capacity in the Auto Scaling group that must remain healthy during an instance refresh to allow the operation to continue, as a percentage of the desired capacity of the Auto Scaling group.
     instance_refresh_triggers = Set of additional property names that will trigger an Instance Refresh. A refresh will always be triggered by a change in any of launch_configuration, launch_template, or mixed_instances_policy.
     max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
     on_demand_base_capacity = Absolute minimum amount of desired capacity that must be fulfilled by on-demand instances.
     on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
-    override_instance_types = List to override the instance type in the Launch Template. Allow to spread spot instances on several types, to reduce interruptions
+    override_instance_types = List to override the instance type in the Launch Template. Allow to spread spot instances on several types, to reduce interruptions.
     profile_name = profile_name = Name of the IAM profile to attach to the Runner Workers.
-    sg_ingresses = Extra security group rule for workers
-    spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions
+    spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions.
     spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
-    upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'
-    enabled_metrics = List of metrics to collect.
+    upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'.
   EOT
   type = object({
+    enabled_metrics                          = optional(list(string), [])
     enable_mixed_instances_policy            = optional(bool, false)
     health_check_grace_period                = optional(number, 300)
     health_check_type                        = optional(string, "EC2")
@@ -703,14 +758,6 @@ variable "runner_worker_docker_autoscaler_asg" {
     subnet_ids                               = optional(list(string), [])
     types                                    = optional(list(string), ["m5.large"])
     upgrade_strategy                         = optional(string, "rolling")
-    enabled_metrics                          = optional(list(string), [])
-    sg_ingresses = optional(list(object({
-      description = string
-      from_port   = number
-      to_port     = number
-      protocol    = string
-      cidr_blocks = list(string)
-    })), [])
   })
   default = {}
 }
@@ -747,32 +794,101 @@ variable "runner_worker_docker_autoscaler_role" {
   default = {}
 }
 
-variable "runner_worker_docker_machine_extra_egress_rules" {
-  description = "List of egress rules for the Runner Workers."
-  type = list(object({
-    cidr_blocks      = list(string)
-    ipv6_cidr_blocks = list(string)
-    prefix_list_ids  = list(string)
-    from_port        = number
-    protocol         = string
-    security_groups  = list(string)
-    self             = bool
-    to_port          = number
-    description      = string
+variable "runner_worker_ingress_rules" {
+  description = "Map of ingress rules for the Runner workers"
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
   }))
-  default = [
-    {
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = null
-      from_port        = 0
-      protocol         = "-1"
-      security_groups  = null
-      self             = null
-      to_port          = 0
-      description      = "Allow all egress traffic for Runner Workers."
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_ingress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_ingress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }
+}
+
+variable "runner_worker_egress_rules" {
+  description = "Map of egress rules for the Runner workers"
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+  default = {
+    allow_https_ipv4 = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "Allow HTTPS egress traffic to all destinations (IPv4)"
+    },
+    allow_https_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      description     = "Allow HTTPS egress traffic to all destinations (IPv6)"
+    },
+    allow_ssh_ipv4 = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      description = "Allow SSH egress traffic to all destinations (IPv4)"
+    },
+    allow_ssh_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      description     = "Allow SSH egress traffic to all destinations (IPv6)"
     }
-  ]
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_egress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_worker_egress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }
 }
 
 variable "runner_worker_docker_machine_security_group_description" {

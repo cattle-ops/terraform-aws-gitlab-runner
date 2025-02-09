@@ -24,6 +24,7 @@
     "glrt",
     "glrunners",
     "hmarr",
+    "icmpv6",
     "instancelifecycle",
     "keyrings",
     "kics",
@@ -83,7 +84,7 @@
     "rebalance",
     "signoff",
     "typecheck",
-    "userdata",
+    "userdata"
   ],
   "flagWords": []
 }
