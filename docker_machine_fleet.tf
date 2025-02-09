@@ -17,6 +17,7 @@ resource "tls_private_key" "fleet" {
 resource "aws_launch_template" "fleet_gitlab_runner" {
   # checkov:skip=CKV_AWS_88:User can decide to add a public IP.
   # checkov:skip=CKV_AWS_79:User can decide to enable Metadata service V2. V2 is the default.
+  # checkov:skip=CKV_AWS_341:Hop limit is user-defined and set to 2 by default as the workload might run in a Docker container.
   count       = var.runner_worker_docker_machine_fleet.enable == true && var.runner_worker.type == "docker+machine" ? 1 : 0
   name_prefix = "${local.name_runner_agent_instance}-worker-"
 
