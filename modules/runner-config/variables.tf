@@ -107,3 +107,95 @@ variable "docker_machine_instance" {
         error_message = "Supported volume types: gp2, gp3, io1 and io2"
     }
 }
+
+variable "runner_worker" {
+    description = <<-EOT
+    For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
+
+    environment_variables = List of environment variables to add to the Runner Worker (environment).
+    max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
+    output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
+    request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
+    ssm_access = Allows to connect to the Runner Worker via SSM.
+    type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
+    use_private_key = Use a private key to connect the Runner Manager to the Runner Workers. Ignored when fleeting is enabled (defaults to `true`).
+  EOT
+    type = object({
+        environment_variables = optional(list(string), [])
+        max_jobs              = optional(number, 0)
+        output_limit          = optional(number, 4096)
+        request_concurrency   = optional(number, 1)
+        ssm_access            = optional(bool, false)
+        type                  = optional(string, "docker+machine")
+        # false positive, use_private_key is not a secret
+        # kics-scan ignore-line
+        use_private_key = optional(bool, false)
+    })
+    default = {}
+
+    validation {
+        condition     = contains(["docker+machine", "docker", "docker-autoscaler"], var.runner_worker.type)
+        error_message = "The executor currently supports `docker+machine` and `docker`."
+    }
+}
+
+variable "runner_worker_docker_autoscaler" {
+    description = <<-EOT
+    fleeting_plugin_version = The version of aws fleeting plugin.
+    connector_config_user = User to connect to worker machine.
+    key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
+    capacity_per_instance = The number of jobs that can be executed concurrently by a single instance.
+    max_use_count = Max job number that can run on a worker.
+    update_interval = The interval to check with the fleeting plugin for instance updates.
+    update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
+    instance_ready_command = Executes this command on each instance provisioned by the autoscaler to ensure that it is ready for use. A failure results in the instance being removed.
+  EOT
+    type = object({
+        fleeting_plugin_version        = optional(string, "1.0.0")
+        connector_config_user          = optional(string, "ec2-user")
+        key_pair_name                  = optional(string, "runner-worker-key")
+        capacity_per_instance          = optional(number, 1)
+        max_use_count                  = optional(number, 100)
+        update_interval                = optional(string, "1m")
+        update_interval_when_expecting = optional(string, "2s")
+        instance_ready_command         = optional(string, "")
+    })
+    default = {}
+}
+
+variable "runner_worker_gitlab_pipeline" {
+    description = <<-EOT
+    post_build_script = Script to execute in the pipeline just after the build, but before executing after_script.
+    pre_build_script = Script to execute in the pipeline just before the build.
+    pre_clone_script = Script to execute in the pipeline before cloning the Git repository. this can be used to adjust the Git client configuration first, for example.
+  EOT
+    type = object({
+        post_build_script = optional(string, "\"\"")
+        pre_build_script  = optional(string, "\"\"")
+        pre_clone_script  = optional(string, "\"\"")
+    })
+    default = {}
+}
+
+variable "runner_gitlab" {
+    description = <<-EOT
+    ca_certificate = Trusted CA certificate bundle (PEM format).
+    certificate = Certificate of the GitLab instance to connect to (PEM format).
+    registration_token = (deprecated, This is replaced by the `registration_token` in `runner_gitlab_registration_config`.) Registration token to use to register the Runner.
+    runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases). Make sure that it is available for your AMI. See https://packages.gitlab.com/app/runner/gitlab-runner/search?dist=amazon%2F2023&filter=rpms&page=1&q=
+    url = URL of the GitLab instance to connect to.
+    url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
+    access_token_secure_parameter_store_name = (deprecated) The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
+    preregistered_runner_token_ssm_parameter_name = The name of the SSM parameter to read the preregistered GitLab Runner token from.
+  EOT
+    type = object({
+        ca_certificate                                = optional(string, "")
+        certificate                                   = optional(string, "")
+        registration_token                            = optional(string, "__REPLACED_BY_USER_DATA__") # deprecated, removed in 8.0.0
+        runner_version                                = optional(string, "16.0.3")
+        url                                           = optional(string, "")
+        url_clone                                     = optional(string, "")
+        access_token_secure_parameter_store_name      = optional(string, "gitlab-runner-access-token") # deprecated, removed in 8.0.0
+        preregistered_runner_token_ssm_parameter_name = optional(string, "")
+    })
+}

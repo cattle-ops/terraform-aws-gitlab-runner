@@ -111,6 +111,11 @@ module "runner" {
   docker_machine_fleet_launch_template_name = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
   docker_machine_tags = local.runner_tags_merged
   docker_machine_instance = var.runner_worker_docker_machine_instance
+
+  runner_worker = var.runner_worker
+  runner_worker_docker_autoscaler = var.runner_worker_docker_autoscaler
+  runner_worker_gitlab_pipeline = var.runner_worker_gitlab_pipeline
+  runner_gitlab = var.runner_gitlab
 }
 
 # ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
