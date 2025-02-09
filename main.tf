@@ -107,7 +107,7 @@ locals {
       }]
   })
 
-  template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
+  template_runner_worker_config = templatefile("${path.module}/template/runner-worker-config.tftpl",
     {
       aws_region       = data.aws_region.current.name
       gitlab_url       = var.runner_gitlab.url
@@ -123,25 +123,32 @@ locals {
       runners_token                  = var.runner_gitlab.registration_token
       runners_executor               = var.runner_worker.type
       runners_limit                  = var.runner_worker.max_jobs
-      runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
       runners_environment_vars       = jsonencode(var.runner_worker.environment_variables)
       runners_pre_build_script       = var.runner_worker_gitlab_pipeline.pre_build_script
       runners_post_build_script      = var.runner_worker_gitlab_pipeline.post_build_script
       runners_pre_clone_script       = var.runner_worker_gitlab_pipeline.pre_clone_script
       runners_request_concurrency    = var.runner_worker.request_concurrency
       runners_output_limit           = var.runner_worker.output_limit
-      runners_check_interval         = var.runner_manager.gitlab_check_interval
       runners_volumes_tmpfs          = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_services_volumes_tmpfs = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
       runners_docker_services        = local.runners_docker_services
       runners_docker_options         = local.runners_docker_options_toml
       bucket_name                    = local.bucket_name
       shared_cache                   = var.runner_worker_cache.shared
-      sentry_dsn                     = var.runner_manager.sentry_dsn
-      prometheus_listen_address      = var.runner_manager.prometheus_listen_address
       auth_type                      = var.runner_worker_cache.authentication_type
       runners_docker_autoscaler      = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
       runners_docker_machine         = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""
+    }
+  )
+
+  template_runner_config = templatefile("runner-agent.tftpl",
+    {
+      prometheus_listen_address      = var.runner_manager.prometheus_listen_address
+      runners_check_interval         = var.runner_manager.gitlab_check_interval
+      runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
+      sentry_dsn                     = var.runner_manager.sentry_dsn
+
+      runners = [local.template_runner_worker_config]
     }
   )
 }
