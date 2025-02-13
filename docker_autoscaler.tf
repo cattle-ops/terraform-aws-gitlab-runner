@@ -3,70 +3,6 @@
 # outdated docker+machine driver. The docker+machine driver is a legacy driver that is no longer maintained by GitLab.
 #
 
-########################################
-###### Security Group and SG rules #####
-########################################
-
-# Base security group
-resource "aws_security_group" "docker_autoscaler" {
-  count       = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
-  name_prefix = "${local.name_sg}-docker-autoscaler"
-  vpc_id      = var.vpc_id
-  description = "Docker-autoscaler security group"
-
-  tags = merge(
-    local.tags,
-    {
-      "Name" = format("%s", local.name_sg)
-    },
-  )
-}
-
-# Ingress rules
-resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_ingress" {
-  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_ingress_rules : {}
-
-  security_group_id = aws_security_group.docker_autoscaler[0].id
-
-  from_port   = each.value.from_port
-  to_port     = each.value.to_port
-  ip_protocol = each.value.protocol
-
-  description                  = each.value.description
-  prefix_list_id               = each.value.prefix_list_id
-  referenced_security_group_id = each.value.security_group
-  cidr_ipv4                    = each.value.cidr_block
-  cidr_ipv6                    = each.value.ipv6_cidr_block
-}
-
-resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_internal_traffic" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
-
-  security_group_id            = aws_security_group.docker_autoscaler[0].id
-  from_port                    = -1
-  to_port                      = -1
-  ip_protocol                  = "-1"
-  description                  = "Allow ALL Ingress traffic between Runner Manager and Docker-autoscaler workers security group"
-  referenced_security_group_id = aws_security_group.runner.id
-}
-
-# Egress rules
-resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
-  for_each = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker_egress_rules : {}
-
-  security_group_id = aws_security_group.docker_autoscaler[0].id
-
-  from_port   = each.value.from_port
-  to_port     = each.value.to_port
-  ip_protocol = each.value.protocol
-
-  description                  = each.value.description
-  prefix_list_id               = each.value.prefix_list_id
-  referenced_security_group_id = each.value.security_group
-  cidr_ipv4                    = each.value.cidr_block
-  cidr_ipv6                    = each.value.ipv6_cidr_block
-}
-
 ####################################
 ###### Launch template Workers #####
 ####################################
@@ -214,4 +150,27 @@ resource "aws_autoscaling_group" "autoscaler" {
       max_size
     ]
   }
+}
+
+resource "aws_iam_instance_profile" "docker_autoscaler" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  name  = "${local.name_iam_objects}-docker-autoscaler"
+  role  = aws_iam_role.docker_autoscaler[0].name
+  tags  = local.tags
+}
+
+resource "tls_private_key" "autoscaler" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "autoscaler" {
+  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+
+  key_name   = "${var.environment}-${var.runner_worker_docker_autoscaler.key_pair_name}"
+  public_key = tls_private_key.autoscaler[0].public_key_openssh
+
+  tags = local.tags
 }
