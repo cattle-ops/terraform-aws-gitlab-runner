@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.0.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.0.0...9.0.1) (2025-02-16)
+
+
+### Bug Fixes
+
+* do not create security group rules for `docker+machine` if `docker-autoscaler` selected ([#1243](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1243)) ([2a947e8](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2a947e886eb81c52866f95764d991536305c5bc9))
+
 ## [9.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.1.0...9.0.0) (2025-02-09)
 
 
