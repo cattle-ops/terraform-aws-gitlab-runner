@@ -2,9 +2,6 @@
 locals {
   # Only include runner security group id and additional if ping is enabled
   security_groups_ping = var.runner_networking.allow_incoming_ping && length(var.runner_networking.allow_incoming_ping_security_group_ids) > 0 ? concat(var.runner_networking.allow_incoming_ping_security_group_ids, [aws_security_group.runner.id]) : []
-
-  ingress_worker_docker_machine = var.runner_worker.type == "docker+machine" ? var.runner_worker_ingress_rules : {}
-  egress_worker_docker_machine = var.runner_worker.type == "docker+machine" ? var.runner_worker_egress_rules : {}
 }
 
 resource "aws_security_group" "docker_machine" {
