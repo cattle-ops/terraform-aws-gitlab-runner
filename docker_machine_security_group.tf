@@ -21,7 +21,7 @@ resource "aws_security_group" "docker_machine" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "docker_machine" {
-  for_each = var.runner_worker_ingress_rules
+  for_each = var.runner_worker.type == "docker+machine" ? var.runner_worker_ingress_rules : {}
 
   security_group_id = aws_security_group.docker_machine[0].id
 
@@ -39,7 +39,7 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "docker_machine" {
-  for_each = var.runner_worker_egress_rules
+  for_each = var.runner_worker.type == "docker+machine" ? var.runner_worker_egress_rules : {}
 
   security_group_id = aws_security_group.docker_machine[0].id
 
