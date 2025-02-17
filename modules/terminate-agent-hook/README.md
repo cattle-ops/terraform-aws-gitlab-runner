@@ -7,7 +7,7 @@ This module is used __internally__ by the parent [_terraform\-aws\-gitlab\-runne
 ## Overview
 
 The Lambda functions evaluates an EC2 instance tag called `gitlab-runner-parent-id`, set in the
-[runner config](../../template/runner-config.tftpl) by the parent module's
+[runner config](../../template/runner-agent.tftpl) by the parent module's
 [user data](../../template/gitlab-runner.tftpl). Runner instances created by the runner
 will have this tag applied with the parent runner's instance ID. When the runner
 in the ASG is terminated, the lifecycle hook triggers the Lambda to
