@@ -11,7 +11,7 @@ data "aws_security_group" "default" {
 # kics-scan ignore-line
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.15.0"
+  version = ">= 5.16.0"
 
   name = "vpc-${var.environment}"
   cidr = "10.0.0.0/16"
@@ -31,7 +31,7 @@ module "vpc" {
 
 module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "5.15.0"
+  version = ">= 5.16.0"
 
   vpc_id = module.vpc.vpc_id
 
@@ -104,7 +104,6 @@ module "runner" {
     enable_mixed_instances_policy            = true
     on_demand_base_capacity                  = 1
     on_demand_percentage_above_base_capacity = 0
-    max_growth_rate                          = 10
   }
 
   runner_worker_docker_autoscaler_autoscaling_options = [

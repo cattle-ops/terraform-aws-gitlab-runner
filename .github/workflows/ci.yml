@@ -56,57 +56,10 @@ jobs:
         run: terraform fmt -recursive -check=true -write=false
       - run: terraform validate
 
-  linter:
-    name: MegaLinter
-    runs-on: ubuntu-latest
-    steps:
-      # Git Checkout
-      - name: Checkout Code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0 # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to improve performances
-
-      # MegaLinter
-      - name: MegaLinter
-        id: ml
-        # You can override MegaLinter flavor used to have faster performances
-        # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter@b38cdf1f0cbe056fad4112cb7cd99c2b574c9617 # v8.1.0
-        env:
-          # All available variables are described in documentation
-          # https://megalinter.io/configuration/
-          VALIDATE_ALL_CODEBASE: false
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
-          SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.gitignore|.tflint.hcl|CHANGELOG.md)
-          # needed to avoid multiple error messages
-          TERRAFORM_TERRASCAN_ARGUMENTS: "--non-recursive"
-          # format issues fail the build
-          TERRAFORM_TERRAFORM_FMT_DISABLE_ERRORS: false
-          # it's an auto-generated file
-          MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
-          # it's an auto-generated file
-          MARKDOWN_MARKDOWN_LINK_CHECK_FILTER_REGEX_EXCLUDE: (CHANGELOG.md)
-          PAT: ${{ secrets.GITHUB_TOKEN }}
-          # automatically commit fixes to the feature branch
-          APPLY_FIXES: all
-          APPLY_FIXES_EVENT: pull_request
-          APPLY_FIXES_MODE: commit
-      # Upload MegaLinter artifacts
-      - name: Archive production artifacts
-        if: ${{ success() || failure() }}
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
-        with:
-          name: MegaLinter reports
-          path: |
-            megalinter-reports
-            mega-linter.log
-
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.1.3-debian@sha256:7a7c9f49b1ec45556384d480e8cec799ab6476876cecc7337bf7205c31b2eff7
+      image: checkmarx/kics:v2.1.5-debian@sha256:b2a99f21ac3a34b411ea5c0213e2a0404908ae57aae191d41f09282865599f28
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
@@ -119,13 +72,13 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         name: Checkout source code
 
-      - uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
+      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@19a52fbac37dacb22a09518e4ef6ee234f2d4987 # v4
+      - uses: terraform-linters/setup-tflint@8093687ecc9dcbfa88d07c103ad4176739a7287e # v4
         name: Setup TFLint
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

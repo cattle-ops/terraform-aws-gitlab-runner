@@ -1,5 +1,56 @@
 # Changelog
 
+## [9.0.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.0.0...9.0.1) (2025-02-16)
+
+
+### Bug Fixes
+
+* do not create security group rules for `docker+machine` if `docker-autoscaler` selected ([#1243](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1243)) ([2a947e8](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2a947e886eb81c52866f95764d991536305c5bc9))
+
+## [9.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.1.0...9.0.0) (2025-02-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove declaration of unused variables for docker-autoscaler setup ([#1223](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1223))
+* add custom egress rules to worker security groups ([#1222](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1222))
+
+### Features
+
+* add custom egress rules to worker security groups ([#1222](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1222)) ([a197e4f](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/a197e4f0581d44e23669e3c2b23f3f0b682fc211))
+* enabled usage of private key with docker autoscaler ([#1232](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1232)) ([95c7ea6](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/95c7ea6045be4fbfe917991a677e8b2df816e5bc))
+
+
+### Miscellaneous Chores
+
+* remove declaration of unused variables for docker-autoscaler setup ([#1223](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1223)) ([41058c8](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/41058c8e627edaaf8bf6132d106e01fd81c2ef7d))
+
+## [8.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.0.1...8.1.0) (2024-12-05)
+
+
+### Features
+
+* add variables to specify the AMI ids ([#1214](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1214)) ([7f47bdb](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/7f47bdbd080b098ee5a3a984826b87224879d784))
+
+## [8.0.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/8.0.0...8.0.1) (2024-11-29)
+
+
+### Bug Fixes
+
+* add additional tags to the worker role ([#1210](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1210)) ([0fe1617](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/0fe1617b6e47f0e195319113a91f7019b874a6d2))
+* add missing `tag_specifications` for launch templates ([#1212](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1212)) ([28f06af](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/28f06af680be5e8d20355d95c6b7bc23b4c7d3c6)), closes [#1207](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1207)
+
+## [8.0.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.15.0...8.0.0) (2024-11-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* update docker machine and encrypt all EBS ([#1204](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1204))
+
+### Features
+
+* update docker machine and encrypt all EBS ([#1204](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1204)) ([7bfe8f7](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/7bfe8f7841b760c247c556a2de43f8e203e86912))
+
 ## [7.15.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/7.14.0...7.15.0) (2024-10-09)
 
 

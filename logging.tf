@@ -11,7 +11,6 @@ locals {
       log_group_name = var.runner_cloudwatch.log_group_name != null ? var.runner_cloudwatch.log_group_name : var.environment
   })
   provided_kms_key = var.kms_key_id != "" ? var.kms_key_id : ""
-  kms_key          = local.provided_kms_key == "" && var.enable_managed_kms_key ? aws_kms_key.default[0].arn : local.provided_kms_key
 }
 
 resource "aws_cloudwatch_log_group" "environment" {
@@ -25,5 +24,5 @@ resource "aws_cloudwatch_log_group" "environment" {
   # ignored as decided by the user
   # tfsec:ignore:aws-cloudwatch-log-group-customer-key
   # checkov:skip=CKV_AWS_158:Encryption can be enabled by user
-  kms_key_id = local.kms_key
+  kms_key_id = local.kms_key_arn
 }
