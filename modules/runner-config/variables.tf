@@ -309,10 +309,40 @@ variable "docker_machine_instance" {
 
     docker_registry_mirror_url = The URL of the Docker registry mirror to use for the Runner Worker.
     destroy_after_max_builds = Destroy the instance after the maximum number of builds has been reached.
+    ebs_optimized = Enable EBS optimization for the Runner Worker.
+    idle_count = Number of idle Runner Worker instances (not working for the Docker Runner Worker) (IdleCount).
+    idle_time = Idle time of the Runner Worker before they are destroyed (not working for the Docker Runner Worker) (IdleTime).
+    max_growth_rate = The maximum number of machines that can be added to the runner in parallel.
+    monitoring = Enable detailed monitoring for the Runner Worker.
+    name_prefix = Set the name prefix and override the `Name` tag for the Runner Worker.
+    private_address_only = Restrict Runner Worker to the use of a private IP address. If `runner_instance.use_private_address_only` is set to `true` (default), `runner_worker_docker_machine_instance.private_address_only` will also apply for the Runner.
+    root_device_name = The name of the root volume for the Runner Worker.
+    root_size = The size of the root volume for the Runner Worker.
+    start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
+    subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
+    types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
+    volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported.
+    volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
+    volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`. Works for fleeting only. See `runner_worker_docker_machine_fleet`.
   EOT
   type = object({
-    destroy_after_max_builds   = optional(number, 0)
-    docker_registry_mirror_url = optional(string, "")
+      destroy_after_max_builds   = optional(number, 0)
+      docker_registry_mirror_url = optional(string, "")
+      ebs_optimized              = optional(bool, true)
+      idle_count                 = optional(number, 0)
+      idle_time                  = optional(number, 600)
+      max_growth_rate            = optional(number, 0)
+      monitoring                 = optional(bool, false)
+      name_prefix                = optional(string, "")
+      private_address_only       = optional(bool, true)
+      root_device_name           = optional(string, "/dev/sda1")
+      root_size                  = optional(number, 8)
+      start_script               = optional(string, "")
+      subnet_ids                 = optional(list(string), [])
+      types                      = optional(list(string), ["m5.large"])
+      volume_type                = optional(string, "gp2")
+      volume_throughput          = optional(number, 125)
+      volume_iops                = optional(number, 3000)
   })
 }
 

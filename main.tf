@@ -85,7 +85,7 @@ locals {
       fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
   })
 
-  template_runner_config = templatefile("runner-agent.tftpl",
+  template_runner_config = templatefile("${path.module}/template/runner-agent.tftpl",
     {
       prometheus_listen_address = var.runner_manager.prometheus_listen_address
       runners_check_interval    = var.runner_manager.gitlab_check_interval
