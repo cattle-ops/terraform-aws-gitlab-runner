@@ -27,12 +27,14 @@
       "amazonec2-volume-type=${runners_volume_type}",
       "amazonec2-userdata=%{~ if runners_userdata != "" ~}/etc/gitlab-runner/runners_userdata.sh%{~ endif ~}",
       "amazonec2-ami=${runners_ami}"
+      %{~ if runners_volume_kms_key != "" ~}
+      ,"amazonec2-volume-encrypted=true",
+      "amazonec2-volume-kms-key=${runners_volume_kms_key}"
+      %{~ endif ~}
       %{~ if use_fleet == true ~}
       ,"amazonec2-ssh-keypath=/root/.ssh/id_rsa",
       "amazonec2-use-fleet=${use_fleet}",
-      "amazonec2-launch-template=${launch_template}",
-      "amazonec2-volume-encrypted=true",
-      "amazonec2-volume-kms-key=${runners_volume_kms_key}"
+      "amazonec2-launch-template=${launch_template}"
       %{~ endif ~}
       ${docker_machine_options}
     ]
