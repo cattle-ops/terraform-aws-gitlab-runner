@@ -113,8 +113,8 @@ module "runner" {
   docker_machine_instance = var.runner_worker_docker_machine_instance
 
   runner_worker = var.runner_worker
-  runner_worker_docker_autoscaler = var.runner_worker_docker_autoscaler
-  runner_worker_gitlab_pipeline = var.runner_worker_gitlab_pipeline
+  docker_autoscaler = var.runner_worker_docker_autoscaler
+  gitlab_pipeline = var.runner_worker_gitlab_pipeline
   runner_gitlab = var.runner_gitlab
 }
 
