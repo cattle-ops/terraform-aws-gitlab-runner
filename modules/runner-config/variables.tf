@@ -43,6 +43,8 @@ variable "kms_key_arn" {
   type        = string
 }
 
+# false positive, use_private_key is not a secret
+# kics-scan ignore-block
 variable "runner_worker" {
   description = <<-EOT
     For detailed information, check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section.
@@ -62,9 +64,7 @@ variable "runner_worker" {
     request_concurrency   = optional(number, 1)
     ssm_access            = optional(bool, false)
     type                  = optional(string, "docker+machine")
-    # false positive, use_private_key is not a secret
-    # kics-scan ignore-line
-    use_private_key = optional(bool, false)
+    use_private_key       = optional(bool, false)
   })
 }
 
@@ -104,6 +104,8 @@ variable "gitlab_pipeline" {
   })
 }
 
+# false positive, registration_token has no secret value here
+# kics-scan ignore-block
 variable "runner_gitlab" {
   description = <<-EOT
     certificate = Certificate of the GitLab instance to connect to (PEM format).

@@ -471,9 +471,7 @@ variable "runner_worker" {
     request_concurrency   = optional(number, 1)
     ssm_access            = optional(bool, false)
     type                  = optional(string, "docker+machine")
-    # false positive, use_private_key is not a secret
-    # kics-scan ignore-line
-    use_private_key = optional(bool, false)
+    use_private_key       = optional(bool, false)
   })
   default = {}
 
