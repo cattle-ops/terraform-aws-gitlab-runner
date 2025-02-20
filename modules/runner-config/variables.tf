@@ -66,12 +66,6 @@ variable "runner_worker" {
         # kics-scan ignore-line
         use_private_key = optional(bool, false)
     })
-    default = {}
-
-    validation {
-        condition     = contains(["docker+machine", "docker", "docker-autoscaler"], var.runner_worker.type)
-        error_message = "The executor currently supports `docker+machine` and `docker`."
-    }
 }
 
 variable "docker_autoscaler" {
@@ -95,7 +89,6 @@ variable "docker_autoscaler" {
         update_interval_when_expecting = optional(string, "2s")
         instance_ready_command         = optional(string, "")
     })
-    default = {}
 }
 
 variable "gitlab_pipeline" {
@@ -109,7 +102,6 @@ variable "gitlab_pipeline" {
         pre_build_script  = optional(string, "\"\"")
         pre_clone_script  = optional(string, "\"\"")
     })
-    default = {}
 }
 
 variable "runner_gitlab" {
@@ -137,7 +129,6 @@ variable "docker_machine_autoscaling_options" {
         idle_time         = optional(number)
         timezone          = optional(string, "UTC")
     }))
-    default = []
 }
 
 variable "runner_instance" {
@@ -147,9 +138,6 @@ variable "runner_instance" {
     type = object({
         name                        = string
     })
-    default = {
-        name = "gitlab-runner"
-    }
 }
 
 variable "docker_volumes_tmpfs" {
@@ -158,7 +146,6 @@ variable "docker_volumes_tmpfs" {
         volume  = string
         options = string
     }))
-    default = []
 }
 
 variable "docker_services_volumes_tmpfs" {
@@ -167,7 +154,6 @@ variable "docker_services_volumes_tmpfs" {
         volume  = string
         options = string
     }))
-    default = []
 }
 
 variable "cache" {
@@ -185,7 +171,6 @@ variable "cache" {
         authentication_type                      = optional(string, "iam")
         shared                                   = optional(bool, false)
     })
-    default = {}
 }
 
 variable "docker_autoscaler_autoscaling_options" {
@@ -198,7 +183,6 @@ variable "docker_autoscaler_autoscaling_options" {
         scale_factor       = optional(number)
         scale_factor_limit = optional(number, 0)
     }))
-    default = []
 }
 
 variable "docker_machine_instance_spot" {
@@ -210,7 +194,6 @@ variable "docker_machine_instance_spot" {
         enable    = optional(bool, true)
         max_price = optional(string, "on-demand-price")
     })
-    default = {}
 }
 
 variable "docker_machine_role" {
@@ -220,7 +203,6 @@ variable "docker_machine_role" {
     type = object({
         profile_name            = optional(string, "")
     })
-    default = {}
 }
 
 variable "docker_machine_fleet" {
@@ -231,9 +213,6 @@ variable "docker_machine_fleet" {
     type = object({
         enable        = bool
     })
-    default = {
-        enable = false
-    }
 }
 
 variable "docker_services" {
@@ -244,7 +223,6 @@ variable "docker_services" {
         entrypoint = list(string)
         command    = list(string)
     }))
-    default = []
 }
 
 variable "docker_options" {
@@ -310,16 +288,6 @@ variable "docker_options" {
         volume_driver                = optional(string)
         wait_for_services_timeout    = optional(number)
     })
-
-    default = {
-        disable_cache = "false"
-        image         = "docker:18.03.1-ce"
-        privileged    = "true"
-        pull_policies = ["always"]
-        shm_size      = 0
-        tls_verify    = "false"
-        volumes       = ["/cache"]
-    }
 }
 
 variable "vpc_id" {
@@ -346,29 +314,11 @@ variable "docker_machine_instance" {
         destroy_after_max_builds   = optional(number, 0)
         docker_registry_mirror_url = optional(string, "")
     })
-    default = {
-    }
-
-    validation {
-        condition     = length(var.docker_machine_instance.name_prefix) <= 28
-        error_message = "Maximum length for docker+machine executor name is 28 characters!"
-    }
-
-    validation {
-        condition     = var.docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.docker_machine_instance.name_prefix))
-        error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
-    }
-
-    validation {
-        condition     = contains(["gp2", "gp3", "io1", "io2"], var.docker_machine_instance.volume_type)
-        error_message = "Supported volume types: gp2, gp3, io1 and io2"
-    }
 }
 
 variable "docker_machine_ami_id" {
     description = "The ID of the AMI to use for the Runner Worker (docker-machine)."
     type        = string
-    default     = ""
 }
 
 variable "docker_machine_ec2_metadata_options" {
@@ -377,28 +327,21 @@ variable "docker_machine_ec2_metadata_options" {
         http_tokens                 = string
         http_put_response_hop_limit = number
     })
-    default = {
-        http_tokens                 = "required"
-        http_put_response_hop_limit = 2
-    }
 }
 
 variable "docker_machine_ec2_options" {
     description = "List of additional options for the docker+machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
     type        = list(string)
-    default     = []
 }
 
 variable "docker_add_dind_volumes" {
     description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
     type        = bool
-    default     = false
 }
 
 variable "suppressed_tags" {
     description = "List of tag keys which are automatically removed and never added as default tag by the module."
     type        = list(string)
-    default     = []
 }
 
 variable "runner_install" {
@@ -408,5 +351,4 @@ variable "runner_install" {
     type = object({
         docker_machine_version       = optional(string, "0.16.2-gitlab.19-cki.5")
     })
-    default = {}
 }
