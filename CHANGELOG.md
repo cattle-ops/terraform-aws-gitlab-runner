@@ -1,5 +1,14 @@
 # Changelog
 
+## [9.0.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.0.1...9.0.2) (2025-02-20)
+
+
+### Bug Fixes
+
+* allow changes to "runner_worker.max_jobs" for Docker Autoscaler ([#1221](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1221)) ([0624391](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/06243914e527e2ea464dbfcb14e85bf244c75208))
+* always encrypt EBS volumes if the KMS key is given ([#1248](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1248)) ([76ae944](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/76ae944da4297f37a4a6f565cb37caaa9a58e9ca)), closes [#1242](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1242)
+* return security group id for docker-autoscaler in `runner_sg_id` ([#1249](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1249)) ([9c573b6](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/9c573b602cb2fbb944a48b2f79ca09fc26872a52)), closes [#1241](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1241)
+
 ## [9.0.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.0.0...9.0.1) (2025-02-16)
 
 
