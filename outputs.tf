@@ -39,8 +39,8 @@ output "runner_agent_sg_id" {
 }
 
 output "runner_sg_id" {
-  description = "ID of the security group attached to the docker machine runners."
-  value       = length(aws_security_group.docker_machine) > 0 ? aws_security_group.docker_machine[0].id : null
+  description = "ID of the security group attached to the worker instances (docker machine/autoscaler runners)."
+  value       = var.runner_worker.type == "docker-autoscaler" ? aws_security_group.docker_autoscaler[0].id : (var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].id : null)
 }
 
 output "runner_eip" {
