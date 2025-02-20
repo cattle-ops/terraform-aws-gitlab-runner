@@ -1,5 +1,6 @@
 # Parameter value is managed by the user-data script of the gitlab runner instance
 resource "aws_ssm_parameter" "runner_registration_token" {
+  # checkov:skip=CKV_AWS_337:KMS key can be enabled by the user
   name  = local.secure_parameter_store_runner_token_key
   type  = "SecureString"
   value = "null"
@@ -14,6 +15,7 @@ resource "aws_ssm_parameter" "runner_registration_token" {
 }
 
 resource "aws_ssm_parameter" "runner_sentry_dsn" {
+  # checkov:skip=CKV_AWS_337:KMS key can be enabled by the user
   name  = local.secure_parameter_store_runner_sentry_dsn
   type  = "SecureString"
   value = "null"
