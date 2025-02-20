@@ -74,7 +74,7 @@
       runners_use_private_address_only = var.docker_machine_instance.private_address_only
       runners_use_private_address      = !var.docker_machine_instance.private_address_only
       runners_request_spot_instance    = var.docker_machine_instance_spot.enable
-      runners_spot_price_bid           = var.docker_machine_instance_spot.max_price == "on-demand-price" || var.runner_worker_docker_machine_instance_spot.max_price == null ? "" : var.runner_worker_docker_machine_instance_spot.max_price
+      runners_spot_price_bid           = var.docker_machine_instance_spot.max_price == "on-demand-price" || var.docker_machine_instance_spot.max_price == null ? "" : var.docker_machine_instance_spot.max_price
       runners_security_group_name      = var.docker_machine_security_group_name
 
       runners_tags                      = replace(replace(local.runner_tags_string, ",,", ","), "/,$/", "")

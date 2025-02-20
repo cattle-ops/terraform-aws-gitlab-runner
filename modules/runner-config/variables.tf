@@ -179,23 +179,299 @@ variable "runner_worker_gitlab_pipeline" {
 
 variable "runner_gitlab" {
     description = <<-EOT
-    ca_certificate = Trusted CA certificate bundle (PEM format).
     certificate = Certificate of the GitLab instance to connect to (PEM format).
     registration_token = (deprecated, This is replaced by the `registration_token` in `runner_gitlab_registration_config`.) Registration token to use to register the Runner.
-    runner_version = Version of the [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner/-/releases). Make sure that it is available for your AMI. See https://packages.gitlab.com/app/runner/gitlab-runner/search?dist=amazon%2F2023&filter=rpms&page=1&q=
     url = URL of the GitLab instance to connect to.
     url_clone = URL of the GitLab instance to clone from. Use only if the agent can’t connect to the GitLab URL.
-    access_token_secure_parameter_store_name = (deprecated) The name of the SSM parameter to read the GitLab access token from. It must have the `api` scope and be pre created.
-    preregistered_runner_token_ssm_parameter_name = The name of the SSM parameter to read the preregistered GitLab Runner token from.
   EOT
     type = object({
-        ca_certificate                                = optional(string, "")
         certificate                                   = optional(string, "")
         registration_token                            = optional(string, "__REPLACED_BY_USER_DATA__") # deprecated, removed in 8.0.0
-        runner_version                                = optional(string, "16.0.3")
         url                                           = optional(string, "")
         url_clone                                     = optional(string, "")
-        access_token_secure_parameter_store_name      = optional(string, "gitlab-runner-access-token") # deprecated, removed in 8.0.0
-        preregistered_runner_token_ssm_parameter_name = optional(string, "")
     })
+}
+
+variable "runner_worker_docker_machine_autoscaling_options" {
+    description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section"
+    type = list(object({
+        periods           = list(string)
+        idle_count        = optional(number)
+        idle_scale_factor = optional(number)
+        idle_count_min    = optional(number)
+        idle_time         = optional(number)
+        timezone          = optional(string, "UTC")
+    }))
+    default = []
+}
+
+variable "runner_instance" {
+    description = <<-EOT
+    name = Name of the Runner instance.
+  EOT
+    type = object({
+        name                        = string
+    })
+    default = {
+        name = "gitlab-runner"
+    }
+}
+
+variable "runner_worker_docker_volumes_tmpfs" {
+    description = "Mount a tmpfs in Executor container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
+    type = list(object({
+        volume  = string
+        options = string
+    }))
+    default = []
+}
+
+variable "runner_worker_docker_services_volumes_tmpfs" {
+    description = "Mount a tmpfs in gitlab service container. https://docs.gitlab.com/runner/executors/docker.html#mounting-a-directory-in-ram"
+    type = list(object({
+        volume  = string
+        options = string
+    }))
+    default = []
+}
+
+variable "runner_worker_cache" {
+    description = <<-EOT
+    Configuration to control the creation of the cache bucket. By default the bucket will be created and used as shared
+    cache. To use the same cache across multiple Runner Worker disable the creation of the cache and provide a policy and
+    bucket name. See the public runner example for more details."
+
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnerscaches3-section.
+
+    authentication_type = A string that declares the AuthenticationType for [runners.cache.s3]. Can either be 'iam' or 'credentials'.
+    shared = Boolean used to enable or disable the use of the cache bucket as shared cache.
+  EOT
+    type = object({
+        authentication_type                      = optional(string, "iam")
+        shared                                   = optional(bool, false)
+    })
+    default = {}
+}
+
+variable "runner_worker_docker_autoscaler_autoscaling_options" {
+    description = "Set autoscaling parameters based on periods, see https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersautoscalerpolicy-sections"
+    type = list(object({
+        periods            = list(string)
+        timezone           = optional(string, "UTC")
+        idle_count         = optional(number)
+        idle_time          = optional(string)
+        scale_factor       = optional(number)
+        scale_factor_limit = optional(number, 0)
+    }))
+    default = []
+}
+
+variable "docker_machine_instance_spot" {
+    description = <<-EOT
+    enable = Enable spot instances for the Runner Worker.
+    max_price = The maximum price willing to pay. By default the price is limited by the current on demand price for the instance type chosen.
+  EOT
+    type = object({
+        enable    = optional(bool, true)
+        max_price = optional(string, "on-demand-price")
+    })
+    default = {}
+}
+
+variable "docker_machine_role" {
+    description = <<-EOT
+    profile_name    = Name of the IAM profile to attach to the Runner Workers.
+  EOT
+    type = object({
+        profile_name            = optional(string, "")
+    })
+    default = {}
+}
+
+variable "docker_machine_fleet" {
+    description = <<-EOT
+    enable = Activates the fleet mode on the Runner. https://gitlab.com/cki-project/docker-machine/-/blob/v0.16.2-gitlab.19-cki.2/docs/drivers/aws.md#fleet-mode
+    key_pair_name = The name of the key pair used by the Runner to connect to the docker-machine Runner Workers. This variable is only supported when `enables` is set to `true`.
+  EOT
+    type = object({
+        enable        = bool
+    })
+    default = {
+        enable = false
+    }
+}
+
+variable "runner_worker_docker_services" {
+    description = "Starts additional services with the Docker container. All fields must be set (examine the Dockerfile of the service image for the entrypoint - see ./examples/runner-default/main.tf)"
+    type = list(object({
+        name       = string
+        alias      = string
+        entrypoint = list(string)
+        command    = list(string)
+    }))
+    default = []
+}
+
+variable "runner_worker_docker_options" {
+    description = <<EOT
+    Options added to the [runners.docker] section of config.toml to configure the Docker container of the Runner Worker. For
+    details check https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+
+    Default values if the option is not given:
+      disable_cache = "false"
+      image         = "docker:18.03.1-ce"
+      privileged    = "true"
+      pull_policy   = "always"
+      shm_size      = 0
+      tls_verify    = "false"
+      volumes       = "/cache"
+  EOT
+
+    type = object({
+        allowed_images               = optional(list(string))
+        allowed_pull_policies        = optional(list(string))
+        allowed_services             = optional(list(string))
+        cache_dir                    = optional(string)
+        cap_add                      = optional(list(string))
+        cap_drop                     = optional(list(string))
+        container_labels             = optional(list(string))
+        cpuset_cpus                  = optional(string)
+        cpu_shares                   = optional(number)
+        cpus                         = optional(string)
+        devices                      = optional(list(string))
+        device_cgroup_rules          = optional(list(string))
+        disable_cache                = optional(bool, false)
+        disable_entrypoint_overwrite = optional(bool)
+        dns                          = optional(list(string))
+        dns_search                   = optional(list(string))
+        extra_hosts                  = optional(list(string))
+        gpus                         = optional(string)
+        helper_image                 = optional(string)
+        helper_image_flavor          = optional(string)
+        host                         = optional(string)
+        hostname                     = optional(string)
+        image                        = optional(string, "docker:18.03.1-ce")
+        isolation                    = optional(string)
+        links                        = optional(list(string))
+        mac_address                  = optional(string)
+        memory                       = optional(string)
+        memory_swap                  = optional(string)
+        memory_reservation           = optional(string)
+        network_mode                 = optional(string)
+        oom_kill_disable             = optional(bool)
+        oom_score_adjust             = optional(number)
+        privileged                   = optional(bool, true)
+        pull_policies                = optional(list(string), ["always"])
+        runtime                      = optional(string)
+        security_opt                 = optional(list(string))
+        shm_size                     = optional(number, 0)
+        sysctls                      = optional(list(string))
+        tls_cert_path                = optional(string)
+        tls_verify                   = optional(bool, false)
+        user                         = optional(string)
+        userns_mode                  = optional(string)
+        volumes                      = optional(list(string), ["/cache"])
+        volumes_from                 = optional(list(string))
+        volume_driver                = optional(string)
+        wait_for_services_timeout    = optional(number)
+    })
+
+    default = {
+        disable_cache = "false"
+        image         = "docker:18.03.1-ce"
+        privileged    = "true"
+        pull_policies = ["always"]
+        shm_size      = 0
+        tls_verify    = "false"
+        volumes       = ["/cache"]
+    }
+}
+
+variable "vpc_id" {
+    description = "The VPC used for the runner and runner workers."
+    type        = string
+}
+
+variable "subnet_id" {
+    description = <<-EOT
+    Subnet id used for the Runner and Runner Workers. Must belong to the `vpc_id`. In case the fleet mode is used, multiple subnets for
+    the Runner Workers can be provided with runner_worker_docker_machine_instance.subnet_ids.
+  EOT
+    type        = string
+}
+
+variable "runner_worker_docker_machine_instance" {
+    description = <<-EOT
+    For detailed documentation check https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runnersmachine-section
+
+    docker_registry_mirror_url = The URL of the Docker registry mirror to use for the Runner Worker.
+    destroy_after_max_builds = Destroy the instance after the maximum number of builds has been reached.
+  EOT
+    type = object({
+        destroy_after_max_builds   = optional(number, 0)
+        docker_registry_mirror_url = optional(string, "")
+    })
+    default = {
+    }
+
+    validation {
+        condition     = length(var.runner_worker_docker_machine_instance.name_prefix) <= 28
+        error_message = "Maximum length for docker+machine executor name is 28 characters!"
+    }
+
+    validation {
+        condition     = var.runner_worker_docker_machine_instance.name_prefix == "" || can(regex("^[a-zA-Z0-9\\.-]+$", var.runner_worker_docker_machine_instance.name_prefix))
+        error_message = "Valid characters for the docker+machine executor name are: [a-zA-Z0-9\\.-]."
+    }
+
+    validation {
+        condition     = contains(["gp2", "gp3", "io1", "io2"], var.runner_worker_docker_machine_instance.volume_type)
+        error_message = "Supported volume types: gp2, gp3, io1 and io2"
+    }
+}
+
+variable "runner_worker_docker_machine_ami_id" {
+    description = "The ID of the AMI to use for the Runner Worker (docker-machine)."
+    type        = string
+    default     = ""
+}
+
+variable "runner_worker_docker_machine_ec2_metadata_options" {
+    description = "Enable the Runner Worker metadata service. Requires you use CKI maintained docker machines."
+    type = object({
+        http_tokens                 = string
+        http_put_response_hop_limit = number
+    })
+    default = {
+        http_tokens                 = "required"
+        http_put_response_hop_limit = 2
+    }
+}
+
+variable "runner_worker_docker_machine_ec2_options" {
+    description = "List of additional options for the docker+machine config. Each element of this list must be a key=value pair. E.g. '[\"amazonec2-zone=a\"]'"
+    type        = list(string)
+    default     = []
+}
+
+variable "runner_worker_docker_add_dind_volumes" {
+    description = "Add certificates and docker.sock to the volumes to support docker-in-docker (dind)"
+    type        = bool
+    default     = false
+}
+
+variable "suppressed_tags" {
+    description = "List of tag keys which are automatically removed and never added as default tag by the module."
+    type        = list(string)
+    default     = []
+}
+
+variable "runner_install" {
+    description = <<-EOT
+    docker_machine_version = By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases
+  EOT
+    type = object({
+        docker_machine_version       = optional(string, "0.16.2-gitlab.19-cki.5")
+    })
+    default = {}
 }
