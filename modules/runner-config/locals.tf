@@ -1,4 +1,4 @@
-  locals {
+locals {
   template_runner_worker_config = templatefile("${path.module}/template/runner-worker-config.tftpl",
     {
       aws_region       = data.aws_region.current.name
@@ -53,7 +53,7 @@
         # Convert key from snake_case to PascalCase which is the casing for this section.
         key => jsonencode(value) if value != null
       }]
-    })
+  })
 
   template_runner_docker_machine = templatefile("${path.module}/template/runner-docker-machine-config.tftpl",
     {
@@ -89,21 +89,21 @@
       docker_machine_options            = length(local.docker_machine_options_string) == 1 ? "" : local.docker_machine_options_string
       runners_max_growth_rate           = var.docker_machine_instance.max_growth_rate
       runners_volume_kms_key            = var.kms_key_arn
-    })
+  })
 
   runners_docker_services = templatefile("${path.module}/template/runners_docker_services.tftpl", {
     runners_docker_services = var.docker_services
-  }
+    }
   )
 
   runners_docker_options_toml = templatefile("${path.module}/template/runners_docker_options.tftpl", {
     options = merge({
       for key, value in var.docker_options : key => value if value != null && key != "volumes" && key != "pull_policies"
-    }, {
+      }, {
       pull_policy = var.docker_options.pull_policies
       volumes     = local.runners_volumes
     })
-  }
+    }
   )
 
   # Convert list to a string separated and prepend by a comma
@@ -125,7 +125,7 @@
   runners_max_builds_string = var.docker_machine_instance.destroy_after_max_builds == 0 ? "" : format("MaxBuilds = %d", var.docker_machine_instance.destroy_after_max_builds)
 
   runners_docker_registry_mirror_option = var.docker_machine_instance.docker_registry_mirror_url == "" ? [] : ["engine-registry-mirror=${var.docker_machine_instance.docker_registry_mirror_url}"]
-  docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0
+  docker_machine_adds_name_tag          = signum(sum(local.docker_machine_version_test)) <= 0
   docker_machine_version_test = [
     for i, j in reverse(range(length(local.docker_machine_version_used)))
     : signum(local.docker_machine_version_with_name_tag[i] - local.docker_machine_version_used[i]) * pow(10, j)

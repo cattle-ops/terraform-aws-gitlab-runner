@@ -87,10 +87,10 @@ locals {
 
   template_runner_config = templatefile("runner-agent.tftpl",
     {
-      prometheus_listen_address      = var.runner_manager.prometheus_listen_address
-      runners_check_interval         = var.runner_manager.gitlab_check_interval
-      runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
-      sentry_dsn                     = var.runner_manager.sentry_dsn
+      prometheus_listen_address = var.runner_manager.prometheus_listen_address
+      runners_check_interval    = var.runner_manager.gitlab_check_interval
+      runners_concurrent        = var.runner_manager.maximum_concurrent_jobs
+      sentry_dsn                = var.runner_manager.sentry_dsn
 
       runners = [module.runner.runner_config]
     }
@@ -100,46 +100,46 @@ locals {
 module "runner" {
   source = "./modules/runner-config"
 
-  vpc_id = var.vpc_id
+  vpc_id    = var.vpc_id
   subnet_id = var.subnet_id
 
   suppressed_tags = var.suppressed_tags
-  kms_key_arn = local.kms_key_arn
+  kms_key_arn     = local.kms_key_arn
 
   runner_instance = var.runner_instance
-  runner_worker = var.runner_worker
-  runner_install = var.runner_install
-  runner_gitlab = var.runner_gitlab
+  runner_worker   = var.runner_worker
+  runner_install  = var.runner_install
+  runner_gitlab   = var.runner_gitlab
 
-  cache = var.runner_worker_cache
+  cache             = var.runner_worker_cache
   cache_bucket_name = local.bucket_name
 
   gitlab_pipeline = var.runner_worker_gitlab_pipeline
 
-  docker_autoscaler = var.runner_worker_docker_autoscaler
-  docker_autoscaler_asg_name = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
+  docker_autoscaler                     = var.runner_worker_docker_autoscaler
+  docker_autoscaler_asg_name            = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
   docker_autoscaler_autoscaling_options = var.runner_worker_docker_autoscaler_autoscaling_options
 
-  docker_machine_runner_name = local.runner_tags_merged["Name"]
-  docker_machine_availability_zone_name = data.aws_availability_zone.runners.name_suffix
-  docker_machine_instance_profile_name = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
-  docker_machine_security_group_name = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
-  docker_machine_ami_id = data.aws_ami.docker_machine_by_filter[0].id
+  docker_machine_runner_name                = local.runner_tags_merged["Name"]
+  docker_machine_availability_zone_name     = data.aws_availability_zone.runners.name_suffix
+  docker_machine_instance_profile_name      = var.runner_worker.type == "docker+machine" ? aws_iam_instance_profile.docker_machine[0].name : ""
+  docker_machine_security_group_name        = var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].name : ""
+  docker_machine_ami_id                     = data.aws_ami.docker_machine_by_filter[0].id
   docker_machine_fleet_launch_template_name = var.runner_worker_docker_machine_fleet.enable == true ? aws_launch_template.fleet_gitlab_runner[0].name : ""
-  docker_machine_tags = local.runner_tags_merged
-  docker_machine_instance = var.runner_worker_docker_machine_instance
-  docker_machine_ec2_options = var.runner_worker_docker_machine_ec2_options
-  docker_machine_ec2_metadata_options = var.runner_worker_docker_machine_ec2_metadata_options
-  docker_machine_fleet = var.runner_worker_docker_machine_fleet
-  docker_machine_role = var.runner_worker_docker_machine_role
-  docker_machine_instance_spot = var.runner_worker_docker_machine_instance_spot
-  docker_machine_autoscaling_options = var.runner_worker_docker_machine_autoscaling_options
+  docker_machine_tags                       = local.runner_tags_merged
+  docker_machine_instance                   = var.runner_worker_docker_machine_instance
+  docker_machine_ec2_options                = var.runner_worker_docker_machine_ec2_options
+  docker_machine_ec2_metadata_options       = var.runner_worker_docker_machine_ec2_metadata_options
+  docker_machine_fleet                      = var.runner_worker_docker_machine_fleet
+  docker_machine_role                       = var.runner_worker_docker_machine_role
+  docker_machine_instance_spot              = var.runner_worker_docker_machine_instance_spot
+  docker_machine_autoscaling_options        = var.runner_worker_docker_machine_autoscaling_options
 
-  docker_add_dind_volumes = var.runner_worker_docker_add_dind_volumes
-  docker_options = var.runner_worker_docker_options
-  docker_services = var.runner_worker_docker_services
+  docker_add_dind_volumes       = var.runner_worker_docker_add_dind_volumes
+  docker_options                = var.runner_worker_docker_options
+  docker_services               = var.runner_worker_docker_services
   docker_services_volumes_tmpfs = var.runner_worker_docker_services_volumes_tmpfs
-  docker_volumes_tmpfs = var.runner_worker_docker_volumes_tmpfs
+  docker_volumes_tmpfs          = var.runner_worker_docker_volumes_tmpfs
 }
 
 # ignores: Autoscaling Groups Supply Tags --> we use a "dynamic" block to create the tags
