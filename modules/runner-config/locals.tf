@@ -1,5 +1,5 @@
 locals {
-  template_runner_worker_config = templatefile("${path.module}/template/runner-worker-config.tftpl",
+  template_runner_worker_config = templatefile("${path.module}/template/runner-definition.tftpl",
     {
       aws_region       = data.aws_region.current.name
       gitlab_url       = var.runner_gitlab.url
