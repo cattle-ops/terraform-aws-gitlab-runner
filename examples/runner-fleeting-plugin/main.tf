@@ -72,8 +72,8 @@ module "runner" {
   }
 
   runner_worker = {
-    type       = "docker-autoscaler"
-    max_jobs   = 10
+    type     = "docker-autoscaler"
+    max_jobs = 10
   }
 
   runner_worker_gitlab_pipeline = {
