@@ -109,6 +109,29 @@ resource "aws_autoscaling_group" "autoscaler" {
             instance_type = override.value
           }
         }
+
+        dynamic "override" {
+          for_each = var.runner_worker_docker_autoscaler_asg.instance_requirements
+          content {
+            instance_requirements {
+              allowed_instance_types = override.value.allowed_instance_types
+              dynamic "memory_mib" {
+                for_each = [override.value.memory_mib]
+                content {
+                  max = memory_mib.value.max
+                  min = memory_mib.value.min
+                }
+              }
+              dynamic "vcpu_count" {
+                for_each = [override.value.vcpu_count]
+                content {
+                  max = vcpu_count.value.max
+                  min = vcpu_count.value.min
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
