@@ -166,7 +166,7 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
 
     content {
       key                 = tag.key
-      value               = tag.value
+      value               = tag.key == "Name" ? "${tag.value}-manager" : tag.value
       propagate_at_launch = true
     }
   }
