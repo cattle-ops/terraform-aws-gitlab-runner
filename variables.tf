@@ -677,6 +677,7 @@ variable "runner_worker_docker_autoscaler" {
     max_use_count = Max job number that can run on a worker.
     update_interval = The interval to check with the fleeting plugin for instance updates.
     update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
+    delete_instances_on_shutdown = delete runner worker instance on shuting down gitlab-runner manager (default true).
     instance_ready_command = Executes this command on each instance provisioned by the autoscaler to ensure that it is ready for use. A failure results in the instance being removed.
   EOT
   type = object({
@@ -687,6 +688,7 @@ variable "runner_worker_docker_autoscaler" {
     max_use_count                  = optional(number, 100)
     update_interval                = optional(string, "1m")
     update_interval_when_expecting = optional(string, "2s")
+    delete_instances_on_shutdown   = optional(bool, true)
     instance_ready_command         = optional(string, "")
   })
   default = {}
