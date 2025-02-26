@@ -25,6 +25,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   # checkov:skip=CKV_AWS_115:We do not assign a reserved concurrency as this function can't be called by users
   # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
   # checkov:skip=CKV_AWS_117:There is no need to run this lambda in our VPC
+  # checkov:skip=CKV_AWS_173:false-positive, kms_key_arn is set
   # checkov:skip=CKV_AWS_272:Code signing would be a nice enhancement, but I guess we can live without it here
   architectures    = ["x86_64"]
   description      = "Lifecycle hook for terminating GitLab runner agent instances"
