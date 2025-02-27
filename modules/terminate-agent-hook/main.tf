@@ -16,7 +16,7 @@ data "archive_file" "terminate_runner_instances_lambda" {
 }
 
 resource "aws_security_group" "terminate_runner_instances" {
-  name = "${var.environment}-${var.name}"
+  name        = "${var.environment}-${var.name}"
   description = "Allowing access to external services for the terminate runner instances lambda"
 
   vpc_id = var.vpc_id
@@ -75,7 +75,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
 
   vpc_config {
     security_group_ids = [aws_security_group.terminate_runner_instances.id]
-    subnet_ids = [var.subnet_id]
+    subnet_ids         = [var.subnet_id]
   }
 
   dynamic "tracing_config" {

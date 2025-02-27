@@ -506,10 +506,10 @@ variable "runner_terminate_ec2_lambda_egress_rules" {
     condition = alltrue([
       for rule in values(var.runner_terminate_ec2_lambda_egress_rules) :
       (rule.cidr_block != null) ||
-    (rule.ipv6_cidr_block != null) ||
-    (rule.prefix_list_id != null) ||
-    (rule.security_group != null)
-      ])
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
     error_message = "At least one destination must be specified."
   }
 }

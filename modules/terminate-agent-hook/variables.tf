@@ -103,7 +103,7 @@ variable "vpc_id" {
 
 variable "subnet_id" {
   type        = string
-    description = "The subnet for the lambda function."
+  description = "The subnet for the lambda function."
 }
 
 variable "egress_rules" {
