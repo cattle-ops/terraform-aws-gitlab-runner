@@ -144,11 +144,14 @@ No modules.
 | [aws_iam_policy.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.spot_request_housekeeping](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.aws_lambda_vpc_access_execution_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.spot_request_housekeeping](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_lambda_function.terminate_runner_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
 | [aws_lambda_permission.current_version_triggers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
 | [aws_lambda_permission.unqualified_alias_triggers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
+| [aws_security_group.terminate_runner_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_vpc_security_group_egress_rule.docker_autoscaler_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [archive_file.terminate_runner_instances_lambda](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -165,15 +168,21 @@ No modules.
 | <a name="input_asg_hook_terminating_heartbeat_timeout"></a> [asg\_hook\_terminating\_heartbeat\_timeout](#input\_asg\_hook\_terminating\_heartbeat\_timeout) | Duration in seconds the ASG should stay in the Terminating:Wait state. | `number` | `30` | no |
 | <a name="input_asg_name"></a> [asg\_name](#input\_asg\_name) | The name of the Auto Scaling Group to attach to. The 'environment' will be prefixed to this. | `string` | n/a | yes |
 | <a name="input_cloudwatch_logging_retention_in_days"></a> [cloudwatch\_logging\_retention\_in\_days](#input\_cloudwatch\_logging\_retention\_in\_days) | The number of days to retain logs in CloudWatch. | `number` | `30` | no |
+| <a name="input_egress_rules"></a> [egress\_rules](#input\_egress\_rules) | Map of egress rules for the Lambda function. | <pre>map(object({<br/>    from_port       = optional(number, null)<br/>    to_port         = optional(number, null)<br/>    protocol        = string<br/>    description     = string<br/>    cidr_block      = optional(string, null)<br/>    ipv6_cidr_block = optional(string, null)<br/>    prefix_list_id  = optional(string, null)<br/>    security_group  = optional(string, null)<br/>  }))</pre> | n/a | yes |
 | <a name="input_enable_xray_tracing"></a> [enable\_xray\_tracing](#input\_enable\_xray\_tracing) | Enables X-Ray for debugging and analysis | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | A name that identifies the environment, used as a name prefix and for tagging. | `string` | n/a | yes |
+| <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | Environment variables to set for the Lambda function. A value of `{HANDLER} is replaced with the handler value of the Lambda function.` | `map(string)` | `{}` | no |
 | <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | KMS key id to encrypt the resources, e.g. logs, lambda environment variables, ... | `string` | n/a | yes |
+| <a name="input_lambda_handler"></a> [lambda\_handler](#input\_lambda\_handler) | The entry point for the Lambda function. | `string` | `null` | no |
+| <a name="input_layer_arns"></a> [layer\_arns](#input\_layer\_arns) | A list of ARNs of Lambda layers to attach to the Lambda function. | `list(string)` | `[]` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Lambda function to create. The 'environment' will be prefixed to this. | `string` | n/a | yes |
 | <a name="input_name_docker_machine_runners"></a> [name\_docker\_machine\_runners](#input\_name\_docker\_machine\_runners) | The `Name` tag of EC2 instances created by the runner agent. | `string` | n/a | yes |
 | <a name="input_name_iam_objects"></a> [name\_iam\_objects](#input\_name\_iam\_objects) | The name to use for IAM resources - roles and policies. | `string` | `""` | no |
 | <a name="input_role_permissions_boundary"></a> [role\_permissions\_boundary](#input\_role\_permissions\_boundary) | An optional IAM permissions boundary to use when creating IAM roles. | `string` | `null` | no |
+| <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | The subnet for the lambda function. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to apply to resources. | `map(any)` | `{}` | no |
 | <a name="input_timeout"></a> [timeout](#input\_timeout) | Timeout in seconds for the Lambda function. | `number` | `90` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The VPC used for the runner and runner workers. | `string` | n/a | yes |
 
 ## Outputs
 
