@@ -496,7 +496,7 @@ variable "runner_terminate_ec2_lambda_egress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.egress_rules) :
+      for rule in values(var.runner_terminate_ec2_lambda_egress_rules) :
       contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
     ])
     error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
@@ -504,7 +504,7 @@ variable "runner_terminate_ec2_lambda_egress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.egress_rules) :
+      for rule in values(var.runner_terminate_ec2_lambda_egress_rules) :
       (rule.cidr_block != null) ||
     (rule.ipv6_cidr_block != null) ||
     (rule.prefix_list_id != null) ||
