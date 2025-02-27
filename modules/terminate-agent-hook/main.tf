@@ -15,16 +15,41 @@ data "archive_file" "terminate_runner_instances_lambda" {
   output_file_mode = "0666"
 }
 
+resource "aws_security_group" "terminate_runner_instances" {
+  name = "${var.environment}-${var.name}"
+  description = "Allowing access to external services for the terminate runner instances lambda"
+
+  vpc_id = var.vpc_id
+
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
+  for_each = var.egress_rules
+
+  security_group_id = aws_security_group.terminate_runner_instances.id
+
+  from_port   = each.value.from_port
+  to_port     = each.value.to_port
+  ip_protocol = each.value.protocol
+
+  description                  = each.value.description
+  prefix_list_id               = each.value.prefix_list_id
+  referenced_security_group_id = each.value.security_group
+  cidr_ipv4                    = each.value.cidr_block
+  cidr_ipv6                    = each.value.ipv6_cidr_block
+
+  tags = var.tags
+}
+
 # tracing functions can be activated by the user
 # tfsec:ignore:aws-lambda-enable-tracing
 # kics-scan ignore-line
 resource "aws_lambda_function" "terminate_runner_instances" {
   #ts:skip=AC_AWS_0485:Tracing functions can be activated by the user
-  #ts:skip=AC_AWS_0486 There is no need to run this lambda in our VPC
   # checkov:skip=CKV_AWS_50:Tracing functions can be activated by the user
   # checkov:skip=CKV_AWS_115:We do not assign a reserved concurrency as this function can't be called by users
   # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
-  # checkov:skip=CKV_AWS_117:There is no need to run this lambda in our VPC
   # checkov:skip=CKV_AWS_272:Code signing would be a nice enhancement, but I guess we can live without it here
   architectures    = ["x86_64"]
   description      = "Lifecycle hook for terminating GitLab runner agent instances"
@@ -40,7 +65,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   timeout          = var.timeout
   kms_key_arn      = var.kms_key_id
 
-  tags = var.tags
+  layers = [for layer_arn in var.layer_arns : layer_arn]
 
   environment {
     variables = merge({
@@ -48,7 +73,10 @@ resource "aws_lambda_function" "terminate_runner_instances" {
     }, local.replaced_environment_variables)
   }
 
-  layers = [for layer_arn in var.layer_arns : layer_arn]
+  vpc_config {
+    security_group_ids = [aws_security_group.terminate_runner_instances.id]
+    subnet_ids = [var.subnet_id]
+  }
 
   dynamic "tracing_config" {
     for_each = var.enable_xray_tracing ? [1] : []
@@ -57,6 +85,8 @@ resource "aws_lambda_function" "terminate_runner_instances" {
       mode = "Passthrough"
     }
   }
+
+  tags = var.tags
 }
 
 resource "aws_lambda_permission" "current_version_triggers" {

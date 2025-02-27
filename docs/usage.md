@@ -325,6 +325,9 @@ module "runner" {
      variable2    = "are"
      old_handler = "{HANDLER}" # automatically replaced by the correct value
    }
+   runner_terminate_ec2_lambda_egress_rules = {
+      # ... whatever you need, IPv4/IPv6 port 443 is the default
+   }
    runner_terminate_ec2_lambda_handler = "instrumented_handler.from.a.layer"
    runner_terminate_ec2_lambda_layer_arns = ["arn:aws:lambda:us-east-1:123456789012:layer:instrumented_handler:1"]
 }

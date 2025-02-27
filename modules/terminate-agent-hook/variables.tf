@@ -95,3 +95,27 @@ variable "lambda_handler" {
   type        = string
   default     = null
 }
+
+variable "vpc_id" {
+  description = "The VPC used for the runner and runner workers."
+  type        = string
+}
+
+variable "subnet_id" {
+  type        = string
+    description = "The subnet for the lambda function."
+}
+
+variable "egress_rules" {
+  description = "Map of egress rules for the Lambda function."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+}

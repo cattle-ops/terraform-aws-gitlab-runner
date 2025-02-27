@@ -382,6 +382,8 @@ module "terminate_agent_hook" {
   environment_variables                  = var.runner_terminate_ec2_environment_variables
   lambda_handler                         = var.runner_terminate_ec2_lambda_handler
   layer_arns                             = var.runner_terminate_ec2_lambda_layer_arns
+  vpc_id = var.vpc_id
+  subnet_id = var.subnet_id
 
   tags = local.tags
 }

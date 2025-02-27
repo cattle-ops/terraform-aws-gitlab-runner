@@ -465,6 +465,55 @@ variable "runner_terminate_ec2_lambda_layer_arns" {
   default     = []
 }
 
+variable "runner_terminate_ec2_lambda_egress_rules" {
+  description = "Map of egress rules for the Lambda function."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+  default = {
+    allow_https_ipv4 = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "Allow HTTPS egress traffic to all destinations (IPv4)"
+    },
+    allow_https_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      description     = "Allow HTTPS egress traffic to all destinations (IPv6)"
+    }
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.egress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.egress_rules) :
+      (rule.cidr_block != null) ||
+    (rule.ipv6_cidr_block != null) ||
+    (rule.prefix_list_id != null) ||
+    (rule.security_group != null)
+      ])
+    error_message = "At least one destination must be specified."
+  }
+}
+
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */
