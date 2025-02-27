@@ -253,9 +253,7 @@ If a KMS key is set via `kms_key_id`, make sure that you also give proper access
 get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
 example checkout [kms-policy.json](https://github.com/cattle-ops/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
 
-### Auto Scaling Group
-
-#### Scheduled scaling
+### Auto Scaling Group - Scheduled scaling
 
 When `runner_schedule_enable=true`, the `runner_schedule_config` block can be used to scale the Auto Scaling group.
 
@@ -281,7 +279,7 @@ module "runner" {
 }
 ```
 
-#### Graceful termination / Zero Downtime deployment
+### Graceful termination / Zero Downtime deployment
 
 This module supports zero-downtime deployments by following a structured process:
 
@@ -314,6 +312,23 @@ The Auto Scaling Group is configured with a [lifecycle hook](https://docs.aws.am
 that executes a provided Lambda function when the runner is terminated to terminate additional instances that were
 provisioned by the Docker Machine executor. a `builds/` directory relative to the root module persists that
 contains the packaged Lambda function.
+
+### Instrumenting the Graceful termination Lambda
+
+To instrument the Lambda function, the following steps are required:
+
+```hcl
+module "runner" {
+  # ...
+   runner_terminate_ec2_environment_variables = {
+     variable1    = "here"
+     variable2    = "are"
+     old_handler = "{HANDLER}" # automatically replaced by the correct value
+   }
+   runner_terminate_ec2_lambda_handler = "instrumented_handler.from.a.layer"
+   runner_terminate_ec2_lambda_handler_layer_arns = ["arn:aws:lambda:us-east-1:123456789012:layer:instrumented_handler:1"]
+}
+```
 
 ### Access the Runner instance
 

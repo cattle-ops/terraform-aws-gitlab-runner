@@ -379,6 +379,9 @@ module "terminate_agent_hook" {
   role_permissions_boundary              = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
   kms_key_id                             = local.kms_key_arn
   asg_hook_terminating_heartbeat_timeout = local.runner_worker_graceful_terminate_heartbeat_timeout
+environment_variables = var.runner_terminate_ec2_environment_variables
+  lambda_handler = var.runner_terminate_ec2_lambda_handler
+    layer_arns     = var.runner_terminate_ec2_lambda_layer_arns
 
   tags = local.tags
 }

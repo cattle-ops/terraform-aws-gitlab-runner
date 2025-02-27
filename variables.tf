@@ -447,6 +447,24 @@ variable "runner_terminate_ec2_timeout_duration" {
   default     = 90
 }
 
+variable "runner_terminate_ec2_environment_variables" {
+  description = "Environment variables to set for the Lambda function. A value of `{HANDLER} is replaced with the handler value of the Lambda function."
+  type        = map(string)
+  default     = {}
+}
+
+variable "runner_terminate_ec2_lambda_handler" {
+  description = "The handler for the terminate Lambda function."
+  type        = string
+  default     = null
+}
+
+variable "runner_terminate_ec2_lambda_handler_layer_arns" {
+  description = "A list of ARNs of Lambda layers to attach to the Lambda function."
+  type        = list(string)
+  default     = []
+}
+
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */

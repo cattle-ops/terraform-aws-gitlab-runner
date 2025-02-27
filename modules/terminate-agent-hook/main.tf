@@ -31,7 +31,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
   source_code_hash = data.archive_file.terminate_runner_instances_lambda.output_base64sha256
   function_name    = "${var.environment}-${var.name}"
-  handler          = "lambda_function.handler"
+  handler          = local.lambda_handler
   memory_size      = 128
   package_type     = "Zip"
   publish          = true
@@ -43,10 +43,12 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   tags = var.tags
 
   environment {
-    variables = {
+    variables = merge({
       NAME_EXECUTOR_INSTANCE = var.name_docker_machine_runners
-    }
+    }, var.environment_variables)
   }
+
+  layers = [for layer_arn in var.layer_arns : layer_arn]
 
   dynamic "tracing_config" {
     for_each = var.enable_xray_tracing ? [1] : []
