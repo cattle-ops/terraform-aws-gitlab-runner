@@ -326,7 +326,7 @@ module "runner" {
      old_handler = "{HANDLER}" # automatically replaced by the correct value
    }
    runner_terminate_ec2_lambda_handler = "instrumented_handler.from.a.layer"
-   runner_terminate_ec2_lambda_handler_layer_arns = ["arn:aws:lambda:us-east-1:123456789012:layer:instrumented_handler:1"]
+   runner_terminate_ec2_lambda_layer_arns = ["arn:aws:lambda:us-east-1:123456789012:layer:instrumented_handler:1"]
 }
 ```
 

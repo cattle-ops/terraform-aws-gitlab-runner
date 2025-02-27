@@ -459,7 +459,7 @@ variable "runner_terminate_ec2_lambda_handler" {
   default     = null
 }
 
-variable "runner_terminate_ec2_lambda_handler_layer_arns" {
+variable "runner_terminate_ec2_lambda_layer_arns" {
   description = "A list of ARNs of Lambda layers to attach to the Lambda function."
   type        = list(string)
   default     = []
