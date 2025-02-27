@@ -36,6 +36,14 @@ resource "aws_iam_role" "lambda" {
 # This IAM policy is used by the Lambda function.
 data "aws_iam_policy_document" "lambda" {
   # checkov:skip=CKV_AWS_111:Write access is limited to the resources needed
+  statement {
+    sid = "allow kms access"
+    actions = [
+      "kms:Decrypt", # to decrypt the Lambda environment variables
+    ]
+    resources = [var.kms_key_id]
+    effect    = "Allow"
+  }
 
   # Permit the function to get a list of instances
   statement {
