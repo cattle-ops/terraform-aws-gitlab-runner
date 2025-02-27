@@ -37,7 +37,7 @@ resource "aws_iam_role" "lambda" {
 data "aws_iam_policy_document" "lambda" {
   # checkov:skip=CKV_AWS_111:Write access is limited to the resources needed
   statement {
-    sid = "allow kms access"
+    sid = "AllowKmsAccess"
     actions = [
       "kms:Decrypt", # to decrypt the Lambda environment variables
     ]
