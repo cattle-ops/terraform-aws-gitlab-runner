@@ -168,7 +168,7 @@ resource "aws_iam_role_policy_attachment" "spot_request_housekeeping" {
   policy_arn = aws_iam_policy.spot_request_housekeeping.arn
 }
 
-resource "aws_iam_role_policy_attachment" "AWSLambdaVPCAccessExecutionRole" {
+resource "aws_iam_role_policy_attachment" "aws_lambda_vpc_access_execution_role" {
   role       = aws_iam_role.lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
