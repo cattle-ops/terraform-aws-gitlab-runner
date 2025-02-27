@@ -45,7 +45,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   environment {
     variables = merge({
       NAME_EXECUTOR_INSTANCE = var.name_docker_machine_runners
-    }, var.environment_variables)
+    }, local.replaced_environment_variables)
   }
 
   layers = [for layer_arn in var.layer_arns : layer_arn]
