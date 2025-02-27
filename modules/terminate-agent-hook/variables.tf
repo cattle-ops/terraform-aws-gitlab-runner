@@ -77,3 +77,45 @@ variable "asg_hook_terminating_heartbeat_timeout" {
     error_message = "AWS only supports heartbeat timeout in the range of 30 to 7200."
   }
 }
+
+variable "environment_variables" {
+  description = "Environment variables to set for the Lambda function. A value of `{HANDLER} is replaced with the handler value of the Lambda function."
+  type        = map(string)
+  default     = {}
+}
+
+variable "layer_arns" {
+  description = "A list of ARNs of Lambda layers to attach to the Lambda function."
+  type        = list(string)
+  default     = []
+}
+
+variable "lambda_handler" {
+  description = "The entry point for the Lambda function."
+  type        = string
+  default     = null
+}
+
+variable "vpc_id" {
+  description = "The VPC used for the runner and runner workers."
+  type        = string
+}
+
+variable "subnet_id" {
+  type        = string
+  description = "The subnet for the lambda function."
+}
+
+variable "egress_rules" {
+  description = "Map of egress rules for the Lambda function."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+}

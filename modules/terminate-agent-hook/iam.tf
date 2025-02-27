@@ -37,7 +37,7 @@ resource "aws_iam_role" "lambda" {
 data "aws_iam_policy_document" "lambda" {
   # checkov:skip=CKV_AWS_111:Write access is limited to the resources needed
   statement {
-    sid = "allow kms access"
+    sid = "AllowKmsAccess"
     actions = [
       "kms:Decrypt", # to decrypt the Lambda environment variables
     ]
@@ -166,4 +166,9 @@ resource "aws_iam_policy" "spot_request_housekeeping" {
 resource "aws_iam_role_policy_attachment" "spot_request_housekeeping" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.spot_request_housekeeping.arn
+}
+
+resource "aws_iam_role_policy_attachment" "aws_lambda_vpc_access_execution_role" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
