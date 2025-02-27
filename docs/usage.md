@@ -111,7 +111,7 @@ We have seen that the [fork](https://gitlab.com/cki-project/docker-machine/-/tre
 module is using consume more RAM using spot fleets. For comparison, if you launch 50 machines in the same time, it consumes
 ~1.2GB of RAM. In our case, we had to change the `instance_type` of the runner from `t3.micro` to `t3.small`.
 
-#### Configuration example
+#### Spot Fleet Configuration
 
 ```hcl
 module "runner" {
@@ -146,9 +146,11 @@ module "runner" {
 
 ### Scenario: Use of Docker autoscaler
 
-As docker machine is no longer maintained by docker, gitlab recently developed docker autoscaler to replace docker machine (still in beta). An option is available to test it out.
+As docker machine is no longer maintained by docker, gitlab recently developed docker autoscaler to replace docker machine
+(still in beta). An option is available to test it out.
 
-Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
+Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been
+added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
 
 ```bash
 # Install docker
@@ -170,7 +172,7 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 usermod -aG docker ubuntu
 ```
 
-#### Configuration example
+#### Docker Autoscaler Configuration
 
 ```hcl
 module "runner" {
