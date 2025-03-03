@@ -32,9 +32,26 @@ resource "aws_iam_role" "lambda" {
   tags                  = var.tags
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_kms" {
+  count = var.kms_key_id != "" ? 1 : 0
 
-# This IAM policy is used by the Lambda function.
-data "aws_iam_policy_document" "lambda" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_kms.arn
+}
+
+resource "aws_iam_policy" "lambda_kms" {
+  count = var.kms_key_id != "" ? 1 : 0
+
+  name   = "${var.name_iam_objects}-${var.name}-lambda-kms"
+  path   = "/"
+  policy = data.aws_iam_policy_document.kms_key.json
+
+  tags = var.tags
+}
+
+data "aws_iam_policy_document" "kms_key" {
+  count = var.kms_key_id != "" ? 1 : 0
+
   # checkov:skip=CKV_AWS_111:Write access is limited to the resources needed
   statement {
     sid = "AllowKmsAccess"
@@ -42,9 +59,11 @@ data "aws_iam_policy_document" "lambda" {
       "kms:Decrypt", # to decrypt the Lambda environment variables
     ]
     resources = [var.kms_key_id]
-    effect    = "Allow"
+    effect = "Allow"
   }
+}
 
+data "aws_iam_policy_document" "lambda" {
   # Permit the function to get a list of instances
   statement {
     sid = "GitLabRunnerLifecycleGetInstances"
