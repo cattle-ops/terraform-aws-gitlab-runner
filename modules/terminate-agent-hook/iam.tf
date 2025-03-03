@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "kms_key" {
       "kms:Decrypt", # to decrypt the Lambda environment variables
     ]
     resources = [var.kms_key_id]
-    effect = "Allow"
+    effect    = "Allow"
   }
 }
 
