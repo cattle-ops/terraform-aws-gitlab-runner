@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "lambda_kms" {
   count = var.kms_key_id != "" ? 1 : 0
 
   role       = aws_iam_role.lambda.name
-  policy_arn = aws_iam_policy.lambda_kms.arn
+  policy_arn = aws_iam_policy.lambda_kms[0].arn
 }
 
 resource "aws_iam_policy" "lambda_kms" {
@@ -44,7 +44,7 @@ resource "aws_iam_policy" "lambda_kms" {
 
   name   = "${var.name_iam_objects}-${var.name}-lambda-kms"
   path   = "/"
-  policy = data.aws_iam_policy_document.kms_key.json
+  policy = data.aws_iam_policy_document.kms_key[0].json
 
   tags = var.tags
 }
