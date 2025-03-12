@@ -27,6 +27,8 @@ resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_ingress" {
   referenced_security_group_id = each.value.security_group
   cidr_ipv4                    = each.value.cidr_block
   cidr_ipv6                    = each.value.ipv6_cidr_block
+
+  tags = local.tags
 }
 
 resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_internal_traffic" {
@@ -38,6 +40,8 @@ resource "aws_vpc_security_group_ingress_rule" "docker_autoscaler_internal_traff
   ip_protocol                  = "-1"
   description                  = "Allow ALL Ingress traffic between Runner Manager and Docker-autoscaler workers security group"
   referenced_security_group_id = aws_security_group.runner.id
+
+  tags = local.tags
 }
 
 # Egress rules
@@ -55,4 +59,6 @@ resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
   referenced_security_group_id = each.value.security_group
   cidr_ipv4                    = each.value.cidr_block
   cidr_ipv6                    = each.value.ipv6_cidr_block
+
+  tags = local.tags
 }

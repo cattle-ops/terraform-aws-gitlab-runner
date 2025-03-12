@@ -447,6 +447,73 @@ variable "runner_terminate_ec2_timeout_duration" {
   default     = 90
 }
 
+variable "runner_terminate_ec2_environment_variables" {
+  description = "Environment variables to set for the Lambda function. A value of `{HANDLER} is replaced with the handler value of the Lambda function."
+  type        = map(string)
+  default     = {}
+}
+
+variable "runner_terminate_ec2_lambda_handler" {
+  description = "The handler for the terminate Lambda function."
+  type        = string
+  default     = null
+}
+
+variable "runner_terminate_ec2_lambda_layer_arns" {
+  description = "A list of ARNs of Lambda layers to attach to the Lambda function."
+  type        = list(string)
+  default     = []
+}
+
+variable "runner_terminate_ec2_lambda_egress_rules" {
+  description = "Map of egress rules for the Lambda function."
+  type = map(object({
+    from_port       = optional(number, null)
+    to_port         = optional(number, null)
+    protocol        = string
+    description     = string
+    cidr_block      = optional(string, null)
+    ipv6_cidr_block = optional(string, null)
+    prefix_list_id  = optional(string, null)
+    security_group  = optional(string, null)
+  }))
+  default = {
+    allow_https_ipv4 = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "Allow HTTPS egress traffic to all destinations (IPv4)"
+    },
+    allow_https_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      description     = "Allow HTTPS egress traffic to all destinations (IPv6)"
+    }
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_terminate_ec2_lambda_egress_rules) :
+      contains(["-1", "tcp", "udp", "icmp", "icmpv6"], rule.protocol)
+    ])
+    error_message = "Protocol must be '-1', 'tcp', 'udp', 'icmp', or 'icmpv6'."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.runner_terminate_ec2_lambda_egress_rules) :
+      (rule.cidr_block != null) ||
+      (rule.ipv6_cidr_block != null) ||
+      (rule.prefix_list_id != null) ||
+      (rule.security_group != null)
+    ])
+    error_message = "At least one destination must be specified."
+  }
+}
+
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
  */

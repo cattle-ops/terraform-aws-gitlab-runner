@@ -1,5 +1,24 @@
 # Changelog
 
+## [9.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.1.0...9.1.1) (2025-03-03)
+
+
+### Bug Fixes
+
+* add KMS policy statement only if key given ([#1258](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1258)) ([7635c21](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/7635c219fd1c758da01afc5f885104ddca3b9544)), closes [#1257](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1257)
+
+## [9.1.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.0.2...9.1.0) (2025-02-27)
+
+
+### Features
+
+* allow instrumentation of Termination lambda ([#1255](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1255)) ([55af1d1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/55af1d16bdf83b9f252113780772f6239234db7b))
+
+
+### Bug Fixes
+
+* allow terminate Lambda to access kms key ([#1253](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1253)) ([48c5a37](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/48c5a37e86c602ac7bb86e40b769e20cb2485fca))
+
 ## [9.0.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.0.1...9.0.2) (2025-02-20)
 
 

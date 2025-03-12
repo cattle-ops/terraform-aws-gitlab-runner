@@ -111,7 +111,7 @@ We have seen that the [fork](https://gitlab.com/cki-project/docker-machine/-/tre
 module is using consume more RAM using spot fleets. For comparison, if you launch 50 machines in the same time, it consumes
 ~1.2GB of RAM. In our case, we had to change the `instance_type` of the runner from `t3.micro` to `t3.small`.
 
-#### Configuration example
+#### Spot Fleet Configuration
 
 ```hcl
 module "runner" {
@@ -146,9 +146,11 @@ module "runner" {
 
 ### Scenario: Use of Docker autoscaler
 
-As docker machine is no longer maintained by docker, gitlab recently developed docker autoscaler to replace docker machine (still in beta). An option is available to test it out.
+As docker machine is no longer maintained by docker, gitlab recently developed docker autoscaler to replace docker machine
+(still in beta). An option is available to test it out.
 
-Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
+Tested with amazon-linux-2-x86 as runner manager and ubuntu-server-22-lts-x86 for runner worker. The following commands have been
+added to the original AMI for the runner worker for the docker-autoscaler to work correctly:
 
 ```bash
 # Install docker
@@ -170,7 +172,7 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 usermod -aG docker ubuntu
 ```
 
-#### Configuration example
+#### Docker Autoscaler Configuration
 
 ```hcl
 module "runner" {
@@ -253,9 +255,7 @@ If a KMS key is set via `kms_key_id`, make sure that you also give proper access
 get errors, e.g. the build cache can't be decrypted or logging via CloudWatch is not possible. For a CloudWatch
 example checkout [kms-policy.json](https://github.com/cattle-ops/terraform-aws-gitlab-runner/blob/main/policies/kms-policy.json)
 
-### Auto Scaling Group
-
-#### Scheduled scaling
+### Auto Scaling Group - Scheduled scaling
 
 When `runner_schedule_enable=true`, the `runner_schedule_config` block can be used to scale the Auto Scaling group.
 
@@ -281,7 +281,7 @@ module "runner" {
 }
 ```
 
-#### Graceful termination / Zero Downtime deployment
+### Graceful termination / Zero Downtime deployment
 
 This module supports zero-downtime deployments by following a structured process:
 
@@ -314,6 +314,26 @@ The Auto Scaling Group is configured with a [lifecycle hook](https://docs.aws.am
 that executes a provided Lambda function when the runner is terminated to terminate additional instances that were
 provisioned by the Docker Machine executor. a `builds/` directory relative to the root module persists that
 contains the packaged Lambda function.
+
+### Instrumenting the Graceful termination Lambda
+
+To instrument the Lambda function, the following steps are required:
+
+```hcl
+module "runner" {
+  # ...
+   runner_terminate_ec2_environment_variables = {
+     variable1    = "here"
+     variable2    = "are"
+     old_handler = "{HANDLER}" # automatically replaced by the correct value
+   }
+   runner_terminate_ec2_lambda_egress_rules = {
+      # ... whatever you need, IPv4/IPv6 port 443 is the default
+   }
+   runner_terminate_ec2_lambda_handler = "instrumented_handler.from.a.layer"
+   runner_terminate_ec2_lambda_layer_arns = ["arn:aws:lambda:us-east-1:123456789012:layer:instrumented_handler:1"]
+}
+```
 
 ### Access the Runner instance
 
