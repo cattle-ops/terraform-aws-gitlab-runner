@@ -839,7 +839,7 @@ variable "runner_worker_docker_autoscaler_asg" {
   default = {}
 
   validation {
-    condition     = length(var.runner_worker_docker_autoscaler_asg.types) == 0 ||length(var.runner_worker_docker_autoscaler_asg.instance_requirements) == 0
+    condition     = length(var.runner_worker_docker_autoscaler_asg.types) == 0 || length(var.runner_worker_docker_autoscaler_asg.instance_requirements) == 0
     error_message = "AWS does not allow setting both 'types' and 'instance_requirements' at the same time. Set only one."
   }
 }
