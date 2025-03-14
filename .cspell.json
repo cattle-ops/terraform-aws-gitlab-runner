@@ -64,6 +64,7 @@
     "trivy",
     "usermod",
     "userns",
+    "vcpu",
     "xanzy",
     "xvda"
   ],
@@ -74,6 +75,7 @@
     "backports",
     "blockquotes",
     "bluegreen",
+    "burstable",
     "codeowners",
     "cpu",
     "cpus",
