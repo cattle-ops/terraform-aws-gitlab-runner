@@ -74,12 +74,6 @@ variable "cache_lifecycle_prefix" {
   default     = "runner/"
 }
 
-variable "cache_incomplete_lifecycle_prefix" {
-  description = "Prefix for incomplete multipart uploads abort rule."
-  type        = string
-  default     = ""
-}
-
 variable "arn_format" {
   type        = string
   default     = "arn:aws"
