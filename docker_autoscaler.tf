@@ -12,7 +12,7 @@ resource "aws_launch_template" "this" {
   name          = "${local.name_runner_agent_instance}-worker-launch-template"
   user_data     = base64gzip(var.runner_worker_docker_autoscaler_instance.start_script)
   image_id      = length(var.runner_worker_docker_autoscaler_ami_id) > 0 ? var.runner_worker_docker_autoscaler_ami_id : data.aws_ami.docker_autoscaler_by_filter[0].id
-  instance_type = var.runner_worker_docker_autoscaler_asg.types[0]
+  instance_type = length(var.runner_worker_docker_autoscaler_asg.types) > 0 ? var.runner_worker_docker_autoscaler_asg.types[0] : var.runner_worker_docker_autoscaler_asg.default_instance_type
   key_name      = aws_key_pair.autoscaler[0].key_name
   ebs_optimized = var.runner_worker_docker_autoscaler_instance.ebs_optimized
 
@@ -103,10 +103,37 @@ resource "aws_autoscaling_group" "autoscaler" {
           launch_template_id = aws_launch_template.this[0].id
           version            = aws_launch_template.this[0].latest_version
         }
+
         dynamic "override" {
           for_each = var.runner_worker_docker_autoscaler_asg.types
           content {
             instance_type = override.value
+          }
+        }
+
+        dynamic "override" {
+          for_each = var.runner_worker_docker_autoscaler_asg.instance_requirements
+          content {
+            instance_requirements {
+              allowed_instance_types = override.value.allowed_instance_types
+              cpu_manufacturers      = override.value.cpu_manufacturers
+              instance_generations   = override.value.instance_generations
+              burstable_performance  = override.value.burstable_performance
+              dynamic "memory_mib" {
+                for_each = [override.value.memory_mib]
+                content {
+                  max = memory_mib.value.max
+                  min = memory_mib.value.min
+                }
+              }
+              dynamic "vcpu_count" {
+                for_each = [override.value.vcpu_count]
+                content {
+                  max = vcpu_count.value.max
+                  min = vcpu_count.value.min
+                }
+              }
+            }
           }
         }
       }
