@@ -805,8 +805,10 @@ variable "runner_worker_docker_autoscaler_asg" {
     spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions.
     spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
+    default_instance_type = Default instance type for the launch template
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
     upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'.
+    instance_requirements = Override the instance type in the Launch Template with instance types that satisfy the requirements.
   EOT
   type = object({
     enabled_metrics                          = optional(list(string), [])
@@ -820,10 +822,28 @@ variable "runner_worker_docker_autoscaler_asg" {
     spot_allocation_strategy                 = optional(string, "lowest-price")
     spot_instance_pools                      = optional(number, 2)
     subnet_ids                               = optional(list(string), [])
-    types                                    = optional(list(string), ["m5.large"])
+    default_instance_type                    = optional(string, "m5.large")
+    types                                    = optional(list(string), [])
     upgrade_strategy                         = optional(string, "rolling")
+    instance_requirements = optional(list(object({
+      allowed_instance_types = optional(list(string), [])
+      cpu_manufacturers      = optional(list(string), [])
+      instance_generations   = optional(list(string), [])
+      burstable_performance  = optional(string)
+      memory_mib = optional(object({
+        min = optional(number, null)
+      max = optional(number, null) }), {})
+      vcpu_count = optional(object({
+        min = optional(number, null)
+      max = optional(number, null) }), {})
+    })), [])
   })
   default = {}
+
+  validation {
+    condition     = length(var.runner_worker_docker_autoscaler_asg.types) == 0 || length(var.runner_worker_docker_autoscaler_asg.instance_requirements) == 0
+    error_message = "AWS does not allow setting both 'types' and 'instance_requirements' at the same time. Set only one."
+  }
 }
 
 variable "runner_worker_docker_machine_role" {
