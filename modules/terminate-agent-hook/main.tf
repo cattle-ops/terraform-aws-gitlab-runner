@@ -51,7 +51,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   # checkov:skip=CKV_AWS_115:We do not assign a reserved concurrency as this function can't be called by users
   # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
   # checkov:skip=CKV_AWS_272:Code signing would be a nice enhancement, but I guess we can live without it here
-  architectures    = ["x86_64"]
+  architectures    = ["arm64"]
   description      = "Lifecycle hook for terminating GitLab runner agent instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
   source_code_hash = data.archive_file.terminate_runner_instances_lambda.output_base64sha256
@@ -61,7 +61,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   package_type     = "Zip"
   publish          = true
   role             = aws_iam_role.lambda.arn
-  runtime          = "python3.11"
+  runtime          = "python3.13"
   timeout          = var.timeout
   kms_key_arn      = var.kms_key_id
 
