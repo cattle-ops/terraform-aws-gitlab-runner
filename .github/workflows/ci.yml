@@ -59,7 +59,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.1.5-debian@sha256:b2a99f21ac3a34b411ea5c0213e2a0404908ae57aae191d41f09282865599f28
+      image: checkmarx/kics:v2.1.6-debian@sha256:042f1f1aab3b9b7399e28f96160b9485c4a32b98cf2eec3b68b08cb5bb606b1e
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         name: Checkout source code
 
-      - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
