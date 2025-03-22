@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.1.1...9.2.0) (2025-03-22)
+
+
+### Features
+
+* add instance requirements option for docker autoscaler asg  ([#1262](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1262)) ([84cbaf5](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/84cbaf535b73339cdcbcbad6451eb395d62ea7ae))
+
+
+### Bug Fixes
+
+* add filter to s3 lifecycle rule ([#1264](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1264)) ([c8180ba](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/c8180baa2cb4e6823fc90d62859838e670b8b4d2))
+
 ## [9.1.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.1.0...9.1.1) (2025-03-03)
 
 
