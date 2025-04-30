@@ -806,6 +806,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     default_instance_type = Default instance type for the launch template
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
     upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'.
+    suspended_processes = List of processes to suspend for the Auto Scaling Group.
     instance_requirements = Override the instance type in the Launch Template with instance types that satisfy the requirements.
   EOT
   type = object({
@@ -823,6 +824,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     default_instance_type                    = optional(string, "m5.large")
     types                                    = optional(list(string), [])
     upgrade_strategy                         = optional(string, "rolling")
+    suspended_processes                      = optional(list(string), [])
     instance_requirements = optional(list(object({
       allowed_instance_types = optional(list(string), [])
       cpu_manufacturers      = optional(list(string), [])
