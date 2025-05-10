@@ -39,15 +39,13 @@ locals {
   })
 
   # "16.0.3" -> ["16", "0", "3"]
-  runner_version_split            = split(".", var.runner_gitlab.runner_version)
+  runner_version_split = split(".", var.runner_gitlab.runner_version)
   # ["16", "0", "3"] -> 16
-  runner_version_major            = parseint(local.runner_version_split[0], 10)
+  runner_version_major = parseint(local.runner_version_split[0], 10)
   # ["16", "0", "3"] -> 0
-  runner_version_minor            = parseint(local.runner_version_split[1], 10)
-  # https://docs.gitlab.com/runner/executors/docker_autoscaler/#example-aws-autoscaling-for-1-job-per-instance
-  # GitLab 16.10 and earlier, manually install the plugin
-  # GitLab 16.11 and later, done through `gitlab runner fleeting install`
-  runner_use_new_fleeting_install = local.runner_version_major >= 16 && local.runner_version_minor >= 11
+  runner_version_minor = parseint(local.runner_version_split[1], 10)
+  # the `gitlab-runner fleeting install` command was introduced in 16.11
+  runner_use_new_fleeting_install = (local.runner_version_major == 16 && local.runner_version_minor >= 11) || local.runner_version_major > 16
 
   file_yum_update = file("${path.module}/template/yum_update.tftpl")
 
