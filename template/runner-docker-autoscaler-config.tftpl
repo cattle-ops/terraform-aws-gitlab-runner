@@ -1,6 +1,6 @@
 # Autoscaler config
   [runners.autoscaler]
-    plugin = "fleeting-plugin-aws"
+    plugin = "${fleeting_plugin}"
 
     capacity_per_instance = ${runners_capacity_per_instance}
     update_interval = "${runners_update_interval}"
