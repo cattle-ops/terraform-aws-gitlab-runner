@@ -38,6 +38,15 @@ locals {
       extra_config        = var.runner_install.start_script
   })
 
+  # "16.0.3" -> ["16", "0", "3"]
+  runner_version_split = split(".", var.runner_gitlab.runner_version)
+  # ["16", "0", "3"] -> 16
+  runner_version_major = parseint(local.runner_version_split[0], 10)
+  # ["16", "0", "3"] -> 0
+  runner_version_minor = parseint(local.runner_version_split[1], 10)
+  # the `gitlab-runner fleeting install` command was introduced in 16.11
+  runner_use_new_fleeting_install = (local.runner_version_major == 16 && local.runner_version_minor >= 11) || local.runner_version_major > 16
+
   file_yum_update = file("${path.module}/template/yum_update.tftpl")
 
   template_eip = templatefile("${path.module}/template/eip.tftpl", {
@@ -80,6 +89,7 @@ locals {
       public_key                                                   = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].public_key_openssh : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
       private_key                                                  = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].private_key_pem : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
       use_private_key                                              = var.runner_worker_docker_machine_fleet.enable || (var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler")
+      use_new_fleeting_install                                     = local.runner_use_new_fleeting_install
       use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
       user_data_trace_log                                          = var.debug.trace_runner_user_data
       fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
@@ -87,6 +97,7 @@ locals {
 
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
     {
+      fleeting_plugin               = local.runner_use_new_fleeting_install ? "aws:latest" : "fleeting-plugin-aws"
       docker_autoscaling_name       = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
       connector_config_user         = var.runner_worker_docker_autoscaler.connector_config_user
       runners_capacity_per_instance = var.runner_worker_docker_autoscaler.capacity_per_instance
