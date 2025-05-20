@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.2.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.0...9.2.1) (2025-05-20)
+
+
+### Bug Fixes
+
+* use current partition instead of assuming `aws` ([#1274](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1274)) ([382b1a9](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/382b1a9a4a72ee201027ae55efff46019156dde5))
+
 ## [9.2.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.1.1...9.2.0) (2025-03-22)
 
 
