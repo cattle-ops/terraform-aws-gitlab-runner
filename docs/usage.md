@@ -219,6 +219,271 @@ module "runner" {
 }
 ```
 
+### Scenario: Use of Docker autoscaler with Windows runners
+
+Using the `docker_autoscaler` runner worker type, it makes it possible to also run Windows-based jobs in CI.
+
+This way you can use a Unix-based machine as runner manager, and spin up Windows-based runner workers when needed
+to keep costs down.
+
+A few pain-points that needs to be taken into account:
+
+- The private key is necessary in order for the manager to connect to the worker nodes
+- The default user has to be changed to `Administrator`
+- The path resolver must be changed to Powershell
+- The worker nodes must have public IPs
+- If the cache is enabled, the cache path must be changed to path valid for Windows
+- Privileged mode must be disabled because not available on Windows Docker
+
+All of these points have a more in-depth explanation in [this issue](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1233)
+and are taken into account in the example configuration below.
+
+#### Docker Autoscaler with Windows-based runners configuration
+
+```hcl
+
+module "runner" {
+  # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
+  source  = "cattle-ops/gitlab-runner/aws"
+
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = element(module.vpc.private_subnets, 0)
+
+  runner_instance = {
+    name                 = "runner-manager"
+    private_address_only = false
+  }
+
+  runner_gitlab = {
+    tag_list = "runner_worker"
+    type     = "instance"
+    url      = "https://gitlab.com"
+
+    preregistered_runner_token_ssm_parameter_name = "my-gitlab-runner-token-ssm-parameter-name"
+  }
+
+  runner_manager = {
+    maximum_concurrent_jobs = 5
+  }
+
+  runner_worker = {
+    type            = "docker-autoscaler"
+    max_jobs        = 5
+    use_private_key = true
+
+    environment_variables = [
+      "FF_USE_POWERSHELL_PATH_RESOLVER=1"
+    ]
+  }
+
+  runner_worker_docker_autoscaler = {
+    fleeting_plugin_version = "1.0.0"
+    connector_config_user   = "Administrator"
+  }
+
+  runner_worker_docker_autoscaler_ami_owners = ["self"]
+  runner_worker_docker_autoscaler_ami_id     = "<windows-ami-id>"
+
+  runner_worker_docker_autoscaler_asg = {
+    types                                    = ["m6a.medium", "m6i.medium"]
+    subnet_ids                               = vpc.private_subnets_ids
+    enable_mixed_instances_policy            = true
+    on_demand_base_capacity                  = 0
+    on_demand_percentage_above_base_capacity = 0
+    max_growth_rate                          = 10
+    spot_allocation_strategy                 = "price-capacity-optimized"
+    spot_instance_pools                      = 0
+  }
+
+  runner_worker_docker_autoscaler_instance = {
+    private_address_only = false
+  }
+
+  runner_worker_docker_options = {
+    volumes    = ["C:/cache"]
+    privileged = false
+  }
+}
+```
+
+#### Windows-based runner AMI configuration example
+
+To build an AMI usable as a Windows-based runner image you can use Packer.
+
+Here is an example configuration that:
+
+- Builds a Windows Server 2022 based AMI
+- Sets up WinRM, needed for the runner manager to connect to the runner
+- Installs Docker Engine, needed to run Docker-based jobs
+- Prefetches the GitLab-runner docker image so that it won't be pulled for every job in case spot instances are used
+
+```hcl
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.2.1"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
+
+variable "password" {
+  type      = string
+  sensitive = true
+  default   = "SuperS3cr3t!!!"
+}
+
+variable "docker_username" {
+  type      = string
+  sensitive = true
+}
+
+variable "docker_password" {
+  type      = string
+  sensitive = true
+}
+
+locals {
+  runner_version = "17.7.0"
+  timestamp = regex_replace(timestamp(), "[- TZ:]", "")
+}
+
+source "amazon-ebs" "docker" {
+  ami_name              = "windows-server-2022-runners-${local.timestamp}"
+  force_deregister      = true
+  force_delete_snapshot = true
+  region                = "eu-west-1"
+  ebs_optimized         = true
+  encrypt_boot          = true
+  instance_type         = "c7a.2xlarge"
+  source_ami_filter {
+    filters = {
+      name                = "Windows_Server-2022-English-Core-Base-*"
+      root-device-type    = "ebs"
+      virtualization-type = "hvm"
+    }
+    most_recent = true
+    owners      = ["amazon"]
+  }
+  tags = {
+    runner_version = "${local.runner_version}"
+  }
+
+  aws_polling {
+    delay_seconds = 60
+    max_attempts  = 60
+  }
+
+  launch_block_device_mappings {
+    device_name           = "/dev/sda1"
+    volume_size           = 50
+    volume_type           = "gp2"
+    delete_on_termination = true
+  }
+
+  communicator   = "winrm"
+  winrm_username = "Administrator"
+  winrm_password = "${var.password}"
+  winrm_use_ssl  = false
+  winrm_insecure = true
+
+  # This user data file sets up winrm and configures it so that the connection
+  # from Packer is allowed. Without this file being set, Packer will not
+  # connect to the instance.
+  user_data = <<-EOT
+  <powershell>
+  # Set administrator password
+  net user Administrator ${var.password}
+  wmic useraccount where "name='Administrator'" set PasswordExpires=FALSE
+
+  # First, make sure WinRM can't be connected to
+  netsh advfirewall firewall set rule name="Windows Remote Management (HTTP-In)" new enable=yes action=block
+
+  # Delete any existing WinRM listeners
+  winrm delete winrm/config/listener?Address=*+Transport=HTTP  2>$Null
+  winrm delete winrm/config/listener?Address=*+Transport=HTTPS 2>$Null
+
+  # Disable group policies which block basic authentication and unencrypted login
+
+  Set-ItemProperty -Path HKLM:\Software\Policies\Microsoft\Windows\WinRM\Client -Name AllowBasic -Value 1
+  Set-ItemProperty -Path HKLM:\Software\Policies\Microsoft\Windows\WinRM\Client -Name AllowUnencryptedTraffic -Value 1
+  Set-ItemProperty -Path HKLM:\Software\Policies\Microsoft\Windows\WinRM\Service -Name AllowBasic -Value 1
+  Set-ItemProperty -Path HKLM:\Software\Policies\Microsoft\Windows\WinRM\Service -Name AllowUnencryptedTraffic -Value 1
+
+  # Create a new WinRM listener and configure
+  winrm create winrm/config/listener?Address=*+Transport=HTTP
+  winrm set winrm/config '@{MaxTimeoutms="7200000"}'
+  winrm set winrm/config '@{MaxEnvelopeSizekb="8192"}'
+  winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="0"}'
+  winrm set winrm/config/winrs '@{MaxProcessesPerShell="0"}'
+  winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+  winrm set winrm/config/service '@{MaxConcurrentOperationsPerUser="12000"}'
+  winrm set winrm/config/service/auth '@{Basic="true"}'
+  winrm set winrm/config/client/auth '@{Basic="true"}'
+
+  # Configure UAC to allow privilege elevation in remote shells
+  $Key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+  $Setting = 'LocalAccountTokenFilterPolicy'
+  Set-ItemProperty -Path $Key -Name $Setting -Value 1 -Force
+
+  # Configure and restart the WinRM Service; Enable the required firewall exception
+  Stop-Service -Name WinRM
+  Set-Service -Name WinRM -StartupType Automatic
+  netsh advfirewall firewall set rule name="Windows Remote Management (HTTP-In)" new action=allow localip=any remoteip=any
+  Start-Service -Name WinRM
+  </powershell>
+  EOT
+}
+
+build {
+  sources = ["source.amazon-ebs.docker"]
+
+  provisioner "powershell" {
+    inline = [
+      "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))",
+    ]
+  }
+
+  # install containers feature
+  provisioner "powershell" {
+    inline = [
+      "choco feature enable -n allowGlobalConfirmation",
+      "choco install git",
+      "choco install Containers Microsoft-Hyper-V --source windowsfeatures",
+    ]
+
+    valid_exit_codes = [0, 3010]
+  }
+
+  # restart is needed for the containers windows feature
+  provisioner "windows-restart" {}
+
+  # install docker-engine
+  provisioner "powershell" {
+    inline = [
+      "choco install docker-engine --version=27.4.1",
+    ]
+  }
+
+  # Administrator is added to docker-users group, we restart for this to work
+  provisioner "windows-restart" {}
+
+  # pre-bake some images to reduce pull time during job execution
+  provisioner "powershell" {
+    inline = [
+      "docker pull mcr.microsoft.com/windows/servercore:ltsc2022",
+      "docker pull registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v${local.runner_version}-servercore21H2",
+    ]
+  }
+
+  provisioner "powershell" {
+    inline = [
+      "& 'C:\\Program Files\\Amazon\\EC2Launch\\ec2launch.exe' sysprep --shutdown=true --clean=true"
+    ]
+  }
+}
+```
+
 ## Examples
 
 A few [examples](https://github.com/cattle-ops/terraform-aws-gitlab-runner/tree/main/examples/) are provided. Use the
