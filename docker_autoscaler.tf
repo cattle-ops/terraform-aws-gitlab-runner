@@ -79,6 +79,7 @@ resource "aws_autoscaling_group" "autoscaler" {
   name                  = "${local.name_runner_agent_instance}-asg"
   capacity_rebalance    = false
   protect_from_scale_in = true
+  suspended_processes   = var.runner_worker_docker_autoscaler_asg.suspended_processes
 
   dynamic "launch_template" {
     for_each = var.runner_worker_docker_autoscaler_asg.enable_mixed_instances_policy ? [] : [1]
