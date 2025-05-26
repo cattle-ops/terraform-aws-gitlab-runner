@@ -59,7 +59,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.1.7-debian@sha256:bf1d137a6e5b9f2116ad3e8618723c6326f995055626b015586dfdbd68c9b632
+      image: checkmarx/kics:v2.1.8-debian@sha256:a490b357244fd62700c8673884faf7834d0a14140b8f95aee34d97430fe6d61d
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
