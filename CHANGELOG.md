@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.2.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.1...9.2.2) (2025-06-06)
+
+
+### Bug Fixes
+
+* update cache module bucket policy ([#1285](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1285)) ([b53045d](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/b53045d6a300751b3e2d40d672aa23512880f426))
+
 ## [9.2.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.0...9.2.1) (2025-05-20)
 
 
