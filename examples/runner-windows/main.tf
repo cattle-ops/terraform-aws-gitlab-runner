@@ -106,9 +106,9 @@ module "runner" {
   }
 
   runner_worker_docker_autoscaler_asg = {
-    subnet_ids                               = module.vpc.private_subnets
-    types                                    = ["m6a.medium", "m6i.medium"] # FIXME change these to what best fits your needs, keeping in mind that Windows runners need bigger instances
-    enable_mixed_instances_policy            = true
+    subnet_ids                    = module.vpc.private_subnets
+    types                         = ["m6a.medium", "m6i.medium"] # FIXME change these to what best fits your needs, keeping in mind that Windows runners need bigger instances
+    enable_mixed_instances_policy = true
 
     # FIXME These settings enable windows runners to scale down to zero if no jobs are running but you can change it to fit your needs
     on_demand_base_capacity                  = 0
