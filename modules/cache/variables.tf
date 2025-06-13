@@ -62,6 +62,12 @@ variable "create_cache_bucket" {
   }
 }
 
+variable "cache_bucket_policy" {
+  type        = string
+  description = "JSON formatted policy document that controls access to S3 Bucket."
+  default     = null
+}
+
 variable "cache_lifecycle_clear" {
   description = "Enable the rule to cleanup the cache for expired objects."
   type        = bool

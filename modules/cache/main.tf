@@ -120,12 +120,28 @@ resource "aws_iam_policy" "docker_machine_cache" {
   name        = "${local.name_iam_objects}-docker-machine-cache"
   path        = "/"
   description = "Policy for docker machine instance to access cache"
+  policy      = var.cache_bucket_policy == null ? data.aws_iam_policy_document.docker_machine_cache_policy[0].json : var.cache_bucket_policy
+  tags        = local.tags
+}
 
-  tags = local.tags
+data "aws_iam_policy_document" "docker_machine_cache_policy" {
+  count = var.cache_bucket_policy == null ? 1 : 0
 
-  policy = templatefile("${path.module}/policies/cache.json",
-    {
-      s3_cache_arn = aws_s3_bucket.build_cache.arn
-    }
-  )
+  statement {
+    sid       = "allowGitLabRunnersAccessCache"
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.build_cache.arn}/*"]
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:GetObject",
+      "s3:GetObjectAcl"
+    ]
+  }
+  statement {
+    sid       = "allowGitLabRunnersListCache"
+    effect    = "Allow"
+    resources = [aws_s3_bucket.build_cache.arn]
+    actions   = ["s3:ListBucket"]
+  }
 }
