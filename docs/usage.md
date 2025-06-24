@@ -197,7 +197,7 @@ module "runner" {
   runner_worker = {
     max_jobs            = 5
     request_concurrency = 5
-    type                = "docker_autoscaler"
+    type                = "docker-autoscaler"
   }
 
   runner_worker_docker_autoscaler_asg = {
