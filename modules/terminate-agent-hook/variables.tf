@@ -56,6 +56,12 @@ variable "name_docker_machine_runners" {
   type        = string
 }
 
+variable "enable_managed_kms_key" {
+  description = "Let the module manage a KMS key. Be-aware of the costs of an custom key. Do not specify a `kms_key_id` when `enable_kms` is set to `true`."
+  type        = bool
+  default     = false
+}
+
 variable "kms_key_id" {
   description = "(optional) KMS key id to encrypt the resources, e.g. logs, lambda environment variables, ..."
   type        = string
