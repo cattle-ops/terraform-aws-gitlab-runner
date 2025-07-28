@@ -1,2 +1,2 @@
-boto3 ==1.39.9
-botocore ==1.39.9
+boto3 ==1.39.14
+botocore ==1.39.14
