@@ -937,6 +937,20 @@ variable "runner_worker_egress_rules" {
       protocol        = "tcp"
       description     = "Allow HTTPS egress traffic to all destinations (IPv6)"
     },
+    allow_http_ipv4 = {
+      cidr_block  = "0.0.0.0/0"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      description = "Allow HTTP egress traffic to all destinations (IPv4)"
+    },
+    allow_http_ipv6 = {
+      ipv6_cidr_block = "::/0"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      description     = "Allow HTTP egress traffic to all destinations (IPv6)"
+    },
     allow_ssh_ipv4 = {
       cidr_block  = "0.0.0.0/0"
       from_port   = 22
