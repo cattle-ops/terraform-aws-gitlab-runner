@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.2.3](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.2...9.2.3) (2025-08-04)
+
+
+### Bug Fixes
+
+* allow HTTP egress traffic to all destinations ([#1303](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1303)) ([62bab5a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/62bab5ad8539671e68415acd23839b0d468613a2))
+
 ## [9.2.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.1...9.2.2) (2025-06-06)
 
 
