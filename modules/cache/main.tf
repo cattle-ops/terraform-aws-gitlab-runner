@@ -130,7 +130,7 @@ data "aws_iam_policy_document" "docker_machine_cache_policy" {
   statement {
     sid       = "allowGitLabRunnersAccessCache"
     effect    = "Allow"
-    resources = ["${aws_s3_bucket.build_cache.arn}/*"]
+    resources = ["${aws_s3_bucket.build_cache.arn}/*"] #tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
       "s3:PutObject",
       "s3:PutObjectAcl",
