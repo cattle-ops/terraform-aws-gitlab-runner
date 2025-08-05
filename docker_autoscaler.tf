@@ -58,7 +58,7 @@ resource "aws_launch_template" "this" {
   tags = local.tags
 
   metadata_options {
-    http_tokens                 = "required"
+    http_tokens                 = var.runner_worker_docker_autoscaler_instance.http_tokens
     http_put_response_hop_limit = var.runner_worker_docker_autoscaler_instance.http_put_response_hop_limit
     instance_metadata_tags      = "enabled"
   }
