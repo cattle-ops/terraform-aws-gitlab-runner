@@ -133,7 +133,7 @@ locals {
       runners_name                   = var.runner_instance.name
       runners_token                  = var.runner_gitlab.registration_token
       runners_executor               = var.runner_worker.type
-      runners_limit                  = var.runner_worker.max_jobs
+      runners_limit                  = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker.max_jobs * var.runner_worker_docker_autoscaler.capacity_per_instance : var.runner_worker.max_jobs
       runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
       runners_environment_vars       = jsonencode(var.runner_worker.environment_variables)
       runners_pre_build_script       = var.runner_worker_gitlab_pipeline.pre_build_script
