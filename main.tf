@@ -359,7 +359,7 @@ resource "aws_iam_instance_profile" "instance" {
 
 resource "aws_eip" "gitlab_runner" {
   # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
-  count = var.runner_instance.use_eip ? 1 : 0
+  count = var.runner_instance.use_eip ? 2 : 0
 
   tags = local.tags
 }
