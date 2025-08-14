@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.2.3](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.2...9.2.3) (2025-08-14)
+
+
+### Bug Fixes
+
+* allow HTTP egress traffic to all destinations ([#1303](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1303)) ([62bab5a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/62bab5ad8539671e68415acd23839b0d468613a2))
+* handle scaling properly when capacity_per_instance &gt; 1 with docker job runners ([#1313](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1313)) ([91d7681](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/91d7681792895dfdd02126c061b045eb53c8b08d))
+
 ## [9.2.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.1...9.2.2) (2025-06-06)
 
 
