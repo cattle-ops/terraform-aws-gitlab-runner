@@ -136,7 +136,7 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "ec2:DeleteKeyPair"
     ]
-    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards # condition provides adequate restriction
+    resources = ["*"] # tfsec:ignore:aws-iam-no-policy-wildcards # condition provides adequate restriction
     condition {
       test     = "StringLike"
       variable = "ec2:KeyPairName"
