@@ -157,7 +157,7 @@ data "aws_iam_policy_document" "spot_request_housekeeping" {
       "ec2:DescribeSpotInstanceRequests"
     ]
     # I didn't found any condition to limit the access
-    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+    resources = ["*"] # tfsec:ignore:aws-iam-no-policy-wildcards:exp:2026-06-01 # I didn't found any condition to limit the access
   }
 }
 
