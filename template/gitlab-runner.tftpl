@@ -325,6 +325,84 @@ imds_token=$(curl -sSf -X PUT "http://169.254.169.254/latest/api/token" -H "X-aw
 instance_id=$(curl -sSf -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/instance-id")
 region=$(curl -sSf -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/placement/region")
 
+%{ if use_eip }
+release_eip() {
+    # File generated in eip.tftpl
+    allocation_id_file="/var/lib/ec2-eip/allocation-id"
+    if [ -f "$allocation_id_file" ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Releasing EIP before lifecycle completion..."
+        allocation_id=$(cat "$allocation_id_file")
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Found stored EIP allocation ID: $allocation_id"
+
+        # Get current association to verify it's ours
+        associated_instance=$(aws --region $region ec2 describe-addresses --allocation-ids "$allocation_id" --query 'Addresses[0].InstanceId' --output text 2>/dev/null || echo "")
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: EIP association check: EIP=$allocation_id, CurrentInstance=$instance_id, AssociatedInstance='$associated_instance'"
+
+        if [ "$associated_instance" = "$instance_id" ] || [ "$associated_instance" = "None" ] || [ -z "$associated_instance" ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Disassociating EIP $allocation_id"
+            association_id=$(aws --region $region ec2 describe-addresses --allocation-ids "$allocation_id" --query 'Addresses[0].AssociationId' --output text 2>/dev/null)
+            if [ "$association_id" != "None" ] && [ -n "$association_id" ]; then
+                DISASSOC_RESULT=$(aws --region $region ec2 disassociate-address --association-id "$association_id" 2>&1)
+            else
+                DISASSOC_RESULT="EIP not associated"
+            fi
+            DISASSOC_EXIT_CODE=$?
+            if [ $DISASSOC_EXIT_CODE -ne 0 ]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Warning: Failed to disassociate EIP (exit code: $DISASSOC_EXIT_CODE): $DISASSOC_RESULT"
+            fi
+
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Releasing EIP $allocation_id"
+            RELEASE_RESULT=$(aws --region $region ec2 release-address --allocation-id "$allocation_id" 2>&1)
+            RELEASE_EXIT_CODE=$?
+            if [ $RELEASE_EXIT_CODE -eq 0 ]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Successfully released EIP $allocation_id"
+                rm -f "$allocation_id_file"
+            else
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Error: Failed to release EIP $allocation_id (exit code: $RELEASE_EXIT_CODE): $RELEASE_RESULT"
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Warning: Failed to release EIP $allocation_id, continuing with lifecycle completion"
+            fi
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Warning: EIP $allocation_id is associated with different instance $associated_instance, not releasing"
+            rm -f "$allocation_id_file"  # Clean up stale file
+        fi
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: No stored EIP allocation ID found, checking for associated EIP"
+
+        # Try to find EIP associated with this instance
+        allocation_id=$(aws --region $region ec2 describe-addresses --filters "Name=instance-id,Values=$instance_id" --query 'Addresses[0].AllocationId' --output text 2>/dev/null || echo "None")
+
+        if [ "$allocation_id" != "None" ] && [ -n "$allocation_id" ]; then
+            echo "Found EIP $allocation_id associated with this instance"
+
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Disassociating EIP $allocation_id"
+            # Get association ID first, then disassociate
+            association_id=$(aws --region $region ec2 describe-addresses --allocation-ids "$allocation_id" --query 'Addresses[0].AssociationId' --output text 2>/dev/null)
+            if [ "$association_id" != "None" ] && [ -n "$association_id" ]; then
+                DISASSOC_RESULT=$(aws --region $region ec2 disassociate-address --association-id "$association_id" 2>&1)
+            else
+                DISASSOC_RESULT="EIP not associated"
+            fi
+            DISASSOC_EXIT_CODE=$?
+            if [ $DISASSOC_EXIT_CODE -ne 0 ]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Warning: Failed to disassociate EIP (exit code: $DISASSOC_EXIT_CODE): $DISASSOC_RESULT"
+            fi
+
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Releasing EIP $allocation_id"
+            RELEASE_RESULT=$(aws --region $region ec2 release-address --allocation-id "$allocation_id" 2>&1)
+            RELEASE_EXIT_CODE=$?
+            if [ $RELEASE_EXIT_CODE -eq 0 ]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Successfully released EIP $allocation_id"
+            else
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Error: Failed to release EIP $allocation_id (exit code: $RELEASE_EXIT_CODE): $RELEASE_RESULT"
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-RELEASE: Warning: Failed to release EIP $allocation_id, continuing with lifecycle completion"
+            fi
+        else
+            echo "No EIP found associated with this instance"
+        fi
+    fi
+}
+%{ endif }
+
 # Function to send complete-lifecycle-action
 send_complete_lifecycle_action() {
     echo "Sending complete-lifecycle-action for instance $instance_id..."
@@ -382,6 +460,11 @@ monitor_process() {
         status=$(systemctl is-active gitlab-runner.service)
         if [ "$status" = "inactive" ] || [ "$status" = "failed" ]; then
           echo "GitLab Runner service $status. Proceeding with cleanup."
+
+%{ if use_eip }
+          release_eip
+%{ endif }
+
           send_complete_lifecycle_action
         else
           echo "GitLab Runner Service still running, sleeping..."

@@ -43,11 +43,6 @@ output "runner_sg_id" {
   value       = var.runner_worker.type == "docker-autoscaler" ? aws_security_group.docker_autoscaler[0].id : (var.runner_worker.type == "docker+machine" ? aws_security_group.docker_machine[0].id : null)
 }
 
-output "runner_eip" {
-  description = "EIP of the Gitlab Runner"
-  value       = length(aws_eip.gitlab_runner) > 0 ? aws_eip.gitlab_runner[0].public_ip : null
-}
-
 output "runner_launch_template_name" {
   description = "The name of the runner's launch template."
   value       = aws_launch_template.gitlab_runner_instance.name

@@ -50,7 +50,7 @@ locals {
   file_yum_update = file("${path.module}/template/yum_update.tftpl")
 
   template_eip = templatefile("${path.module}/template/eip.tftpl", {
-    eip = join(",", [for eip in aws_eip.gitlab_runner : eip.public_ip])
+    eip_tags = join(" ", [for k, v in local.tags : "Key=${k},Value=${v}"])
   })
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
@@ -73,6 +73,7 @@ locals {
       secure_parameter_store_gitlab_runner_registration_token_name = var.runner_gitlab_registration_token_secure_parameter_store_name
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
+      use_eip                                                      = var.runner_instance.use_eip
       secure_parameter_store_gitlab_token_name                     = var.runner_gitlab.access_token_secure_parameter_store_name
       secure_parameter_store_region                                = data.aws_region.current.name
       gitlab_runner_registration_token                             = var.runner_gitlab_registration_config.registration_token
@@ -353,13 +354,6 @@ resource "aws_iam_instance_profile" "instance" {
 
   name = local.aws_iam_role_instance_name
   role = local.aws_iam_role_instance_name
-
-  tags = local.tags
-}
-
-resource "aws_eip" "gitlab_runner" {
-  # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
-  count = var.runner_instance.use_eip ? 1 : 0
 
   tags = local.tags
 }
