@@ -1,10 +1,67 @@
-echo 'installing additional software for assigning EIP'
+echo 'Setting up dynamic EIP management'
 
-yum install python3 -y
-curl --fail --retry 6 -O https://bootstrap.pypa.io/get-pip.py
-python3 get-pip.py --user
-export PATH=~/.local/bin:$PATH
+# Get instance metadata (token already available from user-data)
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-id)
+REGION=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
 
-pip install aws-ec2-assign-elastic-ip
-export AWS_DEFAULT_REGION=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\" '{print $4}')
-/usr/local/bin/aws-ec2-assign-elastic-ip --valid-ips ${eip}
+export AWS_DEFAULT_REGION=$REGION
+
+# Create directory for storing EIP allocation ID
+mkdir -p /var/lib/ec2-eip
+
+max_retries=5
+retry_count=0
+wait_time=10
+
+while [ $retry_count -lt $max_retries ]; do
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Attempting to allocate EIP (attempt $((retry_count + 1))/$max_retries)"
+
+    EIP_RESULT=$(aws ec2 allocate-address --domain vpc --query 'AllocationId' --output text 2>&1)
+    EIP_EXIT_CODE=$?
+
+    if [ $EIP_EXIT_CODE -eq 0 ] && [[ "$EIP_RESULT" =~ ^eipalloc- ]]; then
+        ALLOCATION_ID="$EIP_RESULT"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Successfully allocated EIP with allocation ID: $ALLOCATION_ID"
+
+        TAG_RESULT=$(aws ec2 create-tags --resources "$ALLOCATION_ID" --tags ${eip_tags} 2>&1)
+        TAG_EXIT_CODE=$?
+        if [ $TAG_EXIT_CODE -eq 0 ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Successfully tagged EIP $ALLOCATION_ID"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Warning: Failed to tag EIP $ALLOCATION_ID: $TAG_RESULT"
+        fi
+
+        ASSOC_RESULT=$(aws ec2 associate-address --instance-id "$INSTANCE_ID" --allocation-id "$ALLOCATION_ID" 2>&1)
+        ASSOC_EXIT_CODE=$?
+        if [ $ASSOC_EXIT_CODE -eq 0 ]; then
+            echo "$ALLOCATION_ID" > /var/lib/ec2-eip/allocation-id
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: EIP allocation completed successfully"
+            break
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Error: Failed to associate EIP $ALLOCATION_ID with instance $INSTANCE_ID: $ASSOC_RESULT"
+
+            # Clean up the allocated EIP if association failed
+            CLEANUP_RESULT=$(aws ec2 release-address --allocation-id "$ALLOCATION_ID" 2>&1)
+            if [ $? -eq 0 ]; then
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Successfully cleaned up failed EIP allocation"
+            else
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Warning: Failed to cleanup EIP $ALLOCATION_ID: $CLEANUP_RESULT"
+            fi
+        fi
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Error: Failed to allocate EIP (exit code: $EIP_EXIT_CODE): $EIP_RESULT"
+    fi
+
+    retry_count=$((retry_count + 1))
+    if [ $retry_count -lt $max_retries ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Waiting $wait_time seconds before retry..."
+        sleep $wait_time
+        wait_time=$((wait_time * 2))
+    fi
+done
+
+if [ $retry_count -eq $max_retries ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: Error: Failed to allocate and associate EIP after $max_retries attempts"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] EIP-ALLOCATION: EIP allocation failed - GitLab Runner will not have an EIP associated"
+    exit 1
+fi

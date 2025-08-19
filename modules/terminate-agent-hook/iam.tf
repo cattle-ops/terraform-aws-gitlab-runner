@@ -161,6 +161,20 @@ data "aws_iam_policy_document" "spot_request_housekeeping" {
   }
 }
 
+data "aws_iam_policy_document" "eip_cleanup" {
+  statement {
+    sid = "EIPCleanup"
+
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeAddresses",
+      "ec2:DisassociateAddress",
+      "ec2:ReleaseAddress"
+    ]
+    resources = ["*"]
+  }
+}
+
 resource "aws_iam_policy" "lambda" {
   name   = "${var.name_iam_objects}-${var.name}-lambda"
   path   = "/"
@@ -185,6 +199,19 @@ resource "aws_iam_policy" "spot_request_housekeeping" {
 resource "aws_iam_role_policy_attachment" "spot_request_housekeeping" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.spot_request_housekeeping.arn
+}
+
+resource "aws_iam_policy" "eip_cleanup" {
+  name   = "${var.name_iam_objects}-${var.name}-eip-cleanup"
+  path   = "/"
+  policy = data.aws_iam_policy_document.eip_cleanup.json
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "eip_cleanup" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.eip_cleanup.arn
 }
 
 resource "aws_iam_role_policy_attachment" "aws_lambda_vpc_access_execution_role" {

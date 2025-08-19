@@ -223,6 +223,126 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
                     }))
 
 
+def cleanup_orphaned_eips(ec2_client, executor_name_part):
+    """
+    Clean up orphaned EIPs from terminated instances.
+    :param ec2_client: the boto3 EC2 client
+    :param executor_name_part: used to filter EIPs by Environment tag to match this value
+    """
+    print(json.dumps({
+        "Level": "info",
+        "Message": f"Checking for orphaned EIPs for agent {executor_name_part}"
+    }))
+
+    try:
+        # Find all EIPs (we'll filter by tag content below)
+        eips_response = ec2_client.describe_addresses()
+
+        eips_to_cleanup = []
+
+        for eip in eips_response.get("Addresses", []):
+            allocation_id = eip["AllocationId"]
+            instance_id = eip.get("InstanceId")
+
+            # First check if this EIP belongs to our environment
+            eip_tags = {tag["Key"]: tag["Value"] for tag in eip.get("Tags", [])}
+            if not ("Environment" in eip_tags and executor_name_part in eip_tags["Environment"]):
+                continue  # Skip EIPs not belonging to our environment
+
+            if instance_id:
+                # Check if the associated instance still exists and is terminated
+                try:
+                    instance_response = ec2_client.describe_instances(InstanceIds=[instance_id])
+                    instance_state = instance_response["Reservations"][0]["Instances"][0]["State"]["Name"]
+
+                    if instance_state == "terminated":
+                        eips_to_cleanup.append({
+                            "allocation_id": allocation_id,
+                            "instance_id": instance_id,
+                            "public_ip": eip.get("PublicIp", "unknown"),
+                            "reason": f"associated instance {instance_id} is terminated"
+                        })
+                except ClientError as error:
+                    if 'InvalidInstanceID.NotFound' in str(error):
+                        # Instance no longer exists
+                        eips_to_cleanup.append({
+                            "allocation_id": allocation_id,
+                            "instance_id": instance_id,
+                            "public_ip": eip.get("PublicIp", "unknown"),
+                            "reason": f"associated instance {instance_id} no longer exists"
+                        })
+                    else:
+                        print(json.dumps({
+                            "Level": "warning",
+                            "Message": f"Could not check instance {instance_id} for EIP {allocation_id}",
+                            "Exception": str(error)
+                        }))
+            else:
+                # EIP is not associated with any instance and belongs to our environment
+                eips_to_cleanup.append({
+                    "allocation_id": allocation_id,
+                    "instance_id": "none",
+                    "public_ip": eip.get("PublicIp", "unknown"),
+                    "reason": "unassociated EIP with matching Environment tag"
+                })
+
+        # Clean up identified orphaned EIPs
+        for eip_info in eips_to_cleanup:
+            try:
+                print(json.dumps({
+                    "Level": "info",
+                    "AllocationId": eip_info["allocation_id"],
+                    "PublicIp": eip_info["public_ip"],
+                    "Message": f"Releasing orphaned EIP: {eip_info['reason']}"
+                }))
+
+                # Disassociate first if still associated
+                if eip_info["instance_id"] != "none":
+                    try:
+                        ec2_client.disassociate_address(AllocationId=eip_info["allocation_id"])
+                    except ClientError as disassociate_error:
+                        print(json.dumps({
+                            "Level": "warning", 
+                            "Message": f"Failed to disassociate EIP {eip_info['allocation_id']}",
+                            "Exception": str(disassociate_error)
+                        }))
+
+                # Release the EIP
+                ec2_client.release_address(AllocationId=eip_info["allocation_id"])
+
+                print(json.dumps({
+                    "Level": "info",
+                    "AllocationId": eip_info["allocation_id"],
+                    "Message": "Successfully released orphaned EIP"
+                }))
+
+            except ClientError as error:
+                print(json.dumps({
+                    "Level": "error",
+                    "AllocationId": eip_info["allocation_id"],
+                    "Message": f"Failed to release orphaned EIP",
+                    "Exception": str(error)
+                }))
+
+        if not eips_to_cleanup:
+            print(json.dumps({
+                "Level": "info",
+                "Message": "No orphaned EIPs found to clean up"
+            }))
+        else:
+            print(json.dumps({
+                "Level": "info",
+                "Message": f"Cleaned up {len(eips_to_cleanup)} orphaned EIP(s)"
+            }))
+
+    except ClientError as error:
+        print(json.dumps({
+            "Level": "error",
+            "Message": "Failed to describe EIPs for cleanup",
+            "Exception": str(error)
+        }))
+
+
 # context not used: this is the interface for a AWS Lambda function defined by AWS
 # pylint: disable=unused-argument
 def handler(event, context):
@@ -268,6 +388,9 @@ def handler(event, context):
         }))
 
     remove_unused_ssh_key_pairs(client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
+
+    # Clean up orphaned EIPs from terminated instances
+    cleanup_orphaned_eips(ec2_client=client, executor_name_part=os.environ['NAME_EXECUTOR_INSTANCE'])
 
     return "Housekeeping done"
 

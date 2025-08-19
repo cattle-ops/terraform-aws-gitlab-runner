@@ -1,34 +1,36 @@
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:SetDesiredCapacity",
-                "autoscaling:TerminateInstanceInAutoScalingGroup"
-            ],
-            "Resource": "${autoscaler_asg_arn}"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "autoscaling:DescribeAutoScalingGroups",
-                "ec2:DescribeInstances"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:GetPasswordData",
-                "ec2-instance-connect:SendSSHPublicKey"
-            ],
-            "Resource": "arn:${partition}:ec2:${aws_region}:*:instance/*",
-            "Condition": {
-                "StringEquals": {
-                    "ec2:ResourceTag/aws:autoscaling:groupName": "${autoscaler_asg_name}"
-                }
-            }
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:SetDesiredCapacity",
+        "autoscaling:TerminateInstanceInAutoScalingGroup"
+      ],
+      "Resource": "${autoscaler_asg_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:DescribeAutoScalingGroups",
+        "ec2:DescribeInstances",
+        "autoscaling:CompleteLifecycleAction",
+        "autoscaling:DescribeLifecycleHooks"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:GetPasswordData",
+        "ec2-instance-connect:SendSSHPublicKey"
+      ],
+      "Resource": "arn:${partition}:ec2:${aws_region}:*:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:ResourceTag/aws:autoscaling:groupName": "${autoscaler_asg_name}"
         }
-    ]
+      }
+    }
+  ]
 }
