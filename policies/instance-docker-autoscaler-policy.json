@@ -14,8 +14,7 @@
             "Action": [
                 "autoscaling:DescribeAutoScalingGroups",
                 "ec2:DescribeInstances",
-                "ec2:DescribeSpotInstanceRequests",
-                "ec2:DescribeTags"
+                "ec2:DescribeSpotInstanceRequests"
             ],
             "Resource": "*"
         },
