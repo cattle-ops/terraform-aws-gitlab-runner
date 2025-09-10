@@ -17,7 +17,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4 # ratchet:actions/checkout@v3
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5 # ratchet:actions/checkout@v3
       - name: Generate TF docs
         uses: terraform-docs/gh-actions@6de6da0cefcc6b4b7a5cbea4d79d97060733093c # v1.4.1
         with:
