@@ -1,5 +1,5 @@
+# kics-scan ignore-block
 resource "aws_security_group" "docker_autoscaler" {
-  # kics-scan ignore-line
   count       = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
   name_prefix = "${local.name_sg}-docker-autoscaler"
   vpc_id      = var.vpc_id

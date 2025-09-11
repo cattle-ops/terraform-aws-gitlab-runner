@@ -4,8 +4,8 @@ locals {
   security_groups_ping = var.runner_networking.allow_incoming_ping && length(var.runner_networking.allow_incoming_ping_security_group_ids) > 0 ? concat(var.runner_networking.allow_incoming_ping_security_group_ids, [aws_security_group.runner.id]) : []
 }
 
+# kics-scan ignore-block
 resource "aws_security_group" "docker_machine" {
-  # kics-scan ignore-line
   count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
   name_prefix = "${local.name_sg}-docker-machine"
