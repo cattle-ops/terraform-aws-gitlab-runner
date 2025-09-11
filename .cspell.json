@@ -46,6 +46,7 @@
     "pylintrc",
     "pyright",
     "remoteip",
+    "sarif",
     "servercore",
     "setsubtract",
     "shuf",
