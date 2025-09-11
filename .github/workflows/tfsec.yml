@@ -11,6 +11,8 @@ on:
       - main
   pull_request:
 
+permissions: read-all
+
 jobs:
   tfsec:
     name: tfsec sarif report
