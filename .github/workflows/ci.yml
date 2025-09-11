@@ -25,7 +25,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - run: terraform init -get -backend=false -input=false
       - run: terraform fmt -recursive -check=true -write=false
 
@@ -50,7 +50,7 @@ jobs:
     container:
       image: hashicorp/terraform:${{ matrix.terraform }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - run: terraform init -get -backend=false -input=false
       - if: contains(matrix.terraform, '1.3.')
         run: terraform fmt -recursive -check=true -write=false
@@ -59,9 +59,9 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.1.12-debian@sha256:188693ca62a8e17d4e209ccbe126db70289e1dd97668d709f6e69c4fe12ba87f
+      image: checkmarx/kics:v2.1.13-debian@sha256:5dcabefe00678cdb539f6ddbc60e47304d7f7c4ee35b21e183156ec69c0bbafc
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
       - run: kics scan -p . -o . --config .kics.yml --exclude-queries e38a8e0a-b88b-4902-b3fe-b0fcb17d5c10,e592a0c5-5bdb-414c-9066-5dba7cdea370,084c6686-2a70-4710-91b1-000393e54c12
 
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         name: Checkout source code
 
       - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
@@ -78,7 +78,7 @@ jobs:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@90f302c255ef959cbfb4bd10581afecdb7ece3e6 # v4
+      - uses: terraform-linters/setup-tflint@ae78205cfffec9e8d93fd2b3115c7e9d3166d4b6 # v5
         name: Setup TFLint
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +101,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
       - name: tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@7a44c5dcde5dfab737363e391800629e27b6376b # v1.3.1
