@@ -5,7 +5,7 @@ locals {
 }
 
 resource "aws_security_group" "docker_machine" {
-  # checkov:skip=CKV2_AWS_5:Security group is used within an template and assigned to the docker machines
+  # kics-scan ignore-line
   count = var.runner_worker.type == "docker+machine" ? 1 : 0
 
   name_prefix = "${local.name_sg}-docker-machine"
