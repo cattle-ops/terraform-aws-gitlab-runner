@@ -56,8 +56,8 @@ module "runner" {
   subnet_id = element(module.vpc.private_subnets, 0)
 
   runner_instance = {
-    name                        = var.runner_name
-    ssm_access                  = true
+    name       = var.runner_name
+    ssm_access = true
   }
 
   runner_gitlab = {
