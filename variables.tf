@@ -775,7 +775,8 @@ variable "runner_worker_docker_autoscaler_instance" {
 EOT
 
   type = object({
-    ebs_optimized               = optional(bool, true)
+    ebs_optimized = optional(bool, true)
+    # TODO should always be "required", right? https://aquasecurity.github.io/tfsec/v1.28.0/checks/aws/ec2/enforce-launch-config-http-token-imds/
     http_tokens                 = optional(string, "required")
     http_put_response_hop_limit = optional(number, 2)
     monitoring                  = optional(bool, false)

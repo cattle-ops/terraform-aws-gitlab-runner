@@ -94,6 +94,7 @@
     "cpus",
     "cpuset",
     "gitter",
+    "imds",
     "netsh",
     "Niek",
     "oxsecurity",
