@@ -13,7 +13,6 @@ import time
 
 import boto3
 from botocore.exceptions import ClientError
-from types_boto3_ec2.client import EC2Client
 import json
 import os
 
