@@ -232,7 +232,7 @@ def retry(func, max_retries=3, retry_delay=2):
     :param retry_delay: Delay between attempts in seconds
     :return: Result of func if successful, None otherwise
     """
-    for attempt in range(1, max_retries + 1):
+    for attempt in range(max_retries + 1):
         try:
             return func()
         except Exception as ex:
