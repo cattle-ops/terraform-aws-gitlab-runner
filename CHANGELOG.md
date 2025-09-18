@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.2.5](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.4...9.2.5) (2025-09-18)
+
+
+### Bug Fixes
+
+* add missing policies for the autoscaler ([#1328](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1328)) ([99b8605](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/99b8605c938ad8ad85701c3f5c4935ecb5d63e1c))
+
 ## [9.2.4](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.3...9.2.4) (2025-09-11)
 
 
