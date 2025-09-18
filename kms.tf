@@ -8,7 +8,7 @@ resource "aws_kms_key" "default" {
   policy = templatefile("${path.module}/policies/kms-policy.json",
     {
       partition  = data.aws_partition.current.partition
-      aws_region = data.aws_region.current.name
+      aws_region = data.aws_region.current.region
       account_id = data.aws_caller_identity.current.account_id
     }
   )
