@@ -41,9 +41,10 @@ resource "aws_s3_bucket" "build_cache" {
 resource "aws_s3_bucket_versioning" "build_cache_versioning" {
   bucket = aws_s3_bucket.build_cache.id
 
+  # ok as decided by the user
+  # tfsec:ignore:aws-s3-enable-versioning
   versioning_configuration {
     # ok as decided by the user
-    # tfsec:ignore:aws-s3-enable-versioning
     # kics-scan ignore-line
     status = var.cache_bucket_versioning ? "Enabled" : "Suspended"
   }

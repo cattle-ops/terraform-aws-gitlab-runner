@@ -57,6 +57,8 @@ resource "aws_launch_template" "this" {
 
   tags = local.tags
 
+  # as per user decision. The module default is "required" for better security.
+  # tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds
   metadata_options {
     http_tokens                 = var.runner_worker_docker_autoscaler_instance.http_tokens
     http_put_response_hop_limit = var.runner_worker_docker_autoscaler_instance.http_put_response_hop_limit
