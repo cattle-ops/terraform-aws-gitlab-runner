@@ -182,7 +182,7 @@ module "runner" {
   runner_worker_docker_autoscaler_asg = {
     on_demand_percentage_above_base_capacity = 0
     enable_mixed_instances_policy            = true
-    subnet_ids                               = module.vpc.private_subnets_ids
+    subnet_ids                               = module.vpc.private_subnets
     types = ["t3a.medium", "t3.medium"]
   }
 
