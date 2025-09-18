@@ -9,12 +9,12 @@ https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some di
 
 This is rudimentary and doesn't check if a build runner has a current job.
 """
+import json
+import os
 import time
 
 import boto3
 from botocore.exceptions import ClientError
-import json
-import os
 
 
 def ec2_list(client, **args):
@@ -67,7 +67,7 @@ def ec2_list(client, **args):
                             # Handle other instances without a parent that are still running.
                             _other_child = client.describe_instances(InstanceIds=[tag['Value']])
                             # The specified parent is still in the inventory as 'terminated'
-                            if (len(_other_child['Reservations']) > 0):
+                            if len(_other_child['Reservations']) > 0:
                                 if _other_child['Reservations'][0]['Instances'][0]['State']['Name'] == "terminated":
                                     _terminate_list.append(instance['InstanceId'])
                                     _msg_suffix = "is terminated."
@@ -234,6 +234,8 @@ def retry(func, max_retries=3, retry_delay=2):
     for attempt in range(max_retries + 1):
         try:
             return func()
+        # catch everything here and log it
+        # pylint: disable=broad-exception-caught
         except Exception as ex:
             print(json.dumps({
                 "Level": "exception",
