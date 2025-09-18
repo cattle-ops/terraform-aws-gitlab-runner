@@ -49,7 +49,6 @@ module "runner" {
   # https://registry.terraform.io/modules/cattle-ops/gitlab-runner/aws/
   source  = "cattle-ops/gitlab-runner/aws"
 
-  aws_region  = "eu-west-1"
   environment = "spot-runners"
 
   vpc_id    = module.vpc.vpc_id
