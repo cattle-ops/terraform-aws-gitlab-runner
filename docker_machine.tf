@@ -6,7 +6,7 @@ locals {
       runners_max_builds     = local.runners_max_builds_string
       docker_machine_name    = format("%s-%s", local.runner_tags_merged["Name"], "%s") # %s is always needed
       runners_instance_types = var.runner_worker_docker_machine_instance.types
-      aws_region             = data.aws_region.current.name
+      aws_region             = data.aws_region.current.region
       runners_aws_zone       = data.aws_availability_zone.runners.name_suffix
       runners_userdata       = var.runner_worker_docker_machine_instance.start_script
 
