@@ -43,8 +43,8 @@ resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
 }
 
 # tracing functions can be activated by the user
-# tfsec:ignore:aws-lambda-enable-tracing
 # kics-scan ignore-line
+# tfsec:ignore:aws-lambda-enable-tracing
 resource "aws_lambda_function" "terminate_runner_instances" {
   #ts:skip=AC_AWS_0485:Tracing functions can be activated by the user
   # checkov:skip=CKV_AWS_50:Tracing functions can be activated by the user
