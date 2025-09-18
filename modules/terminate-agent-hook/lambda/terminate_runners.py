@@ -13,7 +13,6 @@ import boto3
 from botocore.exceptions import ClientError
 import json
 import os
-import sys
 
 
 def ec2_list(client, **args):
@@ -273,4 +272,4 @@ def handler(event, context):
 
 
 if __name__ == "__main__":
-    handler(None, None)
+    handler({}, None)
