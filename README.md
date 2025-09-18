@@ -78,7 +78,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.76 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.4.0 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 3 |
 
@@ -86,7 +86,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.12.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.13.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.5.3 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.1.0 |
 
