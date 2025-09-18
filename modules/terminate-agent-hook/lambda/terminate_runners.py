@@ -9,6 +9,8 @@ https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some di
 
 This is rudimentary and doesn't check if a build runner has a current job.
 """
+import time
+
 import boto3
 from botocore.exceptions import ClientError
 from types_boto3_ec2.client import EC2Client
@@ -222,6 +224,33 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
                         "Exception": str(error)
                     }))
 
+def retry(func, max_retries=3, retry_delay=2):
+    """
+    Generic retry helper for functions that may raise exceptions.
+    :param func: Function to execute
+    :param max_retries: Maximum number of attempts
+    :param retry_delay: Delay between attempts in seconds
+    :return: Result of func if successful, None otherwise
+    """
+    for attempt in range(1, max_retries + 1):
+        try:
+            return func()
+        except Exception as ex:
+            print(json.dumps({
+                "Level": "exception",
+                "Attempt": attempt,
+                "Exception": str(ex)
+            }))
+
+            if attempt < max_retries:
+                time.sleep(retry_delay)
+            else:
+                print(json.dumps({
+                    "Level": "error",
+                    "Message": f"Failed after {max_retries} retries"
+                }))
+
+    return None
 
 # context not used: this is the interface for a AWS Lambda function defined by AWS
 # pylint: disable=unused-argument
@@ -247,20 +276,13 @@ def handler(event, context):
             "Level": "info",
             "Message": f"Terminating instances {', '.join(_terminate_list)}"
         }))
-        try:
-            client.terminate_instances(InstanceIds=_terminate_list, DryRun=False, Force=True)
 
-            print(json.dumps({
-                "Level": "info",
-                "Message": "Instances terminated"
-            }))
-        # catch everything here and log it
-        # pylint: disable=broad-exception-caught
-        except Exception as ex:
-            print(json.dumps({
-                "Level": "exception",
-                "Exception": str(ex)
-            }))
+        retry(lambda: client.terminate_instances(InstanceIds=_terminate_list, DryRun=False, Force=True))
+
+        print(json.dumps({
+            "Level": "info",
+            "Message": "Instances terminated"
+        }))
     else:
         print(json.dumps({
             "Level": "info",
