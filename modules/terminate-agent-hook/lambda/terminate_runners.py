@@ -11,6 +11,7 @@ This is rudimentary and doesn't check if a build runner has a current job.
 """
 import boto3
 from botocore.exceptions import ClientError
+from types_boto3_ec2.client import EC2Client
 import json
 import os
 
@@ -32,7 +33,7 @@ def ec2_list(client, **args):
     ec2_instances = client.describe_instances(Filters=[
         {
             "Name": "instance-state-name",
-            "Values": ['running', 'pending'],
+            "Values": ['running', 'pending', 'stopping', 'stopped'],
         },
         {
             "Name": "tag:gitlab-runner-parent-id",
@@ -247,7 +248,7 @@ def handler(event, context):
             "Message": f"Terminating instances {', '.join(_terminate_list)}"
         }))
         try:
-            client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
+            client.terminate_instances(InstanceIds=_terminate_list, DryRun=False, Force=True)
 
             print(json.dumps({
                 "Level": "info",
