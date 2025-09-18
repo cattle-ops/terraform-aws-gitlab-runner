@@ -5,12 +5,12 @@
 # terminating orphaned runner instances.
 # ----------------------------------------------------------------------------
 locals {
-  source_sha256 = filesha256("${path.module}/lambda/lambda_function.py")
+  source_sha256 = filesha256("${path.module}/lambda/terminate_runners.py")
 }
 
 data "archive_file" "terminate_runner_instances_lambda" {
   type             = "zip"
-  source_file      = "${path.module}/lambda/lambda_function.py"
+  source_file      = "${path.module}/lambda/terminate_runners.py"
   output_path      = "builds/lambda_function_${local.source_sha256}.zip"
   output_file_mode = "0666"
 }
@@ -52,7 +52,7 @@ resource "aws_lambda_function" "terminate_runner_instances" {
   # checkov:skip=CKV_AWS_116:We should think about having a dead letter queue for this lambda
   # checkov:skip=CKV_AWS_272:Code signing would be a nice enhancement, but I guess we can live without it here
   architectures    = ["arm64"]
-  description      = "Lifecycle hook for terminating GitLab runner agent instances"
+  description      = "Lifecycle hook for terminating GitLab runner instances"
   filename         = data.archive_file.terminate_runner_instances_lambda.output_path
   source_code_hash = data.archive_file.terminate_runner_instances_lambda.output_base64sha256
   function_name    = "${var.environment}-${var.name}"

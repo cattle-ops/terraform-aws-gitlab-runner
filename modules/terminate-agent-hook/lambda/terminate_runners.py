@@ -9,11 +9,12 @@ https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/317 has some di
 
 This is rudimentary and doesn't check if a build runner has a current job.
 """
-import boto3
-from botocore.exceptions import ClientError
 import json
 import os
-import sys
+import time
+
+import boto3
+from botocore.exceptions import ClientError
 
 
 def ec2_list(client, **args):
@@ -33,7 +34,7 @@ def ec2_list(client, **args):
     ec2_instances = client.describe_instances(Filters=[
         {
             "Name": "instance-state-name",
-            "Values": ['running', 'pending'],
+            "Values": ['running', 'pending', 'stopping', 'stopped'],
         },
         {
             "Name": "tag:gitlab-runner-parent-id",
@@ -66,7 +67,7 @@ def ec2_list(client, **args):
                             # Handle other instances without a parent that are still running.
                             _other_child = client.describe_instances(InstanceIds=[tag['Value']])
                             # The specified parent is still in the inventory as 'terminated'
-                            if (len(_other_child['Reservations']) > 0):
+                            if len(_other_child['Reservations']) > 0:
                                 if _other_child['Reservations'][0]['Instances'][0]['State']['Name'] == "terminated":
                                     _terminate_list.append(instance['InstanceId'])
                                     _msg_suffix = "is terminated."
@@ -222,6 +223,35 @@ def remove_unused_ssh_key_pairs(client, executor_name_part):
                         "Exception": str(error)
                     }))
 
+def retry(func, max_retries=3, retry_delay=2):
+    """
+    Generic retry helper for functions that may raise exceptions.
+    :param func: Function to execute
+    :param max_retries: Maximum number of attempts
+    :param retry_delay: Delay between attempts in seconds
+    :return: Result of func if successful, None otherwise
+    """
+    for attempt in range(max_retries + 1):
+        try:
+            return func()
+        # catch everything here and log it
+        # pylint: disable=broad-exception-caught
+        except Exception as ex:
+            print(json.dumps({
+                "Level": "exception",
+                "Attempt": attempt,
+                "Exception": str(ex)
+            }))
+
+            if attempt < max_retries:
+                time.sleep(retry_delay)
+            else:
+                print(json.dumps({
+                    "Level": "error",
+                    "Message": f"Failed after {max_retries} retries"
+                }))
+
+    return None
 
 # context not used: this is the interface for a AWS Lambda function defined by AWS
 # pylint: disable=unused-argument
@@ -247,20 +277,13 @@ def handler(event, context):
             "Level": "info",
             "Message": f"Terminating instances {', '.join(_terminate_list)}"
         }))
-        try:
-            client.terminate_instances(InstanceIds=_terminate_list, DryRun=False)
 
-            print(json.dumps({
-                "Level": "info",
-                "Message": "Instances terminated"
-            }))
-        # catch everything here and log it
-        # pylint: disable=broad-exception-caught
-        except Exception as ex:
-            print(json.dumps({
-                "Level": "exception",
-                "Exception": str(ex)
-            }))
+        retry(lambda: client.terminate_instances(InstanceIds=_terminate_list, DryRun=False, Force=True))
+
+        print(json.dumps({
+            "Level": "info",
+            "Message": "Instances terminated"
+        }))
     else:
         print(json.dumps({
             "Level": "info",
@@ -273,4 +296,4 @@ def handler(event, context):
 
 
 if __name__ == "__main__":
-    handler(None, None)
+    handler({}, None)
