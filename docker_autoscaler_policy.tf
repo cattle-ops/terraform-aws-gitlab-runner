@@ -16,7 +16,7 @@ resource "aws_iam_policy" "instance_docker_autoscaler_policy" {
   # see https://gitlab.com/gitlab-org/fleeting/plugins/aws#recommended-iam-policy for needed policies
   policy = templatefile("${path.module}/policies/instance-docker-autoscaler-policy.json",
     {
-      aws_region          = data.aws_region.current.name
+      aws_region          = data.aws_region.current.region
       partition           = data.aws_partition.current.partition
       autoscaler_asg_arn  = aws_autoscaling_group.autoscaler[0].arn
       autoscaler_asg_name = aws_autoscaling_group.autoscaler[0].name
