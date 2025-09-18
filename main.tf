@@ -55,7 +55,7 @@ locals {
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
-      aws_region                                                   = data.aws_region.current.name
+      aws_region                                                   = data.aws_region.current.region
       gitlab_runner_version                                        = var.runner_gitlab.runner_version
       docker_machine_version                                       = var.runner_install.docker_machine_version
       docker_machine_download_url                                  = var.runner_install.docker_machine_download_url
@@ -74,7 +74,7 @@ locals {
       secure_parameter_store_runner_token_key                      = local.secure_parameter_store_runner_token_key
       secure_parameter_store_runner_sentry_dsn                     = local.secure_parameter_store_runner_sentry_dsn
       secure_parameter_store_gitlab_token_name                     = var.runner_gitlab.access_token_secure_parameter_store_name
-      secure_parameter_store_region                                = data.aws_region.current.name
+      secure_parameter_store_region                                = data.aws_region.current.region
       gitlab_runner_registration_token                             = var.runner_gitlab_registration_config.registration_token
       gitlab_runner_description                                    = var.runner_gitlab_registration_config["description"]
       gitlab_runner_tag_list                                       = var.runner_gitlab_registration_config["tag_list"]
@@ -120,7 +120,7 @@ locals {
 
   template_runner_config = templatefile("${path.module}/template/runner-config.tftpl",
     {
-      aws_region       = data.aws_region.current.name
+      aws_region       = data.aws_region.current.region
       gitlab_url       = var.runner_gitlab.url
       gitlab_clone_url = var.runner_gitlab.url_clone
       tls_ca_file      = length(var.runner_gitlab.certificate) > 0 ? "tls-ca-file=\"/etc/gitlab-runner/certs/gitlab.crt\"" : ""
