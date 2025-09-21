@@ -56,13 +56,8 @@ module "runner" {
   subnet_id = element(module.vpc.private_subnets, 0)
 
   runner_instance = {
-    collect_autoscaling_metrics = ["GroupDesiredCapacity", "GroupInServiceCapacity"]
-    name                        = var.runner_name
-    ssm_access                  = true
-  }
-
-  runner_networking = {
-    allow_incoming_ping_security_group_ids = [data.aws_security_group.default.id]
+    name       = var.runner_name
+    ssm_access = true
   }
 
   runner_gitlab = {
@@ -76,23 +71,14 @@ module "runner" {
     max_jobs = 10
   }
 
-  runner_worker_gitlab_pipeline = {
-    pre_build_script  = <<EOT
-        '''
-        echo 'multiline 1'
-        echo 'multiline 2'
-        '''
-        EOT
-    post_build_script = "\"echo 'single line'\""
-  }
-
   runner_worker_docker_autoscaler = {
-    fleeting_plugin_version = "1.0.0"
+    connector_config_user = "ubuntu" # this user id is used to connect to the instance via SSH
   }
 
-  runner_worker_docker_autoscaler_ami_owners = ["591542846629"] # FIXME Change to your AWS account ID
+  # FIXME: this AMI is outdated, but has Docker installed, which is needed. There are no other AMIs available with Docker pre-installed.
+  runner_worker_docker_autoscaler_ami_owners = ["099720109477"] # Canonical
   runner_worker_docker_autoscaler_ami_filter = {
-    name = ["al2023-ami-ecs-hvm-2023.0.20240723-kernel-6.1-x86_64"] # FIXME Change to your AMI name
+    name = ["ubuntu-server-22-lts-x86-*"]
   }
 
   runner_worker_docker_autoscaler_instance = {
