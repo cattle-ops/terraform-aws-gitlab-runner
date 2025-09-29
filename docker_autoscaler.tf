@@ -10,7 +10,7 @@ resource "aws_launch_template" "this" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
 
   name          = "${local.name_runner_agent_instance}-worker-launch-template"
-  user_data     = base64gzip(var.runner_worker_docker_autoscaler_instance.start_script)
+  user_data     = var.runner_worker_docker_autoscaler_instance.compress_start_script ? base64gzip(var.runner_worker_docker_autoscaler_instance.start_script) : base64encode(var.runner_worker_docker_autoscaler_instance.start_script)
   image_id      = length(var.runner_worker_docker_autoscaler_ami_id) > 0 ? var.runner_worker_docker_autoscaler_ami_id : data.aws_ami.docker_autoscaler_by_filter[0].id
   instance_type = length(var.runner_worker_docker_autoscaler_asg.types) > 0 ? var.runner_worker_docker_autoscaler_asg.types[0] : var.runner_worker_docker_autoscaler_asg.default_instance_type
   key_name      = aws_key_pair.autoscaler[0].key_name
