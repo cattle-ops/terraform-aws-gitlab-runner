@@ -793,7 +793,7 @@ EOT
   default = {}
 
   validation {
-    condition     = contains(["gzip", "nono"], var.runner_worker_docker_autoscaler_instance.start_script_compression_algorithm)
+    condition     = contains(["gzip", "none"], var.runner_worker_docker_autoscaler_instance.start_script_compression_algorithm)
     error_message = "The start_script_compression_algorithm supports `gzip` or `none`"
   }
 }
