@@ -778,24 +778,24 @@ EOT
   type = object({
     ebs_optimized = optional(bool, true)
     # TODO should always be "required", right? https://aquasecurity.github.io/tfsec/v1.28.0/checks/aws/ec2/enforce-launch-config-http-token-imds/
-    http_tokens                 = optional(string, "required")
-    http_put_response_hop_limit = optional(number, 2)
-    monitoring                  = optional(bool, false)
-    private_address_only        = optional(bool, true)
-    root_device_name            = optional(string, "/dev/sda1")
-    root_size                   = optional(number, 8)
-    start_script                = optional(string, "")
-    start_script_compression_algorithm       = optional(string, "gzip")
-    volume_type                 = optional(string, "gp2")
-    volume_throughput           = optional(number, 125)
-    volume_iops                 = optional(number, 3000)
+    http_tokens                        = optional(string, "required")
+    http_put_response_hop_limit        = optional(number, 2)
+    monitoring                         = optional(bool, false)
+    private_address_only               = optional(bool, true)
+    root_device_name                   = optional(string, "/dev/sda1")
+    root_size                          = optional(number, 8)
+    start_script                       = optional(string, "")
+    start_script_compression_algorithm = optional(string, "gzip")
+    volume_type                        = optional(string, "gp2")
+    volume_throughput                  = optional(number, 125)
+    volume_iops                        = optional(number, 3000)
   })
   default = {}
 
-    validation {
-        condition     = contains(["gzip", "nono"], var.runner_worker_docker_autoscaler_instance.start_script_compression_algorithm)
-        error_message = "The start_script_compression_algorithm supports `gzip` or `none`"
-    }
+  validation {
+    condition     = contains(["gzip", "nono"], var.runner_worker_docker_autoscaler_instance.start_script_compression_algorithm)
+    error_message = "The start_script_compression_algorithm supports `gzip` or `none`"
+  }
 }
 
 variable "runner_worker_docker_autoscaler_asg" {
