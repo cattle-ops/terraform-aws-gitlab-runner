@@ -11,7 +11,7 @@ locals {
 data "archive_file" "terminate_runner_instances_lambda" {
   type             = "zip"
   source_file      = "${path.module}/lambda/terminate_runners.py"
-  output_path      = "builds/lambda_function_${local.source_sha256}.zip"
+  output_path      = "${path.module}/builds/terminate-agent-hook/${var.environment}/${var.name}/lambda_function_${local.source_sha256}.zip"
   output_file_mode = "0666"
 }
 
