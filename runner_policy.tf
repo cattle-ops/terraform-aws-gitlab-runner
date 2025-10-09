@@ -111,6 +111,8 @@ resource "aws_iam_role_policy_attachment" "service_linked_role" {
 ################################################################################
 data "aws_iam_policy_document" "ssm" {
   statement {
+    # "IAM policy allows for data exfiltration": resources are specified below, so we can't access any other parameters
+    # kics-scan ignore-line
     actions = [
       "ssm:GetParameter",
       "ssm:GetParameters",

@@ -132,6 +132,8 @@ data "aws_iam_policy_document" "docker_machine_cache_policy" {
     sid       = "allowGitLabRunnersAccessCache"
     effect    = "Allow"
     resources = ["${aws_s3_bucket.build_cache.arn}/*"] # tfsec:ignore:aws-iam-no-policy-wildcards # allows full access to the own bucket
+    # "IAM policy allows for data exfiltration": resources are specified below, so we can't access any other objects
+    # kics-scan ignore-line
     actions = [
       "s3:PutObject",
       "s3:PutObjectAcl",
