@@ -769,6 +769,7 @@ variable "runner_worker_docker_autoscaler_instance" {
     root_device_name = The name of the root volume for the Runner Worker.
     root_size = The size of the root volume for the Runner Worker.
     start_script = Cloud-init user data that will be passed to the Runner Worker. Should not be base64 encrypted.
+    start_script_compression_algorithm = `gzip` compress the start script to mitigate the ~16 KB user data limit. Use `none` for Windows (EC2Launch does not support gzipped user data).
     volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported.
     volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
     volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
@@ -777,18 +778,24 @@ EOT
   type = object({
     ebs_optimized = optional(bool, true)
     # TODO should always be "required", right? https://aquasecurity.github.io/tfsec/v1.28.0/checks/aws/ec2/enforce-launch-config-http-token-imds/
-    http_tokens                 = optional(string, "required")
-    http_put_response_hop_limit = optional(number, 2)
-    monitoring                  = optional(bool, false)
-    private_address_only        = optional(bool, true)
-    root_device_name            = optional(string, "/dev/sda1")
-    root_size                   = optional(number, 8)
-    start_script                = optional(string, "")
-    volume_type                 = optional(string, "gp2")
-    volume_throughput           = optional(number, 125)
-    volume_iops                 = optional(number, 3000)
+    http_tokens                        = optional(string, "required")
+    http_put_response_hop_limit        = optional(number, 2)
+    monitoring                         = optional(bool, false)
+    private_address_only               = optional(bool, true)
+    root_device_name                   = optional(string, "/dev/sda1")
+    root_size                          = optional(number, 8)
+    start_script                       = optional(string, "")
+    start_script_compression_algorithm = optional(string, "gzip")
+    volume_type                        = optional(string, "gp2")
+    volume_throughput                  = optional(number, 125)
+    volume_iops                        = optional(number, 3000)
   })
   default = {}
+
+  validation {
+    condition     = contains(["gzip", "none"], var.runner_worker_docker_autoscaler_instance.start_script_compression_algorithm)
+    error_message = "The start_script_compression_algorithm supports `gzip` or `none`"
+  }
 }
 
 variable "runner_worker_docker_autoscaler_asg" {
