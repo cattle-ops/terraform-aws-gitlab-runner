@@ -357,8 +357,11 @@ resource "aws_iam_instance_profile" "instance" {
   tags = local.tags
 }
 
+# "AWS EIP not attached to any instance": we attach it via user-data script
+# kics-scan ignore-block
 resource "aws_eip" "gitlab_runner" {
   # checkov:skip=CKV2_AWS_19:We can't use NAT gateway here as we are contacted from the outside.
+  # checkov:skip=CKV2_AWS_20:We can't use NAT gateway here as we are contacted from the outside.
   count = var.runner_instance.use_eip ? 1 : 0
 
   tags = local.tags
