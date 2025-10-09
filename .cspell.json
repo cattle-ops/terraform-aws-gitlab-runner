@@ -93,6 +93,7 @@
     "cpu",
     "cpus",
     "cpuset",
+    "exfiltration",
     "gitter",
     "imds",
     "netsh",
