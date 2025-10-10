@@ -6,7 +6,7 @@ Common pitfalls are documented in [pitfalls.md](pitfalls.md).
 
 The examples are configured with defaults that should work in general. The examples are in general configured for the
 region Ireland `eu-west-1`. The only parameter that needs to be provided is the name of a SSM parameter holding the Runner
-registration token and the URL of your GitLab instance. The Runner token is created in GitLab during the Runner registration process.
+registration token and the URL of your GitLab instance. The Runner token is created in GitLab manually during the Runner registration process.
 Create a file `terraform.tfvars` and put the Runner registration token in the SSM parameter.
 
 ```hcl
@@ -17,10 +17,6 @@ gitlab_url   = "https://my.gitlab.instance/"
 The base image used to host the GitLab Runner agent is the latest available Amazon Linux 2 HVM EBS AMI. In previous versions of
 this module a hard coded list of AMIs per region was provided. This list has been replaced by a search filter to find the latest
 AMI. Setting the filter to `amzn2-ami-hvm-2.0.20200207.1-x86_64-ebs` will allow you to version lock the target AMI if needed.
-
-The Runner uses a token to register with GitLab. This token is stored in the AWS SSM parameter store. The token has to be created
-manually in GitLab and stored in the SSM parameter store. All other registration methods are deprecated and will be removed in
-v8.0.0.
 
 ## Install the module
 
