@@ -47,6 +47,11 @@ variable "iam_permissions_boundary" {
 variable "environment" {
   description = "A name that identifies the environment, used as prefix and for tagging."
   type        = string
+
+  validation {
+    condition     = !startswith(var.environment, "runner-")
+    error_message = "Environment name cannot begin with 'runner-' because it breaks the naming convention for ssh key pairs within the terminate-agent-hook lambda function."
+  }
 }
 
 variable "tags" {
