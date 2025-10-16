@@ -1164,7 +1164,7 @@ variable "runner_worker_docker_autoscaler_autoscaling_options" {
     idle_time          = optional(string)
     scale_factor       = optional(number)
     scale_factor_limit = optional(number, 0)
-    preemptive_mode    = optional(bool, true)
+    preemptive_mode    = optional(bool)
   }))
   default = []
 }
