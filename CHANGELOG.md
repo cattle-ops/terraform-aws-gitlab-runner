@@ -1,5 +1,19 @@
 # Changelog
 
+## [9.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.3.0...9.4.0) (2025-10-20)
+
+
+### Features
+
+* add `preemptive_mode` option passthrough on docker_autoscaler ([#1344](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1344)) ([91a86e1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/91a86e125c7b88627fd54316eeff4773f39e81e0))
+
+
+### Bug Fixes
+
+* correct default terminate lambda handler value ([#1347](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1347)) ([57c17af](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/57c17afe5228840ea03530548f81629c2fc505f2))
+* ensure that key pair names do not overlap ([#1338](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1338)) ([286de13](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/286de13b3fa7a3cb8188ce83b9a2afd9e209f157)), closes [#1291](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1291)
+* use unique output file name for the lambda function ([#1336](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1336)) ([babfd75](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/babfd75dccd57e82e3e2936a94cda39e7019f671))
+
 ## [9.3.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.2.4...9.3.0) (2025-10-09)
 
 
