@@ -150,6 +150,7 @@ locals {
       shared_cache                   = var.runner_worker_cache.shared
       sentry_dsn                     = var.runner_manager.sentry_dsn
       prometheus_listen_address      = var.runner_manager.prometheus_listen_address
+      connection_max_age             = var.runner_manager.connection_max_age
       auth_type                      = var.runner_worker_cache.authentication_type
       runners_docker_autoscaler      = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
       runners_docker_machine         = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""

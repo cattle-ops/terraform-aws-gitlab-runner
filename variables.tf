@@ -90,12 +90,14 @@ variable "runner_manager" {
     maximum_concurrent_jobs = The maximum number of jobs which can be processed by all Runners at the same time (concurrent).
     prometheus_listen_address = Defines an address (<host>:<port>) the Prometheus metrics HTTP server should listen on (listen_address).
     sentry_dsn = Sentry DSN of the project for the Runner Manager to use (uses legacy DSN format) (sentry_dsn)
+    connection_max_age = The maximum age of a connection to the Runner Manager (connection_max_age).
   EOT
   type = object({
     gitlab_check_interval     = optional(number, 3)
     maximum_concurrent_jobs   = optional(number, 10)
     prometheus_listen_address = optional(string, "")
     sentry_dsn                = optional(string, "__SENTRY_DSN_REPLACED_BY_USER_DATA__")
+    connection_max_age        = optional(string, "15m")
   })
   default = {}
 }
