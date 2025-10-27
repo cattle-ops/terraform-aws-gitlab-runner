@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.4.0...9.5.0) (2025-10-27)
+
+
+### Features
+
+* add `connection_max_age` config ([#1340](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1340)) ([b65acc4](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/b65acc4114d4e421636f8e79ba0b2de8c5b7cc5b))
+
 ## [9.4.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.3.0...9.4.0) (2025-10-20)
 
 
