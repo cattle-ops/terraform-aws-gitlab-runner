@@ -60,6 +60,8 @@ resource "aws_launch_template" "this" {
   # as per user decision. The module default is "required" for better security.
   # tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds
   metadata_options {
+    # the module enables IMDSv2 by default, but lets the user decide
+    # kics-scan ignore-line
     http_tokens                 = var.runner_worker_docker_autoscaler_instance.http_tokens
     http_put_response_hop_limit = var.runner_worker_docker_autoscaler_instance.http_put_response_hop_limit
     instance_metadata_tags      = "enabled"
