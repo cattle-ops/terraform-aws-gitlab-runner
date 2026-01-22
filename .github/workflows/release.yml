@@ -25,7 +25,7 @@ jobs:
           appInstallationValue: ${{ github.repository }}
       # bootstrap-sha and release-as needs to be removed after first release
       - name: Release
-        uses: google-github-actions/release-please-action@e4dc86ba9405554aeba3c6bb2d169500e7d3b4ee # v4
+        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
         with:
           token: ${{ steps.token.outputs.token }}
           config-file: ".github/.release-please-config.json"
