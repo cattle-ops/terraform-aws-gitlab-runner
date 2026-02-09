@@ -392,6 +392,7 @@ module "terminate_agent_hook" {
   name_iam_objects                       = local.name_iam_objects
   name_docker_machine_runners            = local.runner_tags_merged["Name"]
   role_permissions_boundary              = var.iam_permissions_boundary == "" ? null : "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.iam_permissions_boundary}"
+  enable_managed_kms_key                 = var.enable_managed_kms_key
   kms_key_id                             = local.kms_key_arn
   asg_hook_terminating_heartbeat_timeout = local.runner_worker_graceful_terminate_heartbeat_timeout
   environment_variables                  = var.runner_terminate_ec2_environment_variables
