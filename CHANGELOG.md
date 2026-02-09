@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.5.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.5.0...9.5.1) (2026-02-09)
+
+
+### Bug Fixes
+
+* add the permissions neeed by `monitor_runner.sh` ([#1355](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1355)) ([5496d4f](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/5496d4f6159d7ecb050b24fca6c3d3a778ab9868))
+
 ## [9.5.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.4.0...9.5.0) (2025-10-27)
 
 
