@@ -14,4 +14,16 @@ export PATH=~/.local/bin:$PATH
 
 pip install aws-ec2-assign-elastic-ip
 export AWS_DEFAULT_REGION=$(curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\" '{print $4}')
-/usr/local/bin/aws-ec2-assign-elastic-ip --valid-ips ${eip}
+
+for i in {1..7}; do
+  echo "Attempt: $i for ip $eip"
+  if /usr/local/bin/aws-ec2-assign-elastic-ip --valid-ips "${eip}" 2>&1; then
+    break
+  fi
+  if [ "$i" -eq 7 ]; then
+    echo "ERROR: Failed to assign Elastic IP after 7 attempts" >&2
+    exit 1
+  fi
+  echo "Retrying in 60 seconds..."
+  sleep 60
+done
