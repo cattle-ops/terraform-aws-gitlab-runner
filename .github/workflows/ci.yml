@@ -59,7 +59,7 @@ jobs:
   kics:
     runs-on: ubuntu-latest
     container:
-      image: checkmarx/kics:v2.1.19-debian@sha256:0a448268acc0ecf8158f9dc47728b86ae0378dbd1a745097b945481483bf7c11
+      image: checkmarx/kics:v2.1.20-debian@sha256:b29ec62a21fb97f0b65aee2307fcb29dd334c1e39e2c1f1cfe56102fce1c6be4
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       # ignore: "tags not used", "access analyzer not used", "shield advanced not used"
@@ -72,13 +72,13 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         name: Checkout source code
 
-      - uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
+      - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@4cb9feea73331a35b422df102992a03a44a3bb33 # v6
+      - uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93 # v6
         name: Setup TFLint
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
