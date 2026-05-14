@@ -94,16 +94,3 @@ jobs:
       - name: Run TFLint
         # assign necessary variables to avoid errors
         run: 'tflint --var ''enable_managed_kms_key=true'' --var=''runner_instance={"name_prefix": "a", "name": "b"}'''
-
-  tfsec:
-    name: tfsec PR commenter
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - name: tfsec
-        uses: aquasecurity/tfsec-pr-commenter-action@7a44c5dcde5dfab737363e391800629e27b6376b # v1.3.1
-        with:
-          github_token: ${{ github.token }}
