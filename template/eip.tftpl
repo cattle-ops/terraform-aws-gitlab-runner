@@ -1,7 +1,14 @@
 echo 'installing additional software for assigning EIP'
 
 yum install python3 -y
-curl --fail --retry 6 -O https://bootstrap.pypa.io/get-pip.py
+
+# Check if Python version is 3.9, or greater
+if python3 -c 'import sys; exit(0) if sys.version_info >= (3, 10) else exit(1)'; then
+  curl --fail --retry 6 -O https://bootstrap.pypa.io/get-pip.py
+else
+  curl --fail --retry 6 -O https://bootstrap.pypa.io/pip/3.9/get-pip.py
+fi
+
 python3 get-pip.py --user
 export PATH=~/.local/bin:$PATH
 
