@@ -20,6 +20,19 @@ resource "aws_launch_template" "this" {
     enabled = var.runner_worker_docker_autoscaler_instance.monitoring
   }
 
+  dynamic "instance_market_options" {
+    for_each = var.runner_worker_docker_autoscaler_asg.spot_price == null || var.runner_worker_docker_autoscaler_asg.spot_price == "" ? [] : ["spot"]
+    content {
+      market_type = instance_market_options.value
+      dynamic "spot_options" {
+        for_each = var.runner_worker_docker_autoscaler_asg.spot_price == "on-demand-price" ? [] : [0]
+        content {
+          max_price = var.runner_worker_docker_autoscaler_asg.spot_price
+        }
+      }
+    }
+  }
+
   iam_instance_profile {
     name = aws_iam_instance_profile.docker_autoscaler[0].name
   }
