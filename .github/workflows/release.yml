@@ -15,12 +15,20 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - name: Decode app private key
+        id: decode-key
+        run: |
+          PRIVATE_KEY=$(echo '${{ secrets.RELEASER_APP_PRIVATE_KEY_BASE64 }}' | base64 --decode)
+          echo "::add-mask::$PRIVATE_KEY"
+          echo "key<<EOF" >> $GITHUB_OUTPUT
+          echo "$PRIVATE_KEY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Get app installation token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: token
         with:
           app-id: ${{ secrets.RELEASER_APP_ID }}
-          private-key: ${{ fromBase64(secrets.RELEASER_APP_PRIVATE_KEY_BASE64) }}
+          private-key: ${{ steps.decode-key.outputs.key }}
       # bootstrap-sha and release-as needs to be removed after first release
       - name: Release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
