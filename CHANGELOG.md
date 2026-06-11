@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.5.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.5.1...9.5.2) (2026-06-11)
+
+
+### Bug Fixes
+
+* replace deprecated npalm/action-app-token with actions/create-github-app-token ([#1378](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1378)) ([2697346](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2697346dcc47286eb2a3e054c800cd7072b9f405))
+* retry to assign the elastic ip ([#1361](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1361)) ([50013ea](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/50013ea239deb1f7080813c70ac154cd524de041))
+
 ## [9.5.1](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.5.0...9.5.1) (2026-05-14)
 
 
