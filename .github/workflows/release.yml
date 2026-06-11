@@ -5,6 +5,7 @@ on: # yamllint disable-line rule:truthy
   push:
     branches:
       - main
+  workflow_dispatch: # temporary: for testing the fix on the PR branch
 
 permissions: read-all
 
