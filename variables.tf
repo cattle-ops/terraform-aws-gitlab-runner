@@ -817,6 +817,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
     spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions.
     spot_instance_pools = Number of Spot pools per availability zone to allocate capacity. EC2 Auto Scaling selects the cheapest Spot pools and evenly allocates Spot capacity across the number of Spot pools that you specify.
+    spot_price = By setting a spot price bid price the Runner is created via a spot request. Be aware that spot instances can be stopped by AWS. Choose "on-demand-price" to pay up to the current on demand price for the instance type chosen.
     subnet_ids = The list of subnet IDs to use for the Runner Worker when the fleet mode is enabled.
     default_instance_type = Default instance type for the launch template
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
@@ -834,6 +835,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     on_demand_percentage_above_base_capacity = optional(number, 100)
     spot_allocation_strategy                 = optional(string, "lowest-price")
     spot_instance_pools                      = optional(number, 2)
+    spot_price                               = optional(string, null)
     subnet_ids                               = optional(list(string), [])
     default_instance_type                    = optional(string, "m5.large")
     types                                    = optional(list(string), [])
