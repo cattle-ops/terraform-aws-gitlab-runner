@@ -33,14 +33,14 @@ resource "aws_iam_role" "lambda" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_kms" {
-  count = var.kms_key_id != "" ? 1 : 0
+  count = !var.enable_managed_kms_key ? 1 : 0
 
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda_kms[0].arn
 }
 
 resource "aws_iam_policy" "lambda_kms" {
-  count = var.kms_key_id != "" ? 1 : 0
+  count = !var.enable_managed_kms_key ? 1 : 0
 
   name   = "${var.name_iam_objects}-${var.name}-lambda-kms"
   path   = "/"
@@ -50,7 +50,7 @@ resource "aws_iam_policy" "lambda_kms" {
 }
 
 data "aws_iam_policy_document" "kms_key" {
-  count = var.kms_key_id != "" ? 1 : 0
+  count = !var.enable_managed_kms_key ? 1 : 0
 
   # checkov:skip=CKV_AWS_111:Write access is limited to the resources needed
   statement {
@@ -190,4 +190,5 @@ resource "aws_iam_role_policy_attachment" "spot_request_housekeeping" {
 resource "aws_iam_role_policy_attachment" "aws_lambda_vpc_access_execution_role" {
   role       = aws_iam_role.lambda.name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+
 }
