@@ -813,7 +813,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     health_check_type = Controls how health checking is done. Values are - EC2 and ELB.
     instance_refresh_min_healthy_percentage = The amount of capacity in the Auto Scaling group that must remain healthy during an instance refresh to allow the operation to continue, as a percentage of the desired capacity of the Auto Scaling group.
     instance_refresh_triggers = Set of additional property names that will trigger an Instance Refresh. A refresh will always be triggered by a change in any of launch_configuration, launch_template, or mixed_instances_policy.
-    on_demand_allocation_strategy = Strategy for allocating on-demand instances. Valid values: 'prioritized' (by override order) or 'lowest-price'. Must be set to 'lowest-price' when instance_requirements is used — AWS rejects any other value with attribute-based instance selection. Defaults to null (AWS uses 'prioritized' when types are used).
+    on_demand_allocation_strategy = Strategy for allocating on-demand instances. Valid values: 'prioritized' (by override order) or 'lowest-price'. Must be 'lowest-price' when instance_requirements is used — AWS rejects any other value with attribute-based instance selection. Defaults to 'lowest-price'.
     on_demand_base_capacity = Absolute minimum amount of desired capacity that must be fulfilled by on-demand instances.
     on_demand_percentage_above_base_capacity = Percentage split between on-demand and Spot instances above the base on-demand capacity.
     spot_allocation_strategy = How to allocate capacity across the Spot pools. 'lowest-price' to optimize cost, 'capacity-optimized' to reduce interruptions.
@@ -831,7 +831,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     health_check_type                        = optional(string, "EC2")
     instance_refresh_min_healthy_percentage  = optional(number, 90)
     instance_refresh_triggers                = optional(list(string), [])
-    on_demand_allocation_strategy            = optional(string, null)
+    on_demand_allocation_strategy            = optional(string, "lowest-price")
     on_demand_base_capacity                  = optional(number, 0)
     on_demand_percentage_above_base_capacity = optional(number, 100)
     spot_allocation_strategy                 = optional(string, "lowest-price")
@@ -861,8 +861,8 @@ variable "runner_worker_docker_autoscaler_asg" {
   }
 
   validation {
-    condition     = var.runner_worker_docker_autoscaler_asg.on_demand_allocation_strategy == null || contains(["prioritized", "lowest-price"], var.runner_worker_docker_autoscaler_asg.on_demand_allocation_strategy)
-    error_message = "on_demand_allocation_strategy must be 'prioritized', 'lowest-price', or null."
+    condition     = contains(["prioritized", "lowest-price"], var.runner_worker_docker_autoscaler_asg.on_demand_allocation_strategy)
+    error_message = "on_demand_allocation_strategy must be 'prioritized' or 'lowest-price'."
   }
 
   validation {
