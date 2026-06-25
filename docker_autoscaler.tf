@@ -98,6 +98,7 @@ resource "aws_autoscaling_group" "autoscaler" {
 
     content {
       instances_distribution {
+        on_demand_allocation_strategy            = var.runner_worker_docker_autoscaler_asg.on_demand_allocation_strategy
         on_demand_base_capacity                  = var.runner_worker_docker_autoscaler_asg.on_demand_base_capacity
         on_demand_percentage_above_base_capacity = var.runner_worker_docker_autoscaler_asg.on_demand_percentage_above_base_capacity
         spot_allocation_strategy                 = var.runner_worker_docker_autoscaler_asg.spot_allocation_strategy
