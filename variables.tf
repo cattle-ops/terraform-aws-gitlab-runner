@@ -697,6 +697,7 @@ variable "runner_worker_docker_options" {
     network_mode                 = optional(string)
     oom_kill_disable             = optional(bool)
     oom_score_adjust             = optional(number)
+    pid_mode                     = optional(string)
     privileged                   = optional(bool, true)
     pull_policies                = optional(list(string), ["always"])
     runtime                      = optional(string)
