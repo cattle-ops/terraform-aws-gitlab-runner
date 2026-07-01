@@ -534,6 +534,7 @@ variable "runner_worker" {
     max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
+    strict_check_interval = Enforces the `check_interval` instead of immediately re-polling after receiving jobs.
     ssm_access = Allows to connect to the Runner Worker via SSM.
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
     use_private_key = Use a private key to connect the Runner Manager to the Runner Workers. Ignored when fleeting is enabled (defaults to `true`).
@@ -543,6 +544,7 @@ variable "runner_worker" {
     max_jobs              = optional(number, 0)
     output_limit          = optional(number, 4096)
     request_concurrency   = optional(number, 1)
+    strict_check_interval = optional(bool, false)
     ssm_access            = optional(bool, false)
     type                  = optional(string, "docker+machine")
     # false positive, use_private_key is not a secret
