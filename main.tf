@@ -140,6 +140,7 @@ locals {
       runners_post_build_script      = var.runner_worker_gitlab_pipeline.post_build_script
       runners_pre_clone_script       = var.runner_worker_gitlab_pipeline.pre_clone_script
       runners_request_concurrency    = var.runner_worker.request_concurrency
+      runners_strict_check_interval  = var.runner_worker.strict_check_interval
       runners_output_limit           = var.runner_worker.output_limit
       runners_check_interval         = var.runner_manager.gitlab_check_interval
       runners_volumes_tmpfs          = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
