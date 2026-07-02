@@ -780,6 +780,7 @@ variable "runner_worker_docker_autoscaler_instance" {
     volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported.
     volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
     volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
+    additional_tags = Additional tags to apply exclusively to the worker launch template's tag_specifications (instance, volume, network-interface). These do not affect the runner manager.
 EOT
 
   type = object({
@@ -796,6 +797,7 @@ EOT
     volume_type                        = optional(string, "gp2")
     volume_throughput                  = optional(number, 125)
     volume_iops                        = optional(number, 3000)
+    additional_tags                    = optional(map(string), {})
   })
   default = {}
 
