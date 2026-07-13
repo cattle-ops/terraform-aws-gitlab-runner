@@ -119,12 +119,16 @@ variable "runner_instance" {
     spot_price = By setting a spot price bid price the Runner is created via a spot request. Be aware that spot instances can be stopped by AWS. Choose \"on-demand-price\" to pay up to the current on demand price for the instance type chosen.
     ssm_access = Allows to connect to the Runner via SSM.
     type = EC2 instance type used.
+    health_check_type = The health check type for the Runner manager ASG. Valid values are "EC2" or "ELB". When set to "ELB", attach a target group to the ASG and configure an application-level health check (e.g. the Prometheus /metrics endpoint on port 9252).
+    health_check_grace_period = Time in seconds after instance comes into service before checking health. Only relevant when health_check_type is "ELB".
     use_eip = Assigns an EIP to the Runner.
   EOT
   type = object({
     additional_tags             = optional(map(string))
     collect_autoscaling_metrics = optional(list(string), null)
     ebs_optimized               = optional(bool, true)
+    health_check_grace_period   = optional(number, 0)
+    health_check_type           = optional(string, "EC2")
     max_lifetime_seconds        = optional(number, null)
     monitoring                  = optional(bool, true)
     name                        = string

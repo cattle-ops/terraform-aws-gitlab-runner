@@ -168,7 +168,8 @@ resource "aws_autoscaling_group" "gitlab_runner_instance" {
   min_size                  = "1"
   max_size                  = "1"
   desired_capacity          = "1"
-  health_check_grace_period = 0
+  health_check_grace_period = var.runner_instance.health_check_grace_period
+  health_check_type         = var.runner_instance.health_check_type
   max_instance_lifetime     = var.runner_instance.max_lifetime_seconds
   enabled_metrics           = var.runner_instance.collect_autoscaling_metrics
 
