@@ -20,6 +20,7 @@ resource "aws_iam_policy" "instance_docker_autoscaler_policy" {
       partition           = data.aws_partition.current.partition
       autoscaler_asg_arn  = aws_autoscaling_group.autoscaler[0].arn
       autoscaler_asg_name = aws_autoscaling_group.autoscaler[0].name
+      runner_asg_arn      = aws_autoscaling_group.gitlab_runner_instance.arn
   })
 
   tags = local.tags
