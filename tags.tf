@@ -26,6 +26,13 @@ locals {
 
   agent_tags = { for k, v in local.agent_tags_merged : k => v if !contains(var.suppressed_tags, k) }
 
+  docker_autoscaler_worker_tags_merged = merge(
+    local.tags,
+    var.runner_worker_docker_autoscaler_instance.additional_tags
+  )
+
+  docker_autoscaler_worker_tags = { for k, v in local.docker_autoscaler_worker_tags_merged : k => v if !contains(var.suppressed_tags, k) }
+
   runner_tags_merged = merge(
     local.tags,
     var.runner_worker_docker_machine_role.additional_tags,

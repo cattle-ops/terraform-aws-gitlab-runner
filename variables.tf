@@ -768,6 +768,7 @@ variable "runner_worker_docker_autoscaler" {
 
 variable "runner_worker_docker_autoscaler_instance" {
   description = <<-EOT
+    additional_tags = Map of tags that will be added to the Runner Worker instances, volumes and network interfaces, but not to the Runner Manager.
     ebs_optimized = Enable EBS optimization for the Runner Worker.
     http_tokens = Whether or not the metadata service requires session tokens.
     http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
@@ -783,7 +784,8 @@ variable "runner_worker_docker_autoscaler_instance" {
 EOT
 
   type = object({
-    ebs_optimized = optional(bool, true)
+    additional_tags = optional(map(string), {})
+    ebs_optimized   = optional(bool, true)
     # TODO should always be "required", right? https://aquasecurity.github.io/tfsec/v1.28.0/checks/aws/ec2/enforce-launch-config-http-token-imds/
     http_tokens                        = optional(string, "required")
     http_put_response_hop_limit        = optional(number, 2)
