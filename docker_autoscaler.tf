@@ -13,7 +13,7 @@ resource "aws_launch_template" "this" {
   user_data     = var.runner_worker_docker_autoscaler_instance.start_script_compression_algorithm == "gzip" ? base64gzip(var.runner_worker_docker_autoscaler_instance.start_script) : base64encode(var.runner_worker_docker_autoscaler_instance.start_script)
   image_id      = length(var.runner_worker_docker_autoscaler_ami_id) > 0 ? var.runner_worker_docker_autoscaler_ami_id : data.aws_ami.docker_autoscaler_by_filter[0].id
   instance_type = length(var.runner_worker_docker_autoscaler_asg.types) > 0 ? var.runner_worker_docker_autoscaler_asg.types[0] : var.runner_worker_docker_autoscaler_asg.default_instance_type
-  key_name      = aws_key_pair.autoscaler[0].key_name
+  key_name      = local.enable_autoscaler_key_pair ? aws_key_pair.autoscaler[0].key_name : null
   ebs_optimized = var.runner_worker_docker_autoscaler_instance.ebs_optimized
 
   monitoring {
@@ -190,14 +190,14 @@ resource "aws_iam_instance_profile" "docker_autoscaler" {
 }
 
 resource "tls_private_key" "autoscaler" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  count = local.enable_autoscaler_key_pair ? 1 : 0
 
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "autoscaler" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  count = local.enable_autoscaler_key_pair ? 1 : 0
 
   key_name   = "${var.environment}-${var.runner_worker_docker_autoscaler.key_pair_name}"
   public_key = tls_private_key.autoscaler[0].public_key_openssh
