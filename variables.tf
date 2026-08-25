@@ -768,6 +768,7 @@ variable "runner_worker_docker_autoscaler" {
 
 variable "runner_worker_docker_autoscaler_instance" {
   description = <<-EOT
+    cpu_options = CPU options for the Runner Worker. Omitted from the launch template when `null`. `amd_sev_snp` and `nested_virtualization` accept `enabled` or `disabled`. `core_count` and `threads_per_core` must be set together.
     ebs_optimized = Enable EBS optimization for the Runner Worker.
     http_tokens = Whether or not the metadata service requires session tokens.
     http_put_response_hop_limit = The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.
@@ -783,6 +784,12 @@ variable "runner_worker_docker_autoscaler_instance" {
 EOT
 
   type = object({
+    cpu_options = optional(object({
+      amd_sev_snp           = optional(string)
+      core_count            = optional(number)
+      nested_virtualization = optional(string)
+      threads_per_core      = optional(number)
+    }))
     ebs_optimized = optional(bool, true)
     # TODO should always be "required", right? https://aquasecurity.github.io/tfsec/v1.28.0/checks/aws/ec2/enforce-launch-config-http-token-imds/
     http_tokens                        = optional(string, "required")
