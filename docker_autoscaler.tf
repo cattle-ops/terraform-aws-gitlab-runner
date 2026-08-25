@@ -16,6 +16,17 @@ resource "aws_launch_template" "this" {
   key_name      = aws_key_pair.autoscaler[0].key_name
   ebs_optimized = var.runner_worker_docker_autoscaler_instance.ebs_optimized
 
+  dynamic "cpu_options" {
+    for_each = var.runner_worker_docker_autoscaler_instance.cpu_options != null ? [var.runner_worker_docker_autoscaler_instance.cpu_options] : []
+
+    content {
+      amd_sev_snp           = cpu_options.value.amd_sev_snp
+      core_count            = cpu_options.value.core_count
+      nested_virtualization = cpu_options.value.nested_virtualization
+      threads_per_core      = cpu_options.value.threads_per_core
+    }
+  }
+
   monitoring {
     enabled = var.runner_worker_docker_autoscaler_instance.monitoring
   }
