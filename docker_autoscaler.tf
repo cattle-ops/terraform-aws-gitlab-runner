@@ -101,7 +101,7 @@ resource "aws_autoscaling_group" "autoscaler" {
         on_demand_base_capacity                  = var.runner_worker_docker_autoscaler_asg.on_demand_base_capacity
         on_demand_percentage_above_base_capacity = var.runner_worker_docker_autoscaler_asg.on_demand_percentage_above_base_capacity
         spot_allocation_strategy                 = var.runner_worker_docker_autoscaler_asg.spot_allocation_strategy
-        spot_instance_pools                      = var.runner_worker_docker_autoscaler_asg.spot_instance_pools
+        spot_instance_pools                      = var.runner_worker_docker_autoscaler_asg.spot_allocation_strategy == "lowest-price" ? var.runner_worker_docker_autoscaler_asg.spot_instance_pools : null
       }
       launch_template {
         launch_template_specification {
