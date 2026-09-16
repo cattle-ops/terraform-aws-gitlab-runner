@@ -1171,6 +1171,12 @@ variable "runner_worker_docker_autoscaler_autoscaling_options" {
   default = []
 }
 
+variable "runners_allowed_docker_credential_helpers" {
+  description = "Permit specific helpers for specific registries, see https://gitlab.com/gitlab-org/gitlab-runner/-/blob/main/docs/configuration/advanced-configuration.md?ref_type=heads#restrict-docker-credential-helpers"
+  type = map(list(string))
+  default = {}
+}
+
 variable "debug" {
   description = <<-EOT
     trace_runner_user_data: Enable bash trace for the user data script on the Agent. Be aware this could log sensitive data such as you GitLab runner token.
