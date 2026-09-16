@@ -22,6 +22,13 @@ connection_max_age = "${connection_max_age}"
   output_limit = ${runners_output_limit}
   limit = ${runners_limit}
 
+%{ if length(runners_allowed_docker_credential_helpers) > 0 ~}
+  [runners.allowed_docker_credential_helpers]
+%{ for key, value in runners_allowed_docker_credential_helpers ~}
+    ${key} = ${jsonencode(value)}
+%{ endfor ~}
+%{ endif ~}
+
   ${runners_docker_options}
 
   ${runners_docker_services}
