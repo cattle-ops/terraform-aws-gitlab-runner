@@ -225,7 +225,7 @@ if [[ "${runners_executor}" == "docker-autoscaler" ]]; then
     mv fleeting-plugin-aws-* /bin/fleeting-plugin-aws
   fi
 
-  mkdir ~/.aws
+  mkdir -p ~/.aws
   cat <<EOF > ~/.aws/config
 [default]
 region = "${aws_region}"
