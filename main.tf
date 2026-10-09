@@ -86,13 +86,14 @@ locals {
       gitlab_runner_project_id                                     = var.runner_gitlab_registration_config["project_id"]
       gitlab_runner_access_level                                   = var.runner_gitlab_registration_config.access_level
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
-      public_key                                                   = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].public_key_openssh : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : ""
-      private_key                                                  = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler" ? tls_private_key.autoscaler[0].private_key_pem : var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : ""
-      use_private_key                                              = var.runner_worker_docker_machine_fleet.enable || (var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler")
-      use_new_fleeting_install                                     = local.runner_use_new_fleeting_install
-      use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
-      user_data_trace_log                                          = var.debug.trace_runner_user_data
-      fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
+      public_key                                                   = local.enable_autoscaler_key_pair ? tls_private_key.autoscaler[0].public_key_openssh : (var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : "")
+      # kics-scan ignore-line There is no plain secret here
+      private_key                             = local.enable_autoscaler_key_pair ? tls_private_key.autoscaler[0].private_key_pem : (var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : "")
+      use_private_key                         = var.runner_worker_docker_machine_fleet.enable || local.enable_autoscaler_key_pair
+      use_new_fleeting_install                = local.runner_use_new_fleeting_install
+      use_new_runner_authentication_gitlab_16 = var.runner_gitlab_registration_config.type != ""
+      user_data_trace_log                     = var.debug.trace_runner_user_data
+      fleeting_plugin_version                 = var.runner_worker_docker_autoscaler.fleeting_plugin_version
   })
 
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
@@ -130,30 +131,32 @@ locals {
         join("", [for subkey in split("_", key) : title(subkey)]) => jsonencode(value) if value != null
       }]
 
-      runners_name                   = var.runner_instance.name
-      runners_token                  = var.runner_gitlab.registration_token
-      runners_executor               = var.runner_worker.type
-      runners_limit                  = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker.max_jobs * var.runner_worker_docker_autoscaler.capacity_per_instance : var.runner_worker.max_jobs
-      runners_concurrent             = var.runner_manager.maximum_concurrent_jobs
-      runners_environment_vars       = jsonencode(var.runner_worker.environment_variables)
-      runners_pre_build_script       = var.runner_worker_gitlab_pipeline.pre_build_script
-      runners_post_build_script      = var.runner_worker_gitlab_pipeline.post_build_script
-      runners_pre_clone_script       = var.runner_worker_gitlab_pipeline.pre_clone_script
-      runners_request_concurrency    = var.runner_worker.request_concurrency
-      runners_output_limit           = var.runner_worker.output_limit
-      runners_check_interval         = var.runner_manager.gitlab_check_interval
-      runners_volumes_tmpfs          = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_services_volumes_tmpfs = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
-      runners_docker_services        = local.runners_docker_services
-      runners_docker_options         = local.runners_docker_options_toml
-      bucket_name                    = local.bucket_name
-      shared_cache                   = var.runner_worker_cache.shared
-      sentry_dsn                     = var.runner_manager.sentry_dsn
-      prometheus_listen_address      = var.runner_manager.prometheus_listen_address
-      connection_max_age             = var.runner_manager.connection_max_age
-      auth_type                      = var.runner_worker_cache.authentication_type
-      runners_docker_autoscaler      = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
-      runners_docker_machine         = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""
+      runners_name                              = var.runner_instance.name
+      runners_token                             = var.runner_gitlab.registration_token
+      runners_executor                          = var.runner_worker.type
+      runners_limit                             = var.runner_worker.type == "docker-autoscaler" ? var.runner_worker.max_jobs * var.runner_worker_docker_autoscaler.capacity_per_instance : var.runner_worker.max_jobs
+      runners_concurrent                        = var.runner_manager.maximum_concurrent_jobs
+      runners_environment_vars                  = jsonencode(var.runner_worker.environment_variables)
+      runners_pre_build_script                  = var.runner_worker_gitlab_pipeline.pre_build_script
+      runners_post_build_script                 = var.runner_worker_gitlab_pipeline.post_build_script
+      runners_pre_clone_script                  = var.runner_worker_gitlab_pipeline.pre_clone_script
+      runners_request_concurrency               = var.runner_worker.request_concurrency
+      runners_strict_check_interval             = var.runner_worker.strict_check_interval
+      runners_output_limit                      = var.runner_worker.output_limit
+      runners_check_interval                    = var.runner_manager.gitlab_check_interval
+      runners_volumes_tmpfs                     = join("\n", [for v in var.runner_worker_docker_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_services_volumes_tmpfs            = join("\n", [for v in var.runner_worker_docker_services_volumes_tmpfs : format("\"%s\" = \"%s\"", v.volume, v.options)])
+      runners_docker_services                   = local.runners_docker_services
+      runners_docker_options                    = local.runners_docker_options_toml
+      bucket_name                               = local.bucket_name
+      shared_cache                              = var.runner_worker_cache.shared
+      sentry_dsn                                = var.runner_manager.sentry_dsn
+      prometheus_listen_address                 = var.runner_manager.prometheus_listen_address
+      connection_max_age                        = var.runner_manager.connection_max_age
+      auth_type                                 = var.runner_worker_cache.authentication_type
+      runners_docker_autoscaler                 = var.runner_worker.type == "docker-autoscaler" ? local.template_runner_docker_autoscaler : ""
+      runners_docker_machine                    = var.runner_worker.type == "docker+machine" ? local.template_runner_docker_machine : ""
+      runners_allowed_docker_credential_helpers = var.runners_allowed_docker_credential_helpers
     }
   )
 }

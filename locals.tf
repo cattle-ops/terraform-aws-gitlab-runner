@@ -97,6 +97,10 @@ locals {
   : var.runner_terminate_ec2_lifecycle_timeout_duration)
 
   kms_key_arn = local.provided_kms_key == "" && var.enable_managed_kms_key ? aws_kms_key.default[0].arn : local.provided_kms_key
+
+  # Without a key pair the manager reaches the workers through EC2 Instance Connect, which issues ephemeral keys per
+  # connection. Creating one anyway would leave a long-lived private key in the state and authorize it on every worker.
+  enable_autoscaler_key_pair = var.runner_worker.type == "docker-autoscaler" && var.runner_worker.use_private_key
 }
 
 resource "local_file" "config_toml" {

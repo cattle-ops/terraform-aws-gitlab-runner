@@ -5,16 +5,22 @@
             "Effect": "Allow",
             "Action": [
                 "autoscaling:SetDesiredCapacity",
-                "autoscaling:TerminateInstanceInAutoScalingGroup",
-                "autoscaling:CompleteLifecycleAction",
-                "autoscaling:DescribeLifecycleHooks"
+                "autoscaling:TerminateInstanceInAutoScalingGroup"
             ],
             "Resource": "${autoscaler_asg_arn}"
         },
         {
             "Effect": "Allow",
             "Action": [
+                "autoscaling:CompleteLifecycleAction"
+            ],
+            "Resource": "${runner_asg_arn}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
                 "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeLifecycleHooks",
                 "ec2:DescribeInstances",
                 "ec2:DescribeSpotInstanceRequests",
                 "ec2:DescribeTags"
