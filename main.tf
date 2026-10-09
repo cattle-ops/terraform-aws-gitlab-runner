@@ -88,12 +88,12 @@ locals {
       sentry_dsn                                                   = var.runner_manager.sentry_dsn
       public_key                                                   = local.enable_autoscaler_key_pair ? tls_private_key.autoscaler[0].public_key_openssh : (var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].public_key_openssh : "")
       # kics-scan ignore-line There is no plain secret here
-      private_key                                                  = local.enable_autoscaler_key_pair ? tls_private_key.autoscaler[0].private_key_pem : (var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : "")
-      use_private_key                                              = var.runner_worker_docker_machine_fleet.enable || local.enable_autoscaler_key_pair
-      use_new_fleeting_install                                     = local.runner_use_new_fleeting_install
-      use_new_runner_authentication_gitlab_16                      = var.runner_gitlab_registration_config.type != ""
-      user_data_trace_log                                          = var.debug.trace_runner_user_data
-      fleeting_plugin_version                                      = var.runner_worker_docker_autoscaler.fleeting_plugin_version
+      private_key                             = local.enable_autoscaler_key_pair ? tls_private_key.autoscaler[0].private_key_pem : (var.runner_worker_docker_machine_fleet.enable == true ? tls_private_key.fleet[0].private_key_pem : "")
+      use_private_key                         = var.runner_worker_docker_machine_fleet.enable || local.enable_autoscaler_key_pair
+      use_new_fleeting_install                = local.runner_use_new_fleeting_install
+      use_new_runner_authentication_gitlab_16 = var.runner_gitlab_registration_config.type != ""
+      user_data_trace_log                     = var.debug.trace_runner_user_data
+      fleeting_plugin_version                 = var.runner_worker_docker_autoscaler.fleeting_plugin_version
   })
 
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
