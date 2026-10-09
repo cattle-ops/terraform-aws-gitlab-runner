@@ -1,5 +1,23 @@
 # Changelog
 
+## [9.6.0](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.5.2...9.6.0) (2026-10-09)
+
+
+### Features
+
+* add allowed_docker_credential_helpers option ([#1394](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1394)) ([1f72fe4](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/1f72fe4f451af0d4f2757ecf5b888c2611784858))
+* add cpu_options support to the docker-autoscaler worker launch template ([#1391](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1391)) ([071d9ba](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/071d9bad6fde947b1f36dadc042b85078d97b94a))
+* add strict_check_interval runner option ([#1385](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1385)) ([4fc5b7a](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/4fc5b7ac73fece4be8779d0d9d70870e648e786e))
+* support additional_tags on worker launch template ([#1388](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1388)) ([d63d4e3](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/d63d4e3f8247fc412050e37d47b031d238e373d1))
+
+
+### Bug Fixes
+
+* allow DescribeLifecycleHooks for monitor_runner.sh ([#1386](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1386)) ([72b225c](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/72b225cedd1c7a026eae9b42dea2092f1cdeac8f))
+* only create the autoscaler key pair when use_private_key is set ([#1390](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1390)) ([82d4847](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/82d4847a04f8100c3e2aca6082aeaf72406262e2))
+* prevent mkdir failure if /root/.aws exists ([#1395](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1395)) ([8185499](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/818549957853300ba8526c818f46a532ef58d1fa))
+* send spot_instance_pools only for the lowest-price allocation strategy  ([#1393](https://github.com/cattle-ops/terraform-aws-gitlab-runner/issues/1393)) ([2655d81](https://github.com/cattle-ops/terraform-aws-gitlab-runner/commit/2655d8199a0dd6497e65fc9b100b3d1cb1ca48b0))
+
 ## [9.5.2](https://github.com/cattle-ops/terraform-aws-gitlab-runner/compare/9.5.1...9.5.2) (2026-06-11)
 
 
