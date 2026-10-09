@@ -44,15 +44,15 @@ resource "aws_launch_template" "this" {
 
   tag_specifications {
     resource_type = "instance"
-    tags          = local.tags
+    tags          = local.worker_tags
   }
   tag_specifications {
     resource_type = "volume"
-    tags          = local.tags
+    tags          = local.worker_tags
   }
   tag_specifications {
     resource_type = "network-interface"
-    tags          = local.tags
+    tags          = local.worker_tags
   }
 
   tags = local.tags
