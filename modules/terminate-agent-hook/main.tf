@@ -24,6 +24,7 @@ resource "aws_security_group" "terminate_runner_instances" {
   tags = var.tags
 }
 
+// jscpd:ignore-start
 resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
   for_each = var.egress_rules
 
@@ -41,6 +42,7 @@ resource "aws_vpc_security_group_egress_rule" "docker_autoscaler_egress" {
 
   tags = var.tags
 }
+// jscpd:ignore-end
 
 # tracing functions can be activated by the user
 # kics-scan ignore-line

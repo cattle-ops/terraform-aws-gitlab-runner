@@ -17,6 +17,8 @@ DISABLE_LINTERS:
   - SPELL_LYCHEE
   # DevSkim as it has issues ignoring files/directories, e.g. .mypy_cache
   - REPOSITORY_DEVSKIM
+  # TODO enable as soon as the token issue has been fixed: HTTP status client error (401 Unauthorized) for url (https://github.com/actions/checkout.git/git-upload-pack)
+  - ACTION_ZIZMOR
 
 PYTHON_PYLINT_PRE_COMMANDS:
   # find all Python requirements and install them

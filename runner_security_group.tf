@@ -16,6 +16,7 @@ resource "aws_security_group" "runner" {
   )
 }
 
+// jscpd:ignore-start
 resource "aws_vpc_security_group_ingress_rule" "runner" {
   for_each = var.runner_ingress_rules
 
@@ -33,7 +34,9 @@ resource "aws_vpc_security_group_ingress_rule" "runner" {
 
   tags = local.tags
 }
+// jscpd:ignore-end
 
+// jscpd:ignore-start
 resource "aws_vpc_security_group_egress_rule" "runner" {
   for_each = var.runner_egress_rules
 
@@ -51,6 +54,7 @@ resource "aws_vpc_security_group_egress_rule" "runner" {
 
   tags = local.tags
 }
+// jscpd:ignore-end
 
 resource "aws_vpc_security_group_egress_rule" "runner_manager_to_docker_autoscaler_egress" {
   count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0

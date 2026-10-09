@@ -106,6 +106,7 @@ variable "subnet_id" {
   description = "The subnet for the lambda function."
 }
 
+// jscpd:ignore-start
 variable "egress_rules" {
   description = "Map of egress rules for the Lambda function."
   type = map(object({
@@ -119,3 +120,4 @@ variable "egress_rules" {
     security_group  = optional(string, null)
   }))
 }
+// jscpd:ignore-end

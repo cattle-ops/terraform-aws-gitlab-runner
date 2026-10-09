@@ -178,6 +178,7 @@ variable "runner_networking" {
   default = {}
 }
 
+// jscpd:ignore-start
 variable "runner_ingress_rules" {
   description = "Map of Ingress rules for the Runner Manager security group."
   type = map(object({
@@ -211,7 +212,9 @@ variable "runner_ingress_rules" {
     error_message = "At least one destination must be specified."
   }
 }
+// jscpd:ignore-start
 
+// jscpd:ignore-start
 variable "runner_egress_rules" {
   description = "Map of Egress rules for the Runner Manager security group."
   type = map(object({
@@ -260,6 +263,7 @@ variable "runner_egress_rules" {
     error_message = "At least one destination must be specified."
   }
 }
+// jscpd:ignore-end
 
 variable "runner_role" {
   description = <<-EOT
@@ -472,6 +476,7 @@ variable "runner_terminate_ec2_lambda_layer_arns" {
   default     = []
 }
 
+// jscpd:ignore-start
 variable "runner_terminate_ec2_lambda_egress_rules" {
   description = "Map of egress rules for the Lambda function."
   type = map(object({
@@ -520,6 +525,7 @@ variable "runner_terminate_ec2_lambda_egress_rules" {
     error_message = "At least one destination must be specified."
   }
 }
+// jscpd:ignore-end
 
 /*
  * Runner Worker: The process created by the Runner on the host computing platform to run jobs.
@@ -870,6 +876,7 @@ variable "runner_worker_docker_autoscaler_asg" {
   }
 }
 
+// jscpd:ignore-start
 variable "runner_worker_docker_machine_role" {
   description = <<-EOT
     additional_tags = Map of tags that will be added to the Runner Worker.
@@ -1012,6 +1019,7 @@ variable "runner_worker_egress_rules" {
     error_message = "At least one destination must be specified."
   }
 }
+// jscpd:ignore-end
 
 variable "runner_worker_docker_machine_security_group_description" {
   description = "A description for the Runner Worker security group"
