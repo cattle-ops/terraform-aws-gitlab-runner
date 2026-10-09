@@ -534,6 +534,7 @@ variable "runner_worker" {
     max_jobs = Number of jobs which can be processed in parallel by the Runner Worker.
     output_limit = Sets the maximum build log size in kilobytes. Default is 4MB (output_limit).
     request_concurrency = Limit number of concurrent requests for new jobs from GitLab (default 1) (request_concurrency).
+    strict_check_interval = Enforces the `check_interval` instead of immediately re-polling after receiving jobs. Requires runner version 18.9.0+
     ssm_access = Allows to connect to the Runner Worker via SSM.
     type = The Runner Worker type to use. Currently supports `docker+machine` or `docker` or `docker-autoscaler`.
     use_private_key = Use a private key to connect the Runner Manager to the Runner Workers. Ignored when fleeting is enabled (defaults to `true`).
@@ -543,6 +544,7 @@ variable "runner_worker" {
     max_jobs              = optional(number, 0)
     output_limit          = optional(number, 4096)
     request_concurrency   = optional(number, 1)
+    strict_check_interval = optional(bool, false)
     ssm_access            = optional(bool, false)
     type                  = optional(string, "docker+machine")
     # false positive, use_private_key is not a secret
@@ -781,6 +783,7 @@ variable "runner_worker_docker_autoscaler_instance" {
     volume_type = The type of volume to use for the Runner Worker. `gp2`, `gp3`, `io1` or `io2` are supported.
     volume_iops = Guaranteed IOPS for the volume. Only supported when using `gp3`, `io1` or `io2` as `volume_type`.
     volume_throughput = Throughput in MB/s for the volume. Only supported when using `gp3` as `volume_type`.
+    additional_tags = Additional tags to apply exclusively to the worker launch template's tag_specifications (instance, volume, network-interface). These do not affect the runner manager.
 EOT
 
   type = object({
@@ -803,6 +806,7 @@ EOT
     volume_type                        = optional(string, "gp2")
     volume_throughput                  = optional(number, 125)
     volume_iops                        = optional(number, 3000)
+    additional_tags                    = optional(map(string), {})
   })
   default = {}
 
