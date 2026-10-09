@@ -39,4 +39,6 @@ locals {
   runner_tags_string = join(",", flatten([
     for key in keys(local.runner_tags) : [key, local.runner_tags[key]]
   ]))
+
+  worker_tags = merge(local.tags, var.runner_worker_docker_autoscaler_instance.additional_tags)
 }
