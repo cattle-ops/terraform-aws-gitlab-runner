@@ -1172,7 +1172,7 @@ variable "runner_worker_docker_autoscaler_autoscaling_options" {
 }
 
 variable "runners_allowed_docker_credential_helpers" {
-  description = "Permit specific helpers for specific registries, see https://gitlab.com/gitlab-org/gitlab-runner/-/blob/main/docs/configuration/advanced-configuration.md?ref_type=heads#restrict-docker-credential-helpers"
+  description = "Permit specific helpers for specific registries, see https://gitlab.com/gitlab-org/gitlab-runner/-/blob/main/docs/configuration/advanced-configuration.md?ref_type=heads#restrict-docker-credential-helpers. Requires runner version 19.1.3+"
   type = map(list(string))
   default = {}
 }
