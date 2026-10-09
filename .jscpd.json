@@ -1,0 +1,9 @@
+{
+  "ignorePattern": ["(?m)^[ \\t]*#.*$"],
+  "ignore": [
+    "**/examples/**",
+    "**/.git/**",
+    "**/*.md",
+    "**/myFolderToSkip/**"
+  ]
+}
