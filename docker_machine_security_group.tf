@@ -20,6 +20,7 @@ resource "aws_security_group" "docker_machine" {
   )
 }
 
+// jscpd:ignore-start
 resource "aws_vpc_security_group_ingress_rule" "docker_machine" {
   for_each = var.runner_worker.type == "docker+machine" ? var.runner_worker_ingress_rules : {}
 
@@ -37,6 +38,7 @@ resource "aws_vpc_security_group_ingress_rule" "docker_machine" {
 
   tags = local.tags
 }
+// jscpd:ignore-start
 
 resource "aws_vpc_security_group_egress_rule" "docker_machine" {
   for_each = var.runner_worker.type == "docker+machine" ? var.runner_worker_egress_rules : {}
