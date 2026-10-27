@@ -314,6 +314,8 @@ cat <<EOF > /etc/systemd/system/gitlab-runner.service.d/kill.conf
 [Service]
 # This initiates a graceful shutdown of the service: https://docs.gitlab.com/runner/commands/#signals
 KillSignal=SIGQUIT
+# Signal only the runner, so the fleeting plugin keeps serving jobs during the drain: https://docs.gitlab.com/runner/configuration/init/
+KillMode=mixed
 TimeoutStopSec=0
 EOF
 
