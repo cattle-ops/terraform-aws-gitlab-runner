@@ -10,6 +10,9 @@
     max_instances = ${runners_max_instances}
 
     instance_ready_command="${runners_instance_ready_command}"
+%{~ if delete_instances_on_shutdown }
+    delete_instances_on_shutdown = true
+%{~ endif }
 
     [runners.autoscaler.plugin_config] # plugin specific configuration (see plugin documentation)
       name = "${docker_autoscaling_name}"     # AWS Autoscaling Group name

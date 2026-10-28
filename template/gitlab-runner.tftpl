@@ -148,6 +148,9 @@ fi
 # It is because the Sentry DSN contains forward slashes as it is an URL so it would break out of the sed command with forward slashes as delimiters :)
 sed -i.bak s,__SENTRY_DSN_REPLACED_BY_USER_DATA__,"$ssm_sentry_dsn",g /etc/gitlab-runner/config.toml
 
+%{ if worker_asg_handover != "" ~}
+${worker_asg_handover}
+%{ endif ~}
 ${pre_install}
 
 if [[ "${runners_executor}" == "docker" ]]

@@ -7,7 +7,7 @@
                 "autoscaling:SetDesiredCapacity",
                 "autoscaling:TerminateInstanceInAutoScalingGroup"
             ],
-            "Resource": "${autoscaler_asg_arn}"
+            "Resource": ${jsonencode(autoscaler_asg_arns)}
         },
         {
             "Effect": "Allow",
@@ -36,9 +36,24 @@
             "Resource": "arn:${partition}:ec2:${aws_region}:*:instance/*",
             "Condition": {
                 "StringEquals": {
-                    "ec2:ResourceTag/aws:autoscaling:groupName": "${autoscaler_asg_name}"
+                    "ec2:ResourceTag/aws:autoscaling:groupName": ${jsonencode(autoscaler_asg_names)}
                 }
             }
-        }
+        }%{ if enable_manager_handover },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Resource": "arn:${partition}:ec2:${aws_region}:*:instance/*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/aws:autoscaling:groupName": "${runner_asg_name}"
+                },
+                "ForAllValues:StringEquals": {
+                    "aws:TagKeys": ["gitlab-runner-worker-asg"]
+                }
+            }
+        }%{ endif }
     ]
 }

@@ -289,6 +289,9 @@ that executes a provided Lambda function when the runner is terminated to termin
 provisioned by the Docker Machine executor. a `builds/` directory relative to the root module persists that
 contains the packaged Lambda function.
 
+With the docker-autoscaler executor, the new manager removes the old manager's workers unless `enable_manager_handover`
+is set, see [Replacing the Runner manager (docker-autoscaler)](#replacing-the-runner-manager-docker-autoscaler).
+
 ### Instrumenting the Graceful termination Lambda
 
 To instrument the Lambda function, the following steps are required:
@@ -308,6 +311,56 @@ module "runner" {
    runner_terminate_ec2_lambda_layer_arns = ["arn:aws:lambda:us-east-1:123456789012:layer:instrumented_handler:1"]
 }
 ```
+
+### Replacing the Runner manager (docker-autoscaler)
+
+At startup, GitLab Runner removes every worker in its ASG that it has no saved state for
+(`no data on pre-existing instance so removing for safety`). A new Runner manager that shares the worker ASG with the
+draining one would therefore kill the jobs of the draining one.
+
+Set `runner_worker_docker_autoscaler_asg.enable_manager_handover = true` to avoid this. The module then creates a second
+worker ASG named `<prefix>-asg-1`, and every Runner manager claims one of the two at boot:
+
+- The new manager tags itself with `gitlab-runner-worker-asg = <worker ASG name>` and uses the worker ASG that no
+  other manager claims. A manager without the tag, such as one created before the option was enabled, claims the first
+  worker ASG.
+- The old manager finishes its jobs in its own worker ASG and deletes its workers on shutdown, as
+  `delete_instances_on_shutdown` is enabled as well. The module keeps the fleeting plugin alive during the graceful shutdown
+  for this, see [keep the fleeting plugin alive on shutdown](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/1403).
+- A manager whose instance is no longer running claims nothing, so the replacement of a crashed manager takes over its
+  worker ASG and removes its workers.
+- If both worker ASGs are claimed, e.g. when a manager is terminated by hand during a drain, the new manager waits and
+  logs `Waiting for a free worker ASG`.
+
+The new manager takes jobs while the old one still finishes its own. During that time each worker ASG can hold up to
+`runner_worker.max_jobs` instances.
+
+For a manual instance refresh, launch the new manager before terminating the old one:
+
+```sh
+aws autoscaling start-instance-refresh --auto-scaling-group-name <manager-asg> \
+  --preferences '{"MinHealthyPercentage":100,"MaxHealthyPercentage":110}'
+```
+
+These log lines are stable and suitable for alerting:
+
+- `Starting gitlab-runner after <n>s of failed AWS calls, last <call>: <error>.`: the manager's AWS calls to claim a
+  worker ASG kept failing for longer than the terminate hook timeout plus 10 minutes, so it uses the first worker ASG.
+- `Cannot complete the terminate lifecycle hook, retrying: <error>.`: a manager that is terminated before it starts
+  gitlab-runner cannot complete its terminate hook.
+
+#### Enabling the option
+
+Enabling the option changes the user data, so the apply replaces the manager. The replaced manager predates
+`delete_instances_on_shutdown` and leaves its idle workers in the first worker ASG. Once it has terminated, start an
+instance refresh. The next manager claims the first worker ASG and removes the leftovers.
+
+#### Disabling the option
+
+Disabling the option deletes the second worker ASG with `force_delete`, which kills the jobs running in it. Start
+instance refreshes until the manager claims the first worker ASG. Disable the option only once no manager claims the
+second one, it has no instances in any lifecycle state and its desired capacity is 0. Start no instance refresh between
+that check and the apply. Afterwards, every manager replacement removes the draining manager's workers again.
 
 ### Access the Runner instance
 

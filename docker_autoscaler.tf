@@ -89,9 +89,9 @@ resource "aws_launch_template" "this" {
 # false positive, tags are created with "dynamic" block
 # kics-scan ignore-line
 resource "aws_autoscaling_group" "autoscaler" {
-  count = var.runner_worker.type == "docker-autoscaler" ? 1 : 0
+  count = var.runner_worker.type == "docker-autoscaler" ? local.docker_autoscaler_asg_count : 0
 
-  name                  = "${local.name_runner_agent_instance}-asg"
+  name                  = count.index == 0 ? "${local.name_runner_agent_instance}-asg" : "${local.name_runner_agent_instance}-asg-${count.index}"
   capacity_rebalance    = false
   protect_from_scale_in = true
   suspended_processes   = ["AZRebalance"]

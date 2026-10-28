@@ -760,6 +760,7 @@ variable "runner_worker_docker_autoscaler" {
     update_interval = The interval to check with the fleeting plugin for instance updates.
     update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
     instance_ready_command = Executes this command on each instance provisioned by the autoscaler to ensure that it is ready for use. A failure results in the instance being removed.
+    delete_instances_on_shutdown = Delete all worker instances when the Runner shuts down, after its running jobs have finished.
   EOT
   type = object({
     fleeting_plugin_version        = optional(string, "1.0.0")
@@ -770,6 +771,7 @@ variable "runner_worker_docker_autoscaler" {
     update_interval                = optional(string, "1m")
     update_interval_when_expecting = optional(string, "2s")
     instance_ready_command         = optional(string, "")
+    delete_instances_on_shutdown   = optional(bool, false)
   })
   default = {}
 }
@@ -839,6 +841,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     types = The type of instance to use for the Runner Worker. In case of fleet mode, multiple instance types are supported.
     upgrade_strategy = Auto deploy new instances when launch template changes. Can be either 'bluegreen', 'rolling' or 'off'.
     instance_requirements = Override the instance type in the Launch Template with instance types that satisfy the requirements.
+    enable_manager_handover = Create a second worker ASG, so a new Runner manager takes jobs while the old one finishes its jobs in the other. Also enables `delete_instances_on_shutdown`. See docs/usage.md.
   EOT
   type = object({
     enabled_metrics                          = optional(list(string), [])
@@ -855,6 +858,7 @@ variable "runner_worker_docker_autoscaler_asg" {
     default_instance_type                    = optional(string, "m5.large")
     types                                    = optional(list(string), [])
     upgrade_strategy                         = optional(string, "rolling")
+    enable_manager_handover                  = optional(bool, false)
     instance_requirements = optional(list(object({
       allowed_instance_types = optional(list(string), [])
       cpu_manufacturers      = optional(list(string), [])

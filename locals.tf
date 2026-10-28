@@ -92,6 +92,13 @@ locals {
 
   docker_machine_adds_name_tag = signum(sum(local.docker_machine_version_test)) <= 0
 
+  # The user data replaces the placeholder with the worker ASG the manager claims at boot
+  docker_autoscaler_asg_count        = var.runner_worker_docker_autoscaler_asg.enable_manager_handover ? 2 : 1
+  docker_autoscaling_name            = var.runner_worker_docker_autoscaler_asg.enable_manager_handover ? "__WORKER_ASG_NAME__" : one(aws_autoscaling_group.autoscaler[*].name)
+  worker_asg_handover_margin_seconds = 600
+
+  runner_terminate_ec2_lifecycle_hook_name = var.runner_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.runner_terminate_ec2_lifecycle_hook_name
+
   runner_worker_graceful_terminate_heartbeat_timeout = (var.runner_terminate_ec2_lifecycle_timeout_duration == null
     ? min(7200, tonumber(coalesce(var.runner_gitlab_registration_config.maximum_timeout, 0)) + 300)
   : var.runner_terminate_ec2_lifecycle_timeout_duration)
