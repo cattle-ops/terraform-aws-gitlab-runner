@@ -760,6 +760,7 @@ variable "runner_worker_docker_autoscaler" {
     update_interval = The interval to check with the fleeting plugin for instance updates.
     update_interval_when_expecting = The interval to check with the fleeting plugin for instance updates when expecting a state change.
     instance_ready_command = Executes this command on each instance provisioned by the autoscaler to ensure that it is ready for use. A failure results in the instance being removed.
+    delete_instances_on_shutdown = Delete all worker instances when the Runner shuts down, after its running jobs have finished.
   EOT
   type = object({
     fleeting_plugin_version        = optional(string, "1.0.0")
@@ -770,6 +771,7 @@ variable "runner_worker_docker_autoscaler" {
     update_interval                = optional(string, "1m")
     update_interval_when_expecting = optional(string, "2s")
     instance_ready_command         = optional(string, "")
+    delete_instances_on_shutdown   = optional(bool, false)
   })
   default = {}
 }

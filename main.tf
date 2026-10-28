@@ -109,6 +109,7 @@ locals {
       runners_update_interval_when_expecting = var.runner_worker_docker_autoscaler.update_interval_when_expecting
 
       runners_instance_ready_command = var.runner_worker_docker_autoscaler.instance_ready_command
+      delete_instances_on_shutdown   = var.runner_worker_docker_autoscaler.delete_instances_on_shutdown
 
       use_private_key = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler"
 
