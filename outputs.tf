@@ -52,3 +52,8 @@ output "runner_launch_template_name" {
   description = "The name of the runner's launch template."
   value       = aws_launch_template.gitlab_runner_instance.name
 }
+
+output "runner_worker_docker_autoscaler_asg_names" {
+  description = "Names of the worker ASGs of the docker-autoscaler executor. A second one exists when `enable_manager_handover` is set."
+  value       = aws_autoscaling_group.autoscaler[*].name
+}

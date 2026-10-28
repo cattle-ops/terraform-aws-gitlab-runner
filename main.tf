@@ -53,6 +53,14 @@ locals {
     eip = join(",", [for eip in aws_eip.gitlab_runner : eip.public_ip])
   })
 
+  template_worker_asg_handover = var.runner_worker.type == "docker-autoscaler" && var.runner_worker_docker_autoscaler_asg.enable_manager_handover ? templatefile("${path.module}/template/worker-asg-handover.tftpl",
+    {
+      aws_region          = data.aws_region.current.region
+      worker_asg_names    = aws_autoscaling_group.autoscaler[*].name
+      terminate_hook_name = "${var.environment}-${local.runner_terminate_ec2_lifecycle_hook_name}"
+      max_wait_seconds    = local.runner_worker_graceful_terminate_heartbeat_timeout + 600
+  }) : ""
+
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
     {
       aws_region                                                   = data.aws_region.current.region
@@ -66,6 +74,7 @@ locals {
       curl_cacert                                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                                     = local.pre_install_certificates
       pre_install                                                  = var.runner_install.pre_install_script
+      worker_asg_handover                                          = local.template_worker_asg_handover
       post_install                                                 = var.runner_install.post_install_script
       runners_gitlab_url                                           = var.runner_gitlab.url
       runners_token                                                = var.runner_gitlab.registration_token
@@ -99,7 +108,7 @@ locals {
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
     {
       fleeting_plugin               = local.runner_use_new_fleeting_install ? "aws:latest" : "fleeting-plugin-aws"
-      docker_autoscaling_name       = var.runner_worker.type == "docker-autoscaler" ? aws_autoscaling_group.autoscaler[0].name : ""
+      docker_autoscaling_name       = var.runner_worker.type != "docker-autoscaler" ? "" : (var.runner_worker_docker_autoscaler_asg.enable_manager_handover ? "__WORKER_ASG_NAME__" : aws_autoscaling_group.autoscaler[0].name)
       connector_config_user         = var.runner_worker_docker_autoscaler.connector_config_user
       runners_capacity_per_instance = var.runner_worker_docker_autoscaler.capacity_per_instance
       runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count
@@ -109,7 +118,7 @@ locals {
       runners_update_interval_when_expecting = var.runner_worker_docker_autoscaler.update_interval_when_expecting
 
       runners_instance_ready_command = var.runner_worker_docker_autoscaler.instance_ready_command
-      delete_instances_on_shutdown   = var.runner_worker_docker_autoscaler.delete_instances_on_shutdown
+      delete_instances_on_shutdown   = var.runner_worker_docker_autoscaler.delete_instances_on_shutdown || var.runner_worker_docker_autoscaler_asg.enable_manager_handover
 
       use_private_key = var.runner_worker.use_private_key && var.runner_worker.type == "docker-autoscaler"
 
@@ -387,7 +396,7 @@ resource "aws_autoscaling_lifecycle_hook" "wait_for_gitlab_runner" {
 module "terminate_agent_hook" {
   source = "./modules/terminate-agent-hook"
 
-  name                                   = var.runner_terminate_ec2_lifecycle_hook_name == null ? "terminate-instances" : var.runner_terminate_ec2_lifecycle_hook_name
+  name                                   = local.runner_terminate_ec2_lifecycle_hook_name
   environment                            = var.environment
   asg_arn                                = aws_autoscaling_group.gitlab_runner_instance.arn
   asg_name                               = aws_autoscaling_group.gitlab_runner_instance.name

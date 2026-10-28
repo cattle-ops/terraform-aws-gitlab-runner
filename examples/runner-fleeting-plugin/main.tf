@@ -91,6 +91,7 @@ module "runner" {
     enable_mixed_instances_policy            = true
     on_demand_base_capacity                  = 1
     on_demand_percentage_above_base_capacity = 0
+    enable_manager_handover                  = true
   }
 
   runner_worker_docker_autoscaler_autoscaling_options = [
