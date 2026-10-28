@@ -171,6 +171,12 @@ then
   yum install amazon-ecr-credential-helper -y
 fi
 
+if [[ -n '${runners_docker_config}' ]]
+then
+  mkdir -p /root/.docker
+  echo '${runners_docker_config}' > /root/.docker/config.json
+fi
+
 if [[ "${runners_executor}" == "docker+machine" ]]
 then
   if [[ "${docker_machine_download_url}" == "" ]]

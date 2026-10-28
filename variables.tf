@@ -335,6 +335,7 @@ variable "runner_schedule_config" {
 variable "runner_install" {
   description = <<-EOT
     amazon_ecr_credential_helper = Install amazon-ecr-credential-helper inside `userdata_pre_install` script
+    docker_credential_helpers = Credential helper per registry, written as `credHelpers` to `/root/.docker/config.json` on the Runner Manager, e.g. `{ "123456789012.dkr.ecr.eu-central-1.amazonaws.com" = "ecr-login" }`. The Runner uses it to pull job images without passing credentials to the jobs.
     docker_machine_download_url = URL to download docker machine binary. If not set, the docker machine version will be used to download the binary.
     docker_machine_version = By default docker_machine_download_url is used to set the docker machine version. This version will be ignored once `docker_machine_download_url` is set. The version number is maintained by the CKI project. Check out at https://gitlab.com/cki-project/docker-machine/-/releases
     pre_install_script = Script to run before installing the Runner
@@ -344,6 +345,7 @@ variable "runner_install" {
   EOT
   type = object({
     amazon_ecr_credential_helper = optional(bool, false)
+    docker_credential_helpers    = optional(map(string), {})
     docker_machine_download_url  = optional(string, "")
     docker_machine_version       = optional(string, "0.16.2-gitlab.19-cki.5")
     pre_install_script           = optional(string, "")
