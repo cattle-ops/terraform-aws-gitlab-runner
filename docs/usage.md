@@ -325,7 +325,8 @@ worker ASG named `<prefix>-asg-1`, and every Runner manager claims one of the tw
   other manager claims. A manager without the tag, such as one created before the option was enabled, claims the first
   worker ASG.
 - The old manager finishes its jobs in its own worker ASG and deletes its workers on shutdown, as
-  `delete_instances_on_shutdown` is enabled as well.
+  `delete_instances_on_shutdown` is enabled as well. This needs the fleeting plugin to stay alive during the graceful
+  shutdown, see [#1403](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/1403).
 - If both worker ASGs are claimed, e.g. a second instance refresh during a drain, the new manager waits and logs
   `Waiting for a free worker ASG`.
 
