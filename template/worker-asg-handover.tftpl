@@ -51,24 +51,24 @@ handover_read_state() {
 }
 
 handover_read_claims() {
-  local tags tagged manager_id claimed_asg worker_asg
+  local members tagged manager_id ec2_state claimed_asg worker_asg member_ids
   handover_claims=()
 
-  # A manager without a claim predates the handover and uses the first worker ASG
-  for manager_id in $handover_members; do
-    handover_claims[$manager_id]=$${handover_worker_asgs[0]}
-  done
   if [[ -n $handover_members ]]; then
-    if ! tags=$(aws ec2 describe-tags --region "$handover_region" --output text --query 'Tags[].[ResourceId,Value]' \
-      --filters "Name=resource-id,Values=$(paste --serial --delimiters=, <<< "$handover_members")" "Name=key,Values=$handover_claim_tag" 2>&1); then
-      handover_cause="ec2 describe-tags: $tags"
+    mapfile -t member_ids <<< "$handover_members"
+    if ! members=$(aws ec2 describe-instances --region "$handover_region" --output text --instance-ids "$${member_ids[@]}" \
+      --query "Reservations[].Instances[].[InstanceId, State.Name, Tags[?Key=='$handover_claim_tag'] | [0].Value]" 2>&1); then
+      handover_cause="ec2 describe-instances: $members"
       return $handover_failed
     fi
-    while read -r manager_id claimed_asg; do
+    # Crashed managers claim nothing, live ones without a claim predate the handover and use the first worker ASG
+    while read -r manager_id ec2_state claimed_asg; do
+      [[ $ec2_state == pending || $ec2_state == running || $ec2_state == stopping ]] || continue
+      handover_claims[$manager_id]=$${handover_worker_asgs[0]}
       for worker_asg in "$${handover_worker_asgs[@]}"; do
-        [[ -n $manager_id && $claimed_asg == "$worker_asg" ]] && handover_claims[$manager_id]=$claimed_asg
+        [[ $claimed_asg == "$worker_asg" ]] && handover_claims[$manager_id]=$claimed_asg
       done
-    done <<< "$tags"
+    done <<< "$members"
   fi
 
   # Managers in another manager ASG, created when the launch template name changes
