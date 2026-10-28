@@ -63,6 +63,7 @@ locals {
       runners_userdata                                             = var.runner_worker_docker_machine_instance.start_script
       runners_executor                                             = var.runner_worker.type
       runners_install_amazon_ecr_credential_helper                 = var.runner_install.amazon_ecr_credential_helper
+      runners_docker_config                                        = length(var.runner_install.docker_credential_helpers) > 0 ? jsonencode({ credHelpers = var.runner_install.docker_credential_helpers }) : ""
       curl_cacert                                                  = length(var.runner_gitlab.certificate) > 0 ? "--cacert /etc/gitlab-runner/certs/gitlab.crt" : ""
       pre_install_certificates                                     = local.pre_install_certificates
       pre_install                                                  = var.runner_install.pre_install_script
