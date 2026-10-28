@@ -58,7 +58,7 @@ locals {
       aws_region          = data.aws_region.current.region
       worker_asg_names    = aws_autoscaling_group.autoscaler[*].name
       terminate_hook_name = "${var.environment}-${local.runner_terminate_ec2_lifecycle_hook_name}"
-      max_wait_seconds    = local.runner_worker_graceful_terminate_heartbeat_timeout + 600
+      max_wait_seconds    = local.runner_worker_graceful_terminate_heartbeat_timeout + local.worker_asg_handover_margin_seconds
   }) : ""
 
   template_gitlab_runner = templatefile("${path.module}/template/gitlab-runner.tftpl",
@@ -108,7 +108,7 @@ locals {
   template_runner_docker_autoscaler = templatefile("${path.module}/template/runner-docker-autoscaler-config.tftpl",
     {
       fleeting_plugin               = local.runner_use_new_fleeting_install ? "aws:latest" : "fleeting-plugin-aws"
-      docker_autoscaling_name       = var.runner_worker.type != "docker-autoscaler" ? "" : (var.runner_worker_docker_autoscaler_asg.enable_manager_handover ? "__WORKER_ASG_NAME__" : aws_autoscaling_group.autoscaler[0].name)
+      docker_autoscaling_name       = var.runner_worker.type == "docker-autoscaler" ? local.docker_autoscaling_name : ""
       connector_config_user         = var.runner_worker_docker_autoscaler.connector_config_user
       runners_capacity_per_instance = var.runner_worker_docker_autoscaler.capacity_per_instance
       runners_max_use_count         = var.runner_worker_docker_autoscaler.max_use_count

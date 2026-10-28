@@ -2,80 +2,88 @@
 handover_region="${aws_region}"
 handover_terminate_hook_name="${terminate_hook_name}"
 handover_max_wait_seconds=${max_wait_seconds}
+handover_retry_seconds=30
 handover_claim_tag="gitlab-runner-worker-asg"
 handover_worker_asgs=(%{ for name in worker_asg_names }"${name}" %{ endfor })
+handover_claimed=0
+handover_failed=1
+handover_retry=2
 
-# Shared by the functions below:
-# handover_instance_id, handover_manager_asg, handover_state and handover_members describe this manager and its ASG,
-# handover_claims maps the instance IDs of other managers to the worker ASG they use,
-# handover_cause holds the last failed AWS call, handover_worker_asg the claimed worker ASG.
+# Set by the functions below, handover_claims maps other manager instance IDs to their worker ASG
 declare -A handover_claims
 
 handover_read_state() {
-  local output imds_token
-  if ! imds_token=$(curl -sSf -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300" 2>&1); then
+  local imds_token instance_id manager_asg members
+  if ! imds_token=$(curl --silent --show-error --fail --request PUT "http://169.254.169.254/latest/api/token" \
+    --header "X-aws-ec2-metadata-token-ttl-seconds: 300" 2>&1); then
     handover_cause="instance metadata token: $imds_token"
-    return 1
+    return $handover_failed
   fi
-  if ! output=$(curl -sSf -H "X-aws-ec2-metadata-token: $imds_token" "http://169.254.169.254/latest/meta-data/instance-id" 2>&1); then
-    handover_cause="instance metadata: $output"
-    return 1
+  if ! instance_id=$(curl --silent --show-error --fail --header "X-aws-ec2-metadata-token: $imds_token" \
+    "http://169.254.169.254/latest/meta-data/instance-id" 2>&1); then
+    handover_cause="instance metadata: $instance_id"
+    return $handover_failed
   fi
-  handover_instance_id=$output
+  handover_instance_id=$instance_id
 
-  if ! output=$(aws ec2 describe-tags --region "$handover_region" --output text --query 'Tags[0].Value' \
+  if ! manager_asg=$(aws ec2 describe-tags --region "$handover_region" --output text --query 'Tags[0].Value' \
     --filters "Name=resource-id,Values=$handover_instance_id" "Name=key,Values=aws:autoscaling:groupName" 2>&1); then
-    handover_cause="ec2 describe-tags: $output"
-    return 1
+    handover_cause="ec2 describe-tags: $manager_asg"
+    return $handover_failed
   fi
-  if [[ -z $output || $output == "None" ]]; then
+  if [[ -z $manager_asg || $manager_asg == "None" ]]; then
     handover_cause="ec2 describe-tags: no aws:autoscaling:groupName tag on $handover_instance_id"
-    return 1
+    return $handover_failed
   fi
-  handover_manager_asg=$output
+  handover_manager_asg=$manager_asg
 
-  if ! output=$(aws autoscaling describe-auto-scaling-groups --region "$handover_region" --output json \
+  if ! members=$(aws autoscaling describe-auto-scaling-groups --region "$handover_region" --output json \
     --auto-scaling-group-names "$handover_manager_asg" --query 'AutoScalingGroups[0].Instances' 2>&1); then
-    handover_cause="autoscaling describe-auto-scaling-groups: $output"
-    return 1
+    handover_cause="autoscaling describe-auto-scaling-groups: $members"
+    return $handover_failed
   fi
-  handover_state=$(jq --raw-output --arg id "$handover_instance_id" '.[] | select(.InstanceId == $id) | .LifecycleState' <<< "$output")
-  handover_members=$(jq --raw-output --arg id "$handover_instance_id" '.[] | select(.InstanceId != $id) | .InstanceId' <<< "$output")
+  handover_state=$(jq --raw-output --arg id "$handover_instance_id" '.[]? | select(.InstanceId == $id) | .LifecycleState' <<< "$members")
+  if [[ -z $handover_state ]]; then
+    handover_cause="autoscaling describe-auto-scaling-groups: $handover_manager_asg does not list $handover_instance_id yet"
+    return $handover_failed
+  fi
+  handover_members=$(jq --raw-output --arg id "$handover_instance_id" '.[] | select(.InstanceId != $id) | .InstanceId' <<< "$members")
 }
 
 handover_read_claims() {
-  local output id value worker_asg
+  local tags tagged manager_id claimed_asg worker_asg
   handover_claims=()
 
   # A manager without a claim predates the handover and uses the first worker ASG
-  for id in $handover_members; do
-    handover_claims[$id]=$${handover_worker_asgs[0]}
+  for manager_id in $handover_members; do
+    handover_claims[$manager_id]=$${handover_worker_asgs[0]}
   done
   if [[ -n $handover_members ]]; then
-    if ! output=$(aws ec2 describe-tags --region "$handover_region" --output text --query 'Tags[].[ResourceId,Value]' \
-      --filters "Name=resource-id,Values=$(paste -sd, <<< "$handover_members")" "Name=key,Values=$handover_claim_tag" 2>&1); then
-      handover_cause="ec2 describe-tags: $output"
-      return 1
+    if ! tags=$(aws ec2 describe-tags --region "$handover_region" --output text --query 'Tags[].[ResourceId,Value]' \
+      --filters "Name=resource-id,Values=$(paste --serial --delimiters=, <<< "$handover_members")" "Name=key,Values=$handover_claim_tag" 2>&1); then
+      handover_cause="ec2 describe-tags: $tags"
+      return $handover_failed
     fi
-    while read -r id value; do
+    while read -r manager_id claimed_asg; do
       for worker_asg in "$${handover_worker_asgs[@]}"; do
-        [[ -n $id && $value == "$worker_asg" ]] && handover_claims[$id]=$value
+        [[ -n $manager_id && $claimed_asg == "$worker_asg" ]] && handover_claims[$manager_id]=$claimed_asg
       done
-    done <<< "$output"
+    done <<< "$tags"
   fi
 
   # Managers in another manager ASG, created when the launch template name changes
-  if ! output=$(aws ec2 describe-instances --region "$handover_region" --output text \
+  if ! tagged=$(aws ec2 describe-instances --region "$handover_region" --output text \
     --filters "Name=instance-state-name,Values=pending,running,stopping" \
     "Name=tag:$handover_claim_tag,Values=$(IFS=,; echo "$${handover_worker_asgs[*]}")" \
     --query "Reservations[].Instances[].[InstanceId, Tags[?Key=='$handover_claim_tag'] | [0].Value]" 2>&1); then
-    handover_cause="ec2 describe-instances: $output"
-    return 1
+    handover_cause="ec2 describe-instances: $tagged"
+    return $handover_failed
   fi
-  while read -r id value; do
-    [[ -n $id && $id != "$handover_instance_id" && -z $${handover_claims[$id]:-} ]] && handover_claims[$id]=$value
-  done <<< "$output"
-  return 0
+  while read -r manager_id claimed_asg; do
+    [[ -n $manager_id && $manager_id != "$handover_instance_id" && -z $${handover_claims[$manager_id]:-} ]] &&
+      handover_claims[$manager_id]=$claimed_asg
+  done <<< "$tagged"
+  return $handover_claimed
 }
 
 # Prints the unclaimed worker ASG with the most instances, given "<name> <instance count>" lines
@@ -85,7 +93,7 @@ handover_choose() {
     for claimed in "$${handover_claims[@]}"; do
       [[ $claimed == "$name" ]] && continue 2
     done
-    count=$(awk -v name="$name" '$1 == name { print $2 }' <<< "$1")
+    count=$(awk --assign name="$name" '$1 == name { print $2 }' <<< "$1")
     if [[ $${count:-0} -gt $best_count ]]; then
       best_count=$${count:-0}
       choice=$name
@@ -100,61 +108,62 @@ handover_complete_terminate_hook() {
   until error=$(aws autoscaling complete-lifecycle-action --region "$handover_region" --lifecycle-action-result CONTINUE \
     --auto-scaling-group-name "$handover_manager_asg" --lifecycle-hook-name "$handover_terminate_hook_name" \
     --instance-id "$handover_instance_id" 2>&1); do
-    echo "Cannot complete the terminate lifecycle hook, retrying: $${error:-complete-lifecycle-action failed}."
-    sleep 30
+    echo "Cannot complete the terminate lifecycle hook, retrying: $${error//$'\n'/ }."
+    sleep $handover_retry_seconds
   done
   exit 0
 }
 
-# Returns 0 once handover_worker_asg is claimed, 1 after a failed AWS call, 2 to try again later
 handover_try_claim() {
-  local counts choice seen error
-  handover_read_state && handover_read_claims || return 1
+  local counts choice claims seen error
+  handover_read_state && handover_read_claims || return $handover_failed
   [[ $handover_state == Terminating* ]] && handover_complete_terminate_hook
 
   if ! counts=$(aws autoscaling describe-auto-scaling-groups --region "$handover_region" --output text \
     --auto-scaling-group-names "$${handover_worker_asgs[@]}" --query 'AutoScalingGroups[].[AutoScalingGroupName, length(Instances)]' 2>&1); then
     handover_cause="autoscaling describe-auto-scaling-groups: $counts"
-    return 1
+    return $handover_failed
   fi
   choice=$(handover_choose "$counts")
   if [[ -z $choice ]]; then
-    echo "Waiting for a free worker ASG: $(for id in "$${!handover_claims[@]}"; do printf '%s=%s ' "$id" "$${handover_claims[$id]}"; done)."
-    return 2
+    claims=$(for manager_id in "$${!handover_claims[@]}"; do echo "$manager_id=$${handover_claims[$manager_id]}"; done | paste --serial --delimiters=' ')
+    echo "Waiting for a free worker ASG: $claims."
+    return $handover_retry
   fi
 
   seen="$handover_state $(declare -p handover_claims)"
-  handover_read_state && handover_read_claims || return 1
+  handover_read_state && handover_read_claims || return $handover_failed
   if [[ "$handover_state $(declare -p handover_claims)" != "$seen" ]]; then
     echo "The managers changed while claiming $choice, starting over."
-    return 2
+    return $handover_retry
   fi
   if ! error=$(aws ec2 create-tags --region "$handover_region" --resources "$handover_instance_id" \
     --tags "Key=$handover_claim_tag,Value=$choice" 2>&1); then
     handover_cause="ec2 create-tags: $error"
-    return 1
+    return $handover_failed
   fi
   handover_worker_asg=$choice
+  return $handover_claimed
 }
 
 handover_deadline=$((SECONDS + handover_max_wait_seconds))
 while :; do
-  handover_status=0
+  handover_status=$handover_claimed
   handover_try_claim || handover_status=$?
-  [[ $handover_status -eq 0 ]] && break
+  [[ $handover_status -eq $handover_claimed ]] && break
 
-  if [[ $handover_status -eq 1 ]]; then
-    echo "Cannot claim a worker ASG, retrying: $handover_cause"
+  if [[ $handover_status -eq $handover_failed ]]; then
+    echo "Cannot claim a worker ASG, retrying: $${handover_cause//$'\n'/ }."
   else
     handover_deadline=$((SECONDS + handover_max_wait_seconds))
   fi
   if [[ $SECONDS -ge $handover_deadline ]]; then
     handover_worker_asg=$${handover_worker_asgs[0]}
-    echo "Starting gitlab-runner after $${handover_max_wait_seconds}s of failed AWS calls, last $handover_cause."
+    echo "Starting gitlab-runner after $${handover_max_wait_seconds}s of failed AWS calls, last $${handover_cause//$'\n'/ }."
     break
   fi
-  sleep 30
+  sleep $handover_retry_seconds
 done
 
 echo "Using worker ASG $handover_worker_asg."
-sed -i.bak "s/__WORKER_ASG_NAME__/$handover_worker_asg/g" /etc/gitlab-runner/config.toml
+sed --in-place=.bak "s/__WORKER_ASG_NAME__/$handover_worker_asg/g" /etc/gitlab-runner/config.toml

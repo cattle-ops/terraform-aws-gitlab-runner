@@ -266,9 +266,6 @@ This process is allocated a maximum of five minutes.
 initiating a graceful shutdown.
 - The maximum allowed time for the shutdown process is defined by the `runner_terminate_ec2_lifecycle_timeout_duration` variable.
 
-With the docker-autoscaler executor, the new manager removes the old manager's workers unless `enable_manager_handover`
-is set, see [Replacing the Runner manager (docker-autoscaler)](#replacing-the-runner-manager-docker-autoscaler).
-
 The diagram below illustrates this process.
 
 ```mermaid
@@ -291,6 +288,9 @@ The Auto Scaling Group is configured with a [lifecycle hook](https://docs.aws.am
 that executes a provided Lambda function when the runner is terminated to terminate additional instances that were
 provisioned by the Docker Machine executor. a `builds/` directory relative to the root module persists that
 contains the packaged Lambda function.
+
+With the docker-autoscaler executor, the new manager removes the old manager's workers unless `enable_manager_handover`
+is set, see [Replacing the Runner manager (docker-autoscaler)](#replacing-the-runner-manager-docker-autoscaler).
 
 ### Instrumenting the Graceful termination Lambda
 
@@ -325,12 +325,12 @@ worker ASG named `<prefix>-asg-1`, and every Runner manager claims one of the tw
   other manager claims. A manager without the tag, such as one created before the option was enabled, claims the first
   worker ASG.
 - The old manager finishes its jobs in its own worker ASG and deletes its workers on shutdown, as
-  `delete_instances_on_shutdown` is enabled as well. This needs the fleeting plugin to stay alive during the graceful
-  shutdown, see [#1403](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/1403).
+  `delete_instances_on_shutdown` is enabled as well. The module keeps the fleeting plugin alive during the graceful shutdown
+  for this, see [keep the fleeting plugin alive on shutdown](https://github.com/cattle-ops/terraform-aws-gitlab-runner/pull/1403).
 - If both worker ASGs are claimed, e.g. a second instance refresh during a drain, the new manager waits and logs
   `Waiting for a free worker ASG`.
 
-The new manager takes jobs while the old one still finishes its own. During that time both worker ASGs can hold up to
+The new manager takes jobs while the old one still finishes its own. During that time each worker ASG can hold up to
 `runner_worker.max_jobs` instances.
 
 For a manual instance refresh, launch the new manager before terminating the old one:
@@ -342,10 +342,10 @@ aws autoscaling start-instance-refresh --auto-scaling-group-name <manager-asg> \
 
 These log lines are stable and suitable for alerting:
 
-- `Starting gitlab-runner after <n>s of failed AWS calls, last <call>: <error>.`: the manager could not read the
-  claims for longer than the terminate hook timeout plus 10 minutes and uses the first worker ASG.
-- `Cannot complete the terminate lifecycle hook, retrying: <error>.`: a manager terminated while it waited for a free
-  worker ASG cannot complete its terminate hook.
+- `Starting gitlab-runner after <n>s of failed AWS calls, last <call>: <error>.`: the manager's AWS calls to claim a
+  worker ASG kept failing for longer than the terminate hook timeout plus 10 minutes, so it uses the first worker ASG.
+- `Cannot complete the terminate lifecycle hook, retrying: <error>.`: a manager that is terminated before it starts
+  gitlab-runner cannot complete its terminate hook.
 
 #### Enabling the option
 
