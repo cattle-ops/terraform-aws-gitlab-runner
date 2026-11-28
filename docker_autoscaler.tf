@@ -186,9 +186,12 @@ resource "aws_autoscaling_group" "autoscaler" {
   }
 
   lifecycle {
-    # do not change desired_capacity as this is controlled at runtime by the runner autoscaler
+    # do not change desired_capacity as this is controlled at runtime by the runner autoscaler.
+    # desired_capacity_type: AWS stores it after a console edit, and the provider cannot clear it
+    # (hashicorp/terraform-provider-aws#37523).
     ignore_changes = [
-      desired_capacity
+      desired_capacity,
+      desired_capacity_type,
     ]
   }
 }
